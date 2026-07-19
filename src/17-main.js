@@ -1,4 +1,4 @@
-// crabby-volley · boucle à pas fixe 60 Hz & amorçage
+// sommet-volley · boucle à pas fixe 60 Hz & amorçage
 "use strict";
 
 // réglages son/musique/volume sauvegardés d'une session à l'autre — à faire
@@ -24,9 +24,8 @@ function loop(now) {
   pollPads();      // l'API Gamepad se sonde à chaque frame
   handlePadMenu(); // navigation des menus à la manette
   musicTick();     // planifie la musique de fond
-  // ralenti dramatique sur les smashs destructeurs — HORS-LIGNE uniquement
-  // (en ligne, le rythme doit rester identique des deux côtés)
-  const tScale = (!online && state === "play" && ball.smash > 0) ? 0.45 : 1;
+  // ralenti dramatique : UNIQUEMENT Smash Battle au filet (hors-ligne)
+  const tScale = (!online && state === "play" && ball.slowMo > 0) ? 0.45 : 1;
   timeScale += (tScale - timeScale) * 0.25;
   advance(now);
   render();

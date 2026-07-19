@@ -1,4 +1,4 @@
-// crabby-volley · rendu — punch caméra, boucle de rendu
+// sommet-volley · rendu — punch caméra, boucle de rendu
 "use strict";
 
 // ---------- Smash Battle : affichage ----------
@@ -125,10 +125,10 @@ function render() {
     shake *= 0.88;
     if (shake < 0.4) shake = 0;
   }
-  // punch de caméra : léger zoom vers l'action sur les temps forts
+  // punch de caméra : uniquement Smash Battle (slowMo) ou point marqué
   let tz = 1;
-  if (state === "play" && ball.smash > 0) tz = 1.16;   // smash destructeur en vol
-  else if (state === "point") tz = 1.10;               // sur le point marqué
+  if (state === "play" && ball.slowMo > 0) tz = 1.16;
+  else if (state === "point") tz = 1.10;
   camZoom += (tz - camZoom) * 0.12;
   if (camZoom > 1.002) {
     const fx = Math.max(W * 0.30, Math.min(W * 0.70, ball.x));
@@ -141,6 +141,15 @@ function render() {
   }
   drawBackground();
   drawNet();
+  const drawBallLayer = () => {
+    if (online && netRole === "guest" && (guestBallSmoothX || guestBallSmoothY)) {
+      ball.x += guestBallSmoothX; ball.y += guestBallSmoothY;
+      drawBall();
+      ball.x -= guestBallSmoothX; ball.y -= guestBallSmoothY;
+    } else {
+      drawBall();
+    }
+  };
   // dessin des joueurs (1 à 4). Le personnage prédit de l'invité est dessiné
   // avec le décalage de lissage, qui se résorbe après chaque réconciliation.
   const mine = (online && netRole === "guest") ? activeBlobs[mySlot] : null;
@@ -153,19 +162,10 @@ function render() {
       b.draw();
     }
   }
-  // Invité : lissage balle au handoff filet (soft ownership ↔ snaps)
-  if (online && netRole === "guest" && (guestBallSmoothX || guestBallSmoothY)) {
-    ball.x += guestBallSmoothX; ball.y += guestBallSmoothY;
-    drawBall();
-    ball.x -= guestBallSmoothX; ball.y -= guestBallSmoothY;
-  } else {
-    drawBall();
-  }
+  // Service inclus : balle au premier plan (sur les bras receive)
+  drawBallLayer();
   if (battle.active) drawBattleFx();
   drawParticles();
-  // banderole de la crabette : vraiment au premier plan (devant joueurs et
-  // filet), pas juste dans la même passe que le décor (voir drawCrab/10-scenery.js)
-  if (TERRAINS[terrain].key === "plage") drawCrabBanner();
   ctx.restore();
   drawBallMarker();
   drawHUD();
@@ -206,4 +206,5 @@ function render() {
     }
   }
 }
+
 

@@ -1,8 +1,9 @@
-# 🏐 Crabby Volley — Volley des Animaux - Jeu du volley avec des animaux
+# Sommet Volley
 
-Un jeu de volley 2D où des animaux rigolos s'affrontent sur la plage, la banquise
-ou sous les étoiles. Techniques signature, météo dynamique, public en délire… et
-un **mode multijoueur en ligne** (1v1 et 2v2) en pair-à-pair.
+Volley 2D satirique : Tsar Vladou, Ronald Trompette et Manu Micron s’affrontent
+sur Place Grand-Rouge, Resort Doré ou Palais de l’Hexagone. Techniques signature,
+météo dynamique, public en délire… et un **mode multijoueur en ligne** (1v1 et
+2v2) en pair-à-pair.
 
 Le jeu tient dans une page HTML + Canvas, **sans build ni dépendance à installer** :
 la seule librairie externe est [PeerJS](https://peerjs.com/) (chargée via CDN)
@@ -38,7 +39,7 @@ propres sous-choix plutôt qu'un mur d'options :
 | **1 — Solo** | choix de la difficulté (Facile/Normale/Difficile/Impitoyable), puis du format : Classique, En équipes (toi + IA vs 2 IA), ou Bombe (qui demande ensuite 1v1 ou en équipes) |
 | **2 — Multijoueur local** | même écran/clavier (ou 2 manettes) : Classique ou Bombe (1v1 uniquement, pas d'équipes en local) |
 | **3 — Multijoueur en ligne** | *Créer une partie* → même écran de format que le solo (Classique/En équipes/Bombe), puis partage le code ; ou *Rejoindre avec un code* |
-| **R — Règles** | rappel des commandes, techniques SUPER et fiche de chaque animal |
+| **R — Règles** | rappel des commandes, techniques SUPER et fiche de chaque personnage |
 
 > **Mode Bombe** — La balle devient une bombe à mèche (durée réglable, 3
 > intensités). Elle explose au bout du délai choisi *ou* dès qu'elle touche
@@ -49,105 +50,35 @@ propres sous-choix plutôt qu'un mur d'options :
 
 ### Commandes & navigation
 
-- **Rouge** : `Q`/`D` (ou flèches) pour bouger, `Z`/`Espace`/`↑` pour sauter, `S` pour la technique SUPER.
-- **Vert** : `←`/`→`, `↑`, `↓` (SUPER).
-- Manettes prises en charge (Gamepad API) : stick/croix pour naviguer les menus, A valider, B retour.
-- **Souris** : tous les menus sont aussi cliquables (survol + clic), en plus du clavier/manette.
-- **Tactile (mobile)** : pavé directionnel + boutons saut/SUPER superposés au
-  jeu sur un appareil tactile, pendant une manche jouable en solo ou en ligne
-  1v1 (le 2v2 tactile n'est pas pris en charge — trop de joueurs pour un seul
-  écran de téléphone).
-- `P` : pause · `M` : son · `N` : musique. Un curseur de volume (5 crans,
-  cliquable) est visible sur l'écran d'accueil ; ces réglages (son coupé,
-  musique, volume) sont **mémorisés d'une session à l'autre** (`localStorage`).
+Voir l’écran **Règles** en jeu (touche R). En résumé : Q/D ou flèches pour
+bouger, Z/Espace ou ↑ pour sauter, S/F ou ↓ pour smash/cloche, E / Shift pour
+SUPER. **P** pause · **M** son · **N** musique.
 
-> ⌨️ **Clavier AZERTY** : les raccourcis sont pensés nativement pour un clavier
-> français (`Q`/`D` pour bouger, `Z` pour sauter — pas `A`/`W` comme en QWERTY).
-> Attention si tu ajoutes un raccourci basé sur une lettre : `event.code` reflète
-> la **position physique** de la touche (norme QWERTY), pas la lettre imprimée
-> sur un clavier AZERTY — certaines touches se déplacent (ex. `M` est à la
-> position `Semicolon` en AZERTY, et `KeyM` y correspond à la virgule). Toujours
-> vérifier les deux avant de considérer un raccourci lettre comme fiable.
+## Développement
 
-## 🗂️ Structure du code
+```bash
+npm test           # filet de sécurité (simulation déterministe)
+```
 
-Le jeu était historiquement un seul gros fichier. Il est désormais découpé en
-**modules thématiques** chargés dans l'ordre par `index.html`. Ce sont des scripts
-classiques qui **partagent le même scope global** : le découpage est purement
-organisationnel, le comportement est strictement identique à l'ancien fichier
-unique (vérifié par diff et par la suite de tests).
-
-L'ordre de chargement **est** l'ordre des dépendances :
+Structure principale :
 
 | Fichier | Rôle |
 |---------|------|
-| `src/01-core.js` | Constantes, canvas Hi-DPI, RNG déterministe |
-| `src/02-audio.js` | Sons, cris des animaux, musique chiptune, volume/réglages persistés (`localStorage`) |
-| `src/03-input.js` | Clavier, manettes (Gamepad API), souris (clic menus) & tactile (mobile) |
-| `src/04-state.js` | État, terrains, animaux, classe `Blob`, combos/supers |
-| `src/05-animals.js` | Dessin des animaux & expressions faciales |
-| `src/06-physics.js` | Balle & physique (collisions, filet, murs) |
-| `src/07-scoring.js` | Points & score |
-| `src/08-ai.js` | Intelligence artificielle (3 niveaux, 1v1 & 2v2) |
-| `src/09-particles.js` | Particules (plumes, sable, confettis…) |
-| `src/10-scenery.js` | Décor commun (public, ombres, filet) |
-| `src/11-terrains.js` | Fonds & ambiances (plage, banquise, nuit) |
-| `src/12-menus.js` | Écrans de menu et de sélection |
-| `src/13-simulation.js` | Boucle de simulation à pas fixe (`stepGame`) |
-| `src/14-snapshots.js` | Sérialisation d'état (snapshots réseau) |
-| `src/15-net.js` | Multijoueur en ligne (WebRTC/PeerJS), 1v1 & 2v2 |
-| `src/16-render.js` | Rendu (caméra, HUD, composition) |
-| `src/17-main.js` | Boucle 60 Hz & amorçage |
+| `index.html` | Page d’accueil, charge les scripts `src/` |
+| `src/01-core.js` | Constantes, canvas, RNG seedé |
+| `src/01b-assets.js` | Sprites PNG (balle, maps) |
+| `src/01c-chars.js` | Pipeline sprites personnages |
+| `src/02-audio.js` | Sons, musique chiptune, volume |
+| `src/04-state.js` | Terrains, casting, Blob, supers |
+| `src/05-animals.js` | Rendu personnages (sprites + fallback canvas) |
+| `src/06-physics.js` | Balle & collisions |
+| `src/08-ai.js` | IA |
+| `src/11-terrains.js` | Décors des maps |
+| `src/12-menus.js` | Menus & sélection |
+| `src/13-simulation.js` | Boucle de jeu déterministe |
+| `src/15-net.js` | Multijoueur PeerJS |
+| `docs/` | Vision, gameplay V2, pipeline perso |
 
-La simulation est **déterministe** (pas fixe 60 Hz + RNG seedé), ce qui est la
-condition du mode en ligne : voir [`docs/MULTIJOUEUR.md`](docs/MULTIJOUEUR.md)
-pour l'architecture réseau (hôte autoritaire, prédiction/réconciliation).
+## Licence
 
-## ✅ Tests
-
-Une petite suite sans dépendance sert de **filet de sécurité**. Elle charge les
-modules `src/` exactement comme le navigateur (concaténation dans l'ordre) puis
-vérifie déterminisme, physique, score, round-trip de snapshot, simulation 2v2,
-mode Bombe (explosion en fin de mèche et à la chute) et l'ownership de balle
-(prédiction/réconciliation invité en 1v1).
-
-```bash
-npm test
-```
-
-## 📦 Déploiement
-
-Le jeu est un site statique : n'importe quel serveur web suffit. Copier
-`index.html` + le dossier `src/` (et servir en HTTPS pour le multijoueur en ligne).
-
-### Déploiement continu (push sur `main` → prod)
-
-Le workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
-lance les tests puis, s'ils passent, synchronise `index.html` + `src/` vers la
-racine web du serveur en SSH (`rsync` via `sudo`). Il se déclenche à chaque push
-sur `main` (ou manuellement via *Run workflow*). Au passage, il remplace le
-suffixe `?v=DEV` des balises `<script>` par le SHA du commit — anti-cache pour
-que chaque déploiement serve du frais, même à un navigateur qui aurait mis les
-scripts en cache.
-
-Il faut renseigner 4 *secrets* du dépôt (**Settings → Secrets and variables →
-Actions → New repository secret**) :
-
-| Secret | Valeur |
-|--------|--------|
-| `DEPLOY_HOST` | l'adresse du serveur (IP ou nom d'hôte) |
-| `DEPLOY_USER` | l'utilisateur SSH (ex. `ubuntu`) |
-| `DEPLOY_WEB_ROOT` | la racine web (ex. `/var/www/blobby-volley`) |
-| `DEPLOY_SSH_KEY` | la **clé privée** de déploiement, **encodée en base64** (voir ci-dessous) |
-
-> La clé privée est encodée en base64 pour éviter que les retours à la ligne
-> soient altérés au copier-coller. Sur macOS :
-> `base64 -i ~/.ssh/crabby_deploy | pbcopy` puis colle dans le secret.
-
-La clé publique correspondante doit être ajoutée à `~/.ssh/authorized_keys` de
-l'utilisateur SSH sur le serveur, et cet utilisateur doit pouvoir écrire dans la
-racine web (ici via `sudo` sans mot de passe).
-
-## 📄 Licence
-
-[MIT](LICENSE) © Benjamin Mille
+MIT — voir `LICENSE`.

@@ -1,32 +1,312 @@
-// crabby-volley · balle & physique (collisions, filet, murs)
+// sommet-volley · balle & physique (collisions, filet, murs)
 "use strict";
 
 // ---------- Balle ----------
 const ball = {
   x: W * 0.25, y: 200, vx: 0, vy: 0, spin: 0, angle: 0,
   frozen: true,
+  inHands: true,       // service V2 : balle dans les mains du serveur
+  tossGrace: 0,        // ignore collision serveur juste après le lancer
+  serveAimLock: true,  // 1ʳᵉ frappe du service : toujours vers l'adversaire
+  serveFlight: false,  // après la frappe de service : filet = faute (pas de rebond sauveur)
   popped: false,       // balle crevée (plantée sur un bec)
-  smash: 0,            // ticks restants de l'effet "smash destructeur"
+  smash: 0,            // ticks restants de l'effet "smash destructeur" (visuel)
+  slowMo: 0,           // ralenti caméra — uniquement Smash Battle au filet
   lastTouchSide: -1,
   lastTouchTick: -999, // tick du dernier contact (anti double-comptage)
   touches: [0, 0], // touches consécutives par équipe
   trail: [],
+  // Gameplay V2
+  heldBy: -1,
+  holdT: 0,
+  chargeT: 0,
+  aimAngle: 0,
+  shotArmed: false,
   reset(side) {
     this.x = side === 0 ? W * 0.25 : W * 0.75;
     this.y = GROUND_Y - 150;
     this.vx = 0; this.vy = 0;
     this.angle = 0; this.spin = 0;
     this.frozen = true;
+    this.inHands = true;
+    this.tossGrace = 0;
+    this.serveAimLock = true;
+    this.serveFlight = false;
     this.popped = false;
     this.smash = 0;
+    this.slowMo = 0;
     this.lastTouchSide = -1;
     this.lastTouchTick = -999;
     this.touches = [0, 0];
     this.trail = [];
+    this.heldBy = -1;
+    this.holdT = 0;
+    this.chargeT = 0;
+    this.shotArmed = false;
+    this.aimAngle = side === 0 ? -0.45 : Math.PI + 0.45;
   }
 };
 
+// ---------- Gameplay V2 : helpers ----------
+function clearBallHold() {
+  ball.heldBy = -1;
+  ball.holdT = 0;
+  ball.chargeT = 0;
+  ball.shotArmed = false;
+}
+
+function registerTouch(blob) {
+  const newContact = ball.lastTouchSide !== blob.side ||
+                     tick - ball.lastTouchTick > TOUCH_COOLDOWN;
+  if (newContact) {
+    if (ball.lastTouchSide !== blob.side) ball.touches[blob.side] = 1;
+    else ball.touches[blob.side]++;
+  }
+  ball.lastTouchSide = blob.side;
+  ball.lastTouchTick = tick;
+  if (ball.touches[blob.side] > MAX_TOUCHES) {
+    awardPoint(1 - blob.side, `Plus de ${MAX_TOUCHES} touches !`);
+  }
+}
+
+function clampAimToCone(blob, ang, center) {
+  const half = AIM_CONE / 2;
+  const norm = a => {
+    while (a < -Math.PI) a += Math.PI * 2;
+    while (a > Math.PI) a -= Math.PI * 2;
+    return a;
+  };
+  const delta = Math.max(-half, Math.min(half, norm(ang - center)));
+  return center + delta;
+}
+
+function stickAimRaw(blob, input, center) {
+  let dx = 0, dy = 0;
+  if (input) {
+    dx = Number(input.ax);
+    dy = Number(input.ay);
+    if (!Number.isFinite(dx)) dx = 0;
+    if (!Number.isFinite(dy)) dy = 0;
+    // Stick prioritaire ; sinon croix / touches
+    if (Math.hypot(dx, dy) < 0.18) {
+      dx = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+      dy = (input.down ? 1 : 0) - (input.up ? 1 : 0);
+    }
+  }
+  if (Math.hypot(dx, dy) < 0.12) return center;
+  return Math.atan2(dy, dx);
+}
+
+function aimAngleFromInput(blob, input) {
+  // Smash / tir tendu : cône vers l'adversaire, stick = direction.
+  const center = blob.side === 0 ? -0.45 : Math.PI + 0.45;
+  return clampAimToCone(blob, stickAimRaw(blob, input, center), center);
+}
+
+function isServeHit(blob) {
+  return !!(GAMEPLAY_V2 && ball.serveAimLock && blob.side === servingSide);
+}
+
+function aimLobAngleFromInput(blob, input) {
+  // Service : cloche forcée vers l'adversaire (pas de multi-touche dans son camp).
+  // Échange : l'angle du stick est respecté dans le cône.
+  const center = blob.side === 0 ? -0.78 : Math.PI + 0.78;
+  if (isServeHit(blob)) return center;
+  return clampAimToCone(blob, stickAimRaw(blob, input, center), center);
+}
+
+/** Service : force la portée ; échange : conserve l'angle du stick. */
+function ensureLobClearsNet(blob) {
+  const dir = blob.side === 0 ? 1 : -1;
+  if (isServeHit(blob)) {
+    if (ball.vx * dir < 6.2) ball.vx = dir * 6.2;
+    if (ball.vy > -7.2) ball.vy = -7.2;
+    clampBallSpeed();
+    return;
+  }
+  let ang = Math.atan2(ball.vy, ball.vx);
+  if (Math.cos(ang) * dir < 0) {
+    ang = Math.atan2(-1, dir * 0.08);
+  }
+  let spd = Math.hypot(ball.vx, ball.vy);
+  if (spd < HOLD_LOB_SPD * 0.9) spd = HOLD_LOB_SPD;
+  ball.vx = Math.cos(ang) * spd;
+  ball.vy = Math.sin(ang) * spd;
+  ball.aimAngle = ang;
+  clampBallSpeed();
+}
+
+function applyDirectedHit(blob, ang, speed, smashTicks) {
+  ball.aimAngle = ang;
+  ball.vx = Math.cos(ang) * speed;
+  ball.vy = Math.sin(ang) * speed;
+  ball.spin = ball.vx * 0.02;
+  ball.frozen = false;
+  ball.smash = smashTicks || 0;
+  clearBallHold();
+  const h = blob.headCircle;
+  ball.x = h.x + Math.cos(ang) * (BALL_R + h.r + 2);
+  ball.y = h.y + Math.sin(ang) * (BALL_R + h.r + 2);
+  clampBallSpeed();
+  registerTouch(blob);
+  if (blob.side === servingSide && ball.serveAimLock) {
+    ball.serveAimLock = false;
+    ball.serveFlight = true; // jusqu'à passer le filet sans le toucher
+  }
+}
+
+// Simulation d'arc pour préviz (rendu local) et tests.
+// Retourne des points {x,y} jusqu'au sol / maxSteps.
+function simulateArc(x0, y0, vx0, vy0, maxSteps) {
+  maxSteps = maxSteps || 90;
+  const pts = [{ x: x0, y: y0 }];
+  let x = x0, y = y0, vx = vx0, vy = vy0;
+  const lift = (typeof ballLift === "function") ? ballLift() : 1;
+  for (let i = 0; i < maxSteps; i++) {
+    const ox = x, oy = y;
+    vy += GRAV_BALL * lift;
+    x += vx; y += vy;
+    const r = resolveNetBall(ox, oy, x, y, vx, vy);
+    x = r.x; y = r.y; vx = r.vx; vy = r.vy;
+    if (x - BALL_R < 0) { x = BALL_R; vx = Math.abs(vx) * 0.9; }
+    if (x + BALL_R > W) { x = W - BALL_R; vx = -Math.abs(vx) * 0.9; }
+    pts.push({ x, y });
+    if (y + BALL_R >= GROUND_Y) break;
+  }
+  return pts;
+}
+
+function ballDistToBlob(blob) {
+  const h = blob.headCircle;
+  return Math.hypot(ball.x - h.x, ball.y - h.y);
+}
+
+/** Distance mini balle↔tête sur le segment du tick (anti-tunneling). */
+function ballPathDistToBlob(blob) {
+  const h = blob.headCircle;
+  const x0 = ball.x - ball.vx, y0 = ball.y - ball.vy;
+  const x1 = ball.x, y1 = ball.y;
+  const d0 = Math.hypot(x0 - h.x, y0 - h.y);
+  const d1 = Math.hypot(x1 - h.x, y1 - h.y);
+  const sx = x1 - x0, sy = y1 - y0;
+  const len2 = sx * sx + sy * sy;
+  if (len2 < 1e-6) return d1;
+  let t = ((h.x - x0) * sx + (h.y - y0) * sy) / len2;
+  t = Math.max(0, Math.min(1, t));
+  return Math.hypot(x0 + sx * t - h.x, y0 + sy * t - h.y);
+}
+
+/** Balle qui retombe vraiment SUR le joueur au sol (jamais en l'air → laisse le smash). */
+function ballLandsOnPlayer(blob) {
+  if (!blob.onGround) return false; // en saut : pas d'auto, il faut X
+  if (ball.vy < 0.6) return false; // doit descendre
+  if (Math.abs(ball.x - blob.x) > AUTO_LOB_DX) return false;
+  const headY = blob.y - 64;
+  // Sur la tête / épaules — pas loin au-dessus ni sous le ventre
+  if (ball.y < headY - 28 || ball.y > blob.y - 26) return false;
+  return ballPathDistToBlob(blob) <= AUTO_LOB_R;
+}
+
+function serverBlob() {
+  for (const b of activeBlobs) if (b.side === servingSide) return b;
+  return servingSide === 0 ? blobL : blobR;
+}
+
+function serveHandsPos(blob) {
+  // Devant le perso (bras tendus de la pose receive), un peu écarté du corps
+  const face = blob.side === 0 ? 1 : -1;
+  return { x: blob.x + face * 28, y: blob.y - 48 };
+}
+
+function attachBallToServerHands() {
+  const s = serverBlob();
+  if (!s) return;
+  const p = serveHandsPos(s);
+  ball.x = p.x; ball.y = p.y;
+  ball.vx = 0; ball.vy = 0;
+}
+
+function tossServeBall(blob) {
+  // Lancer vertical depuis les mains — vraiment vers le haut, puis frappe libre.
+  const p = serveHandsPos(blob);
+  ball.x = p.x;
+  ball.y = p.y - 8;
+  ball.vx = 0;
+  ball.vy = -SERVE_TOSS_SPD;
+  ball.spin = 0;
+  ball.frozen = false;
+  ball.inHands = false;
+  ball.tossGrace = SERVE_TOSS_GRACE;
+  ball.smash = 0;
+  clearBallHold();
+  // Le lancer ne compte PAS comme une touche
+  beep(520, 0.08, "sine", 0.1, 0, 780);
+  return true;
+}
+
+function tryTossServe(blob) {
+  // Lancer au service : uniquement smash (X) — le saut ne doit pas envoyer la balle
+  if (!GAMEPLAY_V2 || !ball.inHands || !ball.frozen || ball.popped) return false;
+  if (blob.side !== servingSide) return false;
+  if (!blob._smashEdge) return false;
+  return tossServeBall(blob);
+}
+
+function canActiveHit(blob) {
+  return tick - (blob.lastActiveHitTick || -999) >= ACTIVE_HIT_COOLDOWN;
+}
+
+function markActiveHit(blob) {
+  blob.lastActiveHitTick = tick;
+}
+
+function wantSmash(blob) {
+  return !!(blob._smashEdge || (blob._input && blob._input.smash));
+}
+
+/** Contact simple = cloche automatique vers l'adversaire. */
+function tryLobBall(blob) {
+  if (ball.inHands && ball.frozen) return false;
+  if (ball.tossGrace > 0 && blob.side === servingSide) return false;
+  if (ballPathDistToBlob(blob) > RECEIVE_R) return false;
+  if (!canActiveHit(blob)) return false;
+  const a = animOf(blob);
+  const ang = aimLobAngleFromInput(blob, blob._input);
+  const spd = HOLD_LOB_SPD * (0.95 + a.control * 0.12);
+  applyDirectedHit(blob, ang, spd, 0);
+  ensureLobClearsNet(blob);
+  markActiveHit(blob);
+  return true;
+}
+
+function trySmashBall(blob) {
+  // Pas de smash tant que la balle est dans les mains (il faut d'abord lancer)
+  if (ball.inHands && ball.frozen) return false;
+  if (ball.tossGrace > 0 && blob.side === servingSide) return false;
+  if (blob.onGround) return false;
+  // 49.3 (Micron) : ses frappes ne peuvent pas être smashées en retour
+  if (ball.lastTouchSide !== blob.side && ball.lastTouchSide >= 0) {
+    for (const o of activeBlobs) {
+      if (o.side === ball.lastTouchSide && o.superKind === "micron" && o.superT > 0) return false;
+    }
+  }
+  // Balle au-dessus de la taille (plus tolérant que « au-dessus des épaules »)
+  if (ball.y > blob.y - 36) return false;
+  if (ballPathDistToBlob(blob) > RECEIVE_R) return false;
+  if (!canActiveHit(blob)) return false;
+  const ang = aimAngleFromInput(blob, blob._input);
+  const pow = blob.kitPower != null ? blob.kitPower : animOf(blob).power;
+  const spd = HIT_SPEED * pow * SMASH_MUL;
+  applyDirectedHit(blob, ang, spd, 0); // smashTicks=0 → pas de slowMo / zoom
+  markActiveHit(blob);
+  shake = Math.max(shake, 4);
+  if (typeof setCharPose === "function") setCharPose(blob, "smash", 28);
+  return true;
+}
+
 // ---------- Filet (partagé simu + vue invité) ----------
+// Même collision sur tous les terrains (NET_W). Pour passer, tout le ballon
+// doit être au-dessus du sommet (clearY = NET_TOP - BALL_R).
 // Résout prev→curr contre le filet. Pure (pas de sons). Utilisée par updateBall
 // ET par la prédiction visuelle de l'invité (sinon dead-reckoning traverse le
 // poteau puis le snap ramène = « balle coincée à chaque échange » en ligne).
@@ -34,6 +314,7 @@ function resolveNetBall(prevX, prevY, x, y, vx, vy) {
   const nl = NET_X - NET_W / 2, nr = NET_X + NET_W / 2;
   const leftC = nl - BALL_R, rightC = nr + BALL_R;
   const TOP_SLACK = 5;
+  const clearY = NET_TOP - BALL_R;
   let hit = false;
   const yAlong = (atX) => {
     if (Math.abs(x - prevX) < 1e-6) return y;
@@ -41,7 +322,7 @@ function resolveNetBall(prevX, prevY, x, y, vx, vy) {
   };
   let clearsOver = false;
   if ((prevX - NET_X) * (x - NET_X) < 0 && Math.abs(vx) > 1e-6) {
-    clearsOver = yAlong(NET_X) <= NET_TOP;
+    clearsOver = yAlong(NET_X) <= clearY;
   }
   if (clearsOver) return { x, y, vx, vy, hit: false };
 
@@ -52,12 +333,11 @@ function resolveNetBall(prevX, prevY, x, y, vx, vy) {
       : (vx < 0 && prevX >= face && x < face);
     if (!crossing) return false;
     const yHit = yAlong(face);
-    // Au-dessus du sommet : la face latérale n'existe pas — on laisse
-    // passer (évite un faux « rebond de sommet » avant le vrai clearsOver).
-    if (yHit <= NET_TOP) return false;
+    // Entièrement au-dessus du sommet : pas de face latérale
+    if (yHit <= clearY) return false;
     // Frôle le bord supérieur du filet → petit rebond vers le haut.
-    if (yHit <= NET_TOP + TOP_SLACK) {
-      if (y > NET_TOP) y = NET_TOP;
+    if (yHit <= clearY + TOP_SLACK) {
+      if (y > clearY) y = clearY;
       if (vy > -1.5) vy = -Math.max(2.5, Math.abs(vy) * 0.5 + 1.2);
       hit = true;
       return true;
@@ -69,12 +349,12 @@ function resolveNetBall(prevX, prevY, x, y, vx, vy) {
   };
   if (!tryFace(+1)) tryFace(-1);
 
-  if (x > leftC && x < rightC && y > NET_TOP + TOP_SLACK) {
+  if (x > leftC && x < rightC && y > clearY + TOP_SLACK) {
     if (x < NET_X) { x = leftC; vx = -Math.max(2.5, Math.abs(vx) * 0.85); }
     else { x = rightC; vx = Math.max(2.5, Math.abs(vx) * 0.85); }
     hit = true;
-  } else if (x > leftC && x < rightC && y > NET_TOP && y <= NET_TOP + TOP_SLACK) {
-    y = NET_TOP;
+  } else if (x > leftC && x < rightC && y > clearY && y <= clearY + TOP_SLACK) {
+    y = clearY;
     if (vy > -1.5) vy = -2.5;
     hit = true;
   }
@@ -135,7 +415,7 @@ function collideCircle(c, blob, isHead) {
     ball.vy = Math.sin(ang) * mag;
   }
 
-  // langue collante de la grenouille : comme le bec, pas à tous les coups
+  // contact collant (legacy flag stick)
   // (10%, seedé) — volontairement rare pour rester lisible : un joueur qui
   // perd un point à cause d'un aléa doit pouvoir sentir que c'est l'exception,
   // pas la norme. Effet tiré au sort : grosse déviation OU balle amortie.
@@ -168,19 +448,46 @@ function beakTip(blob) {
   return { x: blob.x + dir * 30, y: blob.y - 62, r: 7 };
 }
 
+function applyHitExtras(blob, a) {
+  // technique offensive armée (superSmash)
+  let heavy = false;
+  if (blob.superSmash && blob.superT > 0) {
+    const dir = blob.side === 0 ? 1 : -1;
+    const pw = 1.0;
+    ball.vx = dir * SMASH_VX * pw;
+    ball.vy = 2.5;
+    ball.smash = 60; ball.spin = dir * 0.3;
+    clampBallSpeed();
+    blob.superSmash = false; blob.superT = 0; blob.superKind = "";
+    shake = 13;
+    spawnBoom(ball.x, ball.y);
+    heavy = true;
+  }
+  heavy = heavy || Math.hypot(ball.vx, ball.vy) > 11.5 ||
+    (blob.poseAnim === "smash" && blob.poseT > 0);
+  if (heavy) sfxBallSmash();
+  else sfxBallHit();
+  animalHitSound(a, heavy);
+  if (a.molt) {
+    if (blob.molt < MOLT_MAX) blob.molt++;
+    spawnFeathers(ball.x, ball.y - BALL_R, blob.color, 6);
+  }
+  if (a.tired && blob.fatigue < FATIGUE_MAX) blob.fatigue++;
+  if (a.angry && blob.anger < ANGER_MAX) blob.anger++;
+  if (a.crazy && blob.crazy < CRAZY_MAX) blob.crazy++;
+  if (Math.hypot(ball.vx, ball.vy) > 12) shake = Math.min(shake + 4, 9);
+}
+
 function ballBlobCollision(blob) {
+  if (ball.heldBy >= 0) return; // balle contrôlée : pas de collision passive
   const a = animOf(blob);
-  // --- crevaison au bec (oiseau + manchot) ---
-  // si la balle rapide touche la pointe du bec, elle éclate et reste plantée.
-  // la balle peut crever à tout moment, même sur son propre service :
-  // le "BALLON CREVÉ SUR MON SERVICE" fait rire, on le garde. :)
+  const idx = activeBlobs.indexOf(blob);
+
+  // --- crevaison (si trait beak) ---
   if (a.beak && !ball.frozen && !ball.popped) {
     const tip = beakTip(blob);
     const dd = Math.hypot(ball.x - tip.x, ball.y - tip.y);
     const fast = Math.hypot(ball.vx, ball.vy) > 8.5;
-    // rareté seedée : même sur contact franc, ~10% de chance de crever
-    // (même taux pour l'oiseau et le manchot — délibérément rare pour que la
-    // crevaison se lise comme un coup du sort, pas comme un risque courant)
     if (dd < BALL_R + tip.r && fast && rng() < 0.1) {
       ball.popped = true;
       ball.frozen = true;
@@ -189,68 +496,43 @@ function ballBlobCollision(blob) {
       shake = 9;
       beep(120, 0.3, "sawtooth", 0.2);
       pointMsg = "Balle crevée !";
-      // le point sera accordé à l'adversaire à la résolution (updateBall)
       return;
     }
   }
 
+  // Gameplay V2 :
+  // - Smash/X près de la balle → smash (air) sinon cloche
+  // - Sans appui → cloche auto SEULEMENT au sol si la balle tombe dessus
+  //   (jamais en l'air : laisse le temps de smash ; jamais au service)
+  // - Sinon la balle traverse (saut latéral, frôlement…)
+  if (GAMEPLAY_V2) {
+    if (ball.inHands && ball.frozen) {
+      if (tryTossServe(blob)) return;
+      return; // collée aux mains : saut OK, pas de frappe sans lancer
+    }
+    // Grace post-lancer : pas de cloche accidentelle sur le serveur
+    if (ball.tossGrace > 0 && blob.side === servingSide) return;
+    if (wantSmash(blob)) {
+      const near = ballPathDistToBlob(blob) <= RECEIVE_R;
+      if (near && trySmashBall(blob)) { applyHitExtras(blob, a); return; }
+      if (near && tryLobBall(blob)) applyHitExtras(blob, a);
+      return;
+    }
+    // Service : sauter dans le lancer ≠ frappe — il faut X
+    if (isServeHit(blob)) return;
+    if (ballLandsOnPlayer(blob) && tryLobBall(blob)) applyHitExtras(blob, a);
+    return;
+  }
+
+  // --- V1 : bounce géométrique passif ---
   const hit = collideCircle(blob.headCircle, blob, true) ||
               collideCircle(blob.bodyCircle, blob, false);
   if (hit) {
     ball.spin = ball.vx * 0.02;
     if (ball.frozen) ball.frozen = false;
-    ball.smash = 0; // une défense réussie éteint l'effet smash
-    // comptage des touches : un contact qui se prolonge sur plusieurs ticks
-    // (balle "portée" sur la tête en courant) ne compte qu'UNE touche —
-    // c'était le bug du compteur qui sautait de 0 à 3 d'un coup.
-    const newContact = ball.lastTouchSide !== blob.side ||
-                       tick - ball.lastTouchTick > TOUCH_COOLDOWN;
-    if (newContact) {
-      if (ball.lastTouchSide !== blob.side) {
-        ball.touches[blob.side] = 1;
-      } else {
-        ball.touches[blob.side]++;
-      }
-    }
-    ball.lastTouchSide = blob.side;
-    ball.lastTouchTick = tick;
-    // technique offensive : Piqué éclair (oiseau) / Canon des glaces (manchot)
-    if (blob.superSmash && blob.superT > 0) {
-      const dir = blob.side === 0 ? 1 : -1;
-      const pw = a.key === "manchot" ? 1.18 : a.key === "chibre" ? 1.28 : 1.0;
-      ball.vx = dir * SMASH_VX * pw;
-      // manchot : boulet plongeant · chibre : boulet rasant (quasi horizontal) · oiseau : piqué
-      ball.vy = a.key === "manchot" ? 5.5 : a.key === "chibre" ? -0.5 : 2.5;
-      ball.smash = 60; ball.spin = dir * 0.3;
-      clampBallSpeed();
-      blob.superSmash = false; blob.superT = 0; blob.superKind = "";
-      shake = 13;
-      spawnBoom(ball.x, ball.y);
-      beep(140, 0.3, "sawtooth", 0.22);
-    }
-    noiseBurst(0.05, 0.15, 1300);  // "pock" d'impact
-    animalHitSound(a);             // cri de l'animal
-    // l'oiseau se déplume progressivement au fil des touches (8 coups pour
-    // être totalement nu) ET se retrouve instantanément à nu s'il perd le
-    // point avant d'y arriver (voir awardPoint dans 07-scoring.js) — les deux
-    // logiques coexistent, remises à zéro au repos.
-    if (a.molt) {
-      if (blob.molt < MOLT_MAX) blob.molt++;
-      spawnFeathers(ball.x, ball.y - BALL_R, blob.color, 6);
-    }
-    // le lapin se fatigue au fil des touches (purement visuel : oreilles qui
-    // tombent, gouttes de sueur) — remis à zéro au repos, comme le plumage.
-    if (a.tired && blob.fatigue < FATIGUE_MAX) blob.fatigue++;
-    // le manchot devient de plus en plus furieux au fil des touches — même
-    // logique (progressif + instantané au max en cas de point perdu).
-    if (a.angry && blob.anger < ANGER_MAX) blob.anger++;
-    // la grenouille sombre progressivement dans la folie au fil des touches —
-    // même logique (progressif + instantané au max en cas de point perdu).
-    if (a.crazy && blob.crazy < CRAZY_MAX) blob.crazy++;
-    if (Math.hypot(ball.vx, ball.vy) > 12) shake = Math.min(shake + 4, 9);
-    if (ball.touches[blob.side] > MAX_TOUCHES) {
-      awardPoint(1 - blob.side, `Plus de ${MAX_TOUCHES} touches !`);
-    }
+    ball.smash = 0;
+    registerTouch(blob);
+    applyHitExtras(blob, a);
   }
 }
 
@@ -260,14 +542,13 @@ function updateBall() {
   // balle crevée : elle reste plantée sur le bec de celui qui l'a crevée,
   // puis le point est accordé à l'adversaire après un court instant.
   if (ball.popped) {
+    clearBallHold();
     const holder = activeBlobs.find(b => b.hasBall) || null;
     if (holder) {
       const tip = beakTip(holder);
       ball.x = tip.x; ball.y = tip.y;
     }
     if (state === "play" || state === "serve") {
-      // Sans holder (désync soft-own : popped reçu sans hasBall) on marque
-      // quand même — sinon la partie reste bloquée à jamais.
       const loser = holder ? holder.side
         : (ball.lastTouchSide === 0 || ball.lastTouchSide === 1)
           ? ball.lastTouchSide
@@ -276,16 +557,21 @@ function updateBall() {
     }
     return;
   }
+
   if (ball.frozen) {
-    // la balle attend le service : léger flottement, mais on teste
-    // quand même le contact avec les joueurs pour déclencher le service
-    // (basé sur tick, pas sur l'horloge : la simulation doit rester déterministe)
+    if (GAMEPLAY_V2 && ball.inHands) {
+      attachBallToServerHands();
+      for (const b of activeBlobs) ballBlobCollision(b); // lance via Réception
+      return;
+    }
     ball.y += Math.sin(tick / 18) * 0.3;
     for (const b of activeBlobs) ballBlobCollision(b);
     return;
   }
   if (ball.smash > 0) ball.smash--;
-  ball.vy += GRAV_BALL * ballLift(); // sol détrempé : la balle retombe plus vite
+  if (ball.slowMo > 0) ball.slowMo--;
+  if (ball.tossGrace > 0) ball.tossGrace--;
+  ball.vy += GRAV_BALL * ballLift();
   ball.x += ball.vx;
   ball.y += ball.vy;
   ball.angle += ball.vx * 0.03 + ball.spin;
@@ -293,22 +579,30 @@ function updateBall() {
   ball.trail.push({ x: ball.x, y: ball.y });
   if (ball.trail.length > 8) ball.trail.shift();
 
-  // murs latéraux — pas de plafond : la balle peut sortir par le haut
-  if (ball.x - BALL_R < 0)   { ball.x = BALL_R;     ball.vx = Math.abs(ball.vx) * 0.9;  beep(300, 0.04); }
-  if (ball.x + BALL_R > W)   { ball.x = W - BALL_R; ball.vx = -Math.abs(ball.vx) * 0.9; beep(300, 0.04); }
+  if (ball.x - BALL_R < 0)   { ball.x = BALL_R;     ball.vx = Math.abs(ball.vx) * 0.9;  sfxBallWall(); }
+  if (ball.x + BALL_R > W)   { ball.x = W - BALL_R; ball.vx = -Math.abs(ball.vx) * 0.9; sfxBallWall(); }
 
-  // filet (logique partagée avec la prédiction visuelle invité)
   const nr0 = resolveNetBall(ball.x - ball.vx, ball.y - ball.vy, ball.x, ball.y, ball.vx, ball.vy);
-  if (nr0.hit && !noFx) beep(200, 0.05);
+  // Service : tout contact filet = faute (plus de « frôle → rebond → ça passe »)
+  if (ball.serveFlight && nr0.hit) {
+    ball.x = nr0.x; ball.y = nr0.y; ball.vx = 0; ball.vy = 0;
+    ball.serveFlight = false;
+    if (!noFx) sfxBallNet();
+    awardPoint(1 - servingSide, "Filet au service !");
+    return;
+  }
+  if (nr0.hit && !noFx) sfxBallNet();
   ball.x = nr0.x; ball.y = nr0.y; ball.vx = nr0.vx; ball.vy = nr0.vy;
+  if (ball.serveFlight) {
+    const crossed = servingSide === 0 ? ball.x > NET_X : ball.x < NET_X;
+    if (crossed) ball.serveFlight = false;
+  }
 
-  // remise à zéro des touches quand la balle change de camp
   const sideNow = ball.x < NET_X ? 0 : 1;
   if (ball.lastTouchSide !== -1 && sideNow !== ball.lastTouchSide) {
     ball.touches[sideNow] = 0;
   }
 
-  // sol → point (avec explosion si c'était un smash destructeur, ou la bombe)
   if (ball.y + BALL_R >= GROUND_Y) {
     if (bombMode) {
       bombBlast(ball.x, GROUND_Y);

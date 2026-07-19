@@ -1,7 +1,7 @@
 {
   "name": "sommet-volley",
   "version": "1.0.39",
-  "description": "Jeu de volley d'animaux en HTML5 Canvas — solo, 2 joueurs, 2v2 et multijoueur en ligne (WebRTC/PeerJS).",
+  "description": "Sommet Volley — volley satirique HTML5 Canvas (solo, local, en ligne WebRTC/PeerJS).",
   "type": "commonjs",
   "scripts": {
     "test": "node tests/game.test.js",
@@ -19,6 +19,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/TheBenBenJ/crabby-volley.git"
+    "url": "https://github.com/TheBenBenJ/sommet-volley.git"
   }
 }

@@ -1,0 +1,8 @@
+{
+  "key": "houn",
+  "name": "Esplanade du Défilé",
+  "layers": ["far", "skyline"],
+  "props": ["flag", "flower", "net_post", "warn", "radar_0", "radar_1"],
+  "thumb": "thumb.png",
+  "notes": "crowd_0 installé mais non affiché (déjà dans le skyline)"
+}

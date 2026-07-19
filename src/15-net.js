@@ -1,4 +1,4 @@
-// crabby-volley · mode en ligne — PeerJS, 1v1/2v2, HUD réseau
+// sommet-volley · mode en ligne — PeerJS, 1v1/2v2, HUD réseau
 "use strict";
 
 // ============================================================
@@ -125,13 +125,26 @@ function sendFast(m) { if (connFast && connFast.open) connFast.send(m); }
 function onlineLocalInput() {
   // en ligne, chacun est seul devant son écran : tous les mappings clavier
   // marchent, et n'importe quelle manette branchée pilote le joueur local
-  let pl = false, pr = false, pj = false, ps = false;
-  for (const p of padsNow) { pl = pl || p.left; pr = pr || p.right; pj = pj || p.jump; ps = ps || p.super; }
+  let pl = false, pr = false, pj = false, psm = false, ps = false, pu = false, pd = false;
+  let pax = 0, pay = 0;
+  for (const p of padsNow) {
+    pl = pl || p.left; pr = pr || p.right; pj = pj || p.jump;
+    psm = psm || p.smash;
+    ps = ps || p.super; pu = pu || p.up; pd = pd || p.down;
+    if (Math.hypot(p.ax || 0, p.ay || 0) > Math.hypot(pax, pay)) {
+      pax = p.ax || 0; pay = p.ay || 0;
+    }
+  }
   const raw = {
     left:  !!(keys["KeyA"] || keys["ArrowLeft"]) || pl,
     right: !!(keys["KeyD"] || keys["ArrowRight"]) || pr,
     jump:  !!(keys["KeyW"] || keys["Space"] || keys["ArrowUp"]) || pj,
-    super: !!(keys["KeyS"] || keys["ArrowDown"]) || ps
+    smash: !!(keys["KeyS"] || keys["KeyF"] || keys["ArrowDown"] || keys["Slash"]) || psm,
+    super: !!(keys["KeyE"] || keys["ShiftRight"]) || ps,
+    up:    pu,
+    down:  pd,
+    ax:    pax,
+    ay:    pay
   };
   return xInput(mySlot, activeBlobs[mySlot], raw);
 }
@@ -207,7 +220,11 @@ function checkBothOpen() {
     // connecté : l'invité choisit son animal (le vert), puis enverra "hello"
     pendingMode = { online: true };
     selPlayer = 1;
+    peerTakenAnimals = [];
     state = "selectAnimal";
+  } else if (netRole === "host") {
+    // hôte 1v1 : prévenir l'invité des persos déjà pris
+    sendRel({ t: "taken", a: [blobL.animal] });
   }
   // côté hôte : l'écran hostWait affiche "joueur connecté…" jusqu'au hello
 }
@@ -264,8 +281,29 @@ function teardownNet() {
   guestSmoothX = guestSmoothY = 0;
   rematchMe = rematchPeer = false;
   guests = []; lobbyStarted = false; mySlot = 1;
+  peerTakenAnimals = [];
   paused = false;
   netErrorDetail = "";
+}
+
+/** Persos déjà réservés côté hôte 2v2 (hôte + invités prêts). */
+function hostTakenAnimals(exceptGuest) {
+  const t = [blobL.animal];
+  for (const g of guests) {
+    if (exceptGuest && g === exceptGuest) continue;
+    if (g.ready) t.push(g.animal);
+  }
+  return t;
+}
+
+function hostBroadcastTaken() {
+  const a = hostTakenAnimals(null);
+  for (const g of guests) {
+    if (g.rel && g.rel.open) {
+      try { g.rel.send({ t: "taken", a: hostTakenAnimals(g) }); } catch (e) {}
+    }
+  }
+  return a;
 }
 
 function quitOnline() {
@@ -275,7 +313,8 @@ function quitOnline() {
     sendRel({ t: "bye" });
   }
   teardownNet();
-  state = "menu";
+  if (typeof goMenu === "function") goMenu();
+  else state = "menu";
 }
 
 function startPinging() {
@@ -300,10 +339,17 @@ function onNetData(m) {
       pingMs = pingMs < 0 ? rtt : pingMs * 0.7 + rtt * 0.3; // moyenne lissée
       break;
     }
-    case "hello": // hôte : l'invité a choisi son animal → on lance !
+    case "hello": { // hôte : l'invité a choisi son animal → on lance !
       if (netRole !== "host") break;
-      blobR.animal = clampVisibleAnimal(m.animal);
+      let a = clampVisibleAnimal(m.animal);
+      if (a === blobL.animal) a = randomAnimalIdx([blobL.animal]);
+      blobR.animal = a;
       hostStartMatch();
+      break;
+    }
+    case "taken": // invité : persos déjà réservés (pas de doublon)
+      if (netRole !== "guest") break;
+      peerTakenAnimals = Array.isArray(m.a) ? m.a.map(clampVisibleAnimal) : [];
       break;
     case "start": { // invité : configuration reçue de l'hôte → départ
       if (netRole !== "guest") break;
@@ -312,6 +358,7 @@ function onNetData(m) {
       ballSkin = Math.max(0, Math.min(BALL_SKINS.length - 1, m.ballSkin | 0));
       bombMode = !!m.bomb;                          // l'hôte décide de la règle Bombe…
       bombTime = m.bt || BOMB_TIME;                 // …et de la durée de mèche
+      mapEventsQuiet = !!m.quiet;                   // …et terrain calme (sans events)
       guestResetMatch();
       vsAI = false;
       const clampA = v => Math.max(0, Math.min(ANIMALS.length - 1, v | 0));
@@ -331,7 +378,8 @@ function onNetData(m) {
       if (netRole !== "host" || m.m !== matchId) break;
       if (m.s > guestInSeq) {
         guestInSeq = m.s;
-        guestIn = { left: !!m.l, right: !!m.r, jump: !!m.j, super: !!m.sp };
+        guestIn = { left: !!m.l, right: !!m.r, jump: !!m.j, smash: !!(m.sh || m.rc),
+                    super: !!m.sp, ax: (m.ax || 0) / 100, ay: (m.ay || 0) / 100 };
         setX(blobR, !!m.x);
       }
       if (m.b) {
@@ -372,7 +420,7 @@ function hostStartMatch() {
   guestBallGen = 0; appliedGuestBallGen = -1;
   const seed = (Math.random() * 2 ** 31) | 0;
   sendRel({ t: "start", m: matchId, seed, terrain, ballSkin, a: [blobL.animal, blobR.animal],
-            bomb: bombMode ? 1 : 0, bt: bombTime });
+            bomb: bombMode ? 1 : 0, bt: bombTime, quiet: mapEventsQuiet ? 1 : 0 });
   vsAI = false;
   setMode("1v1"); mySlot = 0; // hôte 1v1 = Rouge (slot 0)
   newGame(seed);
@@ -459,8 +507,19 @@ function guestSeedBallFromSnap() {
   ball.angle = b.angle;
   ball.frozen = b.frozen; ball.popped = !!b.popped;
   ball.smash = b.smash || 0;
+  if (b.inHands !== undefined) ball.inHands = !!b.inHands;
+  if (b.tossGrace !== undefined) ball.tossGrace = b.tossGrace | 0;
+  if (b.sal !== undefined) ball.serveAimLock = !!b.sal;
+  if (b.serveAimLock !== undefined) ball.serveAimLock = !!b.serveAimLock;
+  if (b.sf !== undefined) ball.serveFlight = !!b.sf;
+  if (b.serveFlight !== undefined) ball.serveFlight = !!b.serveFlight;
   ball.lastTouchSide = b.lastTouchSide;
   ball.touches = [b.touches[0], b.touches[1]];
+  if (b.heldBy !== undefined) ball.heldBy = b.heldBy;
+  if (b.holdT !== undefined) ball.holdT = b.holdT;
+  if (b.chargeT !== undefined) ball.chargeT = b.chargeT;
+  if (b.aimAngle !== undefined) ball.aimAngle = b.aimAngle;
+  if (b.shotArmed !== undefined) ball.shotArmed = !!b.shotArmed;
   ballScoreLock = false;
 }
 
@@ -534,7 +593,7 @@ function hostAcceptConn(c) {
       return;
     }
     g = { id: c.peer, rel: null, fast: null, slot, animal: 0,
-          inSeq: 0, in: { left: false, right: false, jump: false, super: false },
+          inSeq: 0, in: { left: false, right: false, jump: false, smash: false, super: false },
           ready: false, connected: false, ping: null };
     guests.push(g);
   }
@@ -552,6 +611,8 @@ function hostGuestCheck(g) {
   netConnected = true;             // au moins un invité relié
   lastPeerMsg = performance.now();
   if (!pingTimer) startPinging();
+  // liste des persos déjà pris (hôte + autres prêts) pour éviter les doublons
+  try { g.rel.send({ t: "taken", a: hostTakenAnimals(g) }); } catch (e) {}
 }
 
 function onGuestClosed(g) {
@@ -574,15 +635,21 @@ function onHostData(g, m) {
       pingMs = Math.max(0, ...guests.map(x => x.ping || 0));
       break;
     }
-    case "hello": // l'invité a choisi son animal (lobby)
-      g.animal = clampVisibleAnimal(m.animal);
+    case "hello": { // l'invité a choisi son animal (lobby)
+      let a = clampVisibleAnimal(m.animal);
+      const taken = hostTakenAnimals(g);
+      if (taken.includes(a)) a = randomAnimalIdx(taken);
+      g.animal = a;
       g.ready = true;
+      hostBroadcastTaken();
       break;
+    }
     case "in": // entrées de cet invité (on ne garde que la plus récente)
       if (m.m !== matchId) break;
       if (m.s > g.inSeq) {
         g.inSeq = m.s;
-        g.in = { left: !!m.l, right: !!m.r, jump: !!m.j, super: !!m.sp };
+        g.in = { left: !!m.l, right: !!m.r, jump: !!m.j, smash: !!(m.sh || m.rc),
+                 super: !!m.sp, ax: (m.ax || 0) / 100, ay: (m.ay || 0) / 100 };
         setX(activeBlobs[g.slot], !!m.x);
       }
       break;
@@ -599,12 +666,15 @@ function hostStartMatch2v2() {
   setMode("2v2"); mySlot = 0;
   const seed = (Math.random() * 2 ** 31) | 0;
   const occ = {}; for (const g of guests) occ[g.slot] = g;
-  // animaux : slot 0 = hôte ; slots invités = leur choix ; slots libres = IA
+  // persos : slot 0 = hôte ; slots invités = leur choix ; slots libres = IA
+  // tous distincts (re-tirage si collision)
   const anims = [];
+  const used = new Set();
   for (let s = 0; s < 4; s++) {
-    anims[s] = s === 0 ? blobL.animal
-             : occ[s] ? occ[s].animal
-             : randomAnimalIdx();
+    let a = s === 0 ? blobL.animal : occ[s] ? occ[s].animal : -1;
+    if (a < 0 || used.has(a)) a = randomAnimalIdx([...used]);
+    used.add(a);
+    anims[s] = a;
   }
   newGame(seed); // réinitialise positions/scores (n'écrase pas animal/speedMul en ligne)
   activeBlobs.forEach((b, s) => {
@@ -614,7 +684,7 @@ function hostStartMatch2v2() {
   for (const g of guests) {
     if (g.rel && g.rel.open) {
       g.rel.send({ t: "start", m: matchId, mode: "2v2", slot: g.slot, seed, terrain, ballSkin, a: anims,
-                   bomb: bombMode ? 1 : 0, bt: bombTime });
+                   bomb: bombMode ? 1 : 0, bt: bombTime, quiet: mapEventsQuiet ? 1 : 0 });
     }
   }
 }
@@ -626,6 +696,9 @@ function hostUpdate2v2() {
                   state === "point" || state === "gameover";
   if (!inMatch) return;
 
+  if (state === "point" || state === "gameover") {
+    if (typeof settleAirborneBlobs === "function") settleAirborneBlobs();
+  }
   if (state === "point") {
     pointTimer--;
     // n'importe quel joueur connecté (hôte ou invité) peut faire avancer
@@ -668,6 +741,9 @@ function netUpdate() {
     if (!inMatch) return; // encore dans le lobby
 
     if (!netFrozen) {
+      if (state === "point" || state === "gameover") {
+        if (typeof settleAirborneBlobs === "function") settleAirborneBlobs();
+      }
       if (state === "point") {
         pointTimer--;
         // hôte OU invité peut faire avancer l'écran "Point pour ..." en
@@ -743,7 +819,8 @@ function netUpdate() {
         if (state === "serve" && serveCountdown > 0) {
           me.update({ left: input.left, right: input.right, jump: false });
           serveCountdown--;
-          ball.y += Math.sin(tick / 18) * 0.3;
+          if (GAMEPLAY_V2 && ball.inHands) attachBallToServerHands();
+          else ball.y += Math.sin(tick / 18) * 0.3;
         } else {
           maybeActivateSuper(me, input);
           me.update(input);
@@ -789,7 +866,10 @@ function netUpdate() {
 
       const msg = { t: "in", m: matchId, s: inputSeq,
                     l: input.left ? 1 : 0, r: input.right ? 1 : 0,
-                    j: input.jump ? 1 : 0, sp: input.super ? 1 : 0,
+                    j: input.jump ? 1 : 0, sh: input.smash ? 1 : 0,
+                    sp: input.super ? 1 : 0,
+                    ax: Math.round((input.ax || 0) * 100),
+                    ay: Math.round((input.ay || 0) * 100),
                     x: xOn[mySlot] ? 1 : 0 };
       if (ballPkt) msg.b = ballPkt;
       sendFast(msg);
@@ -891,13 +971,13 @@ function guestDetectEvents(prev, d) {
   if (!prev) return;
   // début / fin d'un Smash Battle
   if (d.battle && prev.battle) {
-    if (d.battle.active && !prev.battle.active) { shake = 6; beep(880, 0.12, "square", 0.18); }
-    if (!d.battle.active && prev.battle.active) { shake = 14; beep(180, 0.4, "sawtooth", 0.25); }
+    if (d.battle.active && !prev.battle.active) { shake = 6; sfxBattleStart(); }
+    if (!d.battle.active && prev.battle.active) { shake = 14; sfxBattleEnd(); }
   }
   // explosion de la bombe : la mèche vient de passer à zéro → éclair + boum
   if (d.bombMode && prev.bombTimer > 0 && (d.bombTimer || 0) <= 0) {
     bombFlash = 1; shake = Math.max(shake, 18);
-    beep(70, 0.5, "sawtooth", 0.3, 0, 30); beep(130, 0.4, "square", 0.22, 0.02, 40);
+    sfxBombBlast();
   }
   // déclenchement d'un SUPER (superT passe de 0 à >0)
   for (let i = 0; i < activeBlobs.length; i++) {
@@ -919,7 +999,7 @@ function guestDetectEvents(prev, d) {
       spawnConfetti(22, s === 0 ? W * 0.25 : W * 0.75);
       setEmote(s, "happy");
       setEmote(1 - s, "sad");
-      beep(s === 0 ? 660 : 550, 0.25, "sine", 0.2);
+      sfxPoint(s);
     }
   }
   const t0 = prev.ball.touches[0] + prev.ball.touches[1];
@@ -933,8 +1013,9 @@ function guestDetectEvents(prev, d) {
       const dd = Math.hypot(b.x - d.ball.x, b.y - d.ball.y);
       if (dd < best) { best = dd; hitter = b; }
     }
-    noiseBurst(0.05, 0.15, 1300);
-    animalHitSound(animOf(hitter));
+    const heavy = Math.hypot(d.ball.vx || 0, d.ball.vy || 0) > 11.5;
+    if (heavy) sfxBallSmash(); else sfxBallHit();
+    animalHitSound(animOf(hitter), heavy);
     if (animOf(hitter).molt) spawnFeathers(d.ball.x, d.ball.y - BALL_R, hitter.color, 6);
   }
 }
@@ -1091,31 +1172,14 @@ function drawNetHUD() {
   if (stale) overlay("Connexion instable…", "La partie reprendra automatiquement");
 }
 
-// En-tête éditorial commun aux écrans en ligne (réutilise le design-system de
-// 12-menus, disponible au runtime). kicker + titre flush-left + filet + folio.
+// En-tête commun aux écrans en ligne (= menus cartoon + décor aléatoire).
 function netScreenBase(title, kicker, subtitle) {
-  drawBackground(); drawNet(); blobL.draw(); blobR.draw();
-  const g = ctx.createLinearGradient(0, 0, W, 0);
-  g.addColorStop(0, "rgba(10,11,16,0.90)");
-  g.addColorStop(0.6, "rgba(10,11,16,0.70)");
-  g.addColorStop(1, "rgba(10,11,16,0.46)");
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  const mx = UI.mx;
-  uiLabel(kicker || "En ligne · WebRTC", mx, 82, 12, UI.accent, 3);
-  ctx.textAlign = "left"; ctx.fillStyle = UI.ink;
-  ctx.font = "800 " + (title.length > 20 ? 36 : 42) + "px " + UI.sans;
-  ctx.fillText(title, mx, 130);
-  uiRule(mx, W - mx, 150, UI.faint);
-  if (subtitle) uiLabel(subtitle, mx, 174, 12, UI.muted, 1);
-  uiRule(mx, W - mx, H - 42, UI.faint);
-  // manquait ici : contrairement à menuScreenBase, ce lien n'était pas
-  // cliquable — sur ces écrans (attente hôte, salon, saisie de code…) seul
-  // le clavier/la manette permettaient de revenir en arrière, impossible au
-  // tactile. Même zone agrandie sur tactile que menuScreenBase.
-  if (hasTouch) hit(mx + 110, H - 24, 260, 52, "Escape");
-  else hit(mx + 45, H - 32, 130, 24, "Escape");
-  uiLabel("Échap ← Retour", mx, H - 26, 10, UI.muted, 1.5);
-  uiLabel((darkMode ? "Pussy Volley" : "Sommet Volley") + " · En ligne", W - mx, H - 26, 10, UI.muted, 1.5, "right");
+  menuScreenBase({
+    title,
+    kicker: kicker || "En ligne · WebRTC",
+    subtitle,
+    titleSize: title.length > 20 ? 34 : 42
+  });
 }
 
 function drawOnlineMenu() {

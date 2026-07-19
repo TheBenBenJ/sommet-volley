@@ -1,0 +1,8 @@
+{
+  "key": "micron",
+  "name": "Palais de l'Hexagone",
+  "layers": ["far", "skyline"],
+  "props": ["flag", "pigeon", "net_post", "warn", "whistle", "marchers_0"],
+  "thumb": "thumb.png",
+  "notes": "crowd_0 installé mais non affiché pour l'instant"
+}

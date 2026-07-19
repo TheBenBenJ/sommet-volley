@@ -1,0 +1,13 @@
+# Fiche personnage — Tsar Vladou (perso pilote Phase 2)
+key: vladou
+name: "Tsar Vladou"
+pays_theme: "Russie — hiver, ours, parade"
+silhouette: "petit, massif, torse bombé, chemise ouverte, regard d'acier"
+palette: ["#b43a2e", "#e8d9b0", "#3a3f4a"]
+stats: { vitesse: 3, detente: 3, puissance: 4, controle: 4 }
+trait_passif: "Sang froid — insensible au gel/ralentissement"
+super:
+  nom: "Hiver Général"
+  effet: "gèle le camp adverse ~6 s (glisse extrême), flocons côté adverse"
+sons: "voix grave, rire bref ; impact = coup sec"
+map: "Place Grand-Rouge"

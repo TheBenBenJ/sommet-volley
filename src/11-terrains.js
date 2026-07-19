@@ -1,15 +1,12 @@
-// crabby-volley · terrains & parallaxe (plage, banquise, nuit)
+// sommet-volley · terrains & parallaxe (plage, banquise, nuit)
 "use strict";
 
 // ---------- Parallaxe (profondeur multi-couches) ----------
-// Décalage horizontal type « caméra » piloté par la position de la balle :
-// les couches lointaines glissent peu, les proches davantage → sensation de
-// profondeur. 100 % visuel (lit ball.x, n'affecte ni la simulation ni les
-// snapshots), et l'invité a la position de la balle par interpolation.
+// Drift temporel très léger uniquement — plus de suivi balle/joystick
+// (en service la balle suit le joueur → le fond « glissait » avec le stick).
 function paraX(depth) {
-  const focus = Math.max(-1, Math.min(1, (ball.x - W / 2) / (W / 2)));
-  const drift = Math.sin(performance.now() / 3000);
-  return -(focus * 34 + drift * 10) * depth;
+  const drift = Math.sin(performance.now() / 4500);
+  return -drift * 5 * depth;
 }
 
 // silhouette de collines/reliefs remplie, décalée selon sa profondeur.
@@ -27,9 +24,107 @@ function drawHillLayer(baseY, color, depth, pts) {
 }
 
 function drawBgPlage() {
-  const sun = celestialPos();
   const storm = weather === "storm";
-  const raining = weather === "rain" || storm; // tempête de sable (même impact que la pluie)
+  const raining = weather === "rain" || storm;
+  if (typeof mapTrompetteReady === "function" && mapTrompetteReady()) {
+    drawBgPlagePng(performance.now() / 1000, raining, storm);
+    return;
+  }
+  drawBgPlageCanvas(raining, storm);
+}
+
+/** Resort Doré PNG (Trompette) — un fond + FX sable en code. */
+function drawBgPlagePng(t, raining, storm) {
+  const p = SPRITES.mapTrompette;
+
+  if (spriteReady(p.far)) {
+    ctx.globalAlpha = storm ? 0.7 : 0.9;
+    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    ctx.globalAlpha = 1;
+  }
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+
+  if (storm) {
+    ctx.fillStyle = "rgba(140,110,50,0.28)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  } else if (raining) {
+    ctx.fillStyle = "rgba(180,140,60,0.14)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  }
+
+  // Public désactivé pour l’instant (pas de crowd_0 / pas de drawCrowd)
+
+  // Sol sable jouable
+  const sand = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
+  if (raining) {
+    sand.addColorStop(0, "#c9a25a");
+    sand.addColorStop(1, "#a07f3f");
+  } else {
+    sand.addColorStop(0, "#f4d58d");
+    sand.addColorStop(1, "#d9b25f");
+  }
+  ctx.fillStyle = sand;
+  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
+  ctx.fillStyle = "rgba(0,0,0,0.06)";
+  ctx.fillRect(0, GROUND_Y, W, 2);
+
+  // barrière dorée au bord du terrain
+  ctx.fillStyle = "#c9a227";
+  ctx.fillRect(0, GROUND_Y - 41, W, 4);
+  ctx.fillStyle = "rgba(255,255,255,0.35)";
+  ctx.fillRect(0, GROUND_Y - 41, W, 1);
+  ctx.fillStyle = "rgba(0,0,0,0.18)";
+  ctx.fillRect(0, GROUND_Y - 37, W, 1);
+
+  // Vaguelettes
+  ctx.strokeStyle = "rgba(255,255,255,0.45)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let x = 0; x <= W; x += 8) {
+    const y = GROUND_Y - 34 + Math.sin(x / 26 + t * 2) * 2;
+    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Pas de palmier « prop » : le fond du resort a déjà ses palmiers géants —
+  // le doublon miniature au premier plan cassait la perspective.
+  if (!spriteReady(p.far) && !spriteReady(p.skyline)) drawPalm(52, storm);
+
+  // Drapeau de green (droite) — à l'échelle d'un vrai drapeau de golf
+  if (spriteReady(p.flag)) {
+    const bob = Math.sin(t * 2.2) * 2;
+    drawMapProp(p.flag, 845, GROUND_Y + 2 + bob, 88);
+  }
+
+  // Voiturette (event ou idle décoratif)
+  drawResortCart(t);
+
+  if (raining) drawSandstorm(storm ? 1 : 0.55);
+  drawMapEventOverlay();
+}
+
+function drawResortCart(t) {
+  const p = SPRITES.mapTrompette;
+  if (!p || (!spriteReady(p.cart) && !spriteReady(p.cartHorn))) return;
+  if (typeof mapEvent === "undefined") return;
+  // Une seule position continue (mapEvent.cartX) — plus de teleport idle ↔ event
+  const cx = mapEvent.cartX;
+  if (cx < -70 || cx > W + 70) return;
+  const horn = !mapEventsQuiet &&
+    (mapEvent.phase === "fire" || (mapEvent.phase === "flying" && mapEvent.t < 18));
+  const img = horn && spriteReady(p.cartHorn) ? p.cartHorn : p.cart;
+  // fondu aux bords pour éviter l'apparition/disparition sèche
+  let a = 1;
+  if (cx < 50) a = Math.max(0, (cx + 70) / 120);
+  if (cx > W - 50) a = Math.min(a, Math.max(0, (W + 70 - cx) / 120));
+  ctx.save();
+  ctx.globalAlpha = a;
+  drawMapProp(img, cx, GROUND_Y + 2, 92);
+  ctx.restore();
+}
+
+function drawBgPlageCanvas(raining, storm) {
+  const sun = celestialPos();
 
   // ciel : bleu clair par beau temps, voilé d'ocre pendant la tempête de sable
   const sky = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
@@ -63,8 +158,7 @@ function drawBgPlage() {
 
   drawClouds(storm ? "rgba(150,120,75,0.9)" : raining ? "rgba(210,185,135,0.8)" : "rgba(255,255,255,0.85)");
 
-  // tribunes (derrière la mer)
-  drawCrowd();
+  // Public Resort désactivé pour l’instant (ni PNG ni canvas)
 
   // mer au loin (plus sombre sous l'orage)
   ctx.fillStyle = storm ? "#1f4c6b" : "#2e86c1";
@@ -107,7 +201,6 @@ function drawBgPlage() {
 
   drawPalm(52, storm);
   drawSkyBirds();
-  drawCrab();
   if (raining) drawSandstorm(storm ? 1 : 0.55);
 }
 
@@ -160,10 +253,291 @@ function drawPalm(px, storm) {
   ctx.restore();
 }
 
+/** Dessine une image en couvrant [dx,dy,dw,dh], alignée en bas (sol). */
+function drawImgCoverBottom(img, dx, dy, dw, dh, parallaxX) {
+  const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height;
+  if (!sw || !sh) return;
+  const scale = Math.max(dw / sw, dh / sh);
+  const tw = sw * scale, th = sh * scale;
+  const ox = dx + (dw - tw) / 2 + (parallaxX || 0);
+  const oy = dy + dh - th;
+  ctx.drawImage(img, ox, oy, tw, th);
+}
+
+/** Prop ancré aux pieds (x centre, y = ligne de sol). */
+function drawMapProp(img, x, footY, drawH) {
+  if (!spriteReady(img)) return;
+  const aspect = img.naturalWidth / img.naturalHeight;
+  const h = drawH, w = h * aspect;
+  ctx.drawImage(img, x - w / 2, footY - h, w, h);
+}
+
+function drawBgNeigePng(t, heavy, blizzard) {
+  const p = SPRITES.mapVladou;
+
+  // Un seul fond (skyline) — la météo se joue en overlays code, pas en 2e PNG
+  if (spriteReady(p.far)) {
+    ctx.globalAlpha = 0.85;
+    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    ctx.globalAlpha = 1;
+  }
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+
+  // Voile météo sur le décor (ciel plus plombé sans changer d'image)
+  if (blizzard) {
+    ctx.fillStyle = "rgba(90,110,130,0.28)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  } else if (heavy) {
+    ctx.fillStyle = "rgba(120,140,165,0.14)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  }
+
+  // Tribune fixe (un seul PNG — pas de swap crowd_0/1) et plus en retrait
+  if (spriteReady(p.crowd0)) {
+    const crowd = p.crowd0;
+    const sw = crowd.naturalWidth || crowd.width;
+    const sh = crowd.naturalHeight || crowd.height;
+    const srcH = Math.max(1, Math.floor(sh * 0.34)); // bande foule en haut
+    const cw = W * 0.78;
+    const ch = Math.min(78, cw * (srcH / sw) * 1.15);
+    const cx = (W - cw) / 2;
+    const cy = GROUND_Y - 118 - ch; // plus haut = plus loin du terrain
+    ctx.globalAlpha = blizzard ? 0.7 : 0.88;
+    ctx.drawImage(crowd, 0, 0, sw, srcH, cx, cy, cw, ch);
+    ctx.globalAlpha = 1;
+  }
+
+  // Sol jouable (bande sous les pieds)
+  const snow = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
+  snow.addColorStop(0, "#fbfdff");
+  snow.addColorStop(1, "#d7e4ee");
+  ctx.fillStyle = snow;
+  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
+  ctx.fillStyle = "rgba(0,0,0,0.05)";
+  ctx.fillRect(0, GROUND_Y, W, 2);
+
+  // Canon d'apparat (gauche) — idle / tir piloté par l'événement de map
+  const firing = typeof mapEvent !== "undefined" &&
+    (mapEvent.phase === "fire" || (mapEvent.phase === "flying" && mapEvent.t < 8));
+  drawMapProp(firing && spriteReady(p.cannonFire) ? p.cannonFire : p.cannon, 78, GROUND_Y + 2, 78);
+
+  // Bonhomme de neige (droite) — se baisse quand la balle approche
+  if (spriteReady(p.snowman)) {
+    const sx = 838;
+    const sbd = Math.hypot(sx - ball.x, (GROUND_Y - 40) - ball.y);
+    const duck = sbd < 90 ? (1 - sbd / 90) * 10 : 0;
+    drawMapProp(p.snowman, sx, GROUND_Y + 2 + duck, 86 - duck * 0.3);
+  }
+
+  // Neige / blizzard animés en code (un seul décor)
+  drawNeigeWeatherFX(t, heavy, blizzard);
+
+  drawMapEventOverlay();
+}
+
+/** Flocons, rafales et voile — météo Place Grand-Rouge sans 2e fond PNG. */
+function drawNeigeWeatherFX(t, heavy, blizzard) {
+  const flakes = blizzard ? 220 : heavy ? 120 : 48;
+  const wind = blizzard ? 95 : heavy ? 28 : 4;
+  const spd = blizzard ? 2.2 : heavy ? 1.45 : 1;
+
+  // Rafales horizontales (blizzard)
+  if (blizzard || heavy) {
+    const n = blizzard ? 28 : 10;
+    ctx.strokeStyle = blizzard ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.12)";
+    ctx.lineWidth = blizzard ? 1.6 : 1;
+    ctx.lineCap = "round";
+    for (let i = 0; i < n; i++) {
+      const fy = ((i * 67.1 + t * (40 + (i % 5) * 10)) % (GROUND_Y + 10));
+      const fx = ((i * 131.7 + t * (80 + wind) + Math.sin(t * 2 + i) * 30) % (W + 120)) - 60;
+      const len = blizzard ? 28 + (i % 5) * 8 : 14 + (i % 3) * 5;
+      ctx.globalAlpha = 0.25 + (i % 4) * 0.08;
+      ctx.beginPath();
+      ctx.moveTo(fx, fy);
+      ctx.lineTo(fx - len, fy + 3 + (i % 3));
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // Flocons
+  ctx.fillStyle = "#fff";
+  for (let i = 0; i < flakes; i++) {
+    const fx = ((i * 97.3 + t * (18 + (i % 5) * 6) * spd + wind * t + Math.sin(t + i) * 12) % (W + 40)) - 20;
+    const fy = (i * 53.7 + t * (30 + (i % 7) * 8) * spd) % (GROUND_Y + 20);
+    ctx.globalAlpha = 0.4 + (i % 4) * 0.14;
+    const r = blizzard ? 1.4 + (i % 4) * 0.7 : 1.2 + (i % 3);
+    ctx.beginPath();
+    ctx.arc(fx, fy, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // Brume blanche / voile de blizzard
+  if (blizzard) {
+    ctx.fillStyle = "rgba(255,255,255,0.16)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+    // bande basse un peu plus dense (rafales au sol)
+    const mist = ctx.createLinearGradient(0, GROUND_Y - 90, 0, GROUND_Y);
+    mist.addColorStop(0, "rgba(255,255,255,0)");
+    mist.addColorStop(1, "rgba(255,255,255,0.22)");
+    ctx.fillStyle = mist;
+    ctx.fillRect(0, GROUND_Y - 90, W, 90);
+  } else if (heavy) {
+    ctx.fillStyle = "rgba(255,255,255,0.07)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  }
+}
+
+/** Warn + projectiles (canon Place Grand-Rouge / voiturette Resort Doré). */
+function drawMapEventOverlay() {
+  if (typeof mapEvent === "undefined" || mapEventsQuiet || !mapEventActiveTerrain()) return;
+  const kind = typeof mapEventKind === "function" ? mapEventKind() : "cannon";
+  const pVlad = (typeof SPRITES !== "undefined" && SPRITES.mapVladou) ? SPRITES.mapVladou : null;
+  const pResort = (typeof SPRITES !== "undefined" && SPRITES.mapTrompette) ? SPRITES.mapTrompette : null;
+  const pWarn = kind === "cart" ? pResort : pVlad;
+
+  if (mapEvent.phase === "warn" || (kind === "cart" && (mapEvent.phase === "fire" || mapEvent.phase === "flying"))) {
+    // Zone dangereuse au sol (Resort) + alerte filet
+    if (kind === "cart" && mapEvent.zoneX) {
+      const pulse = 0.35 + 0.25 * Math.sin((mapEvent.t || 0) * 0.35);
+      const zx = mapEvent.zoneX, zw = mapEvent.zoneW || 150;
+      ctx.fillStyle = "rgba(255,193,7," + pulse.toFixed(2) + ")";
+      ctx.fillRect(zx - zw / 2, GROUND_Y - 36, zw, 34);
+      ctx.strokeStyle = "rgba(255,87,34,0.85)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(zx - zw / 2, GROUND_Y - 36, zw, 34);
+    }
+  }
+
+  if (mapEvent.phase === "warn") {
+    const pulse = 0.7 + 0.3 * Math.sin(mapEvent.t * 0.35);
+    const bob = Math.sin(mapEvent.t * 0.28) * 3;
+    const wx = NET_X;
+    const wy = NET_TOP - 6 + bob;
+    ctx.save();
+    ctx.globalAlpha = pulse;
+    if (pWarn && spriteReady(pWarn.warn)) {
+      const wh = 36;
+      ctx.drawImage(pWarn.warn, wx - wh / 2, wy - wh, wh, wh);
+    } else {
+      ctx.fillStyle = kind === "cart" ? "#ff9800" : "#e53935";
+      ctx.beginPath();
+      ctx.moveTo(wx, wy - 28);
+      ctx.lineTo(wx - 14, wy);
+      ctx.lineTo(wx + 14, wy);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 16px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("!", wx, wy - 6);
+    }
+    ctx.restore();
+  }
+
+  if (mapEvent.phase === "fire" || mapEvent.phase === "flying") {
+    if (mapEvent.phase === "fire" && mapEvent.t < 1) return;
+    if (kind === "cart") {
+      if (mapEvent.balls && mapEvent.balls.length) {
+        for (const b of mapEvent.balls) {
+          if (!b.dead) drawGolfBall(b.x, b.y);
+        }
+      }
+    } else {
+      drawCannonShotBall(mapEvent.x, mapEvent.y, mapEvent.vx, mapEvent.vy);
+    }
+  }
+}
+
+function drawGolfBall(x, y) {
+  const r = 9;
+  ctx.save();
+  ctx.fillStyle = "rgba(0,0,0,0.22)";
+  ctx.beginPath();
+  ctx.ellipse(x + 1, y + 3, r * 0.9, r * 0.45, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#f5f5f5";
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#bdbdbd";
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  ctx.fillStyle = "rgba(0,0,0,0.12)";
+  for (let i = 0; i < 5; i++) {
+    const a = i * 1.1;
+    ctx.beginPath();
+    ctx.arc(x + Math.cos(a) * 3.5, y + Math.sin(a) * 3.5, 1.1, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+/** Boulet bien rond et lisible (le PNG shot a un fond noir + ratio 512×335). */
+function drawCannonShotBall(x, y, vx, vy) {
+  const r = MAP_SHOT_R;
+  ctx.save();
+  // ombre
+  ctx.fillStyle = "rgba(0,0,0,0.28)";
+  ctx.beginPath();
+  ctx.ellipse(x + 2, y + 4, r * 0.95, r * 0.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // corps
+  const g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.4, r * 0.08, x, y, r);
+  g.addColorStop(0, "#6a6a6a");
+  g.addColorStop(0.45, "#2f2f2f");
+  g.addColorStop(1, "#0c0c0c");
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#1a1a1a";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // reflet
+  ctx.fillStyle = "rgba(255,255,255,0.28)";
+  ctx.beginPath();
+  ctx.ellipse(x - r * 0.3, y - r * 0.32, r * 0.32, r * 0.2, -0.55, 0, Math.PI * 2);
+  ctx.fill();
+  // mèche + flamme (direction opposée à la vitesse)
+  const ang = Math.atan2(-(vy || 0), -(vx || 1));
+  const fx = x + Math.cos(ang) * (r * 0.85);
+  const fy = y + Math.sin(ang) * (r * 0.85);
+  ctx.strokeStyle = "#6d4c2b";
+  ctx.lineWidth = 2.2;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(x + Math.cos(ang) * (r * 0.55), y + Math.sin(ang) * (r * 0.55));
+  ctx.lineTo(fx, fy);
+  ctx.stroke();
+  ctx.fillStyle = "#ff9800";
+  ctx.beginPath();
+  ctx.arc(fx, fy, 4.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#ffe082";
+  ctx.beginPath();
+  ctx.arc(fx - 0.5, fy - 0.5, 2, 0, Math.PI * 2);
+  ctx.fill();
+  // traînée
+  ctx.fillStyle = "rgba(255,140,40,0.35)";
+  ctx.beginPath();
+  ctx.arc(x - (vx || 0) * 0.8, y - (vy || 0) * 0.5, 6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawBgNeige() {
   const t = performance.now() / 1000;
   const heavy = weather === "rain";    // chute de neige soutenue
   const blizzard = weather === "storm"; // blizzard
+
+  // Place Grand-Rouge PNG (Vladou) — fallback canvas si pas encore chargé
+  if (typeof mapVladouReady === "function" && mapVladouReady()) {
+    drawBgNeigePng(t, heavy, blizzard);
+    return; // overlay event déjà dessiné dans drawBgNeigePng
+  }
+
   // ciel pâle, plombé quand il neige fort / blizzard
   const sky = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
   if (blizzard) { sky.addColorStop(0, "#7d8ea0"); sky.addColorStop(1, "#b9c9d8"); }
@@ -254,21 +628,18 @@ function drawBgNeige() {
 
   // flocons (positions dérivées du temps : aucun état à synchroniser).
   // Densité et vent selon la météo : léger / chute soutenue / blizzard.
-  const flakes = blizzard ? 190 : heavy ? 110 : 45;
-  const wind = blizzard ? 60 : heavy ? 22 : 0;
-  const spd = blizzard ? 1.9 : heavy ? 1.4 : 1;
-  ctx.fillStyle = "#fff";
-  for (let i = 0; i < flakes; i++) {
-    const fx = ((i * 97.3 + t * (18 + (i % 5) * 6) * spd + wind * t + Math.sin(t + i) * 12) % (W + 40)) - 20;
-    const fy = (i * 53.7 + t * (30 + (i % 7) * 8) * spd) % (GROUND_Y + 20);
-    ctx.globalAlpha = 0.45 + (i % 4) * 0.13;
+  drawNeigeWeatherFX(t, heavy, blizzard);
+
+  // Canon + event (fallback canvas — pas de PNG)
+  if (typeof mapEvent !== "undefined") {
+    const firing = mapEvent.phase === "fire" || (mapEvent.phase === "flying" && mapEvent.t < 8);
+    ctx.fillStyle = firing ? "#4a3728" : "#3a2a1c";
+    ctx.fillRect(52, GROUND_Y - 48, 52, 28);
     ctx.beginPath();
-    ctx.arc(fx, fy, 1.2 + (i % 3), 0, Math.PI * 2);
+    ctx.ellipse(104, GROUND_Y - 40, 22, 12, -0.35, 0, Math.PI * 2);
     ctx.fill();
   }
-  ctx.globalAlpha = 1;
-  // voile blanc du blizzard
-  if (blizzard) { ctx.fillStyle = "rgba(255,255,255,0.12)"; ctx.fillRect(0, 0, W, GROUND_Y); }
+  drawMapEventOverlay();
 }
 
 // aurore boréale : rubans lumineux ondoyants (fondu additif → effet de lueur).
@@ -300,130 +671,15 @@ function drawAurora(t) {
   ctx.restore();
 }
 
-function drawBgNuit() {
-  const t = performance.now() / 1000;
-  const rainy = weather === "rain" || weather === "storm";
-  const stormy = weather === "storm";
-  // ciel nocturne (plus noir sous l'orage)
-  const sky = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
-  if (stormy) { sky.addColorStop(0, "#05060f"); sky.addColorStop(1, "#1a2036"); }
-  else { sky.addColorStop(0, "#0a0f2e"); sky.addColorStop(1, "#2c3d6e"); }
-  ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, W, GROUND_Y);
-
-  // éclair : flash blanc bref et périodique (purement visuel)
-  if (stormy) {
-    const cyc = t % 3.3, on = cyc < 0.09 || (cyc > 0.16 && cyc < 0.24);
-    if (on) { ctx.fillStyle = "rgba(220,230,255,0.5)"; ctx.fillRect(0, 0, W, GROUND_Y); }
-  }
-
-  // étoiles scintillantes (voilées par les nuages quand il pleut)
-  const starA = rainy ? 0.25 : 1;
-  for (let i = 0; i < 60; i++) {
-    const sxx = (i * 127.7) % W;
-    const syy = (i * 67.3) % (GROUND_Y - 130);
-    ctx.globalAlpha = (0.35 + Math.abs(Math.sin(t * 1.5 + i * 2.1)) * 0.65) * starA;
-    ctx.fillStyle = "#fff";
-    ctx.beginPath();
-    ctx.arc(sxx, syy, i % 5 === 0 ? 1.8 : 1, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.globalAlpha = 1;
-  // aurore boréale par temps clair (voilée quand il pleut)
-  if (!rainy) drawAurora(t);
-  if (rainy) drawClouds(stormy ? "rgba(40,46,66,0.95)" : "rgba(70,80,110,0.9)");
-
-  // lune (dérive lente d'est en ouest)
-  const moon = celestialPos();
-  const mnx = moon.x, mny = moon.y;
-  ctx.fillStyle = "rgba(240,234,214,0.25)";
-  ctx.beginPath(); ctx.arc(mnx, mny, 46, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = "#f0ead6";
-  ctx.beginPath(); ctx.arc(mnx, mny, 32, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = "rgba(0,0,0,0.08)";
-  for (const [mx, my, mr] of [[-10, -6, 6], [8, 4, 4], [2, -14, 3]]) {
-    ctx.beginPath(); ctx.arc(mnx + mx, mny + my, mr, 0, Math.PI * 2); ctx.fill();
-  }
-
-  // parallaxe : collines nocturnes lointaines + intermédiaires (silhouettes)
-  drawHillLayer(GROUND_Y - 95, "#0c1330", 0.1,
-    [[120, GROUND_Y - 150], [320, GROUND_Y - 120], [520, GROUND_Y - 158], [720, GROUND_Y - 124], [880, GROUND_Y - 146]]);
-  drawHillLayer(GROUND_Y - 82, "#111a3c", 0.26,
-    [[200, GROUND_Y - 118], [420, GROUND_Y - 98], [640, GROUND_Y - 122], [840, GROUND_Y - 100]]);
-
-  // tribunes (guirlandes lumineuses dans la nuit)
-  drawCrowd();
-
-  // eau stagnante du marais + reflet de lune (sous l'astre)
-  ctx.fillStyle = "#0f2a22";
-  ctx.fillRect(0, GROUND_Y - 55, W, 18);
-  ctx.fillStyle = "rgba(240,234,214,0.2)";
-  for (let i = 0; i < 5; i++) {
-    const rw = 26 - i * 4;
-    ctx.fillRect(mnx - rw / 2 + Math.sin(t * 2 + i) * 6, GROUND_Y - 54 + i * 3.4, rw, 2);
-  }
-
-  // berge boueuse du marais
-  const sand = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  sand.addColorStop(0, "#6e6b42");
-  sand.addColorStop(1, "#4a4a2e");
-  ctx.fillStyle = sand;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.fillStyle = "rgba(0,0,0,0.12)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
-
-  // nénuphars flottant sur l'eau sombre, près de la berge
-  ctx.fillStyle = "#0f3322";
-  for (const [lx, ly, lr] of [[108, GROUND_Y - 47, 9], [176, GROUND_Y - 44, 6],
-                              [758, GROUND_Y - 46, 8], [822, GROUND_Y - 43, 6]]) {
-    ctx.beginPath();
-    ctx.arc(lx, ly, lr, 0.25 * Math.PI, 1.9 * Math.PI);
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  // roseaux du marais : silhouettes de tiges qui se balancent, ancrées sur
-  // la berge (deux touffes de chaque côté, hors de la zone de jeu)
-  ctx.strokeStyle = "#0d2a1c";
-  ctx.lineWidth = 2;
-  ctx.lineCap = "round";
-  for (const [rx, cnt, rh] of [[36, 4, 46], [138, 3, 34], [786, 5, 50], [858, 3, 36]]) {
-    for (let k = 0; k < cnt; k++) {
-      const sway = Math.sin(t * 1.2 + rx + k) * 4;
-      const bx2 = rx + k * 7;
-      const topY = GROUND_Y - 38 - rh + Math.sin(t + k) * 2;
-      ctx.beginPath();
-      ctx.moveTo(bx2, GROUND_Y - 34);
-      ctx.quadraticCurveTo(bx2 + sway * 0.5, GROUND_Y - 34 - rh * 0.6, bx2 + sway, topY);
-      ctx.stroke();
-      ctx.fillStyle = "#1a3d28";
-      ctx.beginPath(); ctx.ellipse(bx2 + sway, topY, 2.4, 7, 0, 0, Math.PI * 2); ctx.fill();
-    }
-  }
-
-  // lucioles (sorties seulement par temps clair) — sinon, la brume se lève
-  if (!rainy) {
-    for (let i = 0; i < 7; i++) {
-      let fx = W / 2 + Math.sin(t * (0.3 + i * 0.07) + i * 2.4) * (W * 0.42);
-      let fy = GROUND_Y - 60 - Math.abs(Math.sin(t * (0.5 + i * 0.1) + i)) * 120;
-      // interactif : elles s'écartent vivement du passage de la balle
-      const dfx = fx - ball.x, dfy = fy - ball.y, dd = Math.hypot(dfx, dfy) || 1;
-      if (dd < 72) { const push = (72 - dd); fx += dfx / dd * push; fy += dfy / dd * push; }
-      const a = 0.35 + Math.abs(Math.sin(t * 2 + i * 1.7)) * 0.65;
-      ctx.fillStyle = "rgba(220,255,120," + (a * 0.25).toFixed(2) + ")";
-      ctx.beginPath(); ctx.arc(fx, fy, 6, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = "rgba(235,255,150," + a.toFixed(2) + ")";
-      ctx.beginPath(); ctx.arc(fx, fy, 2, 0, Math.PI * 2); ctx.fill();
-    }
-  } else {
-    drawFog(stormy ? 1 : 0.55);
-  }
-}
-
 function drawBgPrairie() {
   const t = performance.now() / 1000;
   const storm = weather === "storm";
   const raining = weather === "rain" || storm;
+
+  if (typeof mapMicronReady === "function" && mapMicronReady()) {
+    drawBgPrairiePng(t, raining, storm);
+    return;
+  }
 
   // ciel : bleu vif par beau temps, verdâtre plombé à l'orage
   const sky = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
@@ -513,7 +769,157 @@ function drawBgPrairie() {
   if (raining) drawRain(storm ? 1 : 0.55);
 }
 
-// touffe de carottes plantées dans l'herbe — clin d'œil à Turbo-Jeannot
+/** Esplanade du Défilé — fond PNG Houn. */
+function drawBgParade() {
+  const t = performance.now() / 1000;
+  const storm = weather === "storm";
+  const raining = weather === "rain" || storm;
+  if (typeof mapHounReady === "function" && mapHounReady()) {
+    drawBgParadePng(t, raining, storm);
+    return;
+  }
+  // fallback minimal
+  ctx.fillStyle = "#8a9aaa";
+  ctx.fillRect(0, 0, W, GROUND_Y);
+  drawCrowd();
+  ctx.fillStyle = "#7a8088";
+  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
+  if (raining) drawRain(storm ? 1 : 0.55);
+}
+
+function drawBgParadePng(t, raining, storm) {
+  const p = SPRITES.mapHoun;
+
+  if (spriteReady(p.far)) {
+    ctx.globalAlpha = storm ? 0.55 : 0.75;
+    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    ctx.globalAlpha = 1;
+  }
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+
+  if (storm) {
+    ctx.fillStyle = "rgba(60,70,80,0.35)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  } else if (raining) {
+    ctx.fillStyle = "rgba(90,100,110,0.16)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  }
+
+  // Public calque désactivé (déjà dans le skyline)
+
+  // Sol pavé
+  const pave = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
+  if (raining) {
+    pave.addColorStop(0, "#6a7078");
+    pave.addColorStop(1, "#4a5058");
+  } else {
+    pave.addColorStop(0, "#9aa2aa");
+    pave.addColorStop(1, "#7a828a");
+  }
+  ctx.fillStyle = pave;
+  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
+  ctx.fillStyle = "rgba(0,0,0,0.08)";
+  ctx.fillRect(0, GROUND_Y, W, 2);
+
+  // bordure rouge / or
+  ctx.fillStyle = "#c62828";
+  ctx.fillRect(0, GROUND_Y - 41, W, 3);
+  ctx.fillStyle = "#c9a227";
+  ctx.fillRect(0, GROUND_Y - 38, W, 1);
+
+  // Bannière
+  if (spriteReady(p.flag)) {
+    const bob = Math.sin(t * 2.1) * 2;
+    drawMapProp(p.flag, 78, GROUND_Y + 2 + bob, 100);
+    ctx.save();
+    ctx.translate(W - 78, 0);
+    ctx.scale(-1, 1);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, 100);
+    ctx.restore();
+  }
+
+  // Bouquets
+  if (spriteReady(p.flower)) {
+    drawMapProp(p.flower, 200, GROUND_Y + 2, 42);
+    drawMapProp(p.flower, W - 200, GROUND_Y + 2, 40);
+  }
+
+  // Radar décoratif (gauche) — idle / « actif » léger
+  if (spriteReady(p.radar)) {
+    const ping = Math.sin(t * 4) > 0.65 && spriteReady(p.radarActive);
+    drawMapProp(ping ? p.radarActive : p.radar, 130, GROUND_Y + 2, 70);
+  }
+
+  if (raining) drawRain(storm ? 1 : 0.55);
+  drawMapEventOverlay();
+}
+
+/** Palais de l'Hexagone — fond PNG Micron. */
+function drawBgPrairiePng(t, raining, storm) {
+  const p = SPRITES.mapMicron;
+
+  // far optionnel (scène différente) : léger voile seulement
+  if (spriteReady(p.far)) {
+    ctx.globalAlpha = storm ? 0.35 : 0.45;
+    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    ctx.globalAlpha = 1;
+  }
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+
+  if (storm) {
+    ctx.fillStyle = "rgba(70,80,90,0.32)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  } else if (raining) {
+    ctx.fillStyle = "rgba(100,120,130,0.16)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  }
+
+  // Public PNG désactivé pour l’instant (même raison que Resort)
+
+  // Sol graviers / cour jouable
+  const gravel = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
+  if (raining) {
+    gravel.addColorStop(0, "#9a9080");
+    gravel.addColorStop(1, "#6e6558");
+  } else {
+    gravel.addColorStop(0, "#d2c4a8");
+    gravel.addColorStop(1, "#b5a68a");
+  }
+  ctx.fillStyle = gravel;
+  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
+  ctx.fillStyle = "rgba(0,0,0,0.07)";
+  ctx.fillRect(0, GROUND_Y, W, 2);
+
+  // bordure institutionnelle
+  ctx.fillStyle = "#1a237e";
+  ctx.fillRect(0, GROUND_Y - 41, W, 3);
+  ctx.fillStyle = "#c9a227";
+  ctx.fillRect(0, GROUND_Y - 38, W, 1);
+
+  // Drapeaux (gauche / droite)
+  if (spriteReady(p.flag)) {
+    const bob = Math.sin(t * 2.4) * 2;
+    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, 96);
+    ctx.save();
+    ctx.translate(W - 70, 0);
+    ctx.scale(-1, 1);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, 96);
+    ctx.restore();
+  }
+
+  // Pigeons décoratifs
+  if (spriteReady(p.pigeon)) {
+    const bob1 = Math.sin(t * 3.1) * 1.5;
+    const bob2 = Math.sin(t * 2.7 + 1.2) * 1.5;
+    drawMapProp(p.pigeon, 160, GROUND_Y - 2 + bob1, 28);
+    drawMapProp(p.pigeon, W - 180, GROUND_Y - 4 + bob2, 26);
+  }
+
+  if (raining) drawRain(storm ? 1 : 0.55);
+  drawMapEventOverlay();
+}
+
+// touffe de carottes plantées dans l'herbe (décor)
 function drawCarrotPatch(px, storm) {
   const t = performance.now() / 1000;
   const sway = Math.sin(t * (storm ? 3 : 1)) * (storm ? 4 : 1.5);
@@ -555,478 +961,50 @@ function drawHayBale(px) {
   ctx.beginPath(); ctx.moveTo(px - 26, py); ctx.lineTo(px + 26, py); ctx.stroke();
 }
 
-// ---------- Manoir hanté (Scooby) ----------
-function drawBgManoir() {
-  const t = performance.now() / 1000;
-  const rainy = weather === "rain" || weather === "storm";
-  const stormy = weather === "storm";
 
-  // Fond PNG plat (intérieur manoir) si chargé ; sinon fallback canvas extérieur
-  const manoirPng = typeof spriteReady === "function" && spriteReady(SPRITES.manoirBg);
-  if (manoirPng) {
-    // version accentuée (unsharp mask) si prête, sinon le PNG brut
-    const img = SPRITES.manoirBgSharp || SPRITES.manoirBg;
-    const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height;
-    // Aligne le bas du décor sur la ligne de sol du jeu
-    const drawH = GROUND_Y;
-    const drawW = W;
-    ctx.drawImage(img, 0, 0, sw, sh, 0, 0, drawW, drawH);
-  } else {
-    // Fallback vectoriel (ancien rendu)
-    const sky = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
-    if (stormy) { sky.addColorStop(0, "#0a0614"); sky.addColorStop(1, "#1a1230"); }
-    else { sky.addColorStop(0, "#1a0f2e"); sky.addColorStop(1, "#3a2a55"); }
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, W, GROUND_Y);
-    const starA = rainy ? 0.2 : 0.7;
-    for (let i = 0; i < 40; i++) {
-      const sxx = (i * 139.1) % W;
-      const syy = (i * 71.3) % (GROUND_Y - 160);
-      ctx.globalAlpha = (0.3 + Math.abs(Math.sin(t * 1.2 + i)) * 0.5) * starA;
-      ctx.fillStyle = "#e8e0ff";
-      ctx.beginPath();
-      ctx.arc(sxx, syy, i % 6 === 0 ? 1.6 : 1, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-    const moon = celestialPos();
-    ctx.fillStyle = "rgba(255,230,160,0.15)";
-    ctx.beginPath(); ctx.arc(moon.x, moon.y, 42, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = rainy ? "rgba(230,210,150,0.55)" : "#f5e6b8";
-    ctx.beginPath(); ctx.arc(moon.x, moon.y, 28, 0, Math.PI * 2); ctx.fill();
-    if (rainy) drawClouds(stormy ? "rgba(30,25,45,0.95)" : "rgba(55,45,75,0.88)");
-    drawHillLayer(GROUND_Y - 100, "#1a1528", 0.1,
-      [[80, GROUND_Y - 140], [280, GROUND_Y - 110], [500, GROUND_Y - 150], [720, GROUND_Y - 115], [880, GROUND_Y - 135]]);
-    drawHillLayer(GROUND_Y - 85, "#221c35", 0.28,
-      [[160, GROUND_Y - 115], [400, GROUND_Y - 95], [620, GROUND_Y - 125], [820, GROUND_Y - 100]]);
-    drawHauntedManor(W * 0.28, GROUND_Y - 38, t, stormy);
-    drawDeadTrees();
-    drawGravestones();
-    drawCrowd();
-    drawMysteryMachine(W * 0.78, GROUND_Y - 8, t);
+
+/** Poteau PNG du terrain courant, ou null → fallback canvas. */
+function terrainNetPostImg() {
+  const key = TERRAINS[terrain].key;
+  if (key === "neige" && SPRITES.mapVladou && spriteReady(SPRITES.mapVladou.netPost)) {
+    return SPRITES.mapVladou.netPost;
   }
-
-  // Sol jeu (bande sous les pieds) — tons bois poussiéreux si fond intérieur PNG
-  const ground = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  if (manoirPng) {
-    ground.addColorStop(0, rainy ? "#6a5a48" : "#8a7358");
-    ground.addColorStop(1, "#4a3c30");
-  } else {
-    ground.addColorStop(0, rainy ? "#3a3830" : "#4a4638");
-    ground.addColorStop(1, "#2a2820");
+  if (key === "plage" && SPRITES.mapTrompette && spriteReady(SPRITES.mapTrompette.netPost)) {
+    return SPRITES.mapTrompette.netPost;
   }
-  ctx.fillStyle = ground;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.fillStyle = "rgba(0,0,0,0.2)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
-
-  ctx.strokeStyle = manoirPng ? "rgba(60,45,30,0.35)" : "rgba(80,70,40,0.45)";
-  ctx.lineWidth = 1.4;
-  for (let i = 0; i < 36; i++) {
-    const gx = (i * 181.3) % W;
-    const gy = GROUND_Y + 4 + (i * 29.7) % (H - GROUND_Y - 10);
-    const lean = Math.sin(t * 1.5 + i) * 2.5;
-    ctx.beginPath(); ctx.moveTo(gx, gy + 4); ctx.lineTo(gx + lean, gy - 4); ctx.stroke();
+  if (key === "prairie" && SPRITES.mapMicron && spriteReady(SPRITES.mapMicron.netPost)) {
+    return SPRITES.mapMicron.netPost;
   }
-
-  if (!rainy) {
-    for (let i = 0; i < 6; i++) {
-      const fx = W / 2 + Math.sin(t * (0.25 + i * 0.06) + i * 2) * (W * 0.4);
-      const fy = GROUND_Y - 50 - Math.abs(Math.sin(t * (0.4 + i * 0.08) + i)) * 100;
-      const a = 0.25 + Math.abs(Math.sin(t * 2.2 + i)) * 0.55;
-      ctx.fillStyle = "rgba(120,255,160," + (a * 0.2).toFixed(2) + ")";
-      ctx.beginPath(); ctx.arc(fx, fy, 5, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = "rgba(160,255,180," + a.toFixed(2) + ")";
-      ctx.beginPath(); ctx.arc(fx, fy, 1.8, 0, Math.PI * 2); ctx.fill();
-    }
-  } else {
-    drawFog(stormy ? 1 : 0.6);
+  if (key === "parade" && SPRITES.mapHoun && spriteReady(SPRITES.mapHoun.netPost)) {
+    return SPRITES.mapHoun.netPost;
   }
-}
-
-function drawHauntedManor(cx, baseY, t, stormy) {
-  const flash = stormy && ((t % 3.2) < 0.08 || ((t % 3.2) > 0.14 && (t % 3.2) < 0.2));
-  // corps principal
-  ctx.fillStyle = "#2a2438";
-  ctx.fillRect(cx - 90, baseY - 130, 180, 130);
-  // ailes
-  ctx.fillStyle = "#241e32";
-  ctx.fillRect(cx - 140, baseY - 95, 55, 95);
-  ctx.fillRect(cx + 85, baseY - 110, 60, 110);
-  // toits pointus
-  ctx.fillStyle = "#1a1524";
-  ctx.beginPath();
-  ctx.moveTo(cx - 100, baseY - 130);
-  ctx.lineTo(cx, baseY - 190);
-  ctx.lineTo(cx + 100, baseY - 130);
-  ctx.closePath();
-  ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(cx - 145, baseY - 95);
-  ctx.lineTo(cx - 112, baseY - 140);
-  ctx.lineTo(cx - 80, baseY - 95);
-  ctx.closePath();
-  ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(cx + 80, baseY - 110);
-  ctx.lineTo(cx + 115, baseY - 165);
-  ctx.lineTo(cx + 150, baseY - 110);
-  ctx.closePath();
-  ctx.fill();
-  // tour
-  ctx.fillStyle = "#2e273c";
-  ctx.fillRect(cx + 95, baseY - 175, 28, 70);
-  ctx.beginPath();
-  ctx.moveTo(cx + 90, baseY - 175);
-  ctx.lineTo(cx + 109, baseY - 210);
-  ctx.lineTo(cx + 128, baseY - 175);
-  ctx.closePath();
-  ctx.fill();
-  // fenêtres verdâtres (clignotent un peu)
-  const winCol = flash ? "rgba(220,255,200,0.85)" : "rgba(140,220,120," + (0.35 + Math.abs(Math.sin(t * 2)) * 0.35).toFixed(2) + ")";
-  ctx.fillStyle = winCol;
-  for (const [wx, wy, ww, wh] of [
-    [cx - 60, baseY - 105, 18, 22], [cx - 20, baseY - 105, 18, 22], [cx + 25, baseY - 105, 18, 22],
-    [cx - 55, baseY - 60, 16, 20], [cx + 5, baseY - 60, 16, 20], [cx + 40, baseY - 60, 16, 20],
-    [cx - 125, baseY - 70, 14, 18], [cx + 100, baseY - 80, 14, 18], [cx + 100, baseY - 155, 12, 14]
-  ]) {
-    ctx.fillRect(wx, wy, ww, wh);
-  }
-  // porte
-  ctx.fillStyle = "#1a1420";
-  ctx.fillRect(cx - 18, baseY - 48, 36, 48);
-  ctx.strokeStyle = "#3a3048";
-  ctx.lineWidth = 2;
-  ctx.strokeRect(cx - 18, baseY - 48, 36, 48);
-  ctx.fillStyle = "#c9a84a";
-  ctx.beginPath(); ctx.arc(cx + 10, baseY - 24, 2.5, 0, Math.PI * 2); ctx.fill();
-  // chauves-souris
-  ctx.strokeStyle = "rgba(20,15,30,0.85)";
-  ctx.lineWidth = 1.6;
-  for (let i = 0; i < 4; i++) {
-    const bx = cx - 40 + i * 45 + Math.sin(t * 2 + i) * 30;
-    const by = baseY - 200 - Math.abs(Math.sin(t * 3 + i * 1.3)) * 25;
-    const flap = Math.sin(t * 10 + i) * 4;
-    ctx.beginPath();
-    ctx.moveTo(bx - 8, by + flap);
-    ctx.quadraticCurveTo(bx - 3, by - 3, bx, by);
-    ctx.quadraticCurveTo(bx + 3, by - 3, bx + 8, by + flap);
-    ctx.stroke();
-  }
-}
-
-function drawDeadTrees() {
-  const t = performance.now() / 1000;
-  ctx.strokeStyle = "#1e1830";
-  ctx.lineCap = "round";
-  for (const [tx, th] of [[55, 70], [W - 50, 80]]) {
-    const sway = Math.sin(t * 0.8 + tx) * 3;
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.moveTo(tx, GROUND_Y - 36);
-    ctx.quadraticCurveTo(tx + sway, GROUND_Y - 36 - th * 0.5, tx + sway * 1.2, GROUND_Y - 36 - th);
-    ctx.stroke();
-    ctx.lineWidth = 2.5;
-    for (const [ang, len] of [[-0.7, 22], [0.5, 18], [-0.2, 14]]) {
-      const tipX = tx + sway * 1.2 + Math.cos(ang - Math.PI / 2) * len;
-      const tipY = GROUND_Y - 36 - th + 10 + Math.sin(ang - Math.PI / 2) * len;
-      ctx.beginPath();
-      ctx.moveTo(tx + sway * 0.8, GROUND_Y - 36 - th + 18);
-      ctx.lineTo(tipX, tipY);
-      ctx.stroke();
-    }
-  }
-}
-
-function drawGravestones() {
-  ctx.fillStyle = "#3a3848";
-  for (const [gx, gh] of [[120, 22], [155, 18], [W - 140, 20]]) {
-    ctx.beginPath();
-    ctx.moveTo(gx - 10, GROUND_Y - 36);
-    ctx.lineTo(gx - 10, GROUND_Y - 36 - gh);
-    ctx.arc(gx, GROUND_Y - 36 - gh, 10, Math.PI, 0);
-    ctx.lineTo(gx + 10, GROUND_Y - 36);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = "rgba(0,0,0,0.25)";
-    ctx.fillRect(gx - 4, GROUND_Y - 36 - gh + 4, 8, 3);
-    ctx.fillStyle = "#3a3848";
-  }
-}
-
-// Mystery Machine : sprite PNG si chargé, sinon van canvas
-function drawMysteryMachine(px, py, t) {
-  const bob = Math.sin(t * 1.5) * 0.6;
-  const y = py + bob;
-  ctx.save();
-  ctx.fillStyle = "rgba(0,0,0,0.25)";
-  ctx.beginPath(); ctx.ellipse(px, GROUND_Y - 34, 52, 6, 0, 0, Math.PI * 2); ctx.fill();
-
-  if (spriteReady(SPRITES.mysteryVan)) {
-    const img = SPRITES.mysteryVan;
-    const drawH = 72;
-    const drawW = drawH * (img.naturalWidth / img.naturalHeight);
-    ctx.drawImage(img, px - drawW / 2, y - drawH + 4, drawW, drawH);
-    ctx.restore();
-    return;
-  }
-
-  // caisse principale (turquoise)
-  ctx.fillStyle = "#3d9e9a";
-  ctx.beginPath();
-  ctx.moveTo(px - 55, y - 18);
-  ctx.lineTo(px - 55, y - 48);
-  ctx.quadraticCurveTo(px - 50, y - 62, px - 30, y - 64);
-  ctx.lineTo(px + 35, y - 64);
-  ctx.quadraticCurveTo(px + 55, y - 62, px + 58, y - 48);
-  ctx.lineTo(px + 58, y - 18);
-  ctx.closePath();
-  ctx.fill();
-
-  // bande orange basse
-  ctx.fillStyle = "#e07a2a";
-  ctx.fillRect(px - 55, y - 28, 113, 10);
-
-  // portes / flancs verts
-  ctx.fillStyle = "#2f7a48";
-  ctx.fillRect(px - 20, y - 52, 38, 24);
-  ctx.strokeStyle = "rgba(0,0,0,0.2)";
-  ctx.lineWidth = 1.2;
-  ctx.strokeRect(px - 20, y - 52, 38, 24);
-
-  // fleurs hippies
-  for (const [fx, fy, col] of [[px - 40, y - 40, "#f0c94a"], [px + 42, y - 38, "#e85d8a"], [px + 8, y - 58, "#f0c94a"]]) {
-    ctx.fillStyle = col;
-    for (let k = 0; k < 5; k++) {
-      const a = (k / 5) * Math.PI * 2;
-      ctx.beginPath();
-      ctx.ellipse(fx + Math.cos(a) * 4, fy + Math.sin(a) * 4, 3.2, 2.2, a, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.fillStyle = "#fff8c8";
-    ctx.beginPath(); ctx.arc(fx, fy, 2.2, 0, Math.PI * 2); ctx.fill();
-  }
-
-  // pare-brise
-  ctx.fillStyle = "rgba(180,220,255,0.55)";
-  ctx.beginPath();
-  ctx.moveTo(px - 48, y - 48);
-  ctx.lineTo(px - 30, y - 60);
-  ctx.lineTo(px - 8, y - 60);
-  ctx.lineTo(px - 8, y - 48);
-  ctx.closePath();
-  ctx.fill();
-
-  // phares
-  ctx.fillStyle = "#ffe08a";
-  ctx.beginPath(); ctx.arc(px - 52, y - 24, 4, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(px + 54, y - 24, 3.5, 0, Math.PI * 2); ctx.fill();
-
-  // roues
-  for (const wx of [px - 32, px + 32]) {
-    ctx.fillStyle = "#222";
-    ctx.beginPath(); ctx.arc(wx, y - 12, 11, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#888";
-    ctx.beginPath(); ctx.arc(wx, y - 12, 5, 0, Math.PI * 2); ctx.fill();
-  }
-
-  // antenne
-  ctx.strokeStyle = "#333";
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(px + 20, y - 64);
-  ctx.lineTo(px + 20 + Math.sin(t * 3) * 3, y - 78);
-  ctx.stroke();
-  ctx.fillStyle = "#e85d8a";
-  ctx.beginPath();
-  ctx.arc(px + 20 + Math.sin(t * 3) * 3, y - 78, 2.5, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-}
-
-// ---------- Terrains Belzébuth (mode caché) ----------
-function drawBgEnfer() {
-  const t = performance.now() / 1000;
-  const storm = weather === "storm";
-  const active = weather === "rain" || storm; // éruption plus intense
-
-  const sky = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
-  sky.addColorStop(0, "#0a0000");
-  sky.addColorStop(1, active ? "#5a0f0f" : "#3a0808");
-  ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, W, GROUND_Y);
-
-  // lueur pulsante (soleil infernal)
-  const pulse = 0.5 + Math.sin(t * (storm ? 3 : 1.2)) * 0.25;
-  const glow = ctx.createRadialGradient(W / 2, 70, 10, W / 2, 70, 170);
-  glow.addColorStop(0, "rgba(255,90,20," + (0.55 * pulse).toFixed(2) + ")");
-  glow.addColorStop(1, "rgba(255,90,20,0)");
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, W, GROUND_Y);
-
-  drawHillLayer(GROUND_Y - 100, "#1a0505", 0.12,
-    [[100, GROUND_Y - 150], [260, GROUND_Y - 190], [420, GROUND_Y - 140], [600, GROUND_Y - 200], [800, GROUND_Y - 150]]);
-  drawHillLayer(GROUND_Y - 90, "#2a0808", 0.3,
-    [[170, GROUND_Y - 120], [370, GROUND_Y - 160], [560, GROUND_Y - 110], [770, GROUND_Y - 150]]);
-
-  drawCrowd();
-
-  // rivière de lave au loin
-  ctx.fillStyle = "#7a1a00";
-  ctx.fillRect(0, GROUND_Y - 55, W, 18);
-  ctx.fillStyle = "rgba(255,160,40,0.5)";
-  for (let i = 0; i < 6; i++) {
-    const lx = (i * 160 + Math.sin(t + i) * 20 + W) % W;
-    ctx.fillRect(lx, GROUND_Y - 54, 30, 3);
-  }
-
-  // croûte noire fissurée, lueur orange dans les fissures
-  ctx.fillStyle = "#120404";
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.strokeStyle = "rgba(255,110,30,0.55)";
-  ctx.lineWidth = 2;
-  for (let i = 0; i < 10; i++) {
-    const cx2 = (i * 97.3) % W, cy2 = GROUND_Y + 6 + (i * 23) % (H - GROUND_Y - 10);
-    ctx.globalAlpha = 0.4 + Math.abs(Math.sin(t * 2 + i)) * 0.5;
-    ctx.beginPath();
-    ctx.moveTo(cx2 - 14, cy2); ctx.lineTo(cx2, cy2 - 4); ctx.lineTo(cx2 + 14, cy2 + 3);
-    ctx.stroke();
-  }
-  ctx.globalAlpha = 1;
-
-  // braises montantes
-  ctx.fillStyle = "#ff6a2e";
-  for (let i = 0; i < 40; i++) {
-    const cyc = (t * (30 + (i % 7) * 8) + i * 41) % (H + 40);
-    const ex = (i * 67.7) % W + Math.sin(t * 1.6 + i) * 10;
-    const ey = H - cyc;
-    ctx.globalAlpha = Math.max(0, 1 - cyc / (H + 40)) * 0.85;
-    ctx.beginPath(); ctx.arc(ex, ey, 1.4 + (i % 3), 0, Math.PI * 2); ctx.fill();
-  }
-  ctx.globalAlpha = 1;
-
-  drawSkullPole(60);
-  if (storm) {
-    const cyc = t % 2.4;
-    if (cyc < 0.08) { ctx.fillStyle = "rgba(255,60,20,0.35)"; ctx.fillRect(0, 0, W, GROUND_Y); }
-  }
-}
-
-function drawSkullPole(px) {
-  const baseY = GROUND_Y - 4;
-  ctx.strokeStyle = "#3a1a10"; ctx.lineWidth = 6; ctx.lineCap = "round";
-  ctx.beginPath(); ctx.moveTo(px, baseY); ctx.lineTo(px, baseY - 90); ctx.stroke();
-  ctx.fillStyle = "#e8e2d0";
-  ctx.beginPath(); ctx.arc(px, baseY - 104, 14, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = "#1a0a05";
-  ctx.beginPath(); ctx.arc(px - 5, baseY - 106, 3, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(px + 5, baseY - 106, 3, 0, Math.PI * 2); ctx.fill();
-  ctx.fillRect(px - 3, baseY - 98, 6, 5);
-}
-
-function drawBgStyx() {
-  const t = performance.now() / 1000;
-  const foggy = weather === "rain" || weather === "storm";
-
-  const sky = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
-  sky.addColorStop(0, "#0a1208");
-  sky.addColorStop(1, foggy ? "#233a1e" : "#162412");
-  ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, W, GROUND_Y);
-
-  const mx = W * 0.8, my = 90;
-  ctx.fillStyle = "rgba(150,255,140,0.18)";
-  ctx.beginPath(); ctx.arc(mx, my, 46, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = "#9fce7a";
-  ctx.beginPath(); ctx.arc(mx, my, 30, 0, Math.PI * 2); ctx.fill();
-
-  drawHillLayer(GROUND_Y - 95, "#0d160a", 0.12,
-    [[110, GROUND_Y - 140], [300, GROUND_Y - 110], [500, GROUND_Y - 150], [700, GROUND_Y - 115], [850, GROUND_Y - 140]]);
-  drawHillLayer(GROUND_Y - 82, "#131f0e", 0.3,
-    [[180, GROUND_Y - 112], [380, GROUND_Y - 96], [580, GROUND_Y - 118], [790, GROUND_Y - 100]]);
-
-  drawCrowd();
-
-  // le Styx : eau sombre, reflet verdâtre de la lune
-  ctx.fillStyle = "#0c1a10";
-  ctx.fillRect(0, GROUND_Y - 55, W, 18);
-  ctx.fillStyle = "rgba(150,255,140,0.12)";
-  for (let i = 0; i < 5; i++) {
-    const rw = 26 - i * 4;
-    ctx.fillRect(mx - rw / 2 + Math.sin(t * 2 + i) * 6, GROUND_Y - 54 + i * 3.4, rw, 2);
-  }
-
-  // rive boueuse
-  const mud = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  mud.addColorStop(0, "#2a2314");
-  mud.addColorStop(1, "#181206");
-  ctx.fillStyle = mud;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-
-  drawDeadTree(60);
-  drawDeadTree(840);
-
-  // feux follets
-  for (let i = 0; i < 6; i++) {
-    const fx = W / 2 + Math.sin(t * (0.3 + i * 0.07) + i * 2.4) * (W * 0.42);
-    const fy = GROUND_Y - 70 - Math.abs(Math.sin(t * (0.5 + i * 0.1) + i)) * 100;
-    const a = 0.35 + Math.abs(Math.sin(t * 2 + i * 1.7)) * 0.65;
-    ctx.fillStyle = "rgba(150,255,140," + (a * 0.25).toFixed(2) + ")";
-    ctx.beginPath(); ctx.arc(fx, fy, 6, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "rgba(190,255,170," + a.toFixed(2) + ")";
-    ctx.beginPath(); ctx.arc(fx, fy, 2, 0, Math.PI * 2); ctx.fill();
-  }
-
-  if (foggy) {
-    ctx.fillStyle = "rgba(180,220,180,0.08)";
-    for (let i = 0; i < 3; i++) {
-      const fy2 = GROUND_Y - 10 - i * 8;
-      ctx.beginPath();
-      ctx.ellipse(((t * 20 + i * 300) % (W + 200)) - 100, fy2, 160, 14, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-}
-
-function drawDeadTree(px) {
-  ctx.strokeStyle = "#1a1508"; ctx.lineWidth = 7; ctx.lineCap = "round";
-  ctx.beginPath(); ctx.moveTo(px, GROUND_Y - 6); ctx.lineTo(px - 4, GROUND_Y - 70); ctx.stroke();
-  ctx.lineWidth = 4;
-  for (const [dx, dy, ang] of [[-4, -70, -0.6], [-4, -70, 0.5], [-10, -50, -0.9]]) {
-    ctx.beginPath();
-    ctx.moveTo(px + dx, GROUND_Y + dy);
-    ctx.lineTo(px + dx + Math.cos(ang) * 30, GROUND_Y + dy + Math.sin(ang) * 30 - 10);
-    ctx.stroke();
-  }
+  return null;
 }
 
 function drawNet() {
-  // ombre au sol du poteau
+  // Uniforme : poteau PNG centré sur NET_X, sans maille. Sinon poteau canvas.
+  const img = terrainNetPostImg();
+
   ctx.fillStyle = "rgba(0,0,0,0.15)";
   ctx.beginPath();
-  ctx.ellipse(NET_X + 6, GROUND_Y + 4, 14, 4, 0, 0, Math.PI * 2);
+  ctx.ellipse(NET_X, GROUND_Y + 4, img ? 18 : 14, 4, 0, 0, Math.PI * 2);
   ctx.fill();
-  // poteau en dégradé (effet de volume)
+
+  if (img) {
+    const drawH = (GROUND_Y - NET_TOP) + 42;
+    const aspect = (img.naturalWidth || img.width) / Math.max(1, img.naturalHeight || img.height);
+    const drawW = drawH * aspect * 0.8;
+    ctx.drawImage(img, NET_X - drawW / 2, GROUND_Y - drawH + 2, drawW, drawH);
+    return;
+  }
+
+  // Fallback canvas (pas de pack poteau)
   const pg = ctx.createLinearGradient(NET_X - NET_W / 2, 0, NET_X + NET_W / 2, 0);
   pg.addColorStop(0, "#a1887f");
   pg.addColorStop(0.45, "#8d6e63");
   pg.addColorStop(1, "#5d4037");
   ctx.fillStyle = pg;
   ctx.fillRect(NET_X - NET_W / 2, NET_TOP, NET_W, GROUND_Y - NET_TOP);
-  // maille croisée
-  ctx.strokeStyle = "rgba(255,255,255,0.55)";
-  ctx.lineWidth = 1;
-  for (let y = NET_TOP + 10; y < GROUND_Y - 4; y += 12) {
-    ctx.beginPath();
-    ctx.moveTo(NET_X - NET_W / 2 + 1, y);
-    ctx.lineTo(NET_X + NET_W / 2 - 1, y + 6);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(NET_X + NET_W / 2 - 1, y);
-    ctx.lineTo(NET_X - NET_W / 2 + 1, y + 6);
-    ctx.stroke();
-  }
-  // pommeau brillant
   const kg = ctx.createRadialGradient(NET_X - 2, NET_TOP - 2, 1, NET_X, NET_TOP, NET_W / 2 + 4);
   kg.addColorStop(0, "#8d6e63");
   kg.addColorStop(1, "#4e342e");
@@ -1315,7 +1293,7 @@ function drawHUD() {
     if (ready) {
       ctx.fillStyle = "#ffd93d";
       ctx.font = "700 10px " + MONO;
-      ctx.fillText("SUPER — " + (s === 0 ? "S" : "↓"), cx, by + 22);
+      ctx.fillText("SUPER — " + (s === 0 ? "E" : "Shift"), cx, by + 22);
     } else {
       ctx.fillStyle = "rgba(255,255,255,0.85)";
       ctx.font = "700 10px " + MONO;
@@ -1337,7 +1315,7 @@ function drawHUD() {
   }
 
   // balle de match — liseré sombre systématique : sans lui, la couleur de
-  // l'animal (pas toujours claire) peut se fondre dans le décor.
+  // le perso (pas toujours claire) peut se fondre dans le décor.
   if (state === "play" || state === "serve") {
     for (const s of [0, 1]) {
       if (scores[s] >= WIN_SCORE - 1 && scores[s] - scores[1 - s] >= 1) {
@@ -1368,12 +1346,12 @@ function drawHUD() {
     ctx.font = "bold 88px 'Inter', system-ui, sans-serif";
     ctx.fillText(label, NET_X, H / 2 + 20);
   } else if (state === "serve") {
-    const txt = "Service : " + sideLabel(servingSide) + " — touchez la balle !";
+    const txt = "Service : " + sideLabel(servingSide) + " — X lancer, puis X frapper (pas le saut) !";
     ctx.textAlign = "center";
     ctx.font = "700 17px 'Inter', system-ui, sans-serif";
     const tw = ctx.measureText(txt).width;
     // sous les panneaux de score (qui vont jusqu'à y=126) : avec le nom de
-    // l'animal (souvent plus long que "Gauche"/"Droite"), la pastille est
+    // le perso (souvent plus long que "Gauche"/"Droite"), la pastille est
     // parfois plus large qu'eux — la garder plus haut la faisait chevaucher.
     const pw = tw + 36, ph = 34, px = NET_X - pw / 2, py = 134;
     // pastille pleine (au lieu de texte nu semi-transparent) : lisible sur
@@ -1392,24 +1370,27 @@ function drawHUD() {
 }
 
 function overlay(title, subtitle) {
-  // voile éditorial + plaque centrée (même grammaire que les menus)
-  ctx.fillStyle = "rgba(8,9,14,0.72)";
+  ctx.fillStyle = "rgba(12, 20, 42, 0.72)";
   ctx.fillRect(0, 0, W, H);
   const pw = 520, ph = 160, px = (W - pw) / 2, py = (H - ph) / 2 - 8;
-  ctx.fillStyle = "rgba(10,12,18,0.88)";
+  ctx.fillStyle = "rgba(255,246,232,0.95)";
   ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 12);
+  if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 18);
   else ctx.rect(px, py, pw, ph);
   ctx.fill();
-  ctx.strokeStyle = "rgba(255,255,255,0.12)"; ctx.lineWidth = 1; ctx.stroke();
-  uiLabel(darkMode ? "Pussy Volley" : "Crabby Volley", W / 2, py + 28, 10, uiAccent(), 2, "center");
-  ctx.textAlign = "center";
-  ctx.fillStyle = UI.ink;
-  ctx.font = "800 36px " + UI.sans;
-  ctx.fillText(title, W / 2, py + 78);
+  ctx.strokeStyle = UI.stroke; ctx.lineWidth = 4; ctx.stroke();
+  uiLabel("Sommet Volley", W / 2, py + 32, 13, uiAccent(), 0.4, "center");
+  if (typeof uiTitle === "function") uiTitle(title, W / 2, py + 82, 34, "center");
+  else {
+    ctx.textAlign = "center";
+    ctx.fillStyle = UI.stroke;
+    ctx.font = "800 34px " + UI.sans;
+    ctx.fillText(title, W / 2, py + 82);
+  }
   if (subtitle) {
-    ctx.font = "400 15px " + UI.sans;
-    ctx.fillStyle = "rgba(255,255,255,0.72)";
+    ctx.textAlign = "center";
+    ctx.font = "700 15px " + UI.sans;
+    ctx.fillStyle = "rgba(27,23,48,0.7)";
     ctx.fillText(subtitle, W / 2, py + 118);
   }
 }

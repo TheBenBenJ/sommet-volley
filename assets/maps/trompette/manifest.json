@@ -1,0 +1,8 @@
+{
+  "key": "trompette",
+  "name": "Resort Doré",
+  "layers": ["far", "skyline", "crowd_0"],
+  "props": ["cart_0", "cart_1", "palm", "flag", "warn", "net_post"],
+  "thumb": "thumb.png",
+  "event": "golf_cart"
+}

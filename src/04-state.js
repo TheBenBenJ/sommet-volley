@@ -1,16 +1,14 @@
-// crabby-volley · état & données — terrains, animaux, classe Blob, combos/supers
+// sommet-volley · état & données — terrains, personnages, Blob, combos/supers
 "use strict";
 
-// ---------- Terrains et animaux ----------
-// chaque terrain appartient à un animal (voir ANIMALS plus bas) : son public
-// des tribunes est composé de cet animal, et le nom du terrain lui rend hommage.
+// ---------- Terrains et personnages ----------
+// chaque terrain appartient à un perso (voir ANIMALS) : son public des
+// tribunes est composé de ce perso, et le nom du terrain lui rend hommage.
 const TERRAINS = [
-  { key: "plage",   name: "La Zone de Piou-Piou",     animal: 0 },
-  { key: "neige",   name: "Le QG du Général Frigo",   animal: 2 },
-  { key: "nuit",    name: "La Mare à Slurp",          animal: 1 },
-  { key: "prairie", name: "Le Ter-Ter de Jeannot",    animal: 3 },
-  { key: "enfer",   name: "La Fournaise à Chibre",    animal: 4, hidden: true },
-  { key: "styx",    name: "Le Marigot de Schneck",    animal: 5, hidden: true }
+  { key: "neige",   name: "Place Grand-Rouge",       animal: 0 }, // Vladou
+  { key: "plage",   name: "Resort Doré",             animal: 1 }, // Trompette
+  { key: "prairie", name: "Palais de l'Hexagone",    animal: 2 }, // Micron
+  { key: "parade",  name: "Esplanade du Défilé",     animal: 3 }, // Houn
 ];
 let terrain = 0;
 
@@ -22,128 +20,88 @@ const BALL_SKINS = [
 let ballSkin = 0;
 
 const ANIMALS = [
-  // stats affichées sur 5 (Vitesse/Détente/Puissance/Contrôle) + multiplicateurs moteur.
-  // speed : vitesse au sol · jump : force de saut · power : force de frappe
-  // control : 1 = parfait, <1 = déviation aléatoire à la frappe
-  // beak : possède un bec (risque de crevaison) · slip : inertie/dérapage au sol
-  // stick : langue collante (grosse déviation)
-  // molt : se déplume au fil des touches (8 coups), à nu d'un coup si le point est perdu
-  // tired : se fatigue au fil des touches (oreilles qui tombent, sueur) — purement visuel
-  // angry : de plus en plus furieux au fil des touches, au max d'un coup si le point est perdu
-  // crazy : de plus en plus folle au fil des touches, au max d'un coup si le point est perdu
+  // Casting satirique Sommet Volley — fiches docs/chars/*.yaml
+  // stats /5 + multiplicateurs moteur (speed, jump, power, control)
   {
-    key: "oiseau", name: "Piou-Piou",
-    color: "#f4c531", darkColor: "#d69e18",   // canari jaune
-    stats: { vitesse: 4, detente: 4, puissance: 2, controle: 3 },
-    speed: 1.12, jump: 1.12, power: 0.82, control: 0.9,
-    beak: true, molt: true,
-    trait: "Bec fragile : peut crever la balle. Se déplume à la perte du point.",
-    superName: "Piqué éclair", superDesc: "Bond fulgurant : la frappe suivante est un smash aérien."
+    key: "vladou", name: "Tsar Vladou",
+    color: "#b43a2e", darkColor: "#7a281e",
+    stats: { vitesse: 3, detente: 3, puissance: 4, controle: 4 },
+    speed: 1.06, jump: 1.06, power: 1.18, control: 0.91,
+    coldProof: true, angry: true,
+    trait: "Sang froid : insensible au gel / ralentissement.",
+    superName: "Hiver Général", superDesc: "Gèle le camp adverse ~6 s : glisse extrême + flocons."
   },
   {
-    key: "grenouille", name: "Madame Slurp",
-    color: "#6fbf4b", darkColor: "#4e9331",   // grenouille verte
-    stats: { vitesse: 2, detente: 5, puissance: 3, controle: 1 },
-    speed: 0.9, jump: 1.32, power: 1.0, control: 0.62,
-    stick: true, crazy: true,
-    trait: "Détente énorme, langue collante, et devient dingue au fil des coups.",
-    superName: "Langue-grappin", superDesc: "La langue va chercher une balle trop loin et la renvoie."
+    key: "trompette", name: "Ronald Trompette",
+    color: "#f0a060", darkColor: "#c97838",
+    stats: { vitesse: 3, detente: 2, puissance: 4, controle: 3 },
+    speed: 1.06, jump: 0.94, power: 1.18, control: 0.82,
+    egoCharge: true, slip: true,
+    trait: "Ego en béton : la jauge SUPER monte aussi quand il perd un point.",
+    superName: "Le Mur", superDesc: "Mur doré au milieu du camp adverse ~5 s."
   },
   {
-    key: "manchot", name: "Général Frigo",
-    color: "#5a6b78", darkColor: "#2b3742",   // manchot ardoise (plastron blanc)
-    stats: { vitesse: 2, detente: 2, puissance: 5, controle: 4 },
-    speed: 0.82, jump: 0.82, power: 1.28, control: 0.97,
-    beak: true, angry: true,
-    trait: "Frappe très puissante et précise. Lent. Bec (crevaison rare).",
-    superName: "Canon des glaces", superDesc: "La frappe suivante devient un boulet de canon plongeant."
+    key: "micron", name: "Manu Micron",
+    color: "#3d5afe", darkColor: "#1a237e",
+    stats: { vitesse: 4, detente: 3, puissance: 3, controle: 4 },
+    speed: 1.18, jump: 1.06, power: 1.06, control: 0.91,
+    swapStats: true,
+    trait: "En même temps : après chaque point, échange vitesse ↔ puissance.",
+    superName: "49.3", superDesc: "4 s : ses frappes ne peuvent pas être smashées en retour."
   },
   {
-    key: "lapin", name: "Turbo-Jeannot",
-    color: "#c4c9d1", darkColor: "#9aa1ab",   // lapin gris
-    stats: { vitesse: 5, detente: 3, puissance: 2, controle: 3 },
-    speed: 1.3, jump: 1.0, power: 0.85, control: 0.9,
-    slip: true, tired: true,
-    trait: "Ultra-rapide, mais dérape à l'arrêt : placement difficile.",
-    superName: "Turbo-bond", superDesc: "Vitesse décuplée et sauts illimités pendant un instant."
-  },
-  {
-    key: "chibre", name: "Monsieur Chibre", hidden: true,
-    color: "#e7b28d", darkColor: "#cd8f68",   // teinte chair
-    stats: { vitesse: 3, detente: 5, puissance: 5, controle: 1 },
-    speed: 0.95, jump: 1.3, power: 1.2, control: 0.58,
-    trait: "Ressort sur pattes : saute haut et cogne fort, mais part dans tous les sens.",
-    superName: "Coup de boutoir", superDesc: "Se raidit : la frappe suivante part comme un boulet rasant."
-  },
-  {
-    key: "chneck", name: "Madame Schneck", hidden: true,
-    color: "#e7a48c", darkColor: "#b76a62",   // teinte chair rosée
-    stats: { vitesse: 4, detente: 3, puissance: 2, controle: 5 },
-    speed: 1.12, jump: 1.05, power: 0.85, control: 0.98,
-    trait: "Chatte agile et précise : contrôle parfait, mais frappe tout en finesse.",
-    superName: "Retombée de chat", superDesc: "Défie la gravité : sauts illimités et vol plané un court instant."
-  },
-  // → le casting satirique de Sommet Volley (chefs d'État caricaturés) sera
-  //   ajouté ici via le pipeline documenté dans docs/PIPELINE-PERSONNAGE.md
+    key: "houn", name: "Kim Jong Houn",
+    color: "#2d3a2e", darkColor: "#1a241c",
+    stats: { vitesse: 3, detente: 2, puissance: 4, controle: 3 },
+    speed: 1.06, jump: 0.94, power: 1.18, control: 0.82,
+    clapDouble: true,
+    trait: "Applaudissements : SUPER chargé en 2 points d'affilée.",
+    superName: "Batterie AA", superDesc: "Interdit de sauter au camp adverse ~5 s."
+  }
 ];
 function animOf(b) { return ANIMALS[b.animal]; }
 
-// ---------- Mode Belzébuth ----------
-// Activé/désactivé en tapant "666" au clavier sur l'écran d'accueil ou de
-// sélection des personnages (voir la détection dans handleMenuKeys,
-// 12-menus.js). Bascule EXCLUSIVE : en mode normal, seuls les animaux/
-// terrains "normaux" sont proposés ; en mode Belzébuth, seuls les
-// "hidden" (trash/infernaux) le sont — jamais les deux à la fois.
-let darkMode = false;
-let darkSeq = "";
-// états où "666" ne doit PAS être intercepté : saisie de code de partie et
-// pleine partie (chiffres sans usage ici) ; MAIS AUSSI la sélection perso/
-// terrain — là, les chiffres ont déjà un sens (choisir un slot), et basculer
-// le mode EN PLEIN CHOIX invaliderait silencieusement la sélection en cours
-// (setDarkMode() la remplace alors par un choix aléatoire, sans le dire).
-const MENU_LIKE_EXCLUDED = new Set(["joinEntry", "play", "serve", "point", "gameover", "selectAnimal", "selectTerrain", "selectBall"]);
+// Charge les manifests sprites (01c-chars.js) une fois le roster connu
+if (typeof initCharSprites === "function") initCharSprites();
+
 function visibleAnimalIdx() {
-  const idx = [];
-  for (let i = 0; i < ANIMALS.length; i++) if (!!ANIMALS[i].hidden === darkMode) idx.push(i);
-  return idx;
+  return ANIMALS.map((_, i) => i);
 }
 function visibleTerrainIdx() {
-  const idx = [];
-  for (let i = 0; i < TERRAINS.length; i++) if (!!TERRAINS[i].hidden === darkMode) idx.push(i);
-  return idx;
+  return TERRAINS.map((_, i) => i);
 }
-function randomAnimalIdx() {
+/** Persos déjà pris (sélection locale P2, ou liste reçue de l'hôte en ligne). */
+let peerTakenAnimals = [];
+function takenAnimalSet() {
+  const taken = new Set();
+  if (typeof state !== "undefined" && state === "selectAnimal") {
+    // Multi local : le joueur 2 ne peut pas reprendre le choix du joueur 1
+    if (selPlayer === 1 && !(typeof pendingMode !== "undefined" && pendingMode && pendingMode.online)) {
+      taken.add(blobL.animal);
+    }
+    // En ligne (invité) : exclus les persos déjà réservés par l'hôte / autres
+    if (typeof pendingMode !== "undefined" && pendingMode && pendingMode.online &&
+        typeof netRole !== "undefined" && netRole === "guest") {
+      for (const a of peerTakenAnimals) taken.add(a | 0);
+    }
+  }
+  return taken;
+}
+function randomAnimalIdx(exclude) {
   // choix de menu, hors simulation : Math.random() (pas le rng seedé du jeu)
-  const idx = visibleAnimalIdx();
+  const ex = new Set(exclude || []);
+  const idx = visibleAnimalIdx().filter(i => !ex.has(i));
+  if (!idx.length) return visibleAnimalIdx()[0] | 0;
   return idx[Math.floor(Math.random() * idx.length)];
 }
-// bascule le mode Belzébuth ET rattrape aussitôt tout ce qui serait
-// incohérent avec le nouveau mode : le fond animé des menus (terrain +
-// personnages affichés derrière l'écran courant) doit montrer un vrai
-// visuel du mode qu'on vient d'activer, pas rester sur l'ancien.
-function setDarkMode(on) {
-  darkMode = on;
-  if (visibleTerrainIdx().indexOf(terrain) === -1) terrain = visibleTerrainIdx()[0];
-  if (visibleAnimalIdx().indexOf(blobL.animal) === -1) blobL.animal = randomAnimalIdx();
-  if (visibleAnimalIdx().indexOf(blobR.animal) === -1) blobR.animal = randomAnimalIdx();
-}
-// valide un indice d'animal reçu du réseau : dans les bornes, et cohérent
-// avec le mode (normal/Belzébuth) actif chez l'hôte.
+// valide un indice de perso reçu du réseau
 function clampVisibleAnimal(v) {
-  const i = Math.max(0, Math.min(ANIMALS.length - 1, v | 0));
-  return (!!ANIMALS[i].hidden === darkMode) ? i : visibleAnimalIdx()[0];
+  return Math.max(0, Math.min(ANIMALS.length - 1, v | 0));
 }
 
 // ---------- Identité des camps ----------
-// Les couleurs d'équipe rouge/verte ont disparu : chaque animal a sa couleur
-// naturelle. Un camp est désormais identifié par sa position (Gauche/Droite)
-// et affiché avec la couleur de l'animal qui y joue.
 function sideName(side) { return side === 0 ? "Gauche" : "Droite"; }
-// nom affiché PENDANT le jeu (HUD, service, points…) : le nom de l'animal en
-// 1v1 — bien plus parlant qu'un générique "Gauche"/"Droite" quand un
-// personnage précis représente ce camp — ou le nom d'équipe en 2v2 (pas un
-// seul personnage). sideName() reste "Gauche"/"Droite" pour l'écran de
-// sélection, où l'animal n'est justement pas encore choisi pour ce joueur.
+// nom affiché PENDANT le jeu : le nom du perso en 1v1, ou l'équipe en 2v2.
 function sideLabel(side) {
   if (mode === "2v2") return side === 0 ? "Équipe 1" : "Équipe 2";
   const b = side === 0 ? blobL : blobR;
@@ -179,7 +137,7 @@ let prevCrowdHype = 0;         // détection du front montant → ola sonore
 const emotes = [null, null];   // bulle d'émotion au-dessus de chaque joueur
 
 let pendingMode = null;        // mode choisi au menu, en attente des sélections
-let selPlayer = 0;             // quel joueur choisit son animal
+let selPlayer = 0;             // quel joueur choisit son perso
 
 const AI_LEVELS = [
   // rush : propension à foncer au filet pour provoquer un Smash Battle
@@ -216,26 +174,27 @@ const battle = {
 };
 
 // ---------- Combos & techniques signature ----------
-// Chaque camp charge un SUPER en gagnant SUPER_NEED points d'affilée. Une fois
-// prêt, la touche SUPER déclenche la technique de l'animal en jeu :
-//   Piou-Piou  → "Piqué éclair" : bond fulgurant, la frappe suivante est un smash aérien
-//   Madame Slurp → "Langue-grappin" : la langue va chercher la balle trop loin et la renvoie
-//   Général Frigo → "Canon des glaces" : la frappe suivante est un boulet de canon glacé
-//   Turbo-Jeannot → "Turbo-bond" : vitesse décuplée + sauts illimités pendant ~1,6 s
-//   Monsieur Chibre → "Coup de boutoir" : la frappe suivante part en boulet rasant
-//   Madame Schneck → "Retombée de chat" : sauts illimités + vol plané (gravité réduite)
-//   Scooby → "Scooby Snack" : panique turbo (comme le lapin) pendant ~1,5 s
-//   Sammy → "Zoinks !" : panique turbo (comme Scooby) pendant ~1,5 s
+// Chaque camp charge un SUPER en gagnant SUPER_NEED points d'affilée.
+//   Vladou → Hiver Général · Trompette → Le Mur · Micron → 49.3 · Houn → Batterie AA
 const SUPER_NEED = 3;
 const streak = [0, 0];        // points d'affilée par camp
 const superCharge = [0, 0];   // 0 = vide, 1 = super prête
-const SUPER_DUR = { oiseau: 40, grenouille: 24, manchot: 60, lapin: 100, chibre: 55, chneck: 110 };
+const SUPER_DUR = {
+  vladou: 360,      // Hiver Général ~6 s
+  trompette: 300,   // Le Mur ~5 s
+  micron: 240,      // 49.3 ~4 s
+  houn: 300         // Batterie AA ~5 s
+};
+
+// Effets de zone SUPER (Phase 4 — stubs jouables pour le pilote)
+// { kind, side, t, data } — side = camp qui subit / où est l'effet
+let superEffects = [];
 let superFlash = "";          // libellé "SUPER !" affiché brièvement
 let superFlashT = 0;
 
-const FATIGUE_MAX = 8; // coups avant que le lapin soit visiblement épuisé
-const ANGER_MAX = 8;    // coups avant que le manchot soit au comble de la fureur
-const CRAZY_MAX = 8;    // coups avant que la grenouille soit complètement folle
+const FATIGUE_MAX = 8;
+const ANGER_MAX = 8;
+const CRAZY_MAX = 8;
 
 class Blob {
   constructor(side, color, darkColor) {
@@ -252,25 +211,33 @@ class Blob {
     this.y = GROUND_Y;
     this.vx = 0;
     this.vy = 0;
-    this.dispVx = 0;      // vitesse lissée (inertie/dérapage du lapin)
+    this.dispVx = 0;      // vitesse lissée (inertie / dérapage Trompette)
     this.onGround = true;
     this.squash = 0; // animation d'écrasement
     this.walkPhase = 0;
-    this.scramble = 0;    // lapin qui patine (jambes agitées)
-    this.tongueOut = false; // grenouille : langue sortie après un coup collant
+    this.scramble = 0;    // patinage (jambes agitées)
+    this.tongueOut = false;
     this.molt = 0;        // plumes perdues par l'oiseau : 0 → MOLT_MAX
-    this.fatigue = 0;     // fatigue du lapin (oreilles/sueur) : 0 → FATIGUE_MAX
-    this.anger = 0;       // fureur du manchot (rougeurs, vapeur) : 0 → ANGER_MAX
-    this.crazy = 0;       // folie de la grenouille (yeux, langue, tics) : 0 → CRAZY_MAX
+    this.fatigue = 0;
+    this.anger = 0;       // fureur (Vladou) : 0 → ANGER_MAX
+    this.crazy = 0;
     this.hasBall = false; // balle crevée plantée sur le bec
     this.jumpsUsed = 0;   // 0 au sol, 1 après le saut, 2 après le double saut
     this.prevJump = false; // détection du front montant (double saut)
     this.superT = 0;       // ticks restants de la technique active
-    this.superKind = "";   // animal dont la technique est en cours
-    this.superSmash = false; // prochaine frappe = smash (oiseau/manchot)
+    this.superKind = "";   // perso dont la technique est en cours
+    this.superSmash = false;
     this.prevSuper = false;  // front montant de la touche SUPER
+    this.prevSmashBtn = false; // front smash (Gameplay V2)
+    this._jumpEdge = false;
+    this.lastActiveHitTick = -999; // cooldown frappe maintenue
+    this._input = null;       // dernière entrée (visée dans updateBall)
     this.tongueT = 0;        // animation de la langue-grappin
     this.tongueTX = 0; this.tongueTY = 0; // cible atteinte par la langue
+    this.poseAnim = "";      // smash | panic (override sprite court)
+    this.poseT = 0;
+    this.poseDur = 0;
+    this._faceRight = this.side === 0; // orientation visuelle (suit le déplacement)
   }
   // deux cercles de collision : corps + tête (alignés sur le dessin)
   get bodyCircle() { return { x: this.x, y: this.y - 30, r: 28 }; }
@@ -278,21 +245,27 @@ class Blob {
 
   update(input) {
     const a = animOf(this);
+    if (this.poseT > 0) {
+      this.poseT--;
+      if (this.poseT <= 0) { this.poseAnim = ""; this.poseDur = 0; }
+    }
     // si une balle crevée est plantée sur le bec, l'animal est tétanisé
     // (il ne peut plus bouger ni sauter jusqu'à l'attribution du point)
     if (this.hasBall) { this.vx = 0; if (!this.onGround) this.vy += GRAV_BLOB; this.y += this.vy; if (this.y >= GROUND_Y) { this.y = GROUND_Y; this.vy = 0; this.onGround = true; } return; }
 
-    const grip = groundGrip(); // 1 par temps sec, <1 sur sol détrempé
-    const turbo = (a.key === "lapin" || a.key === "scooby" || a.key === "samy") && this.superT > 0;
-    const cat = a.key === "chneck" && this.superT > 0;  // Retombée de chat : vol plané
+    this._input = input || null;
+    const smashDown = !!(input && input.smash);
+    this._smashEdge = smashDown && !this.prevSmashBtn;
+    this.prevSmashBtn = smashDown;
+
+    const grip = groundGrip(this); // 1 sec, <1 pluie / Hiver Général
     this.vx = 0;
-    const sp = BLOB_SPEED * this.speedMul * a.speed * grip * (turbo ? 1.7 : 1);
+    const kitSp = this.kitSpeed != null ? this.kitSpeed : a.speed;
+    const sp = BLOB_SPEED * this.speedMul * kitSp * grip;
     if (input.left)  this.vx = -sp;
     if (input.right) this.vx =  sp;
 
-    // dérapage du lapin : la vitesse affichée rattrape la consigne avec
-    // inertie — facteur volontairement bas : encore moins stable, il glisse
-    // longtemps avant de suivre une consigne de vitesse/arrêt.
+    // dérapage (Trompette) : la vitesse affichée rattrape la consigne avec inertie
     if (a.slip) {
       this.dispVx += (this.vx - this.dispVx) * 0.07;
       if (Math.abs(this.dispVx) < 0.05) this.dispVx = 0;
@@ -302,49 +275,52 @@ class Blob {
     const moveVx = a.slip ? this.dispVx : this.vx;
 
     if (this.onGround && moveVx !== 0) {
-      // le lapin pédale frénétiquement en permanence dès qu'il court (pas
-      // seulement quand la vitesse réelle est en retard sur la consigne) :
-      // c'est sa signature, Turbo-Jeannot ne trottine jamais tranquillement.
-      // Scooby / Sammy : encore plus paniqués (galop cartoon + poussière).
       const scrambling = a.slip;
-      const gangPanic = a.key === "scooby" || a.key === "samy";
       this.scramble = scrambling ? 1 : 0;
-      // Sammy : marche nettement plus lente que Scooby (jambes trop rapides sinon)
-      let phaseStep = 0.9;
-      if (a.key === "scooby") phaseStep = 1.15;
-      else if (a.key === "samy") phaseStep = 0.5;
-      this.walkPhase += scrambling ? phaseStep : 0.3;
-      if (Math.random() < (scrambling ? (gangPanic ? 0.48 : 0.35) : 0.1)) {
-        spawnSand(this.x - Math.sign(this.vx || moveVx) * 12, GROUND_Y, gangPanic ? 2 : 1);
+      // Rythme de marche stable pour les sprites (8 frames) — le slip
+      // ne doit plus accélérer le cycle (sinon flicker / « 2 images »).
+      this.walkPhase += 0.28;
+      if (Math.random() < (scrambling ? 0.35 : 0.1)) {
+        spawnSand(this.x - Math.sign(this.vx || moveVx) * 12, GROUND_Y, 1);
       }
     } else {
       this.scramble = 0;
     }
     const jumpPressed = input.jump && !this.prevJump; // front montant
+    this._jumpEdge = jumpPressed;
     this.prevJump = !!input.jump;
-    if (input.jump && this.onGround) {
-      this.vy = BLOB_JUMP * a.jump * (0.85 + grip * 0.15); // saut un peu plus mou si détrempé
+    // Batterie AA (Houn) : camp ciblé ne peut plus sauter
+    const noJump = typeof hasSuperEffect === "function" && hasSuperEffect("noground", this.side);
+    if (!noJump && input.jump && this.onGround) {
+      this.vy = BLOB_JUMP * a.jump * (0.85 + grip * 0.15);
       this.onGround = false;
       this.jumpsUsed = 1;
       beep(220, 0.05, "sine", 0.06);
-    } else if (jumpPressed && !this.onGround && (turbo || cat || this.jumpsUsed < 2)) {
-      // double saut (ou sauts illimités pendant Turbo-bond / Retombée de chat)
-      this.vy = BLOB_JUMP * a.jump * (turbo ? 0.8 : cat ? 0.7 : DOUBLE_JUMP_MUL);
-      if (!turbo && !cat) this.jumpsUsed = 2;
+    } else if (!noJump && jumpPressed && !this.onGround && this.jumpsUsed < 2) {
+      this.vy = BLOB_JUMP * a.jump * DOUBLE_JUMP_MUL;
+      this.jumpsUsed = 2;
       spawnAirPuff(this.x, this.y - 6);
-      beep(turbo ? 500 : cat ? 620 : 330, 0.07, "sine", 0.09, 0, turbo ? 760 : cat ? 900 : 520);
+      beep(330, 0.07, "sine", 0.09, 0, 520);
     }
-    // vol plané de la chatte : gravité fortement réduite tant que le super dure
-    if (!this.onGround) this.vy += GRAV_BLOB * (cat ? 0.55 : 1);
+    if (!this.onGround) this.vy += GRAV_BLOB;
 
     this.x += moveVx;
     this.y += this.vy;
 
     // limites : chaque joueur reste de son côté du filet
     const half = 34;
-    const minX = this.side === 0 ? half : NET_X + NET_W / 2 + half - 6;
-    const maxX = this.side === 0 ? NET_X - NET_W / 2 - half + 6 : W - half;
-    if (this.x <= minX || this.x >= maxX) this.dispVx = 0; // stoppe le dérapage au mur
+    let minX = this.side === 0 ? half : NET_X + NET_W / 2 + half - 6;
+    let maxX = this.side === 0 ? NET_X - NET_W / 2 - half + 6 : W - half;
+    // Le Mur (Trompette) : bloque au sol le milieu du camp adverse
+    if (this.onGround && typeof hasSuperEffect === "function") {
+      const wall = hasSuperEffect("wall", this.side);
+      if (wall) {
+        const wallX = this.side === 0 ? NET_X * 0.48 : NET_X + (W - NET_X) * 0.52;
+        if (this.side === 0) maxX = Math.min(maxX, wallX);
+        else minX = Math.max(minX, wallX);
+      }
+    }
+    if (this.x <= minX || this.x >= maxX) this.dispVx = 0;
     this.x = Math.max(minX, Math.min(maxX, this.x));
 
     if (this.y >= GROUND_Y) {

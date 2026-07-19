@@ -1,4 +1,4 @@
-// crabby-volley · cœur — constantes, canvas Hi-DPI, RNG déterministe
+// sommet-volley · cœur — constantes, canvas Hi-DPI, RNG déterministe
 "use strict";
 
 // ---------- Constantes ----------
@@ -11,8 +11,10 @@ const NET_TOP = GROUND_Y - 190;
 const GRAV_BALL = 0.22;
 const GRAV_BLOB = 0.65;
 const BLOB_SPEED = 5.2;
-const BLOB_JUMP = -13.5;
-const DOUBLE_JUMP_MUL = 0.65; // 2e saut nettement plus faible (pas trop haut !)
+// Saut assez haut pour smash au-dessus du filet (NET_TOP = GROUND_Y - 190).
+// ~-17 → perso moyen : pieds au-dessus du filet.
+const BLOB_JUMP = -17;
+const DOUBLE_JUMP_MUL = 0.72; // 2e saut : encore utile pour finir un smash
 const BALL_R = 14;
 const HIT_SPEED = 10.5;
 const MAX_BALL_SPEED = 15;
@@ -20,6 +22,26 @@ const WIN_SCORE = 15;
 const MAX_TOUCHES = 3;
 const STEP = 1000 / 60; // tick fixe 60 Hz (indispensable pour le futur mode en ligne)
 const TOUCH_COOLDOWN = 12;   // ticks mini entre deux touches comptées (anti double-comptage)
+
+// --- Gameplay V2 (réception / tir dirigé / smash) — voir docs/GAMEPLAY-V2.md ---
+// Toggle runtime : touche ` (Backquote) hors saisie de code.
+let GAMEPLAY_V2 = true;
+const RECEIVE_R = 52;          // smash/X intentionnel (fenêtre serrée)
+const AUTO_LOB_DX = 22;        // auto-cloche : balle quasi au-dessus du joueur
+const AUTO_LOB_R = 34;         // auto-cloche : rayon path tête (balle qui tombe dessus)
+const HOLD_MAX = 45;           // ~0,75 s de contrôle
+const HOLD_SPEED_MUL = 0.6;    // vitesse du porteur pendant le contrôle
+const AIM_CONE = (150 * Math.PI) / 180;
+const SHOT_SPEED_SHORT = 11;
+const SHOT_SPEED_LONG = 14;
+const CHARGE_MAX = 24;         // ≤ 0,4 s de charge
+const CHARGE_SHOW_OPP = 12;    // au-delà, l'arc est visible pour l'adversaire
+const SMASH_MUL = 1.6;
+const PASSIVE_SOFT_SPD = 7.5;  // renvoi mou → petite cloche vers l'adversaire
+const HOLD_LOB_SPD = 12.8;     // cloche de réception : doit passer le filet depuis le fond
+const SERVE_TOSS_SPD = 10.5;   // lancer vertical au service (vraiment vers le haut)
+const SERVE_TOSS_GRACE = 10;   // ticks sans re-touche serveur juste après le lancer
+const ACTIVE_HIT_COOLDOWN = 16; // anti multi-frappe si on maintient le bouton
 
 // --- Écran "Point pour ..." ---
 // On reste dessus jusqu'à ce qu'un joueur appuie (saut/confirmation) — mieux

@@ -10,3 +10,5 @@ node_modules/
 npm-debug.log*
 # Divers
 *.log
+# Sources brutes / cutouts (trop volumineux pour git — seuls assets/ sont versionnés)
+raw/

@@ -1,4 +1,4 @@
-// crabby-volley · entrées — clavier & manettes (Gamepad API)
+// sommet-volley · entrées — clavier & manettes (Gamepad API)
 "use strict";
 
 // ---------- Entrées clavier ----------
@@ -6,9 +6,14 @@ const keys = {};
 let xSeq = "";
 window.addEventListener("keydown", e => {
   keys[e.code] = true;
-  if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space","KeyW","KeyA","KeyS","KeyD"].includes(e.code)) e.preventDefault();
+  if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space","KeyW","KeyA","KeyS","KeyD","KeyE","KeyF","Slash","ShiftRight"].includes(e.code)) e.preventDefault();
   const ch = (e.key || "").toLowerCase();
   if (ch.length === 1) { xSeq = (xSeq + ch).slice(-4); if (xSeq === "rler" && typeof xToggleLocal === "function") xToggleLocal(); }
+  // Toggle Gameplay V2 (touche `) — hors saisie de code en ligne
+  if (e.code === "Backquote" && state !== "joinEntry") {
+    GAMEPLAY_V2 = !GAMEPLAY_V2;
+    if (typeof beep === "function") beep(GAMEPLAY_V2 ? 720 : 320, 0.06, "square", 0.08);
+  }
   handleMenuKeys(e.code, e.key);
 });
 window.addEventListener("keyup", e => { keys[e.code] = false; });
@@ -48,11 +53,11 @@ if (typeof canvas.addEventListener === "function") { // absent en environnement 
     const tc = document.getElementById("touchControls");
     function touchKeySet() {
       if (online) {
-        if (mySlot === 0) return { left: "KeyA", right: "KeyD", jump: "KeyW", super: "KeyS" };
-        if (mySlot === 1) return { left: "ArrowLeft", right: "ArrowRight", jump: "ArrowUp", super: "ArrowDown" };
+        if (mySlot === 0) return { left: "KeyA", right: "KeyD", jump: "KeyW", smash: "KeyS", super: "KeyE" };
+        if (mySlot === 1) return { left: "ArrowLeft", right: "ArrowRight", jump: "ArrowUp", smash: "ArrowDown", super: "ShiftRight" };
         return null; // 2v2 en ligne (slots 2/3) : pas pris en charge au tactile
       }
-      if (vsAI || mode === "2v2") return { left: "KeyA", right: "KeyD", jump: "KeyW", super: "KeyS" };
+      if (vsAI || mode === "2v2") return { left: "KeyA", right: "KeyD", jump: "KeyW", smash: "KeyS", super: "KeyE" };
       return null; // 2 joueurs locaux sur le même appareil : peu pertinent au tactile
     }
     function bindTouchBtn(sel, field) {
@@ -77,6 +82,7 @@ if (typeof canvas.addEventListener === "function") { // absent en environnement 
     bindTouchBtn('[data-tc="left"]', "left");
     bindTouchBtn('[data-tc="right"]', "right");
     bindTouchBtn('[data-tc="jump"]', "jump");
+    bindTouchBtn('[data-tc="smash"]', "smash");
     bindTouchBtn('[data-tc="super"]', "super");
 
     // affiché uniquement pendant une manche jouable, et seulement si un jeu
@@ -104,10 +110,12 @@ function readPad(gp) {
   return {
     left:    ax < -PAD_DEADZONE || b(14),
     right:   ax >  PAD_DEADZONE || b(15),
-    jump:    b(0) || b(3) || b(12),
-    superT:  b(1) || b(2) || b(4) || b(5) || b(6) || b(7), // B/X ou gâchettes → SUPER
+    jump:    b(0) || b(12),                             // A / croix-haut
+    smash:   b(2) || b(3),                              // X ou Y → smash
+    superT:  b(1) || b(4) || b(5) || b(6) || b(7),      // B / gâchettes → SUPER
     up:      ay < -0.5 || b(12),
     down:    ay >  0.5 || b(13),
+    ax, ay,                 // stick analog (visée à l'appui)
     confirm: b(0),          // A / Croix
     back:    b(1) || b(8)   // B / Rond, ou Select
   };
@@ -136,8 +144,9 @@ function padEdge(field) {
 // entrées de jeu de la manette n° i (fusionnées avec le clavier)
 function padGameInput(i) {
   const p = padsNow[i];
-  return p ? { left: p.left, right: p.right, jump: p.jump, super: p.superT }
-           : { left: false, right: false, jump: false, super: false };
+  return p
+    ? { left: p.left, right: p.right, jump: p.jump, smash: p.smash, super: p.superT, up: p.up, down: p.down, ax: p.ax, ay: p.ay }
+    : { left: false, right: false, jump: false, smash: false, super: false, up: false, down: false, ax: 0, ay: 0 };
 }
 
 // ---------- Assignation manette en 1v1 local (clavier VS manette) ----------
@@ -150,20 +159,20 @@ function padGameInput(i) {
 //    et mémorisé d'une session à l'autre.
 let padSideLocal = 1;
 try {
-  const v = localStorage.getItem("crabby-pad-side");
+  const v = localStorage.getItem("sommet-pad-side");
   if (v === "0" || v === "1") padSideLocal = +v;
 } catch (e) { /* localStorage indisponible : défaut conservé */ }
 
 function setPadSideLocal(side) {
   padSideLocal = side ? 1 : 0;
-  try { localStorage.setItem("crabby-pad-side", String(padSideLocal)); } catch (e) {}
+  try { localStorage.setItem("sommet-pad-side", String(padSideLocal)); } catch (e) {}
 }
 
 // entrées manette pour un CÔTÉ donné en 1v1 local à deux humains
 function padForSide(side) {
   if (padsNow.length >= 2) return padGameInput(side);            // une manette chacun
   if (padsNow.length === 1 && side === padSideLocal) return padGameInput(0);
-  return { left: false, right: false, jump: false, super: false };
+  return { left: false, right: false, jump: false, smash: false, super: false, up: false, down: false, ax: 0, ay: 0 };
 }
 
 // une touche de saut/confirmation est-elle enfoncée ? Sert à faire avancer
@@ -189,7 +198,11 @@ function navOptions() {
     case "gameModeSelect": return pendingMode && (pendingMode.vsAI || pendingMode.online)
       ? ["Digit1", "Digit2", "Digit3"] : ["Digit1", "Digit2"];
     case "onlineMenu":    return ["Digit1", "Digit2"];
-    case "selectAnimal":  return ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7"].slice(0, visibleAnimalIdx().length);
+    case "selectAnimal": {
+      const vis = visibleAnimalIdx();
+      const taken = takenAnimalSet();
+      return vis.map((_, slot) => "Digit" + (slot + 1)).filter((_, slot) => !taken.has(vis[slot]));
+    }
     case "selectTerrain": return ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5"].slice(0, visibleTerrainIdx().length);
     case "selectBall":    return ["Digit1", "Digit2"].slice(0, BALL_SKINS.length);
     default: return null;

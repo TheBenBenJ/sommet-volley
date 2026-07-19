@@ -1,0 +1,8 @@
+{
+  "key": "vladou",
+  "name": "Place Grand-Rouge",
+  "layers": ["far", "skyline", "crowd_0"],
+  "props": ["cannon_0", "cannon_1", "snowman", "shot", "warn", "net_post"],
+  "thumb": "thumb.png",
+  "event": "ceremonial_cannon"
+}

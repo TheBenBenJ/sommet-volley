@@ -1,0 +1,13 @@
+# Fiche personnage — Ronald Trompette
+key: trompette
+name: "Ronald Trompette"
+pays_theme: "USA — resort doré, golf, ego"
+silhouette: "compact/stocky (même format que Vladou), mèche dorée, cravate rouge, bronzage orange, pouce levé"
+palette: ["#f0a060", "#c9a227", "#c62828"]
+stats: { vitesse: 3, detente: 2, puissance: 4, controle: 3 }
+trait_passif: "Ego en béton — la jauge SUPER se charge aussi quand il perd un point"
+super:
+  nom: "Le Mur"
+  effet: "mur doré au milieu du camp adverse ~5 s"
+sons: "voix nasillarde, fanfare brève"
+map: "Resort Doré"

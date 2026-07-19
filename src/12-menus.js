@@ -1,27 +1,14 @@
-// crabby-volley · menus & écrans de sélection
+// sommet-volley · menus & écrans de sélection
 "use strict";
 
 // ---------- Écrans de menu et de sélection ----------
 function handleMenuKeys(code, key) {
   // pavé numérique équivalent au clavier principal dans tous les menus
-  // (sélection d'animal/terrain, difficulté, etc.) — sauf en saisie de code
+  // (sélection de perso/terrain, difficulté, etc.) — sauf en saisie de code
   // de partie (joinEntry gère déjà Numpad lui-même, plus bas).
   if (state !== "joinEntry" && /^Numpad[0-9]$/.test(code)) code = "Digit" + code.slice(-1);
   if (code === "NumpadEnter") code = "Enter"; // Entrée du pavé numérique = Entrée
   // (c'était le « je remplis le code et rien ne se passe » des claviers à pavé)
-
-  // suite de touches "6-6-6" : marche sur tous les écrans de menu (accueil,
-  // règles, difficulté, choix du mode, sélection perso/terrain, lobby en
-  // ligne…) — seulement pas pendant la saisie d'un code de partie ni en
-  // pleine partie, où les chiffres ont un autre sens.
-  if (!MENU_LIKE_EXCLUDED.has(state)) {
-    if (code === "Digit6") {
-      darkSeq = (darkSeq + "6").slice(-3);
-      if (darkSeq === "666") { setDarkMode(!darkMode); darkSeq = ""; beep(darkMode ? 140 : 90, 0.3, "sawtooth", 0.2, 0, 60); }
-    } else if (/^Digit[0-9]$/.test(code)) darkSeq = "";
-  } else {
-    darkSeq = "";
-  }
 
   // M coupe le son — sauf pendant la saisie d'un code (M peut en faire partie).
   // code (position physique, norme QWERTY) ≠ lettre imprimée sur un clavier
@@ -57,17 +44,17 @@ function handleMenuKeys(code, key) {
     if (code === "KeyC") state = "credits";
 
   } else if (state === "credits") {
-    if (code === "Escape" || code === "Enter" || code === "Space") state = "menu";
+    if (code === "Escape" || code === "Enter" || code === "Space") goMenu();
 
   } else if (state === "aiDifficulty") {
     // Étape 2 (Solo vs IA) : la difficulté choisie amorce pendingMode, complété
     // ensuite par le mode de jeu dans "gameModeSelect".
     const lvl = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3 }[code];
     if (lvl !== undefined) { pendingMode = { vsAI: true, aiLevel: lvl }; state = "gameModeSelect"; }
-    if (code === "Escape") state = "menu";
+    if (code === "Escape") goMenu();
 
   } else if (state === "gameModeSelect") {
-    // Étape finale avant le choix d'animal : type de partie. Le choix d'équipe
+    // Étape finale avant le choix de perso : type de partie. Le choix d'équipe
     // (2v2 : toi + IA coéquipière vs 2 IA, en solo ; ou 2v2 hébergé, en ligne)
     // n'a de sens QUE là où deux formats existent réellement — pas en
     // multijoueur local, qui ne prend en charge que le 1v1 (voir
@@ -90,7 +77,9 @@ function handleMenuKeys(code, key) {
       }
     }
     if (code === "Escape") {
-      state = pendingMode.online ? "onlineMenu" : (pendingMode.vsAI ? "aiDifficulty" : "menu");
+      if (pendingMode.online) state = "onlineMenu";
+      else if (pendingMode.vsAI) state = "aiDifficulty";
+      else goMenu();
     }
 
   } else if (state === "bombFormat") {
@@ -107,12 +96,12 @@ function handleMenuKeys(code, key) {
     if (code === "Escape") state = (pendingMode.vsAI || pendingMode.online) ? "bombFormat" : "gameModeSelect";
 
   } else if (state === "rules") {
-    if (code === "Escape" || code === "Enter" || code === "Space" || code === "KeyR") state = "menu";
+    if (code === "Escape" || code === "Enter" || code === "Space" || code === "KeyR") goMenu();
 
   } else if (state === "onlineMenu") {
     if (code === "Digit1") { pendingMode = { online: true }; state = "gameModeSelect"; } // Créer une partie -> format
     if (code === "Digit2") { joinCode = ""; state = "joinEntry"; }                        // Rejoindre avec un code
-    if (code === "Escape") state = "menu";
+    if (code === "Escape") goMenu();
 
   } else if (state === "hostLobby") {
     if ((code === "Enter" || code === "Space") && guests.length >= 1) hostStartMatch2v2();
@@ -136,13 +125,13 @@ function handleMenuKeys(code, key) {
     if (code === "Escape") { teardownNet(); state = "onlineMenu"; }
 
   } else if (state === "netError") {
-    if (code === "Escape" || code === "Enter" || code === "Space") state = "menu";
+    if (code === "Escape" || code === "Enter" || code === "Space") goMenu();
 
   } else if (state === "selectAnimal") {
     const slot = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Digit5: 4, Digit6: 5, Digit7: 6 }[code];
     const vis = visibleAnimalIdx();
     const n = slot !== undefined && slot < vis.length ? vis[slot] : undefined;
-    if (n !== undefined) {
+    if (n !== undefined && !takenAnimalSet().has(n)) {
       (selPlayer === 0 ? blobL : blobR).animal = n;
       if (pendingMode.online) {
         if (netRole === "guest") {
@@ -155,7 +144,7 @@ function handleMenuKeys(code, key) {
       } else if (selPlayer === 0 && !pendingMode.vsAI) {
         selPlayer = 1; // au joueur vert de choisir
       } else {
-        if (pendingMode.vsAI) blobR.animal = randomAnimalIdx();
+        if (pendingMode.vsAI) blobR.animal = randomAnimalIdx([blobL.animal]);
         state = "selectTerrain";
       }
     }
@@ -169,6 +158,10 @@ function handleMenuKeys(code, key) {
     const visT = visibleTerrainIdx();
     const n = slotT !== undefined && slotT < visT.length ? visT[slotT] : undefined;
     if (n !== undefined) { terrain = n; state = "selectBall"; }
+    if (code === "KeyC") {
+      mapEventsQuiet = !mapEventsQuiet;
+      beep(mapEventsQuiet ? 360 : 520, 0.06, "square", 0.08);
+    }
     if (code === "Escape") { selPlayer = 0; state = "selectAnimal"; }
 
   } else if (state === "selectBall") {
@@ -192,14 +185,14 @@ function handleMenuKeys(code, key) {
       }
       if (code === "Escape") quitOnline();
     } else if (code === "Space" || code === "Enter") {
-      state = "menu";
+      goMenu();
     }
 
   } else if (code === "KeyP") {
     if (!online) paused = !paused; // pas de pause manuelle en ligne
   } else if (code === "Escape") {
     if (online) quitOnline();
-    else { paused = false; state = "menu"; }
+    else { paused = false; goMenu(); }
   }
 }
 
@@ -243,11 +236,15 @@ function newGame(seed) {
   blobR.speedMul = vsAI ? AI_LEVELS[aiLevel].speedMul : 1;
   if (mode === "2v2" && !online) {
     // HORS-LIGNE : les trois IA (blob2L coéquipier, blobR + blob2R adverses)
-    // prennent la vitesse du niveau ; le joueur (blobL) garde 1. Animaux au hasard.
-    // (En ligne, l'hôte fixe animaux et vitesses — voir hostStartMatch2v2.)
+    // prennent la vitesse du niveau ; le joueur (blobL) garde 1. Persos tous distincts.
+    // (En ligne, l'hôte fixe persos et vitesses — voir hostStartMatch2v2.)
     const sm = AI_LEVELS[aiLevel].speedMul;
     blob2L.speedMul = sm; blobR.speedMul = sm; blob2R.speedMul = sm;
-    for (const b of [blob2L, blobR, blob2R]) b.animal = randomAnimalIdx();
+    const used = new Set([blobL.animal]);
+    for (const b of [blob2L, blobR, blob2R]) {
+      b.animal = randomAnimalIdx([...used]);
+      used.add(b.animal);
+    }
     blob2L._aiT = blobR._aiT = blob2R._aiT = 0; // timers IA neutres
   }
   particles.length = 0;
@@ -261,101 +258,190 @@ function newGame(seed) {
   startRally();
 }
 
-// ---------- Design-system de l'interface (registre "suisse") ----------
-// Mise en page éditoriale calée à gauche : kicker mono en capitales, gros titre
-// grotesque, filet, listes à index mono. Palette restreinte + un accent.
+// ---------- Design-system menus (cartoon / match le jeu) ----------
 const UI = {
-  mx: 66,                              // marge gauche (colonne d'accroche)
-  ink: "#f4f5f7",                      // encre (quasi-blanc) sur le voile sombre
-  muted: "rgba(244,245,247,0.52)",
-  faint: "rgba(244,245,247,0.15)",
-  accent: "#ff3b3b",                   // accent unique
-  gold: "#ffcc00",
-  mono: "'Space Mono', ui-monospace, monospace",
-  sans: "'Inter', system-ui, sans-serif"
+  mx: 56,
+  ink: "#fff6e8",
+  muted: "rgba(255,246,232,0.72)",
+  faint: "rgba(255,246,232,0.22)",
+  accent: "#ff4d3d",
+  gold: "#ffd84a",
+  sky: "#3eb5ff",
+  stroke: "#1b1730",
+  panel: "rgba(16, 24, 48, 0.78)",
+  display: "'Fredoka', 'Nunito', sans-serif",
+  sans: "'Nunito', sans-serif",
+  mono: "'Nunito', sans-serif"
 };
-function uiAccent() { return darkMode ? "#ff2e2e" : UI.accent; }
+function uiAccent() { return UI.accent; }
 
-// libellé mono en capitales, espacé (kicker / folio / label technique)
+// Décor de menu : terrain + 2 persos aléatoires (distincts), animés en fond.
+const menuBg = { init: false, terrain: 0, t0: 0, ballX: W * 0.5, ballY: 120, ballVy: 0 };
+let menuActors = { L: null, R: null };
+
+function goMenu() {
+  state = "menu";
+  shuffleMenuBackdrop();
+}
+
+function shuffleMenuBackdrop() {
+  const nA = ANIMALS.length, nT = TERRAINS.length;
+  menuBg.terrain = Math.floor(Math.random() * nT);
+  const a = Math.floor(Math.random() * nA);
+  let b = Math.floor(Math.random() * nA);
+  if (nA > 1) while (b === a) b = Math.floor(Math.random() * nA);
+  menuActors.L = makeMenuActor(0, a);
+  menuActors.R = makeMenuActor(1, b);
+  menuBg.ballX = W * 0.42 + Math.random() * W * 0.16;
+  menuBg.ballY = 90 + Math.random() * 40;
+  menuBg.ballVy = -2.2;
+  menuBg.init = true;
+  menuBg.t0 = performance.now();
+}
+
+function makeMenuActor(side, animalIdx) {
+  const a = ANIMALS[animalIdx];
+  const minX = side === 0 ? 70 : NET_X + 55;
+  const maxX = side === 0 ? NET_X - 55 : W - 70;
+  return {
+    x: side === 0 ? W * 0.22 : W * 0.78,
+    y: GROUND_Y, side, animal: animalIdx,
+    color: a.color, darkColor: a.darkColor,
+    onGround: true, vx: 0, vy: 0,
+    dispVx: side === 0 ? 1.4 : -1.4,
+    walkPhase: Math.random() * 24, squash: 0, molt: 0,
+    _walking: true, _faceRight: side === 0, _faceLock: 0,
+    minX, maxX, hopT: 40 + Math.floor(Math.random() * 90)
+  };
+}
+
+function ensureMenuBackdrop() {
+  if (!menuBg.init) shuffleMenuBackdrop();
+  else if (state === "menu" && performance.now() - menuBg.t0 > 14000) shuffleMenuBackdrop();
+}
+
+function tickMenuActors() {
+  for (const b of [menuActors.L, menuActors.R]) {
+    if (!b) continue;
+    b.x += b.dispVx * 0.55;
+    if (b.x <= b.minX) { b.x = b.minX; b.dispVx = Math.abs(b.dispVx); }
+    if (b.x >= b.maxX) { b.x = b.maxX; b.dispVx = -Math.abs(b.dispVx); }
+    b.vx = b.dispVx; // pour orientation sprite (charFaceRight)
+    b._faceRight = b.dispVx >= 0;
+    b.walkPhase += 0.22;
+    b.hopT--;
+    if (b.hopT <= 0 && b.onGround) {
+      b.vy = -6.5; b.onGround = false; b.hopT = 70 + Math.floor(Math.random() * 110);
+    }
+    if (!b.onGround) {
+      b.vy += 0.45; b.y += b.vy;
+      if (b.y >= GROUND_Y) { b.y = GROUND_Y; b.vy = 0; b.onGround = true; b.squash = 5; }
+    } else if (b.squash > 0) b.squash -= 0.4;
+  }
+  // Ballon qui rebondit doucement au-dessus du filet
+  menuBg.ballVy += 0.12;
+  menuBg.ballY += menuBg.ballVy;
+  if (menuBg.ballY > GROUND_Y - 160) {
+    menuBg.ballY = GROUND_Y - 160;
+    menuBg.ballVy = -3.8 - Math.random() * 1.2;
+  }
+  menuBg.ballX += Math.sin(performance.now() / 900) * 0.35;
+}
+
+function drawMenuWorld() {
+  ensureMenuBackdrop();
+  tickMenuActors();
+  const savedT = terrain, savedW = weather;
+  terrain = menuBg.terrain;
+  weather = "clear";
+  drawBackground();
+  drawNet();
+  // ballon déco (pas la balle de jeu)
+  {
+    const bx = menuBg.ballX, by = menuBg.ballY;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(bx, by, BALL_R * 0.95, 0, Math.PI * 2);
+    const g = ctx.createRadialGradient(bx - 4, by - 5, 2, bx, by, BALL_R);
+    g.addColorStop(0, "#fff6c8");
+    g.addColorStop(1, "#f0a020");
+    ctx.fillStyle = g; ctx.fill();
+    ctx.strokeStyle = UI.stroke; ctx.lineWidth = 2.5; ctx.stroke();
+    ctx.restore();
+  }
+  if (menuActors.L) drawAnimal(menuActors.L);
+  if (menuActors.R) drawAnimal(menuActors.R);
+  terrain = savedT;
+  weather = savedW;
+}
+
+function menuVeil(denseLeft) {
+  const g = ctx.createLinearGradient(0, 0, denseLeft ? W * 0.85 : W, 0);
+  g.addColorStop(0, "rgba(12, 20, 42, 0.82)");
+  g.addColorStop(0.55, "rgba(12, 20, 42, 0.55)");
+  g.addColorStop(1, "rgba(12, 20, 42, 0.28)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+  // léger dégradé bas → lisibilité du folio
+  const vg = ctx.createLinearGradient(0, H * 0.7, 0, H);
+  vg.addColorStop(0, "rgba(12,20,42,0)");
+  vg.addColorStop(1, "rgba(12,20,42,0.55)");
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, W, H);
+}
+
 function uiLabel(txt, x, y, size, col, spacing, align) {
   ctx.save();
   ctx.textAlign = align || "left";
   ctx.fillStyle = col || UI.muted;
-  ctx.font = "700 " + (size || 12) + "px " + UI.mono;
-  try { ctx.letterSpacing = (spacing == null ? 2 : spacing) + "px"; } catch (e) {}
-  ctx.fillText(txt.toUpperCase(), x, y);
+  ctx.font = "700 " + (size || 13) + "px " + UI.sans;
+  try { ctx.letterSpacing = (spacing == null ? 0.5 : spacing) + "px"; } catch (e) {}
+  ctx.fillText(String(txt), x, y);
   ctx.restore();
 }
+
+function uiTitle(txt, x, y, size, align) {
+  ctx.save();
+  ctx.textAlign = align || "left";
+  ctx.font = "700 " + size + "px " + UI.display;
+  ctx.lineJoin = "round";
+  ctx.lineWidth = Math.max(5, size * 0.14);
+  ctx.strokeStyle = UI.stroke;
+  ctx.strokeText(txt, x, y);
+  ctx.fillStyle = UI.ink;
+  ctx.fillText(txt, x, y);
+  ctx.restore();
+}
+
 function uiRule(x1, x2, y, col) {
   ctx.strokeStyle = col || UI.faint;
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(x1, y + 0.5); ctx.lineTo(x2, y + 0.5); ctx.stroke();
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
+  ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke();
 }
 
-// Habillage commun d'un écran de menu : monde animé en fond + voile éditorial,
-// kicker + titre flush-left + filet + sous-titre + folio de pied de page.
-// Signature objet : { title, subtitle, kicker, titleSize }.
+// Habillage commun : monde cartoon + voile + titre avec léger bounce.
+// Signature objet : { title, subtitle, kicker, titleSize, noEscHint }.
 function menuScreenBase(o) {
   if (typeof o === "string") o = { title: o, subtitle: arguments[1], titleSize: arguments[2] };
-  drawBackground();
-  drawNet();
-  blobL.draw();
-  blobR.draw();
-  // voile : dégradé sombre plus dense à gauche (colonne de texte)
-  const g = ctx.createLinearGradient(0, 0, W, 0);
-  g.addColorStop(0, darkMode ? "rgba(22,0,0,0.92)" : "rgba(10,11,16,0.90)");
-  g.addColorStop(0.6, darkMode ? "rgba(22,0,0,0.74)" : "rgba(10,11,16,0.70)");
-  g.addColorStop(1, darkMode ? "rgba(22,0,0,0.5)" : "rgba(10,11,16,0.46)");
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, W, H);
-  if (darkMode) drawHellVignette();
+  drawMenuWorld();
+  menuVeil(true);
 
   const mx = UI.mx, acc = uiAccent();
-  uiLabel(o.kicker || (darkMode ? "VOLLEY DES GÉNITAUX" : "Sommet Volley"), mx, 82, 12, acc, 3);
-  ctx.textAlign = "left";
-  ctx.fillStyle = UI.ink;
-  ctx.font = "800 " + (o.titleSize || 42) + "px " + UI.sans;
-  ctx.fillText(o.title, mx, 130);
-  uiRule(mx, W - mx, 150, UI.faint);
-  if (o.subtitle) uiLabel(o.subtitle, mx, 174, 12, UI.muted, 1);
+  const bounce = Math.sin(performance.now() / 280) * 2.5;
+  uiLabel(o.kicker || "Sommet Volley", mx, 78, 13, acc, 0.5);
+  uiTitle(o.title, mx, 128 + bounce, o.titleSize || 44);
+  uiRule(mx, mx + 120, 148, UI.gold);
+  if (o.subtitle) uiLabel(o.subtitle, mx, 172, 14, UI.muted, 0.3);
 
-  // folio de pied de page : court rappel à gauche, signature à droite.
-  // (les écrans qui ont plus d'infos les posent PLUS HAUT, cf. drawMenu.)
-  uiRule(mx, W - mx, H - 42, UI.faint);
   if (!o.noEscHint) {
-    // seul CE lien est cliquable, jamais tout l'écran : un clic n'importe où
-    // pour revenir en arrière est trop facile à déclencher par accident sur
-    // des écrans qui ont du contenu à lire (règles, crédits…).
-    // Sur tactile, la zone réelle est bien plus grande que le texte affiché :
-    // viser une bande de 24px de haut au doigt, sur un canvas mis à l'échelle
-    // pour un petit écran, est quasi impossible — on élargit largement la cible.
     if (hasTouch) hit(mx + 110, H - 24, 260, 52, "Escape");
     else hit(mx + 45, H - 32, 130, 24, "Escape");
-    uiLabel("Échap ← Retour", mx, H - 26, 10, UI.muted, 1.5);
+    uiLabel("Échap ← Retour", mx, H - 24, 12, UI.muted, 0.3);
   }
-  uiLabel(darkMode ? "Pussy Volley" : "Sommet Volley", W - mx, H - 26, 10, UI.muted, 1.5, "right");
+  uiLabel("Sommet Volley", W - mx, H - 24, 12, UI.muted, 0.3, "right");
 }
 
-// petite ambiance "Belzébuth" superposée aux écrans de menu concernés :
-// vignette rouge sur les bords + braises qui remontent.
-function drawHellVignette() {
-  const t = performance.now() / 1000;
-  const g = ctx.createRadialGradient(W / 2, H / 2, H * 0.25, W / 2, H / 2, H * 0.8);
-  g.addColorStop(0, "rgba(0,0,0,0)");
-  g.addColorStop(1, "rgba(140,0,0,0.5)");
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, W, H);
-  ctx.save();
-  for (let i = 0; i < 26; i++) {
-    const cyc = (t * (24 + (i % 5) * 5) + i * 53) % (H + 40);
-    const ex = (i * 97.3) % W + Math.sin(t * 2 + i) * 14;
-    const ey = H - cyc;
-    ctx.globalAlpha = Math.max(0, 1 - cyc / (H + 40)) * 0.85;
-    ctx.fillStyle = i % 3 === 0 ? "#ffcf3d" : "#ff5a2e";
-    ctx.beginPath(); ctx.arc(ex, ey, 1.5 + (i % 3), 0, Math.PI * 2); ctx.fill();
-  }
-  ctx.restore();
-}
 
 // ---------- Souris : clic pour naviguer dans les menus ----------
 // Chaque écran de menu enregistre ses zones cliquables via hit() pendant son
@@ -379,51 +465,53 @@ function isHover(code) {
   return mouseActive && hitTestIn(menuHitboxesPrev, mouseX, mouseY) === code;
 }
 
-// liste verticale d'options, calée à gauche : index mono + libellé grotesque,
-// toujours blanc (pas de pastille/couleur d'intensité : ça n'ajoutait aucune
-// info que le texte ne donne déjà, juste du désalignement — l'index est
-// toujours à mx, le libellé toujours à mx+42, sans exception). L'élément
-// surligné (manette/souris) reçoit une carte encadrée, comme la sélection
-// perso/terrain. Les chaînes gardent le format "N — Libellé" (l'index est
-// extrait/mis en mono).
+// Liste d'options en gros boutons cartoon (interaction → pastilles OK).
+// Format des chaînes : "N — Libellé" (index → DigitN / KeyX).
 function drawOptionList(items, y0, spacing) {
   const mx = UI.mx;
-  ctx.textAlign = "left";
+  const bw = Math.min(420, W - mx * 2 - 40);
   items.forEach((txt, i) => {
     const y = y0 + i * spacing;
     const parts = txt.split("—");
     const idx = parts[0].trim();
     const label = parts.length > 1 ? parts.slice(1).join("—").trim() : txt;
-    // code clavier associé : chiffre → DigitN, lettre seule (ex. "R") → KeyX
     const code = /^[0-9]$/.test(idx) ? "Digit" + idx : "Key" + idx;
-    hit(W / 2, y - 6, W - mx * 2, spacing - 6, code);
+    const rh = Math.min(42, spacing - 6);
+    const rx = mx - 8, ry = y - rh * 0.72;
+    hit(rx + bw / 2, y - 6, bw + 24, spacing - 4, code);
     const sel = (padConnected && navIdx === i) || isHover(code);
-    if (sel) {
-      const rx = mx - 20, ry = y - spacing * 0.62, rw = W - mx * 2, rh = spacing * 0.86;
-      ctx.fillStyle = "rgba(255,204,0,0.09)";
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(rx, ry, rw, rh, 8); else ctx.rect(rx, ry, rw, rh);
-      ctx.fill();
-      ctx.strokeStyle = UI.gold; ctx.lineWidth = 2;
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(rx, ry, rw, rh, 8); else ctx.rect(rx, ry, rw, rh);
-      ctx.stroke();
-    }
-    // index en mono — l'or est LA seule couleur de sélection/survol dans tout
-    // le jeu (sélection perso/terrain incluses) ; le rouge (uiAccent) reste
-    // réservé aux titres/kickers, jamais mélangé aux deux pour la même chose.
+    // ombre décalée
+    ctx.fillStyle = "rgba(0,0,0,0.28)";
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(rx + 3, ry + 4, bw, rh, 14); else ctx.rect(rx + 3, ry + 4, bw, rh);
+    ctx.fill();
+    ctx.fillStyle = sel ? "rgba(255,216,74,0.95)" : "rgba(255,246,232,0.92)";
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(rx, ry, bw, rh, 14); else ctx.rect(rx, ry, bw, rh);
+    ctx.fill();
+    ctx.strokeStyle = UI.stroke;
+    ctx.lineWidth = sel ? 3.5 : 2.5;
+    ctx.stroke();
+    // pastille index
+    const ix = rx + 22, iy = ry + rh / 2;
+    ctx.beginPath();
+    ctx.arc(ix, iy, 12, 0, Math.PI * 2);
+    ctx.fillStyle = sel ? UI.accent : UI.sky;
+    ctx.fill();
+    ctx.strokeStyle = UI.stroke; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = "#fff";
+    ctx.font = "800 13px " + UI.display;
+    ctx.textAlign = "center";
+    ctx.fillText(idx, ix, iy + 4);
     ctx.textAlign = "left";
-    ctx.fillStyle = sel ? UI.gold : UI.muted;
-    ctx.font = "700 16px " + UI.mono;
-    ctx.fillText(idx, mx, y);
-    ctx.fillStyle = UI.ink;
-    ctx.font = (sel ? "700 " : "500 ") + "22px " + UI.sans;
-    ctx.fillText(label, mx + 42, y);
+    ctx.fillStyle = UI.stroke;
+    ctx.font = "800 18px " + UI.sans;
+    ctx.fillText(label, rx + 46, ry + rh * 0.68);
   });
 }
 
 // petit contrôle de volume (5 crans cliquables, même langage visuel que les
-// jauges de stats des animaux) — un clic sur un cran règle le volume
+// jauges de stats) — un clic sur un cran règle le volume
 // directement à ce niveau, et réactive le son au passage s'il était coupé.
 // (x, y) = coin haut-droit (aligné à droite, comme le kicker est à gauche).
 function drawVolumeControl(x, y) {
@@ -451,13 +539,14 @@ function drawVolumeControl(x, y) {
 
 function drawMenu() {
   const nP = visibleAnimalIdx().length, nT = visibleTerrainIdx().length;
-  menuScreenBase({ title: darkMode ? "PUSSY VOLLEY" : "SOMMET VOLLEY",
-                   kicker: (darkMode ? "Volley des génitaux · " : "Volley des animaux · ") + nP + " persos · " + nT + " terrains",
-                   titleSize: 58, noEscHint: true });
-  drawVolumeControl(W - UI.mx, 82);
+  menuScreenBase({
+    title: "SOMMET VOLLEY",
+    kicker: "Volley satirique · " + nP + " persos · " + nT + " terrains",
+    titleSize: 56,
+    noEscHint: true
+  });
+  drawVolumeControl(W - UI.mx, 78);
 
-  // écran d'accueil : 3 grandes catégories + les règles, chacune débouche
-  // ensuite sur ses propres sous-choix (difficulté, mode de jeu…)
   const items = [
     "1  —  Solo",
     "2  —  Multijoueur local",
@@ -465,15 +554,11 @@ function drawMenu() {
     "R  —  Règles du jeu",
     "C  —  Crédits"
   ];
-  drawOptionList(items, 226, 44);
+  drawOptionList(items, 210, 42);
 
-  // bloc d'infos technique (au-dessus du folio pour ne pas se chevaucher) —
-  // le mode de contrôle réellement actif (manette/tactile/clavier), pas
-  // toujours le clavier par défaut même si une manette est branchée ou qu'on
-  // joue au doigt.
-  uiLabel(controlsHint(), UI.mx, H - 58, 10, controlsHintColor(), 1);
-  uiLabel("Premier à " + WIN_SCORE + " · 2 pts d'écart · " + MAX_TOUCHES + " touches max · P pause · M son · N musique",
-          UI.mx, H - 26, 10, UI.muted, 1);
+  uiLabel(controlsHint(), UI.mx, H - 52, 12, controlsHintColor(), 0.3);
+  uiLabel("Premier à " + WIN_SCORE + " · 2 pts d'écart · " + MAX_TOUCHES + " touches max",
+          UI.mx, H - 24, 12, UI.muted, 0.3);
 }
 
 // résumé du mode de contrôle ACTIF (manette branchée > tactile détecté >
@@ -482,7 +567,7 @@ function drawMenu() {
 // raccourcis clavier, jamais mis à jour selon son matériel réel.
 function controlsHint() {
   if (padConnected) return "🎮 Manette — stick/croix choisir · A valider · B retour";
-  if (hasTouch) return "📱 Tactile — pavé directionnel + boutons SAUT/SUPER à l'écran pendant la partie";
+  if (hasTouch) return "📱 Tactile — pavé + SAUT / SMASH / SUPER à l'écran";
   return "Gauche  Q/D + Z/Espace · S super        Droite  ← → + ↑ · ↓ super";
 }
 function controlsHintColor() { return (padConnected || hasTouch) ? "#7ed957" : UI.muted; }
@@ -575,119 +660,150 @@ function drawBombDuration() {
 }
 
 function drawRules() {
-  // fond sombre
-  ctx.fillStyle = darkMode ? "#160303" : "#0e0f14";
-  ctx.fillRect(0, 0, W, H);
-  if (darkMode) drawHellVignette();
-  uiLabel("Manuel du joueur", UI.mx, 30, 10, uiAccent(), 2);
-  ctx.textAlign = "left"; ctx.fillStyle = UI.ink;
-  ctx.font = "800 24px " + UI.sans;
-  ctx.fillText("Règles du jeu", UI.mx, 54);
-  uiRule(UI.mx, W - UI.mx, 66, UI.faint);
+  drawMenuWorld();
+  menuVeil(false);
+  // panneau lisible par-dessus le décor
+  ctx.fillStyle = "rgba(12, 20, 42, 0.82)";
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(UI.mx - 16, 18, W - UI.mx * 2 + 32, H - 50, 18);
+  else ctx.rect(UI.mx - 16, 18, W - UI.mx * 2 + 32, H - 50);
+  ctx.fill();
+  ctx.strokeStyle = UI.stroke; ctx.lineWidth = 3; ctx.stroke();
+  uiLabel("Manuel du joueur", UI.mx, 40, 13, uiAccent(), 0.4);
+  uiTitle("Règles du jeu", UI.mx, 68, 26);
+  uiRule(UI.mx, UI.mx + 90, 80, UI.gold);
 
-  // colonne gauche : règles générales (bornée pour ne jamais mordre sur la droite)
+  const mid = W * 0.52;
   const lx = UI.mx;
-  const leftMaxW = W / 2 - UI.mx - 16;
-  const hCol = darkMode ? "#ff6a4d" : "#7ed957";
+  const leftW = mid - UI.mx - 18;
+  const rx = mid + 10;
+  const rightW = W - UI.mx - rx;
+  const hCol = "#7ed957";
+  const footY = H - 28;
+
+  // --- Colonne gauche (clip) : règles condensées ---
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(lx - 4, 88, leftW + 8, footY - 92);
+  ctx.clip();
+
   ctx.textAlign = "left";
-  let y = 78;
-  const h = (txt, c) => { ctx.fillStyle = c || hCol; ctx.font = "700 15px " + UI.sans; ctx.fillText(txt, lx, y); y += 20; };
+  let y = 100;
+  const h = (txt, c) => {
+    ctx.fillStyle = c || hCol;
+    ctx.font = "700 13px " + UI.sans;
+    ctx.fillText(txt, lx, y);
+    y += 18;
+  };
   const p = (txt) => {
-    ctx.fillStyle = "rgba(255,255,255,0.85)";
-    ctx.font = "13px " + UI.sans;
+    ctx.fillStyle = "rgba(255,255,255,0.82)";
+    ctx.font = "12px " + UI.sans;
     const words = txt.split(" ");
     let line = "";
     for (const w of words) {
       const test = line ? line + " " + w : w;
-      if (ctx.measureText(test).width > leftMaxW && line) {
-        ctx.fillText(line, lx, y); y += 17; line = w;
+      if (ctx.measureText(test).width > leftW && line) {
+        ctx.fillText(line, lx, y); y += 15; line = w;
       } else line = test;
     }
-    if (line) { ctx.fillText(line, lx, y); y += 17; }
+    if (line) { ctx.fillText(line, lx, y); y += 15; }
   };
 
-  h("But du jeu");
-  p("Faire tomber la balle dans le camp adverse.");
-  p("Premier à " + WIN_SCORE + " points avec 2 points d'écart gagne.");
-  p("Maximum " + MAX_TOUCHES + " touches par camp avant de renvoyer.");
-  y += 6;
-  h("Commandes");
-  p("Gauche : Q/D bouger, Z ou Espace sauter.");
-  p("Droite : ← → bouger, ↑ sauter. (en ligne : les deux)");
-  p("Manette : stick bouger, A sauter, B/gâchette SUPER.");
-  p("SUPER : Gauche = S · Droite = ↓");
-  p("Double saut : réappuie en l'air.");
-  p("P pause · M son · N musique · Échap menu");
-  y += 6;
-  h("★ Techniques SUPER", "#ffd93d");
-  p("3 points d'affilée chargent ta jauge de SUPER.");
-  p("Une fois prête, déclenche la technique de ton animal (fiche à droite).");
+  h("But");
+  p("Fais tomber la balle dans le camp adverse. Premier à " + WIN_SCORE + " avec 2 d'écart. Max " + MAX_TOUCHES + " touches par camp.");
   y += 4;
-  h("Météo & Smash Battle", "#4db3ff"); // nom de la mécanique : ne change pas selon le mode
-  p("Intempérie : sol glissant, balle plus lourde.");
-  p("Deux au filet, balle proche : duel de martelage → smash !");
+  h("Commandes");
+  p("Gauche : Q/D · Z/Espace · S/F smash · E SUPER");
+  p("Droite : ← → · ↑ · ↓ ou / smash · Shift droit SUPER");
+  p("Manette : stick · A saut · X/Y smash · B SUPER");
+  p("P pause · M son · N musique · Échap menu");
+  y += 4;
+  h("Gameplay");
+  p("Au sol, balle sur toi = cloche auto. En l'air sans smash, tu traverses la balle.");
+  p("Smash près de la balle : cloche au sol, smash en l'air (stick pour viser).");
+  p("Service : smash pour lancer, puis smash pour frapper. Double saut en l'air.");
+  y += 4;
+  h("★ SUPER", "#ffd93d");
+  p("3 points d'affilée chargent la jauge (Houn : 2). Puis la technique du perso (à droite).");
+  y += 4;
+  h("Météo & événements", "#4db3ff");
+  p("Pluie / tempête : sol glissant, balle plus lourde.");
+  p("Place Grand-Rouge : canon. Resort Doré : voiturette. Palais / Esplanade : décors PNG.");
+  p("Deux joueurs au filet + balle proche = Smash Battle.");
+  ctx.restore();
 
-  // colonne droite : animaux + stats + traits
-  const rx = W / 2 + 20;
+  // --- Colonne droite (clip) : persos en liste ---
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(rx - 4, 88, rightW + 8, footY - 92);
+  ctx.clip();
+
   ctx.textAlign = "left";
   ctx.fillStyle = hCol;
-  ctx.font = "bold 17px 'Inter', system-ui, sans-serif";
-  ctx.fillText(darkMode ? "Les génitaux" : "Les animaux", rx, 78);
-  ctx.font = "11px 'Inter', system-ui, sans-serif";
-  ctx.fillStyle = "rgba(255,255,255,0.6)";
-  ctx.fillText("V=Vitesse  D=Détente  P=Puissance  C=Contrôle", rx, 96);
+  ctx.font = "800 14px " + UI.display;
+  ctx.fillText("Personnages", rx, 108);
+  ctx.fillStyle = "rgba(255,255,255,0.45)";
+  ctx.font = "600 11px " + UI.sans;
+  ctx.fillText("V vitesse · D détente · P puissance · C contrôle", rx, 124);
 
-  const cellW = (W / 2 - 60) / 2;
   const visR = visibleAnimalIdx();
-  // 5 animaux → 3 rangées : on resserre l'espacement pour ne pas déborder
-  const compact = visR.length > 4;
-  const rowH = compact ? 120 : 168;
-  const ay0 = compact ? 104 : 118;
+  const rowH = Math.min(112, Math.floor((footY - 132) / Math.max(1, visR.length)));
   for (let slot = 0; slot < visR.length; slot++) {
     const i = visR[slot];
     const a = ANIMALS[i];
-    const col = slot % 2, row = Math.floor(slot / 2);
-    const ax = rx + col * (cellW + 20);
-    const ay = ay0 + row * rowH;
+    const ay = 132 + slot * rowH;
+    const previewX = rx + 26;
+    const previewY = ay + 52;
 
-    // aperçu de l'animal
-    drawAnimal({ x: ax + 28, y: ay + 70, groundY: ay + 70, side: 0,
-      color: "#e84545", darkColor: "#b32e2e",
-      onGround: true, vx: 0, walkPhase: 0, squash: 0, animal: i, molt: 0 });
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(rx, ay - 2, 56, rowH - 6);
+    ctx.clip();
+    ctx.translate(previewX, previewY);
+    ctx.scale(0.52, 0.52);
+    drawAnimal({
+      x: 0, y: 0, groundY: 0, side: 0,
+      color: a.color, darkColor: a.darkColor,
+      onGround: true, vx: 0, walkPhase: 0, squash: 0, animal: i, molt: 0
+    });
+    ctx.restore();
 
+    const tx = rx + 58;
     ctx.textAlign = "left";
     ctx.fillStyle = "#fff";
-    ctx.font = "bold 15px 'Inter', system-ui, sans-serif";
-    ctx.fillText(a.name, ax + 62, ay + 22);
+    ctx.font = "700 13px " + UI.sans;
+    ctx.fillText(a.name, tx, ay + 14);
 
-    // mini-jauges
     const st = a.stats;
     const pairs = [["V", st.vitesse], ["D", st.detente], ["P", st.puissance], ["C", st.controle]];
-    ctx.font = "11px 'Inter', system-ui, sans-serif";
-    pairs.forEach((pr, k) => {
-      const gy = ay + 38 + k * 15;
-      ctx.fillStyle = "rgba(255,255,255,0.7)";
-      ctx.fillText(pr[0], ax + 62, gy + 8);
+    ctx.font = "10px " + UI.sans;
+    let bx = tx;
+    for (let k = 0; k < pairs.length; k++) {
+      const pr = pairs[k];
+      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.fillText(pr[0], bx, ay + 30);
       for (let s = 0; s < 5; s++) {
-        ctx.fillStyle = s < pr[1] ? "#ffcc00" : "rgba(255,255,255,0.18)";
-        ctx.fillRect(ax + 74 + s * 11, gy, 8, 8);
+        ctx.fillStyle = s < pr[1] ? "#ffcc00" : "rgba(255,255,255,0.15)";
+        ctx.fillRect(bx + 10 + s * 8, ay + 22, 6, 6);
       }
-    });
+      bx += 58;
+    }
 
-    // trait
-    ctx.fillStyle = "rgba(255,204,0,0.9)";
-    ctx.font = "11px 'Inter', system-ui, sans-serif";
-    wrapText2(a.trait, ax, ay + (compact ? 106 : 116), cellW - 4, 13);
+    ctx.fillStyle = UI.gold;
+    ctx.font = "600 11px " + UI.sans;
+    ctx.fillText(a.superName, tx, ay + 46);
+    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    ctx.font = "11px " + UI.sans;
+    wrapText2(a.trait, tx, ay + 60, rightW - 62, 13);
   }
+  ctx.restore();
 
-  // seul le lien "Échap ← Retour" est cliquable (pas tout l'écran) : il y a
-  // trop de contenu à lire ici pour qu'un clic accidentel renvoie au menu.
   hit(UI.mx + 80, H - 20, 200, 24, "Escape");
   uiLabel("Échap ← Retour au menu", UI.mx, H - 14, 10, UI.muted, 1.5);
 }
 
 function drawCredits() {
-  menuScreenBase({ title: "Crédits", kicker: "À propos", subtitle: darkMode ? "Volley des génitaux" : "Volley des animaux" });
+  menuScreenBase({ title: "Crédits", kicker: "À propos", subtitle: "Sommet Volley" });
 
   const lx = UI.mx;
   let y = 210;
@@ -696,11 +812,9 @@ function drawCredits() {
   const m = (txt) => { ctx.textAlign = "left"; ctx.fillStyle = UI.muted; ctx.font = "13px " + UI.mono; ctx.fillText(txt, lx, y); y += 20; };
 
   h("Créé par");
-  if (darkMode) {
-    p("Benjamin Mille & son gros souci mental");
-  } else {
+  {
     // "(sié un tchigre !)" en plus petit : c'est une private joke, pas le nom
-    const main = "Benjamin Mille & Romain Leray ";
+    const main = "Benjamin Mille";
     ctx.textAlign = "left"; ctx.font = "500 15px " + UI.sans; ctx.fillStyle = UI.ink;
     const mainW = ctx.measureText(main).width;
     ctx.fillText(main, lx, y);
@@ -738,52 +852,44 @@ function wrapText2(text, x, y, maxW, lh) {
 
 function drawStatGauge(x, y, label, val) {
   ctx.textAlign = "left";
-  ctx.font = "11px 'Inter', system-ui, sans-serif";
-  ctx.fillStyle = "rgba(255,255,255,0.7)";
+  ctx.font = "700 11px " + UI.sans;
+  ctx.fillStyle = "rgba(255,246,232,0.75)";
   ctx.fillText(label, x, y - 3);
   for (let k = 0; k < 5; k++) {
-    ctx.fillStyle = k < val ? "#ffcc00" : "rgba(255,255,255,0.18)";
-    ctx.fillRect(x + 62 + k * 13, y - 11, 10, 9);
+    ctx.fillStyle = k < val ? UI.gold : "rgba(255,255,255,0.18)";
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x + 62 + k * 13, y - 11, 10, 9, 2);
+    else ctx.rect(x + 62 + k * 13, y - 11, 10, 9);
+    ctx.fill();
   }
 }
 
 function drawSelectAnimal() {
-  drawBackground();
-  drawNet();
-  const gr = ctx.createLinearGradient(0, 0, 0, H);
-  gr.addColorStop(0, darkMode ? "rgba(22,0,0,0.9)" : "rgba(10,11,16,0.88)");
-  gr.addColorStop(1, darkMode ? "rgba(22,0,0,0.78)" : "rgba(10,11,16,0.72)");
-  ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H);
-  if (darkMode) drawHellVignette();
+  drawMenuWorld();
+  menuVeil(false);
 
-  const pcolor = darkMode ? "#ff5a3d" : "#ffd36b";
-  const pdark  = darkMode ? "#7a1408" : "#d99e18";
-  // en-tête éditorial compact (au-dessus de la rangée de cartes) — l'invité en
-  // ligne ne choisit que son personnage (l'hôte gère le terrain) : un compteur
-  // d'étape n'a pas de sens pour lui, un simple libellé suffit.
+  const pcolor = "#ffd36b";
+  const pdark  = "#d99e18";
   const guestPicking = pendingMode.online && netRole === "guest";
-  uiLabel(guestPicking ? "En ligne · Ton personnage" : wizardStep(wizardTotal() - 2, darkMode ? "Génital" : "Animal"),
-          UI.mx, 34, 11, uiAccent(), 2);
-  ctx.textAlign = "left"; ctx.fillStyle = UI.ink;
-  ctx.font = "800 26px " + UI.sans;
-  // "Joueur X" ne veut dire quelque chose que quand DEUX humains choisissent
-  // chacun leur tour (multi local) — inutile en solo IA ou en ligne, où il
-  // n'y a qu'un seul choix à faire ici.
+  uiLabel(guestPicking ? "En ligne · Ton personnage" : wizardStep(wizardTotal() - 2, "Perso"),
+          UI.mx, 34, 13, uiAccent(), 0.4);
   const twoLocalHumans = !pendingMode.vsAI && !pendingMode.online;
-  const pick = darkMode ? "choisis ton génital" : "choisis ton animal";
-  ctx.fillText(twoLocalHumans ? "Joueur " + sideName(selPlayer) + " — " + pick
-                              : pick.charAt(0).toUpperCase() + pick.slice(1),
-               UI.mx, 60);
+  const pick = "Choisis ton personnage";
+  uiTitle(twoLocalHumans ? "Joueur " + sideName(selPlayer) + " — " + pick : pick, UI.mx, 62, 26);
 
   const vis = visibleAnimalIdx();
-  const cw = W / vis.length; // largeur de carte adaptative (4, 5 ou 6 animaux…)
+  const taken = takenAnimalSet();
+  const navOpts = typeof navOptions === "function" ? navOptions() : null;
+  const navCode = navOpts ? navOpts[navIdx] : null;
+  const cw = W / vis.length; // largeur de carte adaptative
   for (let slot = 0; slot < vis.length; slot++) {
     const i = vis[slot];
     const cx = cw * slot + cw / 2;
     const a = ANIMALS[i];
     const code = "Digit" + (slot + 1);
-    hit(cx, 240, cw, 336, code);
-    if ((padConnected && navIdx === slot) || isHover(code)) {
+    const isTaken = taken.has(i);
+    if (!isTaken) hit(cx, 240, cw, 336, code);
+    if (!isTaken && ((padConnected && navCode === code) || isHover(code))) {
       // carte surlignée (manette ou survol souris) — or : seule couleur de
       // sélection dans tout le jeu (voir drawOptionList/drawSelectTerrain)
       ctx.strokeStyle = UI.gold;
@@ -793,43 +899,41 @@ function drawSelectAnimal() {
       if (ctx.roundRect) ctx.roundRect(rx, ry, rw, rh, 10); else ctx.rect(rx, ry, rw, rh);
       ctx.stroke();
     }
-    // Sprites hauts : pieds plus bas pour ne pas couper la tête (Sammy encore plus grand)
-    const previewY = a.key === "samy" ? 198 : a.key === "scooby" ? 188 : 168;
+    // Sprites hauts : pieds plus bas pour ne pas couper la tête
+    const previewY = 168;
     const preview = {
       x: cx, y: previewY, groundY: previewY,
       side: selPlayer, color: pcolor, darkColor: pdark,
       onGround: true, vx: 0, walkPhase: 0, squash: 0, animal: i, molt: 0
     };
+    if (isTaken) ctx.globalAlpha = 0.35;
     drawAnimal(preview);
+    ctx.globalAlpha = 1;
     ctx.textAlign = "center";
-    ctx.fillStyle = "#fff";
-    // police du nom adaptée au nombre de cartes (plus serré à 5-6 animaux)
-    ctx.font = "bold " + (vis.length >= 6 ? 14 : vis.length === 5 ? 16 : 20) + "px 'Inter', system-ui, sans-serif";
-    ctx.fillText((slot + 1) + " — " + a.name, cx, 205);
+    ctx.fillStyle = isTaken ? "rgba(255,255,255,0.35)" : UI.ink;
+    ctx.font = "800 " + (vis.length >= 6 ? 13 : vis.length === 5 ? 15 : 18) + "px " + UI.display;
+    ctx.fillText(isTaken ? "Pris — " + a.name : (slot + 1) + " — " + a.name, cx, 205);
 
-    // jauges de stats
     const gx = cx - 68, gy0 = 232;
     drawStatGauge(gx, gy0,      "Vitesse",   a.stats.vitesse);
     drawStatGauge(gx, gy0 + 20, "Détente",   a.stats.detente);
     drawStatGauge(gx, gy0 + 40, "Puissance", a.stats.puissance);
     drawStatGauge(gx, gy0 + 60, "Contrôle",  a.stats.controle);
 
-    // trait spécial (encadré, sur plusieurs lignes)
     ctx.textAlign = "center";
-    ctx.font = "12px 'Inter', system-ui, sans-serif";
-    ctx.fillStyle = "rgba(255,204,0,0.92)";
+    ctx.font = "700 12px " + UI.sans;
+    ctx.fillStyle = UI.gold;
     wrapText(a.trait, cx, 322, cw - 30, 14);
 
-    // technique SUPER
-    ctx.fillStyle = "#ffd93d";
-    ctx.font = "bold 13px 'Inter', system-ui, sans-serif";
+    ctx.fillStyle = UI.gold;
+    ctx.font = "800 13px " + UI.display;
     ctx.fillText("★ " + a.superName, cx, 372);
-    ctx.fillStyle = "rgba(255,255,255,0.8)";
-    ctx.font = "11px 'Inter', system-ui, sans-serif";
+    ctx.fillStyle = "rgba(255,246,232,0.85)";
+    ctx.font = "600 11px " + UI.sans;
     wrapText(a.superDesc, cx, 388, cw - 26, 13);
   }
 
-  uiLabel("3 points d'affilée chargent le SUPER (S / ↓)   ·   Choisis 1 – " + vis.length + "   ·   Échap ← retour",
+  uiLabel("3 points d'affilée chargent le SUPER (E / Shift)   ·   Choisis 1 – " + vis.length + "   ·   Échap ← retour",
           UI.mx, 466, 10, UI.muted, 1);
 }
 
@@ -847,14 +951,11 @@ function wrapText(text, cx, y, maxW, lh) {
 }
 
 function drawSelectTerrain() {
-  ctx.fillStyle = darkMode ? "#160303" : "#0e0f14";
-  ctx.fillRect(0, 0, W, H);
-  if (darkMode) drawHellVignette();
-  uiLabel(wizardStep(wizardTotal() - 1, darkMode ? "Bourbier" : "Terrain"), UI.mx, 40, 11, uiAccent(), 2);
-  ctx.textAlign = "left"; ctx.fillStyle = UI.ink;
-  ctx.font = "800 30px " + UI.sans;
-  ctx.fillText(darkMode ? "Choisis ton bourbier" : "Choisis le terrain", UI.mx, 74);
-  uiRule(UI.mx, W - UI.mx, 92, UI.faint);
+  drawMenuWorld();
+  menuVeil(false);
+  uiLabel(wizardStep(wizardTotal() - 1, "Terrain"), UI.mx, 40, 13, uiAccent(), 0.4);
+  uiTitle("Choisis le terrain", UI.mx, 74, 30);
+  uiRule(UI.mx, UI.mx + 100, 90, UI.gold);
 
   const visT = visibleTerrainIdx();
   // largeur de vignette adaptée au nombre de terrains (tient sur 900px de large)
@@ -864,51 +965,50 @@ function drawSelectTerrain() {
   for (let slot = 0; slot < n; slot++) {
     const i = visT[slot];
     const px = startX + slot * (pw + gap);
-    // aperçu réduit du terrain (le vrai rendu, animé)
+    // aperçu : thumb PNG dédié si dispo, sinon rendu live réduit
     ctx.save();
     ctx.beginPath();
     if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 10); else ctx.rect(px, py, pw, ph);
     ctx.clip();
-    ctx.translate(px, py);
-    ctx.scale(pw / W, ph / H);
-    const saved = terrain;
-    terrain = i;
-    drawBackground();
-    drawNet();
-    terrain = saved;
+    if (!drawTerrainMenuThumb(i, px, py, pw, ph)) {
+      ctx.translate(px, py);
+      ctx.scale(pw / W, ph / H);
+      const saved = terrain;
+      terrain = i;
+      drawBackground();
+      drawNet();
+      terrain = saved;
+    }
     ctx.restore();
 
     const code = "Digit" + (slot + 1);
     hit(px + pw / 2, py + ph / 2, pw, ph + 40, code);
     const sel = (padConnected && navIdx === slot) || isHover(code);
-    ctx.strokeStyle = sel ? UI.gold : "rgba(255,255,255,0.6)"; // or : seule couleur de sélection, partout
-    ctx.lineWidth = sel ? 4 : 2;
+    ctx.strokeStyle = sel ? UI.gold : UI.stroke;
+    ctx.lineWidth = sel ? 5 : 3;
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 10); else ctx.rect(px, py, pw, ph);
+    if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 14); else ctx.rect(px, py, pw, ph);
     ctx.stroke();
 
-    // index mono + nom du terrain, centrés sous la vignette
     ctx.textAlign = "center";
-    ctx.fillStyle = sel ? uiAccent() : UI.muted;
-    ctx.font = "700 12px " + UI.mono;
-    ctx.fillText(String(slot + 1), px + pw / 2, py + ph + 24);
-    ctx.fillStyle = sel ? UI.ink : "rgba(244,245,247,0.85)";
-    ctx.font = (n > 3 ? "600 15px " : "600 18px ") + UI.sans;
-    ctx.fillText(TERRAINS[i].name, px + pw / 2, py + ph + 44);
+    ctx.fillStyle = sel ? UI.gold : UI.ink;
+    ctx.font = "800 14px " + UI.display;
+    ctx.fillText(String(slot + 1), px + pw / 2, py + ph + 26);
+    ctx.fillStyle = UI.ink;
+    ctx.font = (n > 3 ? "800 14px " : "800 16px ") + UI.sans;
+    ctx.fillText(TERRAINS[i].name, px + pw / 2, py + ph + 46);
   }
 
-  uiLabel("Choisis 1 – " + n + "   ·   Échap ← retour", UI.mx, 466, 10, UI.muted, 1);
+  uiLabel("Choisis 1 – " + n + "   ·   C terrain calme : " + (mapEventsQuiet ? "ON" : "OFF") +
+          "   ·   Échap ← retour", UI.mx, 466, 10, UI.muted, 1);
 }
 
 function drawSelectBall() {
-  ctx.fillStyle = darkMode ? "#160303" : "#0e0f14";
-  ctx.fillRect(0, 0, W, H);
-  if (darkMode) drawHellVignette();
-  uiLabel(wizardStep(wizardTotal(), "Ballon"), UI.mx, 40, 11, uiAccent(), 2);
-  ctx.textAlign = "left"; ctx.fillStyle = UI.ink;
-  ctx.font = "800 30px " + UI.sans;
-  ctx.fillText("Choisis le ballon", UI.mx, 74);
-  uiRule(UI.mx, W - UI.mx, 92, UI.faint);
+  drawMenuWorld();
+  menuVeil(false);
+  uiLabel(wizardStep(wizardTotal(), "Ballon"), UI.mx, 40, 13, uiAccent(), 0.4);
+  uiTitle("Choisis le ballon", UI.mx, 74, 30);
+  uiRule(UI.mx, UI.mx + 100, 90, UI.gold);
 
   const n = BALL_SKINS.length, gap = 36;
   const pw = 200, ph = 200, py = 130;

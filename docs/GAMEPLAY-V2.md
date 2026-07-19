@@ -1,6 +1,6 @@
 # Gameplay V2 — Réception, smash, tir dirigé
 
-## Constat sur le système actuel (hérité de crabby-volley)
+## Constat sur le système actuel (hérité de l’ancien moteur Crabby (fork))
 
 La frappe est **passive** : la balle rebondit automatiquement au contact du
 corps/de la tête, l'angle du renvoi découle de la géométrie du contact, et le

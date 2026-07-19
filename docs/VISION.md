@@ -1,8 +1,8 @@
 # Sommet Volley — Vision
 
 Jeu de volley 2D **satirique** : les grandes figures politiques mondiales,
-caricaturées façon dessin de presse, s'affrontent au filet. Fork de
-crabby-volley (même moteur : physique déterministe, netcode soft-ownership,
+caricaturées façon dessin de presse, s'affrontent au filet. Fork d’un
+moteur HTML5 existant (même base : physique déterministe, netcode soft-ownership,
 manettes, modes 1v1/2v2/Bombe/en ligne), avec un nouveau casting, un nouveau
 gameplay (voir GAMEPLAY-V2.md) et une direction artistique 100 % cartoon
 générée par IA via un pipeline reproductible (voir PIPELINE-PERSONNAGE.md).
@@ -82,13 +82,11 @@ suivants (Kim, Boris, Silvio, Angela…) — chacun via la même fiche.
 ## Roadmap (ordre volontaire)
 
 - **Phase 0 — Base saine** ✅ : fork nettoyé (roster hérité retiré), docs.
-- **Phase 1 — Gameplay V2 d'abord** : réception / smash / tir dirigé,
-  prototypé avec les persos canvas existants derrière un flag. *Pourquoi
-  d'abord : la liste des animations à générer (poses de réception, visée,
-  smash…) dépend du gameplay final — générer l'art avant, c'est tout refaire.*
-- **Phase 2 — Pipeline + perso pilote** : outil de découpe/intégration,
-  génération complète de **Tsar Vladou** de bout en bout via Gemini CLI,
-  validation du process sur un cas réel.
+- **Phase 1 — Gameplay V2 d'abord** ✅ : cloche / smash / service (lancer X),
+  IA adaptée, sauts au-dessus du filet.
+- **Phase 2 — Pipeline + perso pilote** 🚧 : roster satirique + loader
+  générique + `tools/cutout.py` + canvas Vladou. Génération PNG complète
+  de **Tsar Vladou** (Gemini CLI) à finaliser.
 - **Phase 3 — Casting + maps** : les 2 autres persos, leurs maps animées,
   les événements interactifs.
 - **Phase 4 — Supers tactiques & équilibrage** : framework d'effets de

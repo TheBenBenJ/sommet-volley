@@ -56,18 +56,19 @@ const EPILOGUE = `
   setBombMode: v => { bombMode = v; }, getBombMode: () => bombMode,
   getBombTimer: () => bombTimer, setBombTimer: v => { bombTimer = v; },
   setBombTime: v => { bombTime = v; }, getBombTime: () => bombTime,
+  mapEvent, getMapEvent: () => mapEvent,
+  setMapEventsQuiet: v => { mapEventsQuiet = !!v; }, getMapEventsQuiet: () => mapEventsQuiet,
+  MAP_EVENT_WARN_T: typeof MAP_EVENT_WARN_T !== "undefined" ? MAP_EVENT_WARN_T : 120,
   updateBall,
   ballInGuestOwnZone, packBallState, applyBallState,
-  ANIMALS, TERRAINS,
+  simulateArc, aimAngleFromInput, clearBallHold,
+  getGameplayV2: () => GAMEPLAY_V2, setGameplayV2: v => { GAMEPLAY_V2 = !!v; },
+  HOLD_MAX, RECEIVE_R, CHARGE_MAX, AIM_CONE,
+  ANIMALS, TERRAINS, superEffects,
   SPRITES: typeof SPRITES !== "undefined" ? SPRITES : null,
   spriteReady: typeof spriteReady === "function" ? spriteReady : () => false,
-  drawScoobySpriteMaster: typeof drawScoobySpriteMaster === "function" ? drawScoobySpriteMaster : null,
-  drawScooby: typeof drawScooby === "function" ? drawScooby : null,
-  drawSamySpriteMaster: typeof drawSamySpriteMaster === "function" ? drawSamySpriteMaster : null,
-  drawSamy: typeof drawSamy === "function" ? drawSamy : null,
   SUPER_DUR: typeof SUPER_DUR !== "undefined" ? SUPER_DUR : {},
-  drawBgManoir: typeof drawBgManoir === "function" ? drawBgManoir : null,
-  consts: { W, H, NET_X, NET_W, NET_TOP, GROUND_Y, BALL_R, MAX_BALL_SPEED, GUEST_BALL_MARGIN }
+  consts: { W, H, NET_X, NET_W, NET_TOP, GROUND_Y, BALL_R, MAX_BALL_SPEED, GUEST_BALL_MARGIN, HOLD_LOB_SPD: typeof HOLD_LOB_SPD !== "undefined" ? HOLD_LOB_SPD : 0 }
 };`;
 
 function srcConcat() {

@@ -6,7 +6,7 @@ référence : tout nouveau perso suit ces 6 étapes dans l'ordre. Le premier
 perso (« pilote ») sert à valider le pipeline lui-même — chaque friction
 rencontrée doit être corrigée ICI, pas contournée en douce.
 
-> Leçons déjà payées (crabby-volley) qui motivent ce process :
+> Leçons déjà payées (l’ancien moteur Crabby (fork)) qui motivent ce process :
 > - une **planche** multi-poses à découper donne des cellules trop petites et
 >   des cadrages ratés → **une pose = une image** ;
 > - un détourage au seuil donne un **alpha binaire** (bords en escalier) →

@@ -57,7 +57,7 @@ jobs:
             pkg.version = parts.join('.');
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
             fs.writeFileSync('src/00-version.js',
-              '// crabby-volley · version du jeu (générée automatiquement au déploiement\n' +
+              '// sommet-volley · version du jeu (générée automatiquement au déploiement\n' +
               '// — voir .github/workflows/deploy.yml — ne pas éditer à la main)\n' +
               '\"use strict\";\n' +
               'const GAME_VERSION = \"' + pkg.version + '\";\n');
