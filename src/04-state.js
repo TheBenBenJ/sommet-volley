@@ -9,7 +9,6 @@ const TERRAINS = [
   { key: "neige",   name: "Le QG du Général Frigo",   animal: 2 },
   { key: "nuit",    name: "La Mare à Slurp",          animal: 1 },
   { key: "prairie", name: "Le Ter-Ter de Jeannot",    animal: 3 },
-  { key: "manoir",  name: "Le Manoir Hanté",          animal: 6 }, // Scooby
   { key: "enfer",   name: "La Fournaise à Chibre",    animal: 4, hidden: true },
   { key: "styx",    name: "Le Marigot de Schneck",    animal: 5, hidden: true }
 ];
@@ -84,24 +83,8 @@ const ANIMALS = [
     trait: "Chatte agile et précise : contrôle parfait, mais frappe tout en finesse.",
     superName: "Retombée de chat", superDesc: "Défie la gravité : sauts illimités et vol plané un court instant."
   },
-  {
-    key: "scooby", name: "Scooby",
-    color: "#c4a35a", darkColor: "#8b6914",   // brun scooby
-    stats: { vitesse: 4, detente: 4, puissance: 2, controle: 2 },
-    speed: 1.18, jump: 1.15, power: 0.88, control: 0.72,
-    slip: true, tired: true,
-    trait: "Lâche et goofy : dérape à l'arrêt, mais panique très vite.",
-    superName: "Scooby Snack", superDesc: "Peur bleue : vitesse décuplée et sauts illimités un instant."
-  },
-  {
-    key: "samy", name: "Sammy",
-    color: "#6b8f3c", darkColor: "#4a6a28",   // vert t-shirt Sammy
-    stats: { vitesse: 5, detente: 3, puissance: 2, controle: 2 },
-    speed: 1.25, jump: 1.05, power: 0.85, control: 0.7,
-    slip: true, tired: true,
-    trait: "Grand échalas nerveux : rapide, glisse, et panique encore plus vite.",
-    superName: "Zoinks !", superDesc: "Peur bleue : vitesse décuplée et sauts illimités un instant."
-  }
+  // → le casting satirique de Sommet Volley (chefs d'État caricaturés) sera
+  //   ajouté ici via le pipeline documenté dans docs/PIPELINE-PERSONNAGE.md
 ];
 function animOf(b) { return ANIMALS[b.animal]; }
 
@@ -246,7 +229,7 @@ const battle = {
 const SUPER_NEED = 3;
 const streak = [0, 0];        // points d'affilée par camp
 const superCharge = [0, 0];   // 0 = vide, 1 = super prête
-const SUPER_DUR = { oiseau: 40, grenouille: 24, manchot: 60, lapin: 100, chibre: 55, chneck: 110, scooby: 90, samy: 90 };
+const SUPER_DUR = { oiseau: 40, grenouille: 24, manchot: 60, lapin: 100, chibre: 55, chneck: 110 };
 let superFlash = "";          // libellé "SUPER !" affiché brièvement
 let superFlashT = 0;
 

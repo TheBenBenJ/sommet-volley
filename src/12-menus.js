@@ -311,7 +311,7 @@ function menuScreenBase(o) {
   if (darkMode) drawHellVignette();
 
   const mx = UI.mx, acc = uiAccent();
-  uiLabel(o.kicker || (darkMode ? "VOLLEY DES GÉNITAUX" : "Crabby Volley"), mx, 82, 12, acc, 3);
+  uiLabel(o.kicker || (darkMode ? "VOLLEY DES GÉNITAUX" : "Sommet Volley"), mx, 82, 12, acc, 3);
   ctx.textAlign = "left";
   ctx.fillStyle = UI.ink;
   ctx.font = "800 " + (o.titleSize || 42) + "px " + UI.sans;
@@ -333,7 +333,7 @@ function menuScreenBase(o) {
     else hit(mx + 45, H - 32, 130, 24, "Escape");
     uiLabel("Échap ← Retour", mx, H - 26, 10, UI.muted, 1.5);
   }
-  uiLabel(darkMode ? "Pussy Volley" : "Crabby Volley", W - mx, H - 26, 10, UI.muted, 1.5, "right");
+  uiLabel(darkMode ? "Pussy Volley" : "Sommet Volley", W - mx, H - 26, 10, UI.muted, 1.5, "right");
 }
 
 // petite ambiance "Belzébuth" superposée aux écrans de menu concernés :
@@ -451,7 +451,7 @@ function drawVolumeControl(x, y) {
 
 function drawMenu() {
   const nP = visibleAnimalIdx().length, nT = visibleTerrainIdx().length;
-  menuScreenBase({ title: darkMode ? "PUSSY VOLLEY" : "CRABBY VOLLEY",
+  menuScreenBase({ title: darkMode ? "PUSSY VOLLEY" : "SOMMET VOLLEY",
                    kicker: (darkMode ? "Volley des génitaux · " : "Volley des animaux · ") + nP + " persos · " + nT + " terrains",
                    titleSize: 58, noEscHint: true });
   drawVolumeControl(W - UI.mx, 82);

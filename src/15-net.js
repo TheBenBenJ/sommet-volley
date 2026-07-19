@@ -1115,7 +1115,7 @@ function netScreenBase(title, kicker, subtitle) {
   if (hasTouch) hit(mx + 110, H - 24, 260, 52, "Escape");
   else hit(mx + 45, H - 32, 130, 24, "Escape");
   uiLabel("Échap ← Retour", mx, H - 26, 10, UI.muted, 1.5);
-  uiLabel((darkMode ? "Pussy Volley" : "Crabby Volley") + " · En ligne", W - mx, H - 26, 10, UI.muted, 1.5, "right");
+  uiLabel((darkMode ? "Pussy Volley" : "Sommet Volley") + " · En ligne", W - mx, H - 26, 10, UI.muted, 1.5, "right");
 }
 
 function drawOnlineMenu() {

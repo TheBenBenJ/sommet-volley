@@ -296,51 +296,6 @@ test("balle crevée : sans holder local, le point tombe quand même", () => {
   assert.strictEqual(g.scores[0], 1, "le camp opposé au lastTouch marque");
 });
 
-test("Scooby : animal visible avec dessin et super turbo", () => {
-  const g = loadGame();
-  const scooby = g.ANIMALS.find(a => a.key === "scooby");
-  assert.ok(scooby, "entrée ANIMALS scooby");
-  assert.strictEqual(scooby.hidden, undefined);
-  assert.ok(scooby.slip && scooby.tired, "traits slip + tired");
-  assert.ok(typeof g.drawScooby === "function", "drawScooby défini");
-  const idx = g.ANIMALS.indexOf(scooby);
-  assert.ok(idx >= 6, "append en fin de tableau (pas de casse d'indices terrain)");
-  g.blobL.animal = idx;
-  assert.strictEqual(g.blobL.animal, idx);
-});
-
-test("sprites Scooby / Mystery Machine déclarés", () => {
-  const g = loadGame();
-  assert.ok(g.SPRITES, "SPRITES exposé");
-  assert.ok(g.SPRITES.scoobyRun, "sprite run");
-  assert.ok(g.SPRITES.mysteryVan, "sprite van");
-  assert.ok(g.SPRITES.manoirBg, "fond manoir");
-  assert.ok(Array.isArray(g.SPRITES.scoobyWalk) && g.SPRITES.scoobyWalk.length === 8, "cycle walk 8 frames");
-  assert.strictEqual(g.spriteReady(null), false);
-  assert.strictEqual(g.spriteReady(g.SPRITES.scoobyRun), false, "stub Image → fallback canvas");
-});
-
-test("terrain Manoir Hanté lié à Scooby", () => {
-  const g = loadGame();
-  const manoir = g.TERRAINS.find(t => t.key === "manoir");
-  assert.ok(manoir, "terrain manoir présent");
-  assert.ok(!manoir.hidden, "terrain visible (pas Belzébuth)");
-  assert.strictEqual(g.ANIMALS[manoir.animal].key, "scooby");
-  assert.ok(typeof g.drawBgManoir === "function", "drawBgManoir défini");
-});
-
-test("Sammy : animal visible avec sprites et super turbo", () => {
-  const g = loadGame();
-  const samy = g.ANIMALS.find(a => a.key === "samy");
-  assert.ok(samy, "entrée ANIMALS samy");
-  assert.strictEqual(samy.hidden, undefined);
-  assert.ok(samy.slip && samy.tired, "traits slip + tired");
-  assert.ok(typeof g.drawSamy === "function", "drawSamy défini");
-  assert.ok(g.SPRITES.samyRun, "sprite run");
-  assert.ok(Array.isArray(g.SPRITES.samyWalk) && g.SPRITES.samyWalk.length === 8, "cycle walk 8");
-  assert.ok(g.SUPER_DUR.samy > 0, "durée super");
-});
-
 test("soft ownership : pack/applyBallState round-trip", () => {
   const g = loadGame();
   g.newGame(2);

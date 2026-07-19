@@ -103,29 +103,11 @@ function scoobyWalkReady() {
 }
 
 function initSprites() {
-  const base = "assets/scooby/";
-  SPRITES.scoobyIdle = loadSprite(base + "idle.png");
-  SPRITES.scoobyIdleSide = loadSprite(base + "idle_side.png");
-  SPRITES.scoobyRun = loadSprite(base + "run.png");
-  SPRITES.scoobyPounce = loadSprite(base + "pounce.png");
-  SPRITES.mysteryVan = loadSprite(base + "van.png");
-  SPRITES.manoirBg = loadSprite("assets/manoir/bg.png");
-  prepareSharpBg(SPRITES.manoirBg, "manoirBgSharp", 0.7, 2); // accentuation légère anti-flou
+  // Sommet Volley : le roster hérité (sprites persos + fond manoir) a été
+  // retiré — le nouveau casting chargera ses sprites via un manifest générique
+  // par personnage (voir docs/PIPELINE-PERSONNAGE.md). La table SPRITES et les
+  // fonctions de rendu héritées restent en place (inertes) durant la migration.
   SPRITES.ballPurple = loadSprite("assets/ball/volley_purple.png");
-  SPRITES.scoobyWalk = [];
-  for (let i = 0; i < 8; i++) {
-    SPRITES.scoobyWalk.push(loadSprite(base + "walk" + i + ".png"));
-  }
-  const samy = "assets/samy/";
-  SPRITES.samyIdle = loadSprite(samy + "idle.png");
-  SPRITES.samyIdleSide = loadSprite(samy + "idle_side.png");
-  SPRITES.samyRun = loadSprite(samy + "run.png");
-  SPRITES.samyPounce = loadSprite(samy + "pounce.png");
-  SPRITES.samyPanic = loadSprite(samy + "panic.png");
-  SPRITES.samyWalk = [];
-  for (let i = 0; i < 8; i++) {
-    SPRITES.samyWalk.push(loadSprite(samy + "walk" + i + ".png"));
-  }
 }
 
 initSprites();
