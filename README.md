@@ -1,7 +1,7 @@
 # Sommet Volley
 
 Volley 2D satirique : Tsar Vladou, Ronald Trompette et Manu Micron s’affrontent
-sur Place Grand-Rouge, Resort Doré ou Palais de l’Hexagone. Techniques signature,
+sur Place Grand-Rouge, Pelouse Oval ou Palais de l’Hexagone. Techniques signature,
 météo dynamique, public en délire… et un **mode multijoueur en ligne** (1v1 et
 2v2) en pair-à-pair.
 

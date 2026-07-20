@@ -47,10 +47,9 @@ existant (vitesse/détente/puissance/contrôle sur 5).
 - **SUPER « Le Mur »** : élève un mur doré au milieu du camp adverse pendant
   ~5 s : l'adversaire doit le contourner/sauter par-dessus pour défendre.
   Tactique : coupe les déplacements, à combiner avec un smash croisé.
-- **Map « Resort Doré »** : tour dorée, palmiers, green de golf, drapeaux.
-  **Événement interactif** : une voiturette de golf traverse le fond et
-  klaxonne ; au passage, elle projette des balles de golf en pluie sur une
-  zone annoncée (marqueur au sol) — zone à éviter 1,5 s.
+- **Map « Pelouse Oval »** : façade néoclassique blanche, pelouse, drapeaux
+  stylisés. **Événement interactif** : un mini-cortège (voiturette) traverse
+  le fond et klaxonne ; au passage, pluie de balles sur une zone annoncée.
 
 ### 3. Manu Micron (France)
 - **Silhouette** : costume cintré impeccable, mèche laquée, gestuelle de

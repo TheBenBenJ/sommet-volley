@@ -4,7 +4,7 @@
 const SPRITES = {
   ballPurple: null,      // ballon volley violet / crème
   mapVladou: null,       // Place Grand-Rouge (pack PNG)
-  mapTrompette: null,    // Resort Doré (pack PNG)
+  mapTrompette: null,    // Pelouse Oval (pack PNG)
   mapMicron: null,       // Palais de l'Hexagone (pack PNG)
   mapHoun: null          // Esplanade du Défilé (pack PNG)
 };
@@ -52,7 +52,7 @@ function mapVladouReady() {
   return !!(p && spriteReady(p.skyline));
 }
 
-/** Pack fond / props Resort Doré (terrain Trompette). */
+/** Pack fond / props Pelouse Oval (terrain Trompette). */
 function initMapTrompette() {
   SPRITES.mapTrompette = loadMapPack("trompette", {
     skyline: "skyline.png", far: "far.png", crowd0: "crowd_0.png",

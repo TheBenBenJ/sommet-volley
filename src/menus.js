@@ -1152,7 +1152,7 @@ function drawRules() {
   y += 4;
   h("Météo & événements", "#4db3ff");
   p("Pluie / tempête : sol glissant, balle plus lourde.");
-  p("Place Grand-Rouge : canon. Resort Doré : voiturette. Palais / Esplanade : décors PNG.");
+  p("Place Grand-Rouge : canon. Pelouse Oval : voiturette. Palais / Esplanade : décors PNG.");
   p("Deux joueurs au filet + balle proche = Smash Battle.");
   ctx.restore();
 

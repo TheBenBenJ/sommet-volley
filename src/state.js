@@ -6,7 +6,7 @@
 // tribunes est composé de ce perso, et le nom du terrain lui rend hommage.
 const TERRAINS = [
   { key: "neige",   name: "Place Grand-Rouge",       character: 0 }, // Vladou
-  { key: "plage",   name: "Resort Doré",             character: 1 }, // Trompette
+  { key: "plage",   name: "Pelouse Oval",            character: 1 }, // Trompette
   { key: "prairie", name: "Palais de l'Hexagone",    character: 2 }, // Micron
   { key: "parade",  name: "Esplanade du Défilé",     character: 3 }, // Houn
 ];

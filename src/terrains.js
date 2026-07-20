@@ -33,7 +33,7 @@ function drawBgPlage() {
   drawBgPlageCanvas(raining, storm);
 }
 
-/** Resort Doré PNG (Trompette) — un fond + FX sable en code. */
+/** Pelouse Oval PNG (Trompette) — pelouse + FX poussière en code. */
 function drawBgPlagePng(t, raining, storm) {
   const p = SPRITES.mapTrompette;
 
@@ -54,49 +54,39 @@ function drawBgPlagePng(t, raining, storm) {
 
   // Public désactivé pour l’instant (pas de crowd_0 / pas de drawCrowd)
 
-  // Sol sable jouable
+  // Sol pelouse / gravier clair jouable
   const sand = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
   if (raining) {
-    sand.addColorStop(0, "#c9a25a");
-    sand.addColorStop(1, "#a07f3f");
+    sand.addColorStop(0, "#6a8f4e");
+    sand.addColorStop(1, "#4a6a38");
   } else {
-    sand.addColorStop(0, "#f4d58d");
-    sand.addColorStop(1, "#d9b25f");
+    sand.addColorStop(0, "#8fbc6a");
+    sand.addColorStop(1, "#6a9a48");
   }
   ctx.fillStyle = sand;
   ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
   ctx.fillStyle = "rgba(0,0,0,0.06)";
   ctx.fillRect(0, GROUND_Y, W, 2);
 
-  // barrière dorée au bord du terrain
-  ctx.fillStyle = "#c9a227";
+  // barrière blanche / or au bord du terrain
+  ctx.fillStyle = "#e8e4d8";
   ctx.fillRect(0, GROUND_Y - 41, W, 4);
-  ctx.fillStyle = "rgba(255,255,255,0.35)";
+  ctx.fillStyle = "#c9a227";
   ctx.fillRect(0, GROUND_Y - 41, W, 1);
   ctx.fillStyle = "rgba(0,0,0,0.18)";
   ctx.fillRect(0, GROUND_Y - 37, W, 1);
 
-  // Vaguelettes
-  ctx.strokeStyle = "rgba(255,255,255,0.45)";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  for (let x = 0; x <= W; x += 8) {
-    const y = GROUND_Y - 34 + Math.sin(x / 26 + t * 2) * 2;
-    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-
-  // Pas de palmier « prop » : le fond du resort a déjà ses palmiers géants —
+  // Pas de palmier « prop » : le fond a déjà ses éléments géants —
   // le doublon miniature au premier plan cassait la perspective.
   if (!spriteReady(p.far) && !spriteReady(p.skyline)) drawPalm(52, storm);
 
-  // Drapeau de green (droite) — à l'échelle d'un vrai drapeau de golf
+  // Drapeau cérémoniel (droite)
   if (spriteReady(p.flag)) {
     const bob = Math.sin(t * 2.2) * 2;
     drawMapProp(p.flag, 845, GROUND_Y + 2 + bob, 88);
   }
 
-  // Voiturette (event ou idle décoratif)
+  // Voiturette / mini-cortège (event ou idle décoratif)
   drawResortCart(t);
 
   if (raining) drawSandstorm(storm ? 1 : 0.55);
