@@ -103,7 +103,7 @@ function render() {
   if (state === "bombFormat") { drawBombFormat(); return; }
   if (state === "bombDuration") { drawBombDuration(); return; }
   if (state === "rules") { drawRules(); return; }
-  if (state === "tutorial") { drawTutorial(); return; }
+  if (state === "tutorialHelp") { drawTutorial(); return; }
   if (state === "credits") { drawCredits(); return; }
   if (state === "selectCharacter") { drawSelectCharacter(); return; }
   if (state === "selectTerrain") { drawSelectTerrain(); return; }
@@ -172,6 +172,7 @@ function render() {
   drawHUD();
   drawBattleHUD();
   if (online && netConnected) drawNetHUD();
+  if (typeof drawTutorialCoach === "function") drawTutorialCoach();
 
   if (state === "point") {
     drawPointCelebBanner();
@@ -251,7 +252,9 @@ function drawGameoverCeleb() {
   const sub = online
     ? ((winSide === (netRole === "host" ? 0 : (mode === "2v2" ? (mySlot < 2 ? 0 : 1) : 1)))
         ? "Gagné !" : "Perdu…")
-    : (ready ? "Espace ou Entrée — menu" : "Gagné !");
+    : tutorialMode
+      ? (ready ? "Espace — retour au menu" : "Tutoriel terminé !")
+      : (ready ? "Espace ou Entrée — menu" : "Gagné !");
 
   if (online) {
     overlay(pointMsg, sub);

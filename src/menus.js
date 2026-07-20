@@ -28,6 +28,18 @@ function handleMenuKeys(code, key) {
   if (volMatch) { muted = false; setVolume(Number(volMatch[1]) / 5); return; }
 
   if (state === "menu") {
+    // Invitation 1ʳᵉ visite : bloque le reste du menu
+    if (tutorialInviteOpen) {
+      if (code === "TutPlay" || code === "KeyT" || code === "Enter" || code === "Space") startTutorial();
+      else if (code === "TutLater" || code === "Escape") {
+        tutorialInviteOpen = false;
+        tutorialInviteSessionDismissed = true;
+      } else if (code === "TutNever") {
+        tutorialInviteOpen = false;
+        markTutorialDone();
+      }
+      return;
+    }
     // Écran d'accueil : 3 grandes catégories, chacune débouche sur ses propres
     // sous-choix (difficulté, mode de jeu…) au lieu d'un mur de 8 options.
     if (code === "Digit1") { pendingMode = { vsAI: true }; state = "aiDifficulty"; } // Solo vs IA — pendingMode neuf : évite qu'un ancien "bomb" traîne dans le compteur d'étapes
@@ -41,14 +53,18 @@ function handleMenuKeys(code, key) {
       }
     }
     if (code === "KeyR") state = "rules";
-    if (code === "KeyT") { tutorialReset(); state = "tutorial"; }
+    if (code === "KeyT") startTutorial();
+    if (code === "KeyH") { tutorialReset(); state = "tutorialHelp"; }
     if (code === "KeyC") state = "credits";
+    if (code === "TutPlay") startTutorial();
+    if (code === "TutLater") { tutorialInviteOpen = false; tutorialInviteSessionDismissed = true; }
+    if (code === "TutNever") { tutorialInviteOpen = false; markTutorialDone(); }
 
   } else if (state === "credits") {
     if (code === "Escape" || code === "Enter" || code === "Space") goMenu();
 
-  } else if (state === "tutorial") {
-    if (code === "Escape" || code === "Enter" || code === "Space" || code === "KeyT") goMenu();
+  } else if (state === "tutorialHelp") {
+    if (code === "Escape" || code === "Enter" || code === "Space" || code === "KeyH") goMenu();
     if (code === "TutKey") tutorialTab = "keyboard";
     if (code === "TutPad") tutorialTab = "pad";
     if (code === "TutTouch") tutorialTab = "touch";
@@ -56,6 +72,7 @@ function handleMenuKeys(code, key) {
     if (code === "TutAuto") tutorialTab = "auto";
     if (code === "TutAim") tutorialAimLob = !tutorialAimLob;
     if (code === "TutSide") tutorialSide = tutorialSide === 0 ? 1 : 0;
+    if (code === "TutPlay") startTutorial();
   } else if (state === "aiDifficulty") {
     // Étape 2 (Solo vs IA) : la difficulté choisie amorce pendingMode, complété
     // ensuite par le mode de jeu dans "gameModeSelect".
@@ -199,6 +216,12 @@ function handleMenuKeys(code, key) {
       goMenu();
     }
 
+  } else if ((state === "serve" || state === "play") && tutorialMode &&
+             (code === "Enter" || code === "Space")) {
+    // Avance manuelle d'une étape coach (sans lancer la balle au service si inHands —
+    // Space est aussi saut : on avance seulement si l'étape le demande)
+    if (tutorialStepCanSkip()) advanceTutorialStep();
+
   } else if (code === "KeyP") {
     if (!online) paused = !paused; // pas de pause manuelle en ligne
   } else if (code === "Escape") {
@@ -291,8 +314,57 @@ const menuBg = { init: false, terrain: 0, t0: 0, ballX: W * 0.5, ballY: 120, bal
 let menuActors = { L: null, R: null };
 
 function goMenu() {
+  tutorialMode = false;
+  tutorialStep = 0;
   state = "menu";
   shuffleMenuBackdrop();
+  if (shouldShowTutorialInvite()) tutorialInviteOpen = true;
+}
+
+/** Lance la partie tutoriel guidée (1v1 vs IA Facile, premier à 3). */
+function startTutorial() {
+  tutorialInviteOpen = false;
+  tutorialInviteSessionDismissed = true;
+  tutorialMode = true;
+  tutorialStep = 0;
+  bombMode = false;
+  mapEventsQuiet = true;
+  vsAI = true;
+  aiLevel = 0;
+  online = false;
+  pendingMode = null;
+  setMode("1v1");
+  blobL.charId = 2; // Micron
+  blobR.charId = 1; // Trompette
+  terrain = 2;      // Palais de l'Hexagone
+  ballSkin = 0;
+  paused = false;
+  newGame(42);
+}
+
+function tutorialStepCanSkip() {
+  // Étapes « tip » dismissibles ; les étapes auto (mouvement détecté) aussi via Entrée
+  return tutorialStep >= 0 && tutorialStep <= 5;
+}
+
+function advanceTutorialStep() {
+  if (!tutorialMode) return;
+  if (tutorialStep < 5) {
+    tutorialStep++;
+    beep(520, 0.04, "square", 0.06);
+  }
+}
+
+/** Auto-progression du coach selon les actions du joueur. */
+function tickTutorialCoach() {
+  if (!tutorialMode) return;
+  if (state !== "serve" && state !== "play") return;
+  const me = blobL;
+  if (tutorialStep === 0 && Math.abs(me.vx) > 1.2) advanceTutorialStep();
+  else if (tutorialStep === 1 && !me.onGround) advanceTutorialStep();
+  else if (tutorialStep === 2 && !ball.inHands && !ball.frozen) advanceTutorialStep();
+  else if (tutorialStep === 3 && scores[0] + scores[1] >= 1) advanceTutorialStep();
+  else if (tutorialStep === 4 && (me.superT > 0 || superCharge[0] > 0)) advanceTutorialStep();
 }
 
 function shuffleMenuBackdrop() {
@@ -644,15 +716,47 @@ function drawMenu() {
     "1  —  Solo",
     "2  —  Multijoueur local",
     "3  —  Multijoueur en ligne",
-    "T  —  Tutoriel",
+    "T  —  Tutoriel" + (tutorialDone ? "" : "  · Nouveau"),
+    "H  —  Aide commandes",
     "R  —  Règles du jeu",
     "C  —  Crédits"
   ];
-  drawOptionList(items, 200, 38);
+  drawOptionList(items, 188, 34);
 
   uiLabel(controlsHint(), UI.mx, H - 52, 12, controlsHintColor(), 0.3);
   uiLabel("Premier à " + WIN_SCORE + " · 2 pts d'écart · " + MAX_TOUCHES + " touches max",
           UI.mx, H - 24, 12, UI.muted, 0.3);
+
+  if (tutorialInviteOpen || shouldShowTutorialInvite()) {
+    tutorialInviteOpen = true;
+    menuHitboxes = []; // seule la modal est cliquable
+    drawTutorialInvite();
+  }
+}
+
+function drawTutorialInvite() {
+  ctx.fillStyle = "rgba(8, 12, 28, 0.72)";
+  ctx.fillRect(0, 0, W, H);
+  const pw = 420, ph = 200;
+  const px = (W - pw) / 2, py = (H - ph) / 2 - 10;
+  ctx.fillStyle = "rgba(255,246,232,0.97)";
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 18); else ctx.rect(px, py, pw, ph);
+  ctx.fill();
+  ctx.strokeStyle = UI.stroke; ctx.lineWidth = 3.5; ctx.stroke();
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = UI.stroke;
+  ctx.font = "800 22px " + UI.display;
+  ctx.fillText("Première fois ?", W / 2, py + 42);
+  ctx.font = "600 14px " + UI.sans;
+  ctx.fillStyle = "rgba(27,23,48,0.75)";
+  ctx.fillText("Un match court guidé pour apprendre", W / 2, py + 72);
+  ctx.fillText("les commandes (3 points, IA Facile).", W / 2, py + 92);
+
+  drawTutorialTab("Jouer le tutoriel", "TutPlay", W / 2, py + 130, 220, true);
+  drawTutorialTab("Plus tard", "TutLater", W / 2 - 70, py + 168, 120, false);
+  drawTutorialTab("Ne plus demander", "TutNever", W / 2 + 90, py + 168, 150, false);
 }
 
 // résumé du mode de contrôle ACTIF (manette branchée > tactile détecté >
@@ -1012,8 +1116,8 @@ function drawTutorial() {
   ctx.fill();
   ctx.strokeStyle = UI.stroke; ctx.lineWidth = 3; ctx.stroke();
 
-  uiLabel("Apprends les commandes", UI.mx, 36, 12, uiAccent(), 0.4);
-  uiTitle("Tutoriel", UI.mx, 60, 26);
+  uiLabel("Référence des commandes", UI.mx, 36, 12, uiAccent(), 0.4);
+  uiTitle("Aide commandes", UI.mx, 60, 26);
   uiRule(UI.mx, UI.mx + 90, 72, UI.gold);
 
   // Onglets device
@@ -1080,7 +1184,50 @@ function drawTutorial() {
 
   hit(UI.mx + 45, H - 32, 130, 24, "Escape");
   uiLabel("Échap / Entrée ← Retour", UI.mx, H - 28, 12, UI.muted, 0.3);
-  uiLabel("Sommet Volley", W - UI.mx, H - 28, 12, UI.muted, 0.3, "right");
+  drawTutorialTab("Jouer le tutoriel", "TutPlay", W - UI.mx - 90, H - 28, 160, true);
+}
+
+/** Bandeau coach pendant la partie tutoriel. */
+function drawTutorialCoach() {
+  if (!tutorialMode || (state !== "serve" && state !== "play")) return;
+  const tips = [
+    { title: "Déplacement", body: "Q / D (ou stick) pour bouger · Entrée pour continuer" },
+    { title: "Saut", body: "Z ou Espace (manette : A) pour sauter" },
+    { title: "Service", body: "X / S / F pour lancer la balle, puis frappe-la" },
+    { title: "Visée", body: "Tiens ← → (ou oriente le stick) en frappant" },
+    { title: "SUPER", body: "Remplis la jauge (points d'affilée) puis E" },
+    { title: "Objectif", body: "Marque " + TUTORIAL_WIN_SCORE + " points — Échap pour quitter" }
+  ];
+  const tip = tips[Math.min(tutorialStep, tips.length - 1)];
+  const pw = Math.min(520, W - 40);
+  const ph = 64;
+  const px = (W - pw) / 2, py = 8;
+  ctx.fillStyle = "rgba(12,20,42,0.88)";
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 14); else ctx.rect(px, py, pw, ph);
+  ctx.fill();
+  ctx.strokeStyle = UI.gold; ctx.lineWidth = 2.5; ctx.stroke();
+  ctx.textAlign = "center";
+  ctx.fillStyle = UI.gold;
+  ctx.font = "800 13px " + UI.sans;
+  ctx.fillText("Tutoriel · " + (tutorialStep + 1) + "/" + tips.length + "  —  " + tip.title, W / 2, py + 24);
+  ctx.fillStyle = "rgba(255,246,232,0.9)";
+  ctx.font = "600 13px " + UI.sans;
+  ctx.fillText(tip.body, W / 2, py + 46);
+
+  // Mini-flèche d'aim pendant l'étape visée
+  if (tutorialStep === 3 && typeof aimLobAngleFromInput === "function") {
+    const input = localInputs(0);
+    const ang = aimLobAngleFromInput(blobL, input);
+    const ox = blobL.x, oy = blobL.y - 52;
+    const len = 56;
+    ctx.strokeStyle = "rgba(255,216,74,0.9)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(ox, oy);
+    ctx.lineTo(ox + Math.cos(ang) * len, oy + Math.sin(ang) * len);
+    ctx.stroke();
+  }
 }
 
 function drawRules() {

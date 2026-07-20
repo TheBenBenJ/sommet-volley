@@ -5,6 +5,7 @@
 // avant la première frame pour que le tout premier rendu (menu) soit déjà
 // cohérent avec les préférences du joueur.
 loadSettings();
+if (typeof loadTutorialDone === "function") loadTutorialDone();
 
 // ---------- Boucle à pas fixe (60 Hz) ----------
 // La simulation avance par ticks constants, découplés du framerate :

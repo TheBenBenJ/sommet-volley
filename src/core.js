@@ -19,6 +19,7 @@ const BALL_R = 14;
 const HIT_SPEED = 10.5;
 const MAX_BALL_SPEED = 15;
 const WIN_SCORE = 15;
+const TUTORIAL_WIN_SCORE = 3; // premier à 3 en tutoriel (sans écart obligatoire)
 const MAX_TOUCHES = 3;
 const STEP = 1000 / 60; // tick fixe 60 Hz (indispensable pour le futur mode en ligne)
 const TOUCH_COOLDOWN = 12;   // ticks mini entre deux touches comptées (anti double-comptage)

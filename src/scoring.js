@@ -72,10 +72,17 @@ function awardPoint(side, reason) {
     b._celebHop = b.side === side ? (18 + (b === blobL || b === blobR ? 0 : 8)) : 0;
   }
   const lead = Math.abs(scores[0] - scores[1]);
-  if (scores[side] >= WIN_SCORE && lead >= 2) {
+  const winNeed = typeof matchWinScore === "function" ? matchWinScore() : WIN_SCORE;
+  const winOk = tutorialMode
+    ? scores[side] >= winNeed
+    : (scores[side] >= winNeed && lead >= 2);
+  if (winOk) {
     state = "gameover";
     gameoverTimer = GAMEOVER_MIN_WAIT;
-    pointMsg = name + " remporte le match " + scores[0] + " – " + scores[1] + " !";
+    pointMsg = tutorialMode
+      ? "Tutoriel terminé !  " + scores[0] + " – " + scores[1]
+      : (name + " remporte le match " + scores[0] + " – " + scores[1] + " !");
+    if (tutorialMode) markTutorialDone();
     if (!noFx) {
       spawnConfetti(120); spawnConfetti(40, W * 0.5);
       setEmote(side, "happy"); setEmote(1 - side, "sad");

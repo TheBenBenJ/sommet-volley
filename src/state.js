@@ -114,13 +114,13 @@ function sideColor(side) {
 }
 
 // ---------- État du jeu ----------
-// state: "menu" | "aiDifficulty" | "gameModeSelect" | "rules" | "credits" | "tutorial"
+// state: "menu" | "aiDifficulty" | "gameModeSelect" | "rules" | "credits" | "tutorialHelp"
 //        | "selectCharacter" | "selectTerrain" | "selectBall" | "serve" | "play" | "point" | "gameover"
 //        | états du mode en ligne : "onlineMenu" | "joinEntry" | "hostWait"
 //          | "connecting" | "netWait" | "netError"
 // Flux du menu : menu → (Solo IA : aiDifficulty → gameModeSelect) | (Local : gameModeSelect direct)
 //                     → selectCharacter → selectTerrain → selectBall → partie
-//                     | Tutoriel / Règles / Crédits (retour menu)
+//                     | Tutoriel (partie guidée) / Aide commandes / Règles / Crédits
 let state = "menu";
 let vsAI = true;
 let pointTimer = 0;
@@ -138,6 +138,30 @@ const particles = [];          // plumes et sable
 let crowdHype = 0;             // ferveur du public (pic sur point/smash), décroît
 let prevCrowdHype = 0;         // détection du front montant → ola sonore
 const emotes = [null, null];   // bulle d'émotion au-dessus de chaque joueur
+
+// --- Tutoriel jouable ---
+let tutorialMode = false;      // partie guidée en cours
+let tutorialStep = 0;          // étape coach (0..)
+let tutorialInviteOpen = false; // modal 1ʳᵉ visite sur le menu
+let tutorialInviteSessionDismissed = false; // « Plus tard » cette session
+let tutorialDone = false;      // persisté — ne plus inviter auto
+const TUTORIAL_DONE_KEY = "sommetTutorialDone";
+
+function loadTutorialDone() {
+  try {
+    tutorialDone = localStorage.getItem(TUTORIAL_DONE_KEY) === "1";
+  } catch (e) { tutorialDone = false; }
+}
+function markTutorialDone() {
+  tutorialDone = true;
+  try { localStorage.setItem(TUTORIAL_DONE_KEY, "1"); } catch (e) {}
+}
+function shouldShowTutorialInvite() {
+  return state === "menu" && !tutorialDone && !tutorialInviteSessionDismissed;
+}
+function matchWinScore() {
+  return tutorialMode ? TUTORIAL_WIN_SCORE : WIN_SCORE;
+}
 
 let pendingMode = null;        // mode choisi au menu, en attente des sélections
 let selPlayer = 0;             // quel joueur choisit son perso

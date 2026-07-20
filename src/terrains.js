@@ -1300,7 +1300,7 @@ function drawHUD() {
   // balle de match
   if (state === "play" || state === "serve") {
     for (const s of [0, 1]) {
-      if (scores[s] >= WIN_SCORE - 1 && scores[s] - scores[1 - s] >= 1) {
+      if (scores[s] >= matchWinScore() - 1 && scores[s] - scores[1 - s] >= 1) {
         const txt = "★ Balle de match — " + sideLabel(s) + " ★";
         ctx.textAlign = "center";
         ctx.font = "700 16px " + DISP;

@@ -286,5 +286,6 @@ function update() {
   const inL = localInputs(0);
   const inR = vsAI ? aiInput() : localInputs(1);
   stepGame(inL, inR);
+  if (typeof tickTutorialCoach === "function") tickTutorialCoach();
 }
 

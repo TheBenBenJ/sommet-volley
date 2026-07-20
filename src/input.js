@@ -189,7 +189,9 @@ function pointAdvanceRequested() {
 // options navigables à la manette, par état (mêmes codes que le clavier)
 function navOptions() {
   switch (state) {
-    case "menu":          return ["Digit1", "Digit2", "Digit3", "KeyT", "KeyR", "KeyC"];
+    case "menu":          return tutorialInviteOpen
+      ? ["TutPlay", "TutLater", "TutNever"]
+      : ["Digit1", "Digit2", "Digit3", "KeyT", "KeyH", "KeyR", "KeyC"];
     case "aiDifficulty":  return ["Digit1", "Digit2", "Digit3", "Digit4"];
     case "bombDuration":  return ["Digit1", "Digit2", "Digit3"];
     case "bombFormat":    return ["Digit1", "Digit2"];
@@ -218,8 +220,11 @@ function handlePadMenu() {
     if (padEdge(horiz ? "left" : "up"))    { navIdx = (navIdx - 1 + opts.length) % opts.length; beep(500, 0.03, "square", 0.05); }
     if (padEdge("confirm")) { const c = opts[navIdx]; navIdx = 0; handleMenuKeys(c, ""); return; }
     if (padEdge("back")) { navIdx = 0; handleMenuKeys("Escape", ""); }
-  } else if (state === "rules" || state === "tutorial" || state === "netError" || state === "credits") {
+  } else if (state === "rules" || state === "tutorialHelp" || state === "netError" || state === "credits") {
     if (padEdge("confirm") || padEdge("back")) handleMenuKeys("Escape", "");
+  } else if ((state === "serve" || state === "play") && tutorialMode) {
+    if (padEdge("confirm")) handleMenuKeys("Enter", "");
+    if (padEdge("back")) handleMenuKeys("Escape", "");
   } else if (state === "gameover") {
     if (padEdge("confirm") && gameoverTimer <= 0) handleMenuKeys(online ? "KeyR" : "Space", "");
     if (padEdge("back")) handleMenuKeys("Escape", "");
