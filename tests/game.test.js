@@ -471,6 +471,20 @@ test("soft ownership : pack/applyBallState round-trip", () => {
   assert.deepStrictEqual(g.ball.touches, [1, 2]);
 });
 
+test("soft ownership : cooldown frappe avance avec tick (smash post-réception invité)", () => {
+  // Régression : sans tick++ pendant guestBallAuthority, lastActiveHitTick
+  // restait égal à tick → canActiveHit faux pour toute la possession.
+  const g = loadGame();
+  g.newGame(3);
+  g.setTick(1000);
+  g.blobR.lastActiveHitTick = 1000; // vient de réceptionner
+  assert.strictEqual(g.canActiveHit(g.blobR), false, "cooldown actif juste après frappe");
+  for (let i = 0; i < 15; i++) g.setTick(g.getTick() + 1);
+  assert.strictEqual(g.canActiveHit(g.blobR), false, "encore en cooldown à +15");
+  g.setTick(g.getTick() + 1);
+  assert.strictEqual(g.canActiveHit(g.blobR), true, "smash autorisé après cooldown (tick qui avance)");
+});
+
 // ---------- Gameplay V2 ----------
 const N0 = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
 

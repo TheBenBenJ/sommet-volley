@@ -819,6 +819,9 @@ function netUpdate() {
       }
 
       if (guestBallAuthority) {
+        // Même horloge que stepGame : sans tick++, le cooldown post-réception
+        // (canActiveHit) reste figé → smash impossible après une cloche.
+        tick++;
         guestSyncRemoteBlobs();
         netDeferScore = true;
         const me = activeBlobs[mySlot];
