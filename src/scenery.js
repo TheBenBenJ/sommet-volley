@@ -239,19 +239,17 @@ function scheduleNextMapEvent() {
   mapEvent.balls = [];
 }
 
-/** Déplacement continu du caddie hors event (une seule position, jamais de pop). */
+/** Déplacement continu du caddie hors event (une seule position, jamais de pop).
+ *  Va-et-vient lent ; le rendu miroite le sprite selon cartDir (jamais en marche arrière). */
 function stepCartIdleMotion() {
   if (mapEventKind() !== "cart") return;
   if (mapEvent.phase !== "idle") return;
   if (mapEvent.cartDir !== 1 && mapEvent.cartDir !== -1) mapEvent.cartDir = 1;
-  // Va-et-vient lent au milieu, près des barrières (pas au premier plan)
   const lo = W * 0.5 - 100;
   const hi = W * 0.5 + 100;
-  if (mapEvent.cartX < lo) { mapEvent.cartX = lo; mapEvent.cartDir = 1; }
-  if (mapEvent.cartX > hi) { mapEvent.cartX = hi; mapEvent.cartDir = -1; }
   mapEvent.cartX += mapEvent.cartDir * 0.28;
-  if (mapEvent.cartX > hi) mapEvent.cartDir = -1;
-  if (mapEvent.cartX < lo) mapEvent.cartDir = 1;
+  if (mapEvent.cartX >= hi) { mapEvent.cartX = hi; mapEvent.cartDir = -1; }
+  else if (mapEvent.cartX <= lo) { mapEvent.cartX = lo; mapEvent.cartDir = 1; }
 }
 
 function mapEventKind() {

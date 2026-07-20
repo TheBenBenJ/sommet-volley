@@ -366,7 +366,14 @@ function drawResortCart(t) {
   if (cx > W - 50) a = Math.min(a, Math.max(0, (W + 70 - cx) / 120));
   ctx.save();
   ctx.globalAlpha = a;
-  drawMapProp(img, cx, footY, drawH);
+  // Sprite face droite : miroir si jamais cartDir < 0 (pas de marche arrière)
+  if (mapEvent.cartDir < 0) {
+    ctx.translate(cx, 0);
+    ctx.scale(-1, 1);
+    drawMapProp(img, 0, footY, drawH);
+  } else {
+    drawMapProp(img, cx, footY, drawH);
+  }
   ctx.restore();
 }
 
