@@ -66,6 +66,75 @@ function drawBgSkylinePack(p, t, raining, storm, cols) {
   if (raining) drawRain(storm ? 1 : 0.55);
 }
 
+/** Place du Matin PNG (Panda) — portail rouge, muraille, bannières. */
+function drawBgMatinPng(t, raining, storm) {
+  const p = SPRITES.mapMatin;
+
+  if (spriteReady(p.far)) {
+    ctx.globalAlpha = storm ? 0.55 : 0.8;
+    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    ctx.globalAlpha = 1;
+  }
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+
+  if (storm) {
+    ctx.fillStyle = "rgba(60,50,45,0.32)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  } else if (raining) {
+    ctx.fillStyle = "rgba(90,80,70,0.16)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  }
+
+  // Foule (bande haute du crowd_0) — discrète derrière le portail
+  if (spriteReady(p.crowd0)) {
+    const crowd = p.crowd0;
+    const sw = crowd.naturalWidth || crowd.width;
+    const sh = crowd.naturalHeight || crowd.height;
+    const srcH = Math.max(1, Math.floor(sh * 0.42));
+    const cw = W * 0.92;
+    const ch = Math.min(72, cw * (srcH / sw) * 1.05);
+    const cx = (W - cw) / 2;
+    const cy = GROUND_Y - 108 - ch;
+    ctx.globalAlpha = storm ? 0.65 : 0.82;
+    ctx.drawImage(crowd, 0, 0, sw, srcH, cx, cy, cw, ch);
+    ctx.globalAlpha = 1;
+  }
+
+  // Sol pavé gris-beige
+  const pave = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
+  if (raining) {
+    pave.addColorStop(0, "#8a8278");
+    pave.addColorStop(1, "#5e5850");
+  } else {
+    pave.addColorStop(0, "#c8beb0");
+    pave.addColorStop(1, "#a89e90");
+  }
+  ctx.fillStyle = pave;
+  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
+  ctx.fillStyle = "rgba(0,0,0,0.08)";
+  ctx.fillRect(0, GROUND_Y, W, 2);
+
+  // bordure rouge / or
+  ctx.fillStyle = "#c62828";
+  ctx.fillRect(0, GROUND_Y - 41, W, 3);
+  ctx.fillStyle = "#c9a227";
+  ctx.fillRect(0, GROUND_Y - 38, W, 1);
+
+  // Bannières cérémonielles
+  if (spriteReady(p.flag)) {
+    const bob = Math.sin(t * 2.1) * 2;
+    drawMapProp(p.flag, 72, GROUND_Y + 2 + bob, 96);
+    ctx.save();
+    ctx.translate(W - 72, 0);
+    ctx.scale(-1, 1);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, 96);
+    ctx.restore();
+  }
+
+  if (raining) drawRain(storm ? 1 : 0.55);
+  drawMapEventOverlay();
+}
+
 /** Pelouse Oval PNG (Trompette) — pelouse + FX poussière en code. */
 function drawBgPlagePng(t, raining, storm) {
   const p = SPRITES.mapTrompette;
@@ -675,11 +744,8 @@ function drawBgPrairie() {
   const storm = weather === "storm";
   const raining = weather === "rain" || storm;
   const tk = TERRAINS[terrain] && TERRAINS[terrain].key;
-  if (tk === "matin" && SPRITES.mapMatin && spriteReady(SPRITES.mapMatin.skyline)) {
-    drawBgSkylinePack(SPRITES.mapMatin, t, raining, storm, {
-      ground0: raining ? "#9a9080" : "#d2c4a8",
-      ground1: raining ? "#6e6558" : "#b5a68a"
-    });
+  if (tk === "matin" && typeof mapMatinReady === "function" && mapMatinReady()) {
+    drawBgMatinPng(t, raining, storm);
     return;
   }
   if (tk === "bosphore" && SPRITES.mapBosphore && spriteReady(SPRITES.mapBosphore.skyline)) {
@@ -998,6 +1064,9 @@ function terrainNetPostImg() {
   }
   if (key === "parade" && SPRITES.mapHoun && spriteReady(SPRITES.mapHoun.netPost)) {
     return SPRITES.mapHoun.netPost;
+  }
+  if (key === "matin" && SPRITES.mapMatin && spriteReady(SPRITES.mapMatin.netPost)) {
+    return SPRITES.mapMatin.netPost;
   }
   return null;
 }

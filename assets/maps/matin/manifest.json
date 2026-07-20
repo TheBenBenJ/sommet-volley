@@ -3,8 +3,14 @@
   "name": "Place du Matin",
   "layers": [
     "far",
-    "skyline"
+    "skyline",
+    "crowd_0"
   ],
-  "props": [],
+  "props": [
+    "flag",
+    "warn",
+    "net_post"
+  ],
+  "notes": "Place du Matin — portail rouge / muraille. net_post = colonne rouge-or. flag = bannière rouge.",
   "thumb": "thumb.png"
 }

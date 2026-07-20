@@ -40,10 +40,23 @@ function initSprites() {
   initMapTrompette();
   initMapMicron();
   initMapHoun();
-  SPRITES.mapMatin = loadMapPack("matin", { skyline: "skyline.png", far: "far.png", thumb: "thumb.png" });
+  initMapMatin();
   SPRITES.mapBosphore = loadMapPack("bosphore", { skyline: "skyline.png", far: "far.png", thumb: "thumb.png" });
   SPRITES.mapAshram = loadMapPack("ashram", { skyline: "skyline.png", far: "far.png", thumb: "thumb.png" });
   SPRITES.mapAmazon = loadMapPack("amazon", { skyline: "skyline.png", far: "far.png", thumb: "thumb.png" });
+}
+
+/** Pack fond / props Place du Matin (terrain Panda). */
+function initMapMatin() {
+  SPRITES.mapMatin = loadMapPack("matin", {
+    skyline: "skyline.png", far: "far.png", crowd0: "crowd_0.png",
+    flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png"
+  });
+}
+
+function mapMatinReady() {
+  const p = SPRITES.mapMatin;
+  return !!(p && spriteReady(p.skyline));
 }
 
 /** Pack fond / props Place Grand-Rouge (terrain Vladou). */
