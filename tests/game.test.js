@@ -500,6 +500,8 @@ test("V2 : smash/X au sol = cloche dirigée", () => {
   assert.ok(g.ball.vy < 0, "cloche : composante vers le haut");
   assert.strictEqual(g.ball.touches[0], 1, "contact = 1 touche");
   assert.strictEqual(g.ball.slowMo, 0, "pas de ralenti");
+  assert.strictEqual(g.blobL.poseAnim, "receive", "pose réception après cloche");
+  assert.ok(g.blobL.poseT >= 35, "réception tenue assez longtemps (poseT=" + g.blobL.poseT + ")");
 });
 
 test("V2 : smash dirigé sans ralenti", () => {

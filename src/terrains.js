@@ -480,40 +480,41 @@ function drawMapEventOverlay() {
   const pWarn = kind === "cart" ? pResort : pVlad;
 
   if (mapEvent.phase === "warn" || (kind === "cart" && (mapEvent.phase === "fire" || mapEvent.phase === "flying"))) {
-    // Zone dangereuse au sol (Resort) + alerte filet
+    // Zone dangereuse au sol (Pelouse Oval) — anneaux / rayures, pas un rectangle plat
     if (kind === "cart" && mapEvent.zoneX) {
-      const pulse = 0.35 + 0.25 * Math.sin((mapEvent.t || 0) * 0.35);
-      const zx = mapEvent.zoneX, zw = mapEvent.zoneW || 150;
-      ctx.fillStyle = "rgba(255,193,7," + pulse.toFixed(2) + ")";
-      ctx.fillRect(zx - zw / 2, GROUND_Y - 36, zw, 34);
-      ctx.strokeStyle = "rgba(255,87,34,0.85)";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(zx - zw / 2, GROUND_Y - 36, zw, 34);
+      drawEventDangerZone(mapEvent.zoneX, mapEvent.zoneW || 150, mapEvent.t || 0, pWarn);
     }
   }
 
   if (mapEvent.phase === "warn") {
-    const pulse = 0.7 + 0.3 * Math.sin(mapEvent.t * 0.35);
-    const bob = Math.sin(mapEvent.t * 0.28) * 3;
+    const pulse = 0.72 + 0.28 * Math.sin(mapEvent.t * 0.4);
+    const bob = Math.sin(mapEvent.t * 0.32) * 4;
+    const scale = 1 + 0.08 * Math.sin(mapEvent.t * 0.5);
     const wx = NET_X;
-    const wy = NET_TOP - 6 + bob;
+    const wy = NET_TOP - 8 + bob;
     ctx.save();
     ctx.globalAlpha = pulse;
+    ctx.translate(wx, wy);
+    ctx.scale(scale, scale);
     if (pWarn && spriteReady(pWarn.warn)) {
-      const wh = 36;
-      ctx.drawImage(pWarn.warn, wx - wh / 2, wy - wh, wh, wh);
+      const wh = 42;
+      ctx.drawImage(pWarn.warn, -wh / 2, -wh, wh, wh);
     } else {
       ctx.fillStyle = kind === "cart" ? "#ff9800" : "#e53935";
       ctx.beginPath();
-      ctx.moveTo(wx, wy - 28);
-      ctx.lineTo(wx - 14, wy);
-      ctx.lineTo(wx + 14, wy);
+      ctx.moveTo(0, -30);
+      ctx.lineTo(-16, 2);
+      ctx.lineTo(16, 2);
       ctx.closePath();
       ctx.fill();
+      ctx.strokeStyle = "#1a1a1a";
+      ctx.lineWidth = 2;
+      ctx.stroke();
       ctx.fillStyle = "#fff";
-      ctx.font = "bold 16px sans-serif";
+      ctx.font = "bold 18px sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("!", wx, wy - 6);
+      ctx.textBaseline = "middle";
+      ctx.fillText("!", 0, -10);
     }
     ctx.restore();
   }
@@ -530,6 +531,68 @@ function drawMapEventOverlay() {
       drawCannonShotBall(mapEvent.x, mapEvent.y, mapEvent.vx, mapEvent.vy);
     }
   }
+}
+
+/** Zone d'impact event (golf) : ellipses pulsantes + rayures, sans fillRect. */
+function drawEventDangerZone(zx, zw, t, pWarn) {
+  const pulse = 0.45 + 0.35 * Math.sin(t * 0.38);
+  const breathe = 1 + 0.06 * Math.sin(t * 0.55);
+  const rx = (zw * 0.52) * breathe;
+  const ry = 16 * breathe;
+  const cy = GROUND_Y - 10;
+
+  ctx.save();
+  // ombre / hot spot au sol
+  const g = ctx.createRadialGradient(zx, cy, 4, zx, cy, rx);
+  g.addColorStop(0, "rgba(255,80,40," + (0.35 * pulse).toFixed(2) + ")");
+  g.addColorStop(0.55, "rgba(255,180,40," + (0.22 * pulse).toFixed(2) + ")");
+  g.addColorStop(1, "rgba(255,200,60,0)");
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.ellipse(zx, cy, rx, ry, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // anneaux concentriques
+  for (let i = 0; i < 3; i++) {
+    const k = (t * 0.045 + i * 0.33) % 1;
+    const a = (1 - k) * 0.55 * pulse;
+    ctx.strokeStyle = "rgba(255,87,34," + a.toFixed(2) + ")";
+    ctx.lineWidth = 2.2 - i * 0.4;
+    ctx.setLineDash([7, 5]);
+    ctx.beginPath();
+    ctx.ellipse(zx, cy, rx * (0.35 + k * 0.7), ry * (0.35 + k * 0.7), 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // bord net
+  ctx.strokeStyle = "rgba(255,235,59," + (0.75 * pulse).toFixed(2) + ")";
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.ellipse(zx, cy, rx, ry, 0, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // petit warn flottant au centre
+  const bob = Math.sin(t * 0.35) * 3;
+  if (pWarn && spriteReady(pWarn.warn)) {
+    const wh = 28;
+    ctx.globalAlpha = 0.85 * pulse;
+    ctx.drawImage(pWarn.warn, zx - wh / 2, cy - ry - wh - 4 + bob, wh, wh);
+    ctx.globalAlpha = 1;
+  } else {
+    ctx.fillStyle = "rgba(255,193,7," + (0.9 * pulse).toFixed(2) + ")";
+    ctx.beginPath();
+    ctx.moveTo(zx, cy - ry - 28 + bob);
+    ctx.lineTo(zx - 12, cy - ry - 6 + bob);
+    ctx.lineTo(zx + 12, cy - ry - 6 + bob);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#1a1a1a";
+    ctx.font = "bold 14px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("!", zx, cy - ry - 12 + bob);
+  }
+  ctx.restore();
 }
 
 function drawGolfBall(x, y) {

@@ -69,11 +69,10 @@ function charAnyReady(key) {
   return false;
 }
 
-/** Pose sprite courte (smash / panic). No-op si l'anim n'est pas chargée. */
+/** Pose sprite courte (smash / panic / receive). Pose posée même sans PNG
+ *  (tests headless / net) — le rendu ignore si l'anim n'est pas chargée. */
 function setCharPose(blob, anim, dur) {
   if (!blob || !anim) return;
-  const key = charOf(blob).key;
-  if (!charAnimReady(key, anim)) return;
   blob.poseAnim = anim;
   blob.poseDur = dur | 0;
   blob.poseT = dur | 0;

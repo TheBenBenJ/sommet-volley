@@ -384,6 +384,8 @@ function tryLobBall(blob) {
   if (serving) forceServeClearsNet(blob);
   else ensureLobClearsNet(blob);
   markActiveHit(blob);
+  // Pose réception un peu tenue pour qu'on la lise (~0.7 s)
+  if (typeof setCharPose === "function") setCharPose(blob, "receive", 42);
   return true;
 }
 
