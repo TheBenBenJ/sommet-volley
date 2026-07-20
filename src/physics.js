@@ -306,8 +306,12 @@ function serverBlob() {
 }
 
 function serveHandsPos(blob) {
-  // Ancré sur la pose receive_0 du perso (manifest.serveHands), face adversaire.
-  const face = blob.side === 0 ? 1 : -1;
+  // Ancré sur la pose receive (manifest.serveHands), côté vers lequel le
+  // sprite regarde — si le serveur se retourne, la balle suit les mains.
+  const faceRight = (typeof charFaceRight === "function")
+    ? !!charFaceRight(blob)
+    : (blob.side === 0);
+  const face = faceRight ? 1 : -1;
   let dx = 28, dy = -48;
   if (typeof charOf === "function" && typeof charPack === "function") {
     const pack = charPack(charOf(blob).key);

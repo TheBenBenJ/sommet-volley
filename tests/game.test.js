@@ -579,6 +579,27 @@ test("V2 : service — balle dans les mains, lancer vertical (smash/X)", () => {
   assert.ok(g.ball.y < y0, "la balle a quitté les mains vers le haut");
 });
 
+test("V2 : service — se retourner déplace la balle avec les mains", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(51);
+  g.setState("serve"); g.setServeCountdown(0);
+  g.setServingSide(0);
+  g.ball.reset(0);
+  // Face adversaire (droite) : balle à droite du corps
+  for (let i = 0; i < 5; i++) g.stepGame(N0, N0);
+  assert.ok(g.ball.inHands && g.ball.frozen);
+  const dxFace = g.ball.x - g.blobL.x;
+  assert.ok(dxFace > 16, "face adversaire → balle à droite (dx=" + dxFace + ")");
+  // Marche vers la gauche → sprite se retourne, balle doit suivre
+  for (let i = 0; i < 25; i++) g.stepGame({ ...N0, left:true }, N0);
+  assert.ok(g.ball.inHands && g.ball.frozen, "toujours en mains");
+  const dxBack = g.ball.x - g.blobL.x;
+  assert.ok(dxBack < -16, "dos à l'adversaire → balle à gauche (dx=" + dxBack + ")");
+  assert.ok(Math.abs(Math.abs(dxBack) - Math.abs(dxFace)) < 4,
+    "même écart aux mains (face=" + dxFace + " back=" + dxBack + ")");
+});
+
 test("V2 : service — sauter dans le lancer sans X ne frappe pas", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(1);
