@@ -942,7 +942,7 @@ function drawTutorialControls(dev, x, y, maxW) {
       ["Saut", "Gauche : Z / Espace    ·    Droite : ↑"],
       ["Smash / cloche (X)", "Gauche : S / F    ·    Droite : ↓ / /"],
       ["SUPER", "Gauche : E    ·    Droite : Shift droit"],
-      ["Visée", "Tiens ← ou → en frappant pour orienter dans le cône"],
+      ["Visée", "Auto vers l'adversaire ; ← → ajuste un peu (manette = stick précis)"],
       ["Pause / son", "P pause · M son · N musique · Échap menu"]
     ],
     pad: [
@@ -958,7 +958,7 @@ function drawTutorialControls(dev, x, y, maxW) {
       ["Saut", "Bouton ⤒"],
       ["Smash / cloche (X)", "Bouton ⚡"],
       ["SUPER", "Bouton ★"],
-      ["Visée", "Comme au clavier : direction tenue + frappe"],
+      ["Visée", "Assistée comme au clavier ; manette = stick plus précis"],
       ["Note", "Pavé visible en partie (solo / en ligne)"]
     ],
     mouse: [

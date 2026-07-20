@@ -80,6 +80,46 @@ function clampAimToCone(blob, ang, center) {
   return center + delta;
 }
 
+/** Visée « digitale » (clavier / tactile / croix sans stick) : pas d'analogique. */
+function isKeyboardStyleAim(input) {
+  if (!input) return true;
+  const ax = Number(input.ax) || 0;
+  const ay = Number(input.ay) || 0;
+  if (Math.hypot(ax, ay) >= 0.18) return false;
+  // Croix haut/bas = intention de viser (manette) → pas d'assist clavier
+  if (input.up || input.down) return false;
+  return true;
+}
+
+/**
+ * Angle de base clavier : cloche/smash sûrs vers le camp adverse
+ * (le stick analogique n'est pas disponible → on évite les bords du cône).
+ */
+function keyboardAutoAimRaw(blob, mode) {
+  const fwd = blob.side === 0 ? 1 : -1;
+  if (mode === "lob") {
+    // Cloche haute avec un peu d'avance — passe le filet facilement
+    return Math.atan2(-0.88, fwd * 0.42);
+  }
+  // Smash : un peu plus tendu, toujours vers l'avant
+  return Math.atan2(-0.38, fwd * 0.82);
+}
+
+/** ← / → = léger réglage autour de l'auto-aim (pas les extrémités du cône). */
+function keyboardAimAngle(blob, input, center, mode) {
+  let ang = keyboardAutoAimRaw(blob, mode);
+  const left = !!(input && input.left);
+  const right = !!(input && input.right);
+  if (left !== right) {
+    // P1 : ← = plus lobé, → = plus tendu ; P2 miroir
+    const loft = blob.side === 0
+      ? (left ? -0.34 : 0.30)
+      : (right ? -0.34 : 0.30);
+    ang += loft;
+  }
+  return clampAimToCone(blob, ang, center);
+}
+
 function stickAimRaw(blob, input, center) {
   let dx = 0, dy = 0;
   if (input) {
@@ -100,6 +140,7 @@ function stickAimRaw(blob, input, center) {
 function aimAngleFromInput(blob, input) {
   // Smash / tir tendu : cône vers l'adversaire, stick = direction.
   const center = blob.side === 0 ? -0.45 : Math.PI + 0.45;
+  if (isKeyboardStyleAim(input)) return keyboardAimAngle(blob, input, center, "smash");
   return clampAimToCone(blob, stickAimRaw(blob, input, center), center);
 }
 
@@ -112,6 +153,7 @@ function aimLobAngleFromInput(blob, input) {
   // Échange : l'angle du stick est respecté dans le cône.
   const center = blob.side === 0 ? -0.92 : Math.PI + 0.92;
   if (isServeHit(blob)) return center;
+  if (isKeyboardStyleAim(input)) return keyboardAimAngle(blob, input, center, "lob");
   return clampAimToCone(blob, stickAimRaw(blob, input, center), center);
 }
 

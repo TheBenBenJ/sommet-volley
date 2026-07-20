@@ -700,6 +700,36 @@ test("V2 : cloche suit l'angle du stick", () => {
   assert.ok(Math.abs(g.ball.vx) < Math.abs(g.ball.vy) * 0.35, "plein haut ≠ tir vers l'avant (vx=" + g.ball.vx + ", vy=" + g.ball.vy + ")");
 });
 
+test("V2 : clavier — visée assistée vers l'adversaire (sans stick)", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(55);
+  g.setState("play"); g.setServeCountdown(0);
+  const setup = () => {
+    g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y; g.blobL.onGround = true;
+    g.blobL.lastActiveHitTick = -999;
+    g.ball.x = 250; g.ball.y = g.blobL.y - 70; g.ball.vx = 0; g.ball.vy = 1;
+    g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+    g.ball.serveAimLock = false;
+    g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
+  };
+  // Neutre clavier : doit partir vers l'adversaire (pas un angle extrême)
+  setup();
+  g.stepGame({ ...N0, smash:true }, N0);
+  assert.ok(g.ball.vx > 3, "clavier neutre → vers l'adversaire (vx=" + g.ball.vx + ")");
+  assert.ok(g.ball.vy < -2, "clavier neutre → cloche (vy=" + g.ball.vy + ")");
+  const vxMid = g.ball.vx;
+  // ← = plus lobé (moins de vx), → = plus tendu
+  setup();
+  g.stepGame({ ...N0, smash:true, left:true }, N0);
+  const vxLeft = g.ball.vx;
+  setup();
+  g.stepGame({ ...N0, smash:true, right:true }, N0);
+  const vxRight = g.ball.vx;
+  assert.ok(vxRight > vxLeft + 0.4, "← plus lobé que → (vx L=" + vxLeft + " R=" + vxRight + ")");
+  assert.ok(vxMid > 2 && vxRight > 2, "les deux directions restent vers l'adversaire");
+});
+
 test("V2 : cloche depuis le fond passe au-dessus du filet", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(1);
