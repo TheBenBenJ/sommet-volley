@@ -68,8 +68,72 @@ def flood_bg_mask(im: Image.Image) -> Image.Image:
     return soft
 
 
+def punch_enclosed_white(im: Image.Image, thr: int = 250, min_size: int = 400) -> Image.Image:
+    """Percer les îlots de blanc ENFERMÉS hors torse (bras/jambes), pas la chemise.
+
+    La chemise blanche est aussi un îlot enfermé : on ne perce que les
+    composantes côté dos (perso face à droite) ou entre les jambes.
+    """
+    from collections import deque
+    out = im.convert("RGBA")
+    w, h = out.size
+    px = out.load()
+
+    # bbox du personnage (non-blanc)
+    xs, ys = [], []
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a < 8:
+                continue
+            if r < thr - 5 or g < thr - 5 or b < thr - 5:
+                xs.append(x)
+                ys.append(y)
+    if not xs:
+        return out
+    left, right, top, bot = min(xs), max(xs), min(ys), max(ys)
+    bw, bh = max(1, right - left), max(1, bot - top)
+
+    seen = [[False] * w for _ in range(h)]
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if seen[y][x] or a < 8 or not (r >= thr and g >= thr and b >= thr):
+                continue
+            q = deque([(x, y)])
+            seen[y][x] = True
+            cells = []
+            touch_border = False
+            while q:
+                cx, cy = q.popleft()
+                cells.append((cx, cy))
+                if cx == 0 or cy == 0 or cx == w - 1 or cy == h - 1:
+                    touch_border = True
+                for nx, ny in ((cx - 1, cy), (cx + 1, cy), (cx, cy - 1), (cx, cy + 1)):
+                    if 0 <= nx < w and 0 <= ny < h and not seen[ny][nx]:
+                        rr, gg, bb, aa = px[nx, ny]
+                        if aa >= 8 and rr >= thr and gg >= thr and bb >= thr:
+                            seen[ny][nx] = True
+                            q.append((nx, ny))
+            if touch_border or len(cells) < min_size:
+                continue
+            cx = sum(p[0] for p in cells) // len(cells)
+            cy = sum(p[1] for p in cells) // len(cells)
+            rel_x = (cx - left) / bw
+            rel_y = (cy - top) / bh
+            # dos / entre bras (face à droite) ou entre jambes — pas le plastron
+            back_arm = rel_x < 0.40 and 0.22 < rel_y < 0.78
+            between_legs = 0.28 < rel_x < 0.72 and rel_y > 0.70
+            if not (back_arm or between_legs):
+                continue
+            for px_, py_ in cells:
+                r, g, b, _ = px[px_, py_]
+                px[px_, py_] = (r, g, b, 0)
+    return out
+
+
 def apply_cutout(im: Image.Image) -> Image.Image:
-    rgba = im.convert("RGBA")
+    rgba = punch_enclosed_white(im.convert("RGBA"))
     bg = flood_bg_mask(rgba)
     out = rgba.copy()
     op, bp = out.load(), bg.load()
@@ -81,6 +145,30 @@ def apply_cutout(im: Image.Image) -> Image.Image:
             fade = bp[x, y] / 255.0
             na = int(a * (1.0 - fade))
             op[x, y] = (r, g, b, na)
+    return despill_white_fringe(out)
+
+
+def despill_white_fringe(im: Image.Image) -> Image.Image:
+    """Supprime le halo blanc (matte) sur les bords semi-transparents."""
+    out = im.convert("RGBA")
+    px = out.load()
+    w, h = out.size
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a < 8 or a >= 250:
+                continue
+            # pixel de bord quasi-blanc → teinte vers transparent / assombri
+            if r >= 230 and g >= 230 and b >= 230:
+                # plus c'est blanc et transparent, plus on coupe
+                whiteness = (r + g + b) / (3 * 255.0)
+                soft = a / 255.0
+                if whiteness > 0.92 and soft < 0.85:
+                    px[x, y] = (r, g, b, int(a * 0.15))
+                elif whiteness > 0.88:
+                    # assombrit le fringe restant pour éviter le flash blanc
+                    f = 0.55
+                    px[x, y] = (int(r * f), int(g * f), int(b * f), a)
     return out
 
 
