@@ -213,10 +213,25 @@ def apply_cutout(im: Image.Image, prop: bool = False) -> Image.Image:
     return out
 
 
-def process_prop(src: Path, dst: Path, target_h: int = 720):
-    """Détourage prop (drapeau…) : pas d'ancrage pieds, punch blancs agressif."""
-    im = Image.open(src)
-    cut = apply_cutout(im, prop=True)
+def process_prop(src: Path, dst: Path, target_h: int = 720, preserve_white: bool = False):
+    """Détourage prop (drapeau…) : pas d'ancrage pieds.
+
+    preserve_white=True pour drapeaux / bannières : on ne perce PAS les
+    îlots blancs enfermés (sinon les bandes blanches deviennent transparentes).
+    """
+    im = Image.open(src).convert("RGBA")
+    if preserve_white:
+        bg = flood_bg_mask(im)
+        cut = im.copy()
+        op, bp = cut.load(), bg.load()
+        w, h = cut.size
+        for y in range(h):
+            for x in range(w):
+                r, g, b, a = op[x, y]
+                fade = bp[x, y] / 255.0
+                op[x, y] = (r, g, b, int(a * (1.0 - fade)))
+    else:
+        cut = apply_cutout(im, prop=True)
     # crop contenu + scale hauteur
     bb = content_bbox(cut)
     cropped = cut.crop(bb)
@@ -231,10 +246,11 @@ def process_prop(src: Path, dst: Path, target_h: int = 720):
     scale = target_h / padded.height
     nw, nh = max(1, int(padded.width * scale)), target_h
     norm = padded.resize((nw, nh), Image.Resampling.LANCZOS)
-    norm = despill_white_fringe(norm)
+    if not preserve_white:
+        norm = despill_white_fringe(norm)
     dst.parent.mkdir(parents=True, exist_ok=True)
     norm.save(dst)
-    print(f"  {src.name} → {dst} (prop)")
+    print(f"  {src.name} → {dst} (prop{', blancs gardés' if preserve_white else ''})")
 
 
 def _has_transparent_neighbor(px, x, y, w, h, a_thr: int = 40) -> bool:
@@ -424,12 +440,22 @@ def main():
         print(__doc__)
         sys.exit(1)
     raw_dir, out_dir = Path(sys.argv[1]), Path(sys.argv[2])
+    # Props maps : flag / warn / flower… — le reste passe en perso
+    PROP_NAMES = {
+        "flag", "warn", "flower", "palm", "net_post", "cart_0", "cart_1",
+        "cannon", "cannon_fire", "snowman", "radar_0", "radar_1", "pigeon",
+    }
+    FLAG_KEEP_WHITE = {"flag"}  # bandes blanches du drapeau
     outs = []
     for src in sorted(raw_dir.glob("*.png")):
         if src.name.startswith("_"):
             continue
         dst = out_dir / src.name
-        process_one(src, dst)
+        stem = src.stem
+        if stem in PROP_NAMES or src.name in {n + ".png" for n in PROP_NAMES}:
+            process_prop(src, dst, preserve_white=(stem in FLAG_KEEP_WHITE))
+        else:
+            process_one(src, dst)
         outs.append(dst)
     contact_sheet(outs, out_dir / "_contact.png")
 

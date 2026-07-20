@@ -224,6 +224,7 @@ function resetMapEvent() {
   mapEvent.zoneX = 0;
   mapEvent.zoneW = 150;
   mapEvent.balls = [];
+  mapEventFlash = ""; mapEventFlashSub = ""; mapEventFlashT = 0;
 }
 
 function scheduleNextMapEvent() {
@@ -237,6 +238,7 @@ function scheduleNextMapEvent() {
   mapEvent.cartDir = 1;
   mapEvent.zoneX = 0;
   mapEvent.balls = [];
+  mapEventFlash = ""; mapEventFlashSub = ""; mapEventFlashT = 0;
 }
 
 /** Déplacement continu du caddie hors event (une seule position, jamais de pop).
@@ -257,6 +259,42 @@ function mapEventKind() {
   if (k === "neige") return "cannon";
   if (k === "plage") return "cart";
   return null;
+}
+
+/** Textes d'annonce pour l'événement de map courant. */
+function mapEventAnnounceCopy(kind, phase) {
+  if (kind === "cannon") {
+    if (phase === "warn") {
+      return {
+        title: "Canon d'apparat en approche !",
+        sub: "Un boulet va traverser le terrain — il dévie la balle au contact."
+      };
+    }
+    return {
+      title: "Boulet en vol !",
+      sub: "Évite le projectile — collision = déviation."
+    };
+  }
+  if (kind === "cart") {
+    if (phase === "warn") {
+      return {
+        title: "Cortège sécu en approche !",
+        sub: "Zone orange dangereuse — pluie de balles de golf imminente."
+      };
+    }
+    return {
+      title: "Pluie de golf !",
+      sub: "Les balles de golf dévient la volley au contact."
+    };
+  }
+  return { title: "Événement de map !", sub: "" };
+}
+
+function flashMapEventAnnounce(kind, phase) {
+  const copy = mapEventAnnounceCopy(kind, phase);
+  mapEventFlash = copy.title;
+  mapEventFlashSub = copy.sub;
+  mapEventFlashT = phase === "warn" ? MAP_EVENT_WARN_T + 30 : 90;
 }
 
 function mapEventActiveTerrain() {
@@ -352,6 +390,7 @@ function stepMapEvent() {
     if (--mapEvent.timer <= 0) {
       mapEvent.phase = "warn";
       mapEvent.t = 0;
+      flashMapEventAnnounce(kind, "warn");
       if (kind === "cart") {
         mapEvent.zoneW = 140 + Math.floor(rng() * 40);
         mapEvent.zoneX = 160 + Math.floor(rng() * (W - 320));
@@ -377,6 +416,7 @@ function stepMapEvent() {
     if (mapEvent.t >= MAP_EVENT_WARN_T) {
       mapEvent.phase = "fire";
       mapEvent.t = 0;
+      flashMapEventAnnounce(kind, "fire");
     }
     return;
   }

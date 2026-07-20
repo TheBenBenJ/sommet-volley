@@ -56,7 +56,15 @@ function awardPoint(side, reason) {
     superCharge[side] = 1;
     beep(700, 0.12, "square", 0.16, 0, 1050);
     beep(1050, 0.16, "square", 0.14, 0.1, 1500);
-    superFlash = "SUPER PRÊT — " + sideLabel(side) + " !"; superFlashT = 70;
+    superFlash = "SUPER PRÊT — " + sideLabel(side) + " !";
+    const readyBlob = activeBlobs.find(b => b.side === side);
+    if (readyBlob) {
+      const a = charOf(readyBlob);
+      superFlashSub = "Appuie sur SUPER — " + (a.superName || "technique") + " : " + (a.superDesc || "");
+    } else {
+      superFlashSub = "Appuie sur SUPER pour lancer ta technique.";
+    }
+    superFlashT = 90;
   }
   const name = sideLabel(side);
   pointMsg = reason ? reason + "  —  Point " + name : "Point pour " + name + " !";

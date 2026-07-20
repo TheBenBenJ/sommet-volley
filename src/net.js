@@ -1003,8 +1003,10 @@ function guestDetectEvents(prev, d) {
       shake = Math.max(shake, 7);
       crowdHype = Math.max(crowdHype, 45);
       superSound(cb.superKind || charOf(activeBlobs[i]).key);
-      superFlash = CHARACTERS[cb.charId].name + " !";
-      superFlashT = 48;
+      const ch = CHARACTERS[cb.charId];
+      superFlash = (ch && ch.superName) || ((ch && ch.name) ? ch.name + " !" : "SUPER !");
+      superFlashSub = (ch && ch.superDesc) || "";
+      superFlashT = 110;
       spawnSuperBurst(activeBlobs[i]);
     }
   }

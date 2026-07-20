@@ -286,7 +286,8 @@ function newGame(seed) {
   xOn.fill(false);
   for (const b of [blobL, blob2L, blobR, blob2R]) b._xSpd = undefined;
   streak[0] = streak[1] = 0; superCharge[0] = superCharge[1] = 0;
-  superFlash = ""; superFlashT = 0;
+  superFlash = ""; superFlashSub = ""; superFlashT = 0;
+  mapEventFlash = ""; mapEventFlashSub = ""; mapEventFlashT = 0;
   resetWeather();
   servingSide = rng() < 0.5 ? 0 : 1;
   startRally();

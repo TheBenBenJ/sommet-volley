@@ -239,9 +239,8 @@ function drawResortCart(t) {
   const horn = !mapEventsQuiet &&
     (mapEvent.phase === "fire" || (mapEvent.phase === "flying" && mapEvent.t < 18));
   const img = horn && spriteReady(p.cartHorn) ? p.cartHorn : p.cart;
-  // Midground : pelouse juste devant la clôture fer forgé (pas le sol joueurs)
-  // Clôture skyline ≈ GROUND_Y - 295 ; pieds du caddy un peu devant.
-  const footY = GROUND_Y - 200;
+  // Midground : un peu au-dessus du sol joueurs (plus bas qu'avant)
+  const footY = GROUND_Y - 110;
   const drawH = 78;
   let a = 1;
   if (cx < 50) a = Math.max(0, (cx + 70) / 120);
@@ -1515,16 +1514,56 @@ function drawHUD() {
     }
   }
 
-  // message flash de SUPER
+  // message flash de SUPER (nom + explication)
   if (superFlashT > 0 && superFlash) {
+    const alpha = Math.min(1, superFlashT / 18);
     ctx.textAlign = "center";
-    ctx.globalAlpha = Math.min(1, superFlashT / 12);
-    ctx.fillStyle = "#ffd84a";
+    ctx.globalAlpha = alpha;
+    const titleY = 118;
+    ctx.fillStyle = "rgba(12,20,42,0.72)";
+    const boxW = Math.min(640, W - 48);
+    const boxH = superFlashSub ? 64 : 44;
+    const bx = NET_X - boxW / 2, by = titleY - 28;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, by, boxW, boxH, 12); else ctx.rect(bx, by, boxW, boxH);
+    ctx.fill();
     ctx.strokeStyle = STROKE;
-    ctx.lineWidth = 5; ctx.lineJoin = "round";
-    ctx.font = "700 34px " + DISP;
-    ctx.strokeText(superFlash, NET_X, 150);
-    ctx.fillText(superFlash, NET_X, 150);
+    ctx.lineWidth = 3; ctx.lineJoin = "round";
+    ctx.font = "700 26px " + DISP;
+    ctx.strokeText(superFlash, NET_X, titleY);
+    ctx.fillStyle = "#ffd84a";
+    ctx.fillText(superFlash, NET_X, titleY);
+    if (superFlashSub) {
+      ctx.font = "700 13px " + SANS;
+      ctx.fillStyle = "rgba(255,246,232,0.95)";
+      ctx.fillText(superFlashSub, NET_X, titleY + 22);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // Annonce événement de map
+  if (typeof mapEventFlashT !== "undefined" && mapEventFlashT > 0 && mapEventFlash) {
+    const alpha = Math.min(1, mapEventFlashT / 16);
+    ctx.textAlign = "center";
+    ctx.globalAlpha = alpha;
+    const titleY = (superFlashT > 0 && superFlash) ? 188 : 118;
+    const boxW = Math.min(660, W - 40);
+    const boxH = mapEventFlashSub ? 58 : 40;
+    const bx = NET_X - boxW / 2, by = titleY - 24;
+    ctx.fillStyle = "rgba(12,20,42,0.78)";
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, by, boxW, boxH, 12); else ctx.rect(bx, by, boxW, boxH);
+    ctx.fill();
+    ctx.font = "700 22px " + DISP;
+    ctx.strokeStyle = STROKE; ctx.lineWidth = 3; ctx.lineJoin = "round";
+    ctx.strokeText(mapEventFlash, NET_X, titleY);
+    ctx.fillStyle = "#ff9800";
+    ctx.fillText(mapEventFlash, NET_X, titleY);
+    if (mapEventFlashSub) {
+      ctx.font = "700 12px " + SANS;
+      ctx.fillStyle = "rgba(255,246,232,0.95)";
+      ctx.fillText(mapEventFlashSub, NET_X, titleY + 20);
+    }
     ctx.globalAlpha = 1;
   }
 

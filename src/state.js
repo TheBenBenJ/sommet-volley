@@ -258,8 +258,13 @@ const SUPER_DUR = {
 // Effets de zone SUPER (Phase 4 — stubs jouables pour le pilote)
 // { kind, side, t, data } — side = camp qui subit / où est l'effet
 let superEffects = [];
-let superFlash = "";          // libellé "SUPER !" affiché brièvement
+let superFlash = "";          // titre SUPER (nom)
+let superFlashSub = "";       // explication courte
 let superFlashT = 0;
+// Bannière événements de map (canon / cortège…)
+let mapEventFlash = "";
+let mapEventFlashSub = "";
+let mapEventFlashT = 0;
 
 class Blob {
   constructor(side, color, darkColor) {

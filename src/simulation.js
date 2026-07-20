@@ -91,7 +91,9 @@ function maybeActivateSuper(blob, input) {
   superCharge[blob.side] = 0;
   blob.superKind = a.key;
   blob.superT = SUPER_DUR[a.key] || 50;
-  superFlash = a.name + " !"; superFlashT = 48;
+  superFlash = a.superName || (a.name + " !");
+  superFlashSub = a.superDesc || "";
+  superFlashT = 110;
   shake = Math.max(shake, 7);
   crowdHype = Math.max(crowdHype, 45);
   spawnSuperBurst(blob);
@@ -164,6 +166,7 @@ function stepGame(inL, inR, ins, opts) {
   tick++;
   stepWeather();
   if (superFlashT > 0) superFlashT--;
+  if (typeof mapEventFlashT !== "undefined" && mapEventFlashT > 0) mapEventFlashT--;
   if (battle.cooldown > 0) battle.cooldown--;
   if (battle.active && !ins) {
     stepBattle(inL, inR);
