@@ -41,8 +41,8 @@ function initSprites() {
   initMapMicron();
   initMapHoun();
   initMapMatin();
+  initMapAshram();
   SPRITES.mapBosphore = loadMapPack("bosphore", { skyline: "skyline.png", far: "far.png", thumb: "thumb.png" });
-  SPRITES.mapAshram = loadMapPack("ashram", { skyline: "skyline.png", far: "far.png", thumb: "thumb.png" });
   SPRITES.mapAmazon = loadMapPack("amazon", { skyline: "skyline.png", far: "far.png", thumb: "thumb.png" });
 }
 
@@ -56,6 +56,19 @@ function initMapMatin() {
 
 function mapMatinReady() {
   const p = SPRITES.mapMatin;
+  return !!(p && spriteReady(p.skyline));
+}
+
+/** Pack fond / props Stade Ashram (terrain Yogi). */
+function initMapAshram() {
+  SPRITES.mapAshram = loadMapPack("ashram", {
+    skyline: "skyline.png", far: "far.png",
+    flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png"
+  });
+}
+
+function mapAshramReady() {
+  const p = SPRITES.mapAshram;
   return !!(p && spriteReady(p.skyline));
 }
 

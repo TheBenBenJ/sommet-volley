@@ -122,6 +122,62 @@ function drawBgMatinPng(t, raining, storm) {
   drawMapEventOverlay();
 }
 
+/** Stade Ashram PNG (Yogi) — arcs safran, sable, bannières orange. */
+function drawBgAshramPng(t, raining, storm) {
+  const p = SPRITES.mapAshram;
+
+  if (spriteReady(p.far)) {
+    ctx.globalAlpha = storm ? 0.55 : 0.8;
+    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    ctx.globalAlpha = 1;
+  }
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+
+  if (storm) {
+    ctx.fillStyle = "rgba(80,55,30,0.32)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  } else if (raining) {
+    ctx.fillStyle = "rgba(120,90,50,0.16)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  }
+
+  // Public désactivé pour l’instant (crowd en raw seulement)
+
+  // Sol sable / ocre
+  const sand = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
+  if (raining) {
+    sand.addColorStop(0, "#8a7a60");
+    sand.addColorStop(1, "#5a4a38");
+  } else {
+    sand.addColorStop(0, "#d4b878");
+    sand.addColorStop(1, "#b09058");
+  }
+  ctx.fillStyle = sand;
+  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
+  ctx.fillStyle = "rgba(0,0,0,0.08)";
+  ctx.fillRect(0, GROUND_Y, W, 2);
+
+  // bordure safran / or
+  ctx.fillStyle = "#ef6c00";
+  ctx.fillRect(0, GROUND_Y - 41, W, 3);
+  ctx.fillStyle = "#c9a227";
+  ctx.fillRect(0, GROUND_Y - 38, W, 1);
+
+  // Bannières orange
+  if (spriteReady(p.flag)) {
+    const bob = Math.sin(t * 2.0) * 2;
+    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, 100);
+    ctx.save();
+    ctx.translate(W - 70, 0);
+    ctx.scale(-1, 1);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, 100);
+    ctx.restore();
+  }
+
+  if (raining) drawRain(storm ? 1 : 0.55);
+  drawMapEventOverlay();
+}
+
 /** Pelouse Oval PNG (Trompette) — pelouse + FX poussière en code. */
 function drawBgPlagePng(t, raining, storm) {
   const p = SPRITES.mapTrompette;
@@ -904,11 +960,8 @@ function drawBgParade() {
   const storm = weather === "storm";
   const raining = weather === "rain" || storm;
   const tk = TERRAINS[terrain] && TERRAINS[terrain].key;
-  if (tk === "ashram" && SPRITES.mapAshram && spriteReady(SPRITES.mapAshram.skyline)) {
-    drawBgSkylinePack(SPRITES.mapAshram, t, raining, storm, {
-      ground0: raining ? "#8a7a60" : "#c4a86a",
-      ground1: raining ? "#5a4a38" : "#9a7850"
-    });
+  if (tk === "ashram" && typeof mapAshramReady === "function" && mapAshramReady()) {
+    drawBgAshramPng(t, raining, storm);
     return;
   }
   if (typeof mapHounReady === "function" && mapHounReady() && tk !== "ashram") {
@@ -1117,6 +1170,9 @@ function terrainNetPostImg() {
   }
   if (key === "matin" && SPRITES.mapMatin && spriteReady(SPRITES.mapMatin.netPost)) {
     return SPRITES.mapMatin.netPost;
+  }
+  if (key === "ashram" && SPRITES.mapAshram && spriteReady(SPRITES.mapAshram.netPost)) {
+    return SPRITES.mapAshram.netPost;
   }
   return null;
 }

@@ -5,6 +5,11 @@
     "far",
     "skyline"
   ],
-  "props": [],
+  "props": [
+    "flag",
+    "warn",
+    "net_post"
+  ],
+  "notes": "Stade Ashram — arcs safran / sable. Public (crowd_0) en raw seulement, non affiché.",
   "thumb": "thumb.png"
 }
