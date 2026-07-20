@@ -84,8 +84,8 @@ et servira de filet de sécurité.
 { "t": "snap", "tick": 1236, "data": { /* état complet */ } }
 
 // Poignée de main au début
-{ "t": "hello", "name": "Ben", "animal": 2 }
-{ "t": "start", "seed": 987654321, "terrain": 1, "animals": [0, 2] }
+{ "t": "hello", "name": "Ben", "charId": 2 }
+{ "t": "start", "seed": 987654321, "terrain": 1, "a": [0, 2] }
 
 // Mesure de latence
 { "t": "ping", "id": 7 }   { "t": "pong", "id": 7 }
@@ -130,7 +130,7 @@ Débit estimé : snapshot ≈ 300 octets × 20 Hz ≈ 6 ko/s — négligeable.
 4. **Interpolation** côté invité (fluidité).
 5. **Prédiction + réconciliation** du personnage de l'invité (réactivité).
 6. **Confort** : indicateur de ping, pause auto, revanche sans repasser
-   par le lobby, choix d'animal/terrain dans le lobby.
+   par le lobby, choix de personnage/terrain dans le lobby.
 
 Estimation : étape 3 ≈ une demi-journée ; étapes 4-5 ≈ une journée ;
 le tout jouable confortablement sur Internet en ~2-3 jours de travail.

@@ -85,17 +85,6 @@ function setEmote(side, kind) {
   else if (kind === "wow") { beep(880, 0.06, "square", 0.07); beep(1240, 0.06, "square", 0.06, 0.05); }
 }
 
-function spawnFeathers(x, y, color, n) {
-  if (noFx) return;
-  for (let i = 0; i < n; i++) particles.push({
-    type: "feather",
-    x, y,
-    vx: (Math.random() - 0.5) * 5, vy: -Math.random() * 3 - 1,
-    life: 50 + Math.random() * 35, maxLife: 85,
-    size: 5 + Math.random() * 3, color,
-    rot: Math.random() * Math.PI * 2, vr: (Math.random() - 0.5) * 0.25
-  });
-}
 
 function updateParticles() {
   for (let i = particles.length - 1; i >= 0; i--) {
@@ -195,7 +184,7 @@ function drawBallMarker() {
   ctx.fillRect(mx - 24, 44, 48, 20);
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
-  ctx.font = "bold 13px 'Inter', system-ui, sans-serif";
+  ctx.font = "700 13px " + (typeof UI !== "undefined" ? UI.sans : "sans-serif");
   ctx.fillText(alt + " m", mx, 58);
 }
 

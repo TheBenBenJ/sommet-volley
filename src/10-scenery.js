@@ -22,7 +22,7 @@ function drawClouds(color) {
 function drawCrowd() {
   const t = performance.now() / 1000;
   const key = TERRAINS[terrain].key;
-  const species = ANIMALS[TERRAINS[terrain].animal].key;
+  const species = CHARACTERS[TERRAINS[terrain].character].key;
   const top = GROUND_Y - 118, bot = GROUND_Y - 78;
   let stand, rail, pal, glow = false;
   if (key === "neige") {
@@ -78,7 +78,7 @@ function drawCrowd() {
   ctx.fillRect(0, bot - 3, W, 1);
 }
 
-// un spectateur, dessiné en version miniature de l'animal du terrain.
+// un spectateur, dessiné en version miniature du personnage du terrain.
 // (x, hy) = position de la tête (déjà animée : ola + bonds d'excitation).
 // col = teinte d'accessoire/plumage propre à ce spectateur (variété dans la
 // foule). excited = bras/ailes/oreilles levés (explosion de joie du moment).
@@ -465,7 +465,6 @@ function stepWeather() {
 // true si le soleil est (au moins partiellement) visible → arc-en-ciel possible
 function sunVisible() { return weather === "clear" || weather === "rain"; }
 
-const MOLT_MAX = 8; // coups avant que l'oiseau soit totalement déplumé
 
 // adhérence du sol : 1 (sec) → 0.8 (intempérie) → 0.6 (déchaînée). Tous terrains.
 // Sur la banquise, la neige rend déjà le sol un peu glissant même au "sec".
@@ -477,7 +476,7 @@ function groundGrip(blob) {
   else g = icy;
   // Hiver Général : glisse extrême sur le camp gelé (sauf Sang froid)
   if (blob && typeof hasSuperEffect === "function" && hasSuperEffect("ice", blob.side)) {
-    if (!(animOf(blob) && animOf(blob).coldProof)) g *= 0.32;
+    if (!(charOf(blob) && charOf(blob).coldProof)) g *= 0.32;
   }
   return g;
 }

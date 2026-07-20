@@ -198,12 +198,12 @@ function navOptions() {
     case "gameModeSelect": return pendingMode && (pendingMode.vsAI || pendingMode.online)
       ? ["Digit1", "Digit2", "Digit3"] : ["Digit1", "Digit2"];
     case "onlineMenu":    return ["Digit1", "Digit2"];
-    case "selectAnimal": {
-      const vis = visibleAnimalIdx();
-      const taken = takenAnimalSet();
+    case "selectCharacter": {
+      const vis = characterIndices();
+      const taken = takenCharacterSet();
       return vis.map((_, slot) => "Digit" + (slot + 1)).filter((_, slot) => !taken.has(vis[slot]));
     }
-    case "selectTerrain": return ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5"].slice(0, visibleTerrainIdx().length);
+    case "selectTerrain": return ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5"].slice(0, terrainIndices().length);
     case "selectBall":    return ["Digit1", "Digit2"].slice(0, BALL_SKINS.length);
     default: return null;
   }
@@ -212,7 +212,7 @@ function navOptions() {
 function handlePadMenu() {
   const opts = navOptions();
   if (opts) {
-    const horiz = state === "selectAnimal" || state === "selectTerrain" || state === "selectBall";
+    const horiz = state === "selectCharacter" || state === "selectTerrain" || state === "selectBall";
     if (navIdx >= opts.length) navIdx = 0;
     if (padEdge(horiz ? "right" : "down")) { navIdx = (navIdx + 1) % opts.length; beep(500, 0.03, "square", 0.05); }
     if (padEdge(horiz ? "left" : "up"))    { navIdx = (navIdx - 1 + opts.length) % opts.length; beep(500, 0.03, "square", 0.05); }

@@ -24,8 +24,7 @@ function awardPoint(side, reason) {
   // au prochain service via Blob.reset() dans startRally().
   for (const b of activeBlobs) {
     if (b.side !== 1 - side) continue;
-    const a = animOf(b);
-    if (a.angry) b.anger = ANGER_MAX;
+    const a = charOf(b);
     // Ego en béton (Trompette) : perdre un point charge aussi le SUPER
     if (a.egoCharge && superCharge[b.side] === 0) {
       superCharge[b.side] = 1;
@@ -35,7 +34,7 @@ function awardPoint(side, reason) {
 
   // En même temps (Micron) : swap seedé vitesse ↔ puissance
   for (const b of activeBlobs) {
-    const a = animOf(b);
+    const a = charOf(b);
     if (!a.swapStats) continue;
     if (rng() < 0.5) {
       b.kitSpeed = a.power;
@@ -51,7 +50,7 @@ function awardPoint(side, reason) {
   // Applaudissements (Houn) : SUPER en 2 points d'affilée
   let need = SUPER_NEED;
   for (const b of activeBlobs) {
-    if (b.side === side && animOf(b).clapDouble) { need = 2; break; }
+    if (b.side === side && charOf(b).clapDouble) { need = 2; break; }
   }
   if (streak[side] % need === 0 && superCharge[side] === 0) {
     superCharge[side] = 1;

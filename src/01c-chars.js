@@ -44,7 +44,7 @@ function loadCharManifest(key) {
 }
 
 function initCharSprites() {
-  for (const a of ANIMALS) {
+  for (const a of CHARACTERS) {
     if (a.hidden) continue;
     loadCharManifest(a.key);
   }
@@ -72,7 +72,7 @@ function charAnyReady(key) {
 /** Pose sprite courte (smash / panic). No-op si l'anim n'est pas chargée. */
 function setCharPose(blob, anim, dur) {
   if (!blob || !anim) return;
-  const key = animOf(blob).key;
+  const key = charOf(blob).key;
   if (!charAnimReady(key, anim)) return;
   blob.poseAnim = anim;
   blob.poseDur = dur | 0;
@@ -90,7 +90,7 @@ function charWantPanic(b) {
 
 /** Choisit l'anim selon l'état physique (commun à tous les sprités). */
 function charPickAnim(b) {
-  const key = animOf(b).key;
+  const key = charOf(b).key;
 
   // Fin de point / match : célébration ou défaite — seulement au sol
   // (sinon le perso « s'assoit » en l'air pendant la chute).
@@ -128,7 +128,7 @@ function charPickAnim(b) {
   }
   if (charWantPanic(b) && charAnimReady(key, "panic")) return "panic";
   // Marche avec hystérésis collante — évite idle↔walk qui clignote.
-  const a = animOf(b);
+  const a = charOf(b);
   const disp = (a.slip && typeof b.dispVx === "number") ? b.dispVx : (b.vx || 0);
   const spd = Math.max(Math.abs(disp), a.slip ? Math.abs(b.vx || 0) * 0.85 : 0);
   const enter = a.slip ? 0.30 : 0.55;
@@ -145,7 +145,7 @@ function charPickAnim(b) {
 }
 
 function charPickFrame(b, anim) {
-  const key = animOf(b).key;
+  const key = charOf(b).key;
   const frames = charPack(key).frames[anim];
   if (!frames || !frames.length) return null;
   let idx = 0;
@@ -181,7 +181,7 @@ function charPickFrame(b, anim) {
 function charFaceRight(b) {
   // Aperçus menu : toujours orientés vers le centre du terrain
   if (b.groundY != null) return b.side === 0;
-  const a = animOf(b);
+  const a = charOf(b);
   const mv = (a && a.slip && typeof b.dispVx === "number") ? b.dispVx : (b.vx || 0);
   if (b._faceRight === undefined) b._faceRight = b.side === 0;
   // Verrou anti-tourniquet (IA qui oscille gauche/droite)
@@ -204,7 +204,7 @@ function charFaceRight(b) {
 
 /** Rendu générique. true si dessiné, false → fallback canvas. */
 function drawSpriteChar(b) {
-  const key = animOf(b).key;
+  const key = charOf(b).key;
   if (!charAnyReady(key)) return false;
   const anim = charPickAnim(b);
   if (!anim) return false;
@@ -236,7 +236,7 @@ function drawSpriteChar(b) {
 
 // Menus : préfère idle_face si dispo
 function drawSpriteCharMenu(b) {
-  const key = animOf(b).key;
+  const key = charOf(b).key;
   if (charAnimReady(key, "idle_face")) {
     const img = charPack(key).frames.idle_face[0];
     if (spriteReady(img)) {
@@ -257,4 +257,4 @@ function drawSpriteCharMenu(b) {
   return drawSpriteChar(b);
 }
 
-// initCharSprites() est appelé depuis 04-state.js (après ANIMALS).
+// initCharSprites() est appelé depuis 04-state.js (après CHARACTERS).

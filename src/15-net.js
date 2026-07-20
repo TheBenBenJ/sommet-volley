@@ -90,7 +90,7 @@ let guestCoastLeft = 0;
 // mesure des arrivées : 1er invité → adversaire, 2e → coéquipier, 3e → dernier.
 const SLOT_ORDER = [2, 1, 3];
 let mySlot = 1;                // slot du joueur local (hôte = 0 ; invité 1v1 = 1)
-let guests = [];               // hôte 2v2 : {id, rel, fast, slot, animal, inSeq, in, ready, connected}
+let guests = [];               // hôte 2v2 : {id, rel, fast, slot, charId, …}
 let lobbyStarted = false;      // hôte 2v2 : la partie a été lancée
 
 // --- côté invité ---
@@ -217,14 +217,14 @@ function checkBothOpen() {
   lastPeerMsg = lastSnapTime = performance.now();
   startPinging();
   if (netRole === "guest") {
-    // connecté : l'invité choisit son animal (le vert), puis enverra "hello"
+    // connecté : l'invité choisit son personnage (le vert), puis enverra "hello"
     pendingMode = { online: true };
     selPlayer = 1;
-    peerTakenAnimals = [];
-    state = "selectAnimal";
+    peerTakenCharacters = [];
+    state = "selectCharacter";
   } else if (netRole === "host") {
     // hôte 1v1 : prévenir l'invité des persos déjà pris
-    sendRel({ t: "taken", a: [blobL.animal] });
+    sendRel({ t: "taken", a: [blobL.charId] });
   }
   // côté hôte : l'écran hostWait affiche "joueur connecté…" jusqu'au hello
 }
@@ -281,17 +281,17 @@ function teardownNet() {
   guestSmoothX = guestSmoothY = 0;
   rematchMe = rematchPeer = false;
   guests = []; lobbyStarted = false; mySlot = 1;
-  peerTakenAnimals = [];
+  peerTakenCharacters = [];
   paused = false;
   netErrorDetail = "";
 }
 
 /** Persos déjà réservés côté hôte 2v2 (hôte + invités prêts). */
 function hostTakenAnimals(exceptGuest) {
-  const t = [blobL.animal];
+  const t = [blobL.charId];
   for (const g of guests) {
     if (exceptGuest && g === exceptGuest) continue;
-    if (g.ready) t.push(g.animal);
+    if (g.ready) t.push(g.charId);
   }
   return t;
 }
@@ -339,17 +339,17 @@ function onNetData(m) {
       pingMs = pingMs < 0 ? rtt : pingMs * 0.7 + rtt * 0.3; // moyenne lissée
       break;
     }
-    case "hello": { // hôte : l'invité a choisi son animal → on lance !
+    case "hello": { // hôte : l'invité a choisi son personnage → on lance !
       if (netRole !== "host") break;
-      let a = clampVisibleAnimal(m.animal);
-      if (a === blobL.animal) a = randomAnimalIdx([blobL.animal]);
-      blobR.animal = a;
+      let a = clampCharacterIdx(m.charId);
+      if (a === blobL.charId) a = randomCharacterIdx([blobL.charId]);
+      blobR.charId = a;
       hostStartMatch();
       break;
     }
     case "taken": // invité : persos déjà réservés (pas de doublon)
       if (netRole !== "guest") break;
-      peerTakenAnimals = Array.isArray(m.a) ? m.a.map(clampVisibleAnimal) : [];
+      peerTakenCharacters = Array.isArray(m.a) ? m.a.map(clampCharacterIdx) : [];
       break;
     case "start": { // invité : configuration reçue de l'hôte → départ
       if (netRole !== "guest") break;
@@ -361,15 +361,15 @@ function onNetData(m) {
       mapEventsQuiet = !!m.quiet;                   // …et terrain calme (sans events)
       guestResetMatch();
       vsAI = false;
-      const clampA = v => Math.max(0, Math.min(ANIMALS.length - 1, v | 0));
+      const clampA = v => Math.max(0, Math.min(CHARACTERS.length - 1, v | 0));
       if (m.mode === "2v2") {
         setMode("2v2");
         mySlot = Math.max(0, Math.min(3, m.slot | 0));
-        activeBlobs.forEach((b, s) => { b.animal = clampA((m.a && m.a[s]) || 0); });
+        activeBlobs.forEach((b, s) => { b.charId = clampCharacterIdx((m.a && m.a[s]) || 0); });
       } else {
         setMode("1v1"); mySlot = 1;       // invité 1v1 = Vert (slot 1)
-        blobL.animal = clampA(m.a[0]);
-        blobR.animal = clampA(m.a[1]);
+        blobL.charId = clampCharacterIdx(m.a[0]);
+        blobR.charId = clampCharacterIdx(m.a[1]);
       }
       newGame(m.seed); // même graine → mêmes positions/service de départ
       break;
@@ -419,7 +419,7 @@ function hostStartMatch() {
   guestBall = null; lastGuestBallAt = 0; lastGuestPtSeq = 0;
   guestBallGen = 0; appliedGuestBallGen = -1;
   const seed = (Math.random() * 2 ** 31) | 0;
-  sendRel({ t: "start", m: matchId, seed, terrain, ballSkin, a: [blobL.animal, blobR.animal],
+  sendRel({ t: "start", m: matchId, seed, terrain, ballSkin, a: [blobL.charId, blobR.charId],
             bomb: bombMode ? 1 : 0, bt: bombTime, quiet: mapEventsQuiet ? 1 : 0 });
   vsAI = false;
   setMode("1v1"); mySlot = 0; // hôte 1v1 = Rouge (slot 0)
@@ -592,7 +592,7 @@ function hostAcceptConn(c) {
       setTimeout(() => { try { c.close(); } catch (e) {} }, 500);
       return;
     }
-    g = { id: c.peer, rel: null, fast: null, slot, animal: 0,
+    g = { id: c.peer, rel: null, fast: null, slot, charId: 0,
           inSeq: 0, in: { left: false, right: false, jump: false, smash: false, super: false },
           ready: false, connected: false, ping: null };
     guests.push(g);
@@ -635,11 +635,11 @@ function onHostData(g, m) {
       pingMs = Math.max(0, ...guests.map(x => x.ping || 0));
       break;
     }
-    case "hello": { // l'invité a choisi son animal (lobby)
-      let a = clampVisibleAnimal(m.animal);
+    case "hello": { // l'invité a choisi son personnage (lobby)
+      let a = clampCharacterIdx(m.charId);
       const taken = hostTakenAnimals(g);
-      if (taken.includes(a)) a = randomAnimalIdx(taken);
-      g.animal = a;
+      if (taken.includes(a)) a = randomCharacterIdx(taken);
+      g.charId = a;
       g.ready = true;
       hostBroadcastTaken();
       break;
@@ -671,14 +671,14 @@ function hostStartMatch2v2() {
   const anims = [];
   const used = new Set();
   for (let s = 0; s < 4; s++) {
-    let a = s === 0 ? blobL.animal : occ[s] ? occ[s].animal : -1;
-    if (a < 0 || used.has(a)) a = randomAnimalIdx([...used]);
+    let a = s === 0 ? blobL.charId : occ[s] ? occ[s].charId : -1;
+    if (a < 0 || used.has(a)) a = randomCharacterIdx([...used]);
     used.add(a);
     anims[s] = a;
   }
-  newGame(seed); // réinitialise positions/scores (n'écrase pas animal/speedMul en ligne)
+  newGame(seed); // réinitialise positions/scores (n'écrase pas charId/speedMul en ligne)
   activeBlobs.forEach((b, s) => {
-    b.animal = anims[s];
+    b.charId = anims[s];
     b.speedMul = (s === 0 || occ[s]) ? 1 : AI_LEVELS[aiLevel].speedMul; // IA sur slots libres
   });
   for (const g of guests) {
@@ -838,8 +838,7 @@ function netUpdate() {
         // ne tombe qu'au tick suivant. Si on libère l'autorité sur `popped`
         // tout de suite, ce tick n'arrive jamais → pas de `pt` → partie bloquée.
         if (ball.popped && !pendingNetPoint && (state === "play" || state === "serve")) {
-          const holder = activeBlobs.find(b => b.hasBall);
-          if (holder) awardPoint(1 - holder.side, "Balle crevée !");
+                    if (holder) awardPoint(1 - holder.side, "Balle crevée !");
         }
         netDeferScore = false;
         ballPkt = packBallState(true);
@@ -975,11 +974,9 @@ function applyDiscrete(d) {
   }
   activeBlobs.forEach((b, i) => {
     const sb = d.blobs[i]; if (!sb) return;
-    if (sb.animal !== undefined) b.animal = sb.animal;
-    b.molt = sb.molt || 0; b.tongueOut = !!sb.tongueOut; b.scramble = sb.scramble || 0;
-    b.hasBall = !!sb.hasBall;
+    if (sb.charId !== undefined) b.charId = sb.charId;
+    b.scramble = sb.scramble || 0;
     b.superT = sb.superT || 0; b.superKind = sb.superKind || ""; b.superSmash = !!sb.superSmash;
-    b.tongueT = sb.tongueT || 0; b.tongueTX = sb.tongueTX || 0; b.tongueTY = sb.tongueTY || 0;
   });
 }
 
@@ -1002,8 +999,8 @@ function guestDetectEvents(prev, d) {
     if (cb && pb && (cb.superT || 0) > 0 && (pb.superT || 0) <= 0) {
       shake = Math.max(shake, 7);
       crowdHype = Math.max(crowdHype, 45);
-      superSound(cb.superKind || animOf(activeBlobs[i]).key);
-      superFlash = ANIMALS[cb.animal].name + " !";
+      superSound(cb.superKind || charOf(activeBlobs[i]).key);
+      superFlash = CHARACTERS[cb.charId].name + " !";
       superFlashT = 48;
       spawnSuperBurst(activeBlobs[i]);
     }
@@ -1032,8 +1029,7 @@ function guestDetectEvents(prev, d) {
     }
     const heavy = Math.hypot(d.ball.vx || 0, d.ball.vy || 0) > 11.5;
     if (heavy) sfxBallSmash(); else sfxBallHit();
-    animalHitSound(animOf(hitter), heavy);
-    if (animOf(hitter).molt) spawnFeathers(d.ball.x, d.ball.y - BALL_R, hitter.color, 6);
+    charHitSound(charOf(hitter), heavy);
   }
 }
 
@@ -1174,12 +1170,12 @@ function drawNetHUD() {
     ctx.fillStyle = col;
     ctx.beginPath(); ctx.arc(W - 70, 20, 5, 0, Math.PI * 2); ctx.fill();
     ctx.textAlign = "right";
-    ctx.font = "bold 14px 'Inter', system-ui, sans-serif";
+    ctx.font = "700 14px " + (typeof UI !== "undefined" ? UI.sans : "sans-serif");
     ctx.fillStyle = "rgba(255,255,255,0.9)";
     ctx.fillText(p + " ms", W - 14, 25);
   }
   ctx.textAlign = "right";
-  ctx.font = "13px 'Inter', system-ui, sans-serif";
+  ctx.font = "600 13px " + (typeof UI !== "undefined" ? UI.sans : "sans-serif");
   ctx.fillStyle = "rgba(255,255,255,0.9)";
   ctx.fillText(netRole === "host" ? "Tu joues à gauche" : "Tu joues à droite", W - 14, 44);
 
@@ -1228,7 +1224,7 @@ function drawHostWait() {
   const dots = ".".repeat(1 + Math.floor(performance.now() / 400) % 3);
   ctx.textAlign = "left"; ctx.fillStyle = UI.ink; ctx.font = "500 18px " + UI.sans;
   ctx.fillText(
-    netConnected ? "Joueur connecté ! Il choisit son animal" + dots
+    netConnected ? "Joueur connecté ! Il choisit son personnage" + dots
     : peerReady  ? "En attente d'un joueur — envoie-lui ce code"
     :              "Création de la partie" + dots,
     UI.mx, 306);

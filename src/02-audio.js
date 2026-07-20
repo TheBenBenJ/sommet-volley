@@ -30,6 +30,7 @@ function setVolume(v) {
 // ces fonctions ne s'exécutent qu'au runtime, une fois tous les modules
 // chargés, donc la référence est sûre.
 const SETTINGS_KEY = "sommetVolleySettings";
+/** Migration depuis un fork antérieur — peut être retiré après quelques versions. */
 const SETTINGS_KEY_LEGACY = "crabbyVolleySettings";
 function saveSettings() {
   try {
@@ -248,7 +249,7 @@ function crowdCheer(intensity) {
 }
 
 // ---------- Cris / SFX personnages à la frappe ----------
-function animalHitSound(a, heavy) {
+function charHitSound(a, heavy) {
   if (!a) return;
   switch (a.key) {
     case "vladou":

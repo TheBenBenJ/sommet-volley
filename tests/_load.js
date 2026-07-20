@@ -64,7 +64,7 @@ const EPILOGUE = `
   simulateArc, aimAngleFromInput, clearBallHold,
   getGameplayV2: () => GAMEPLAY_V2, setGameplayV2: v => { GAMEPLAY_V2 = !!v; },
   HOLD_MAX, RECEIVE_R, CHARGE_MAX, AIM_CONE,
-  ANIMALS, TERRAINS, superEffects,
+  CHARACTERS, TERRAINS, superEffects,
   SPRITES: typeof SPRITES !== "undefined" ? SPRITES : null,
   spriteReady: typeof spriteReady === "function" ? spriteReady : () => false,
   SUPER_DUR: typeof SUPER_DUR !== "undefined" ? SUPER_DUR : {},

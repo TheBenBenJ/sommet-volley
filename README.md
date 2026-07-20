@@ -70,14 +70,14 @@ Structure principale :
 | `src/01c-chars.js` | Pipeline sprites personnages |
 | `src/02-audio.js` | Sons, musique chiptune, volume |
 | `src/04-state.js` | Terrains, casting, Blob, supers |
-| `src/05-animals.js` | Rendu personnages (sprites + fallback canvas) |
+| `src/05-chars.js` | Rendu personnages (sprites + fallback) |
 | `src/06-physics.js` | Balle & collisions |
 | `src/08-ai.js` | IA |
 | `src/11-terrains.js` | Décors des maps |
 | `src/12-menus.js` | Menus & sélection |
 | `src/13-simulation.js` | Boucle de jeu déterministe |
 | `src/15-net.js` | Multijoueur PeerJS |
-| `docs/` | Vision, gameplay V2, pipeline perso |
+| `docs/` | Vision, gameplay V2, architecture, pipeline perso |
 
 ## Déploiement
 

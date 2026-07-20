@@ -2,13 +2,13 @@
 "use strict";
 
 // ---------- Terrains et personnages ----------
-// chaque terrain appartient à un perso (voir ANIMALS) : son public des
+// chaque terrain appartient à un perso (voir CHARACTERS) : son public des
 // tribunes est composé de ce perso, et le nom du terrain lui rend hommage.
 const TERRAINS = [
-  { key: "neige",   name: "Place Grand-Rouge",       animal: 0 }, // Vladou
-  { key: "plage",   name: "Resort Doré",             animal: 1 }, // Trompette
-  { key: "prairie", name: "Palais de l'Hexagone",    animal: 2 }, // Micron
-  { key: "parade",  name: "Esplanade du Défilé",     animal: 3 }, // Houn
+  { key: "neige",   name: "Place Grand-Rouge",       character: 0 }, // Vladou
+  { key: "plage",   name: "Resort Doré",             character: 1 }, // Trompette
+  { key: "prairie", name: "Palais de l'Hexagone",    character: 2 }, // Micron
+  { key: "parade",  name: "Esplanade du Défilé",     character: 3 }, // Houn
 ];
 let terrain = 0;
 
@@ -19,7 +19,7 @@ const BALL_SKINS = [
 ];
 let ballSkin = 0;
 
-const ANIMALS = [
+const CHARACTERS = [
   // Casting satirique Sommet Volley — fiches docs/chars/*.yaml
   // stats /5 + multiplicateurs moteur (speed, jump, power, control)
   {
@@ -27,7 +27,7 @@ const ANIMALS = [
     color: "#b43a2e", darkColor: "#7a281e",
     stats: { vitesse: 3, detente: 3, puissance: 4, controle: 4 },
     speed: 1.06, jump: 1.06, power: 1.18, control: 0.91,
-    coldProof: true, angry: true,
+    coldProof: true,
     trait: "Sang froid : insensible au gel / ralentissement.",
     superName: "Hiver Général", superDesc: "Gèle le camp adverse ~6 s : glisse extrême + flocons."
   },
@@ -59,44 +59,44 @@ const ANIMALS = [
     superName: "Batterie AA", superDesc: "Interdit de sauter au camp adverse ~5 s."
   }
 ];
-function animOf(b) { return ANIMALS[b.animal]; }
+function charOf(b) { return CHARACTERS[b.charId]; }
 
 // Charge les manifests sprites (01c-chars.js) une fois le roster connu
 if (typeof initCharSprites === "function") initCharSprites();
 
-function visibleAnimalIdx() {
-  return ANIMALS.map((_, i) => i);
+function characterIndices() {
+  return CHARACTERS.map((_, i) => i);
 }
-function visibleTerrainIdx() {
+function terrainIndices() {
   return TERRAINS.map((_, i) => i);
 }
 /** Persos déjà pris (sélection locale P2, ou liste reçue de l'hôte en ligne). */
-let peerTakenAnimals = [];
-function takenAnimalSet() {
+let peerTakenCharacters = [];
+function takenCharacterSet() {
   const taken = new Set();
-  if (typeof state !== "undefined" && state === "selectAnimal") {
+  if (typeof state !== "undefined" && state === "selectCharacter") {
     // Multi local : le joueur 2 ne peut pas reprendre le choix du joueur 1
     if (selPlayer === 1 && !(typeof pendingMode !== "undefined" && pendingMode && pendingMode.online)) {
-      taken.add(blobL.animal);
+      taken.add(blobL.charId);
     }
     // En ligne (invité) : exclus les persos déjà réservés par l'hôte / autres
     if (typeof pendingMode !== "undefined" && pendingMode && pendingMode.online &&
         typeof netRole !== "undefined" && netRole === "guest") {
-      for (const a of peerTakenAnimals) taken.add(a | 0);
+      for (const a of peerTakenCharacters) taken.add(a | 0);
     }
   }
   return taken;
 }
-function randomAnimalIdx(exclude) {
+function randomCharacterIdx(exclude) {
   // choix de menu, hors simulation : Math.random() (pas le rng seedé du jeu)
   const ex = new Set(exclude || []);
-  const idx = visibleAnimalIdx().filter(i => !ex.has(i));
-  if (!idx.length) return visibleAnimalIdx()[0] | 0;
+  const idx = characterIndices().filter(i => !ex.has(i));
+  if (!idx.length) return characterIndices()[0] | 0;
   return idx[Math.floor(Math.random() * idx.length)];
 }
 // valide un indice de perso reçu du réseau
-function clampVisibleAnimal(v) {
-  return Math.max(0, Math.min(ANIMALS.length - 1, v | 0));
+function clampCharacterIdx(v) {
+  return Math.max(0, Math.min(CHARACTERS.length - 1, v | 0));
 }
 
 // ---------- Identité des camps ----------
@@ -105,21 +105,21 @@ function sideName(side) { return side === 0 ? "Gauche" : "Droite"; }
 function sideLabel(side) {
   if (mode === "2v2") return side === 0 ? "Équipe 1" : "Équipe 2";
   const b = side === 0 ? blobL : blobR;
-  return ANIMALS[b.animal].name;
+  return CHARACTERS[b.charId].name;
 }
 function sideColor(side) {
   const b = side === 0 ? blobL : blobR;
-  const a = ANIMALS[b.animal];
+  const a = CHARACTERS[b.charId];
   return (a && a.color) || (side === 0 ? "#e8913b" : "#4db3ff");
 }
 
 // ---------- État du jeu ----------
 // state: "menu" | "aiDifficulty" | "gameModeSelect"
-//        | "selectAnimal" | "selectTerrain" | "selectBall" | "serve" | "play" | "point" | "gameover"
+//        | "selectCharacter" | "selectTerrain" | "selectBall" | "serve" | "play" | "point" | "gameover"
 //        | états du mode en ligne : "onlineMenu" | "joinEntry" | "hostWait"
 //          | "connecting" | "netWait" | "netError"
 // Flux du menu : menu → (Solo IA : aiDifficulty → gameModeSelect) | (Local : gameModeSelect direct)
-//                     → selectAnimal → selectTerrain → selectBall → partie
+//                     → selectCharacter → selectTerrain → selectBall → partie
 let state = "menu";
 let vsAI = true;
 let pointTimer = 0;
@@ -194,10 +194,6 @@ let superEffects = [];
 let superFlash = "";          // libellé "SUPER !" affiché brièvement
 let superFlashT = 0;
 
-const FATIGUE_MAX = 8;
-const ANGER_MAX = 8;
-const CRAZY_MAX = 8;
-
 class Blob {
   constructor(side, color, darkColor) {
     this.side = side;               // 0 gauche, 1 droite
@@ -205,7 +201,7 @@ class Blob {
     this.darkColor = darkColor;
     this.homeX = side === 0 ? W * 0.25 : W * 0.75;
     this.speedMul = 1;
-    this.animal = 0;
+    this.charId = 0;
     this.reset();
   }
   reset() {
@@ -217,26 +213,18 @@ class Blob {
     this.onGround = true;
     this.squash = 0; // animation d'écrasement
     this.walkPhase = 0;
-    this.scramble = 0;    // patinage (jambes agitées)
-    this.tongueOut = false;
-    this.molt = 0;        // plumes perdues par l'oiseau : 0 → MOLT_MAX
-    this.fatigue = 0;
-    this.anger = 0;       // fureur (Vladou) : 0 → ANGER_MAX
-    this.crazy = 0;
-    this.hasBall = false; // balle crevée plantée sur le bec
-    this.jumpsUsed = 0;   // 0 au sol, 1 après le saut, 2 après le double saut
-    this.prevJump = false; // détection du front montant (double saut)
-    this.superT = 0;       // ticks restants de la technique active
-    this.superKind = "";   // perso dont la technique est en cours
+    this.scramble = 0;       // patinage (Trompette)
+    this.jumpsUsed = 0;      // 0 sol, 1 après saut, 2 après double saut
+    this.prevJump = false;   // front montant (double saut)
+    this.superT = 0;         // ticks restants de technique
+    this.superKind = "";
     this.superSmash = false;
-    this.prevSuper = false;  // front montant de la touche SUPER
-    this.prevSmashBtn = false; // front smash (Gameplay V2)
+    this.prevSuper = false;
+    this.prevSmashBtn = false;
     this._jumpEdge = false;
-    this.lastActiveHitTick = -999; // cooldown frappe maintenue
-    this._input = null;       // dernière entrée (visée dans updateBall)
-    this.tongueT = 0;        // animation de la langue-grappin
-    this.tongueTX = 0; this.tongueTY = 0; // cible atteinte par la langue
-    this.poseAnim = "";      // smash | panic (override sprite court)
+    this.lastActiveHitTick = -999;
+    this._input = null;
+    this.poseAnim = "";      // smash | panic (override sprite)
     this.poseT = 0;
     this.poseDur = 0;
     this._faceRight = this.side === 0; // orientation visuelle (suit le déplacement)
@@ -247,15 +235,11 @@ class Blob {
   get headCircle() { return { x: this.x, y: this.y - 64, r: 22 }; }
 
   update(input) {
-    const a = animOf(this);
+    const a = charOf(this);
     if (this.poseT > 0) {
       this.poseT--;
       if (this.poseT <= 0) { this.poseAnim = ""; this.poseDur = 0; }
     }
-    // si une balle crevée est plantée sur le bec, l'animal est tétanisé
-    // (il ne peut plus bouger ni sauter jusqu'à l'attribution du point)
-    if (this.hasBall) { this.vx = 0; if (!this.onGround) this.vy += GRAV_BLOB; this.y += this.vy; if (this.y >= GROUND_Y) { this.y = GROUND_Y; this.vy = 0; this.onGround = true; } return; }
-
     this._input = input || null;
     const smashDown = !!(input && input.smash);
     this._smashEdge = smashDown && !this.prevSmashBtn;
@@ -345,7 +329,7 @@ class Blob {
     if (this.squash > 0) this.squash -= 0.5;
   }
 
-  draw() { drawAnimal(this); }
+  draw() { drawCharacter(this); }
 }
 
 const blobL = new Blob(0, "#e84545", "#b32e2e");

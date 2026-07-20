@@ -80,14 +80,14 @@ function stepBattle(inL, inR) {
 // graine = même partie. C'est l'unité de synchronisation du futur mode en ligne.
 // ---------- Techniques signature (SUPER) ----------
 function superReadyFor(blob) {
-  return state === "play" && superCharge[blob.side] === 1 && blob.superT <= 0 && !blob.hasBall;
+  return state === "play" && superCharge[blob.side] === 1 && blob.superT <= 0 ;
 }
 
 function maybeActivateSuper(blob, input) {
   const pressed = input.super && !blob.prevSuper;
   blob.prevSuper = !!input.super;
   if (!pressed || !superReadyFor(blob)) return;
-  const a = animOf(blob);
+  const a = charOf(blob);
   superCharge[blob.side] = 0;
   blob.superKind = a.key;
   blob.superT = SUPER_DUR[a.key] || 50;
@@ -112,7 +112,6 @@ function maybeActivateSuper(blob, input) {
 }
 
 function tickSuper(blob) {
-  if (blob.tongueT > 0) blob.tongueT--;
   if (blob.superT > 0 && --blob.superT <= 0) { blob.superKind = ""; blob.superSmash = false; }
 }
 

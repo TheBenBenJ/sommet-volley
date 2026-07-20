@@ -226,7 +226,7 @@ function aiInput(side, lvlOverride, god) {
   }
 
   if (superCharge[side] === 1 && me.superT <= 0 && !ball.frozen && state === "play") {
-    const key = animOf(me).key;
+    const key = charOf(me).key;
     const onMySide = side === 0 ? ball.x < NET_X : ball.x > NET_X;
     const hitReach = god ? 100 : 72;
     const nearHit = Math.abs(ball.x - me.x) < hitReach && ball.y > me.y - 210 && ball.vy > -1;
@@ -299,7 +299,7 @@ function aiInput(side, lvlOverride, god) {
     : Math.max(NET_X + 36, Math.min(W - 40, targetX));
 
   const dx = targetX - me.x;
-  const step = BLOB_SPEED * lvl.speedMul * animOf(me).speed;
+  const step = BLOB_SPEED * lvl.speedMul * charOf(me).speed;
   // Zone morte + hystérésis : évite l'oscillation gauche/droite (sprite qui tourne)
   aiSteerToward(me, input, dx, step, lvl);
 
@@ -375,7 +375,7 @@ function aiInput2v2(me, lvlOverride) {
   targetX = Math.max(minX + 6, Math.min(maxX - 6, targetX));
 
   const dx = targetX - me.x;
-  const step2v2 = BLOB_SPEED * lvl.speedMul * animOf(me).speed;
+  const step2v2 = BLOB_SPEED * lvl.speedMul * charOf(me).speed;
   aiSteerToward(me, input, dx, step2v2, lvl);
 
   const opp = activeBlobs.find(b => b.side !== side) || (side === 0 ? blobR : blobL);
@@ -399,7 +399,7 @@ function aiInput2v2(me, lvlOverride) {
 
   // technique SUPER : charge partagée par l'équipe (superCharge[side])
   if (iChase && superCharge[side] === 1 && me.superT <= 0 && !ball.frozen && state === "play") {
-    const key = animOf(me).key;
+    const key = charOf(me).key;
     const nearHit = Math.abs(ball.x - me.x) < 72 && ball.y > me.y - 210 && ball.vy > -1;
     if (key === "vladou" || key === "trompette" || key === "micron") {
       if (onMySide && nearHit) input.super = true;

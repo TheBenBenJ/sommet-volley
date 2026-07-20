@@ -104,7 +104,7 @@ function render() {
   if (state === "bombDuration") { drawBombDuration(); return; }
   if (state === "rules") { drawRules(); return; }
   if (state === "credits") { drawCredits(); return; }
-  if (state === "selectAnimal") { drawSelectAnimal(); return; }
+  if (state === "selectCharacter") { drawSelectCharacter(); return; }
   if (state === "selectTerrain") { drawSelectTerrain(); return; }
   if (state === "selectBall") { drawSelectBall(); return; }
   if (state === "onlineMenu") { drawOnlineMenu(); return; }

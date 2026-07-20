@@ -19,6 +19,17 @@ function spriteReady(img) {
   return !!(img && img.complete && img.naturalWidth > 0);
 }
 
+
+/** Charge un pack de map `assets/maps/<key>/` (fichiers listés). */
+function loadMapPack(key, files) {
+  const base = "assets/maps/" + key + "/";
+  const pack = {};
+  for (const [prop, file] of Object.entries(files)) {
+    pack[prop] = loadSprite(base + file);
+  }
+  return pack;
+}
+
 function initSprites() {
   SPRITES.ballPurple = loadSprite("assets/ball/volley_purple.png");
   initMapVladou();
@@ -29,21 +40,11 @@ function initSprites() {
 
 /** Pack fond / props Place Grand-Rouge (terrain Vladou). */
 function initMapVladou() {
-  const b = "assets/maps/vladou/";
-  SPRITES.mapVladou = {
-    skyline: loadSprite(b + "skyline.png"),
-    far: loadSprite(b + "far.png"),
-    // blizzard.png retiré : un seul fond + effets neige/vent en code
-    crowd0: loadSprite(b + "crowd_0.png"),
-    // crowd_1.png : swap d’images trop saccadé, tribune fixe sur crowd_0
-    snowman: loadSprite(b + "snowman.png"),
-    cannon: loadSprite(b + "cannon_0.png"),
-    cannonFire: loadSprite(b + "cannon_1.png"),
-    shot: loadSprite(b + "shot.png"),
-    warn: loadSprite(b + "warn.png"),
-    thumb: loadSprite(b + "thumb.png"),
-    netPost: loadSprite(b + "net_post.png")
-  };
+  SPRITES.mapVladou = loadMapPack("vladou", {
+    skyline: "skyline.png", far: "far.png", crowd0: "crowd_0.png",
+    snowman: "snowman.png", cannon: "cannon_0.png", cannonFire: "cannon_1.png",
+    shot: "shot.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png"
+  });
 }
 
 function mapVladouReady() {
@@ -53,19 +54,11 @@ function mapVladouReady() {
 
 /** Pack fond / props Resort Doré (terrain Trompette). */
 function initMapTrompette() {
-  const b = "assets/maps/trompette/";
-  SPRITES.mapTrompette = {
-    skyline: loadSprite(b + "skyline.png"),
-    far: loadSprite(b + "far.png"),
-    crowd0: loadSprite(b + "crowd_0.png"),
-    cart: loadSprite(b + "cart_0.png"),
-    cartHorn: loadSprite(b + "cart_1.png"),
-    palm: loadSprite(b + "palm.png"),
-    flag: loadSprite(b + "flag.png"),
-    warn: loadSprite(b + "warn.png"),
-    thumb: loadSprite(b + "thumb.png"),
-    netPost: loadSprite(b + "net_post.png")
-  };
+  SPRITES.mapTrompette = loadMapPack("trompette", {
+    skyline: "skyline.png", far: "far.png", crowd0: "crowd_0.png",
+    cart: "cart_0.png", cartHorn: "cart_1.png", palm: "palm.png",
+    flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png"
+  });
 }
 
 function mapTrompetteReady() {
@@ -75,19 +68,12 @@ function mapTrompetteReady() {
 
 /** Pack fond / props Palais de l'Hexagone (terrain Micron). */
 function initMapMicron() {
-  const b = "assets/maps/micron/";
-  SPRITES.mapMicron = {
-    skyline: loadSprite(b + "skyline.png"),
-    far: loadSprite(b + "far.png"),
-    crowd0: loadSprite(b + "crowd_0.png"),
-    flag: loadSprite(b + "flag.png"),
-    pigeon: loadSprite(b + "pigeon.png"),
-    warn: loadSprite(b + "warn.png"),
-    whistle: loadSprite(b + "whistle.png"),
-    marchers0: loadSprite(b + "marchers_0.png"),
-    thumb: loadSprite(b + "thumb.png"),
-    netPost: loadSprite(b + "net_post.png")
-  };
+  SPRITES.mapMicron = loadMapPack("micron", {
+    skyline: "skyline.png", far: "far.png", crowd0: "crowd_0.png",
+    flag: "flag.png", pigeon: "pigeon.png", warn: "warn.png",
+    whistle: "whistle.png", marchers0: "marchers_0.png",
+    thumb: "thumb.png", netPost: "net_post.png"
+  });
 }
 
 function mapMicronReady() {
@@ -97,19 +83,12 @@ function mapMicronReady() {
 
 /** Pack fond / props Esplanade du Défilé (terrain Houn). */
 function initMapHoun() {
-  const b = "assets/maps/houn/";
-  SPRITES.mapHoun = {
-    skyline: loadSprite(b + "skyline.png"),
-    far: loadSprite(b + "far.png"),
-    crowd0: loadSprite(b + "crowd_0.png"),
-    flag: loadSprite(b + "flag.png"),
-    flower: loadSprite(b + "flower.png"),
-    warn: loadSprite(b + "warn.png"),
-    radar: loadSprite(b + "radar_0.png"),
-    radarActive: loadSprite(b + "radar_1.png"),
-    thumb: loadSprite(b + "thumb.png"),
-    netPost: loadSprite(b + "net_post.png")
-  };
+  SPRITES.mapHoun = loadMapPack("houn", {
+    skyline: "skyline.png", far: "far.png", crowd0: "crowd_0.png",
+    flag: "flag.png", flower: "flower.png", warn: "warn.png",
+    radar: "radar_0.png", radarActive: "radar_1.png",
+    thumb: "thumb.png", netPost: "net_post.png"
+  });
 }
 
 function mapHounReady() {

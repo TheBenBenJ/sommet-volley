@@ -1,4 +1,4 @@
-// sommet-volley · terrains & parallaxe (plage, banquise, nuit)
+// sommet-volley · terrains, HUD match, décors
 "use strict";
 
 // ---------- Parallaxe (profondeur multi-couches) ----------
@@ -643,33 +643,6 @@ function drawBgNeige() {
 }
 
 // aurore boréale : rubans lumineux ondoyants (fondu additif → effet de lueur).
-function drawAurora(t) {
-  const bands = [
-    { y: 66,  c: "rgba(70,240,170,0.13)" },
-    { y: 94,  c: "rgba(140,110,255,0.10)" },
-    { y: 120, c: "rgba(90,210,255,0.09)" }
-  ];
-  ctx.save();
-  ctx.globalCompositeOperation = "lighter";
-  for (let b = 0; b < bands.length; b++) {
-    const baseY = bands[b].y;
-    const grad = ctx.createLinearGradient(0, baseY - 42, 0, baseY + 90);
-    grad.addColorStop(0, "rgba(0,0,0,0)");
-    grad.addColorStop(0.45, bands[b].c);
-    grad.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.moveTo(0, baseY + 120);
-    for (let x = 0; x <= W; x += 20) {
-      const y = baseY + Math.sin(x / 90 + t * 0.5 + b) * 22 + Math.sin(x / 40 - t * 0.35) * 8;
-      ctx.lineTo(x, y);
-    }
-    ctx.lineTo(W, baseY + 120);
-    ctx.closePath();
-    ctx.fill();
-  }
-  ctx.restore();
-}
 
 function drawBgPrairie() {
   const t = performance.now() / 1000;

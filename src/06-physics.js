@@ -321,7 +321,7 @@ function tryLobBall(blob) {
   if (ball.tossGrace > 0 && blob.side === servingSide) return false;
   if (ballPathDistToBlob(blob) > RECEIVE_R) return false;
   if (!canActiveHit(blob)) return false;
-  const a = animOf(blob);
+  const a = charOf(blob);
   const serving = isServeHit(blob);
   const ang = aimLobAngleFromInput(blob, blob._input);
   const spd = HOLD_LOB_SPD * (0.95 + a.control * 0.12);
@@ -352,7 +352,7 @@ function trySmashBall(blob) {
   const ang = serving
     ? aimLobAngleFromInput(blob, blob._input)
     : aimAngleFromInput(blob, blob._input);
-  const pow = blob.kitPower != null ? blob.kitPower : animOf(blob).power;
+  const pow = blob.kitPower != null ? blob.kitPower : charOf(blob).power;
   const spd = serving
     ? HOLD_LOB_SPD * 1.05
     : HIT_SPEED * pow * SMASH_MUL;
@@ -456,12 +456,12 @@ function collideCircle(c, blob, isHead) {
   const minDist = BALL_R + c.r;
   if (dist >= minDist || dist === 0) return false;
 
-  const a = animOf(blob);
+  const a = charOf(blob);
   const nx = dx / dist, ny = dy / dist;
   // repousser la balle hors du cercle
   ball.x = c.x + nx * minDist;
   ball.y = c.y + ny * minDist;
-  // vitesse de frappe : direction normale * puissance de l'animal + mouvement du joueur
+  // vitesse de frappe : direction normale * puissance du personnage + mouvement du joueur
   const hs = HIT_SPEED * a.power;
   ball.vx = nx * hs + blob.vx * 0.55;
   ball.vy = ny * hs + blob.vy * 0.35 - 2.5;
@@ -475,46 +475,15 @@ function collideCircle(c, blob, isHead) {
     ball.vy = Math.sin(ang) * mag;
   }
 
-  // contact collant (legacy flag stick)
-  // (10%, seedé) — volontairement rare pour rester lisible : un joueur qui
-  // perd un point à cause d'un aléa doit pouvoir sentir que c'est l'exception,
-  // pas la norme. Effet tiré au sort : grosse déviation OU balle amortie.
-  // La langue sort et reste visible jusqu'au prochain coup / nouveau point.
-  blob.tongueOut = false;
-  if (a.stick && rng() < 0.1) {
-    blob.tongueOut = true;
-    if (rng() < 0.5) {
-      // déviation marquée
-      const ang = Math.atan2(ball.vy, ball.vx) + (rng() - 0.5) * 1.25;
-      const mag = Math.hypot(ball.vx, ball.vy);
-      ball.vx = Math.cos(ang) * mag;
-      ball.vy = Math.sin(ang) * mag;
-    } else {
-      // balle amortie / molle : la langue absorbe une partie de la frappe
-      // (amorti adouci : la balle reste jouable, le malus gêne sans punir)
-      ball.vx *= 0.68; ball.vy *= 0.68;
-      ball.vy -= 2; // petit sursaut pour garder un arc jouable
-    }
-    beep(300, 0.12, "sine", 0.12);
-  }
-
   clampBallSpeed();
   return true;
 }
 
-function beakTip(blob) {
-  // pointe du bec : devant la tête, du côté où l'animal regarde
-  const dir = blob.side === 0 ? 1 : -1;
-  return { x: blob.x + dir * 30, y: blob.y - 62, r: 7 };
-}
-
 function applyHitExtras(blob, a) {
-  // technique offensive armée (superSmash)
   let heavy = false;
   if (blob.superSmash && blob.superT > 0) {
     const dir = blob.side === 0 ? 1 : -1;
-    const pw = 1.0;
-    ball.vx = dir * SMASH_VX * pw;
+    ball.vx = dir * SMASH_VX;
     ball.vy = 2.5;
     ball.smash = 60; ball.spin = dir * 0.3;
     clampBallSpeed();
@@ -527,38 +496,13 @@ function applyHitExtras(blob, a) {
     (blob.poseAnim === "smash" && blob.poseT > 0);
   if (heavy) sfxBallSmash();
   else sfxBallHit();
-  animalHitSound(a, heavy);
-  if (a.molt) {
-    if (blob.molt < MOLT_MAX) blob.molt++;
-    spawnFeathers(ball.x, ball.y - BALL_R, blob.color, 6);
-  }
-  if (a.tired && blob.fatigue < FATIGUE_MAX) blob.fatigue++;
-  if (a.angry && blob.anger < ANGER_MAX) blob.anger++;
-  if (a.crazy && blob.crazy < CRAZY_MAX) blob.crazy++;
+  charHitSound(a, heavy);
   if (Math.hypot(ball.vx, ball.vy) > 12) shake = Math.min(shake + 4, 9);
 }
 
 function ballBlobCollision(blob) {
   if (ball.heldBy >= 0) return; // balle contrôlée : pas de collision passive
-  const a = animOf(blob);
-  const idx = activeBlobs.indexOf(blob);
-
-  // --- crevaison (si trait beak) ---
-  if (a.beak && !ball.frozen && !ball.popped) {
-    const tip = beakTip(blob);
-    const dd = Math.hypot(ball.x - tip.x, ball.y - tip.y);
-    const fast = Math.hypot(ball.vx, ball.vy) > 8.5;
-    if (dd < BALL_R + tip.r && fast && rng() < 0.1) {
-      ball.popped = true;
-      ball.frozen = true;
-      ball.vx = 0; ball.vy = 0;
-      blob.hasBall = true;
-      shake = 9;
-      beep(120, 0.3, "sawtooth", 0.2);
-      pointMsg = "Balle crevée !";
-      return;
-    }
-  }
+  const a = charOf(blob);
 
   // Gameplay V2 :
   // - Smash/X près de la balle → smash (air) sinon cloche
@@ -599,25 +543,6 @@ function ballBlobCollision(blob) {
 function updateBall() {
   // Invité : point différé déjà armé — on fige la balle jusqu'à validation hôte.
   if (ballScoreLock) return;
-  // balle crevée : elle reste plantée sur le bec de celui qui l'a crevée,
-  // puis le point est accordé à l'adversaire après un court instant.
-  if (ball.popped) {
-    clearBallHold();
-    const holder = activeBlobs.find(b => b.hasBall) || null;
-    if (holder) {
-      const tip = beakTip(holder);
-      ball.x = tip.x; ball.y = tip.y;
-    }
-    if (state === "play" || state === "serve") {
-      const loser = holder ? holder.side
-        : (ball.lastTouchSide === 0 || ball.lastTouchSide === 1)
-          ? ball.lastTouchSide
-          : (ball.x < NET_X ? 0 : 1);
-      awardPoint(1 - loser, "Balle crevée !");
-    }
-    return;
-  }
-
   if (ball.frozen) {
     if (GAMEPLAY_V2 && ball.inHands) {
       attachBallToServerHands();

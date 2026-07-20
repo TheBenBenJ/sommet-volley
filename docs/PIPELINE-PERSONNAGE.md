@@ -108,7 +108,7 @@ Entrée `raw/<key>/*.png` → sortie `assets/<key>/*.png` :
 3. Rendu générique `drawSpriteChar(b)` : machine à états **état physique →
    anim** (au sol+vx→walk, en l'air→jump, ball.heldBy→aim, etc.) commune à
    tous les persos sprités — un seul endroit à déboguer.
-4. Entrée roster dans `ANIMALS` (fiche étape 0) + effet SUPER dans le
+4. Entrée roster dans `CHARACTERS` (fiche étape 0) + effet SUPER dans le
    framework `superEffects`.
 5. Sons : cri de frappe + son de super (WebAudio, comme l'existant).
 

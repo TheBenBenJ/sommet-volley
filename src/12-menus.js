@@ -64,11 +64,11 @@ function handleMenuKeys(code, key) {
     // (voir "bombFormat"), sinon (local) va direct à la durée de mèche.
     const teamChoice = pendingMode.vsAI || pendingMode.online;
     if (teamChoice) {
-      if (code === "Digit1") { startAnimalSelect(); }                       // Classique (1v1)
-      if (code === "Digit2") { setTeamMode(true); startAnimalSelect(); }     // En équipes (2v2)
+      if (code === "Digit1") { startCharacterSelect(); }                       // Classique (1v1)
+      if (code === "Digit2") { setTeamMode(true); startCharacterSelect(); }     // En équipes (2v2)
       if (code === "Digit3") { pendingMode.bomb = true; state = "bombFormat"; } // Bombe -> 1v1 ou équipes ?
     } else {
-      if (code === "Digit1") { startAnimalSelect(); }                       // Classique (1v1)
+      if (code === "Digit1") { startCharacterSelect(); }                       // Classique (1v1)
       if (code === "Digit2") { pendingMode.bomb = true; state = "bombDuration"; } // Bombe (1v1 uniquement en local)
       // clavier VS manette : bascule le côté piloté par la manette unique
       if (code === "KeyG" && padConnected) {
@@ -92,7 +92,7 @@ function handleMenuKeys(code, key) {
   } else if (state === "bombDuration") {
     // durée de la mèche, commune à tous les modes (offline & hôte online)
     const d = { Digit1: 0, Digit2: 1, Digit3: 2 }[code];
-    if (d !== undefined) { pendingMode.bombTime = BOMB_DURATIONS[d].ticks; startAnimalSelect(); }
+    if (d !== undefined) { pendingMode.bombTime = BOMB_DURATIONS[d].ticks; startCharacterSelect(); }
     if (code === "Escape") state = (pendingMode.vsAI || pendingMode.online) ? "bombFormat" : "gameModeSelect";
 
   } else if (state === "rules") {
@@ -127,16 +127,16 @@ function handleMenuKeys(code, key) {
   } else if (state === "netError") {
     if (code === "Escape" || code === "Enter" || code === "Space") goMenu();
 
-  } else if (state === "selectAnimal") {
+  } else if (state === "selectCharacter") {
     const slot = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Digit5: 4, Digit6: 5, Digit7: 6 }[code];
-    const vis = visibleAnimalIdx();
+    const vis = characterIndices();
     const n = slot !== undefined && slot < vis.length ? vis[slot] : undefined;
-    if (n !== undefined && !takenAnimalSet().has(n)) {
-      (selPlayer === 0 ? blobL : blobR).animal = n;
+    if (n !== undefined && !takenCharacterSet().has(n)) {
+      (selPlayer === 0 ? blobL : blobR).charId = n;
       if (pendingMode.online) {
         if (netRole === "guest") {
           // l'invité a choisi : on prévient l'hôte, qui lancera la partie
-          sendRel({ t: "hello", animal: n });
+          sendRel({ t: "hello", charId: n });
           state = "netWait";
         } else {
           state = "selectTerrain"; // l'hôte choisit aussi le terrain
@@ -144,7 +144,7 @@ function handleMenuKeys(code, key) {
       } else if (selPlayer === 0 && !pendingMode.vsAI) {
         selPlayer = 1; // au joueur vert de choisir
       } else {
-        if (pendingMode.vsAI) blobR.animal = randomAnimalIdx([blobL.animal]);
+        if (pendingMode.vsAI) blobR.charId = randomCharacterIdx([blobL.charId]);
         state = "selectTerrain";
       }
     }
@@ -155,14 +155,14 @@ function handleMenuKeys(code, key) {
 
   } else if (state === "selectTerrain") {
     const slotT = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Digit5: 4 }[code];
-    const visT = visibleTerrainIdx();
+    const visT = terrainIndices();
     const n = slotT !== undefined && slotT < visT.length ? visT[slotT] : undefined;
     if (n !== undefined) { terrain = n; state = "selectBall"; }
     if (code === "KeyC") {
       mapEventsQuiet = !mapEventsQuiet;
       beep(mapEventsQuiet ? 360 : 520, 0.06, "square", 0.08);
     }
-    if (code === "Escape") { selPlayer = 0; state = "selectAnimal"; }
+    if (code === "Escape") { selPlayer = 0; state = "selectCharacter"; }
 
   } else if (state === "selectBall") {
     const slotB = { Digit1: 0, Digit2: 1 }[code];
@@ -197,9 +197,9 @@ function handleMenuKeys(code, key) {
   }
 }
 
-function startAnimalSelect() {
+function startCharacterSelect() {
   selPlayer = 0;
-  state = "selectAnimal";
+  state = "selectCharacter";
 }
 
 // bascule le format "en équipes" sur le bon champ selon qu'on est en ligne
@@ -241,10 +241,10 @@ function newGame(seed) {
     // (En ligne, l'hôte fixe persos et vitesses — voir hostStartMatch2v2.)
     const sm = AI_LEVELS[aiLevel].speedMul;
     blob2L.speedMul = sm; blobR.speedMul = sm; blob2R.speedMul = sm;
-    const used = new Set([blobL.animal]);
+    const used = new Set([blobL.charId]);
     for (const b of [blob2L, blobR, blob2R]) {
-      b.animal = randomAnimalIdx([...used]);
-      used.add(b.animal);
+      b.charId = randomCharacterIdx([...used]);
+      used.add(b.charId);
     }
     blob2L._aiT = blobR._aiT = blob2R._aiT = 0; // timers IA neutres
   }
@@ -286,7 +286,7 @@ function goMenu() {
 }
 
 function shuffleMenuBackdrop() {
-  const nA = ANIMALS.length, nT = TERRAINS.length;
+  const nA = CHARACTERS.length, nT = TERRAINS.length;
   menuBg.terrain = Math.floor(Math.random() * nT);
   const a = Math.floor(Math.random() * nA);
   let b = Math.floor(Math.random() * nA);
@@ -300,17 +300,17 @@ function shuffleMenuBackdrop() {
   menuBg.t0 = performance.now();
 }
 
-function makeMenuActor(side, animalIdx) {
-  const a = ANIMALS[animalIdx];
+function makeMenuActor(side, charIdx) {
+  const a = CHARACTERS[charIdx];
   const minX = side === 0 ? 70 : NET_X + 55;
   const maxX = side === 0 ? NET_X - 55 : W - 70;
   return {
     x: side === 0 ? W * 0.22 : W * 0.78,
-    y: GROUND_Y, side, animal: animalIdx,
+    y: GROUND_Y, side, charId: charIdx,
     color: a.color, darkColor: a.darkColor,
     onGround: true, vx: 0, vy: 0,
     dispVx: side === 0 ? 0.65 : -0.65,
-    walkPhase: Math.random() * 24, squash: 0, molt: 0,
+    walkPhase: Math.random() * 24, squash: 0,
     _walking: true, _faceRight: side === 0, _faceLock: 0,
     minX, maxX, hopT: 90 + Math.floor(Math.random() * 160)
   };
@@ -372,8 +372,8 @@ function drawMenuWorld() {
     ctx.strokeStyle = UI.stroke; ctx.lineWidth = 2.5; ctx.stroke();
     ctx.restore();
   }
-  if (menuActors.L) drawAnimal(menuActors.L);
-  if (menuActors.R) drawAnimal(menuActors.R);
+  if (menuActors.L) drawCharacter(menuActors.L);
+  if (menuActors.R) drawCharacter(menuActors.R);
   terrain = savedT;
   weather = savedW;
 }
@@ -608,7 +608,7 @@ function drawVolumeControl(x, y) {
 }
 
 function drawMenu() {
-  const nP = visibleAnimalIdx().length, nT = visibleTerrainIdx().length;
+  const nP = characterIndices().length, nT = terrainIndices().length;
   menuScreenBase({
     title: "SOMMET VOLLEY",
     kicker: "Volley satirique · " + nP + " persos · " + nT + " terrains",
@@ -816,11 +816,11 @@ function drawRules() {
   ctx.font = "600 11px " + UI.sans;
   ctx.fillText("V vitesse · D détente · P puissance · C contrôle", rx, 124);
 
-  const visR = visibleAnimalIdx();
+  const visR = characterIndices();
   const rowH = Math.min(112, Math.floor((footY - 132) / Math.max(1, visR.length)));
   for (let slot = 0; slot < visR.length; slot++) {
     const i = visR[slot];
-    const a = ANIMALS[i];
+    const a = CHARACTERS[i];
     const ay = 132 + slot * rowH;
     const previewX = rx + 26;
     const previewY = ay + 52;
@@ -831,10 +831,10 @@ function drawRules() {
     ctx.clip();
     ctx.translate(previewX, previewY);
     ctx.scale(0.52, 0.52);
-    drawAnimal({
+    drawCharacter({
       x: 0, y: 0, groundY: 0, side: 0,
       color: a.color, darkColor: a.darkColor,
-      onGround: true, vx: 0, walkPhase: 0, squash: 0, animal: i, molt: 0
+      onGround: true, vx: 0, walkPhase: 0, squash: 0, charId: i
     });
     ctx.restore();
 
@@ -883,20 +883,13 @@ function drawCredits() {
 
   h("Créé par");
   {
-    // "(sié un tchigre !)" en plus petit : c'est une private joke, pas le nom
-    const main = "Benjamin Mille";
-    ctx.textAlign = "left"; ctx.font = "500 15px " + UI.sans; ctx.fillStyle = UI.ink;
-    const mainW = ctx.measureText(main).width;
-    ctx.fillText(main, lx, y);
-    ctx.font = "500 11px " + UI.sans; ctx.fillStyle = UI.muted;
-    ctx.fillText("(sié un tchigre !)", lx + mainW, y);
     y += 24;
   }
   y += 10;
 
   h("Technique");
   m("PeerJS — signalisation WebRTC (peerjs.com)");
-  m("Polices Inter & Space Mono — Google Fonts");
+  m("Polices Fredoka & Nunito — Google Fonts");
   y += 10;
 
   h("Licence");
@@ -934,7 +927,7 @@ function drawStatGauge(x, y, label, val) {
   }
 }
 
-function drawSelectAnimal() {
+function drawSelectCharacter() {
   drawMenuWorld();
   menuVeil(false);
 
@@ -947,15 +940,15 @@ function drawSelectAnimal() {
   const pick = "Choisis ton personnage";
   uiTitle(twoLocalHumans ? "Joueur " + sideName(selPlayer) + " — " + pick : pick, UI.mx, 62, 26);
 
-  const vis = visibleAnimalIdx();
-  const taken = takenAnimalSet();
+  const vis = characterIndices();
+  const taken = takenCharacterSet();
   const navOpts = typeof navOptions === "function" ? navOptions() : null;
   const navCode = navOpts ? navOpts[navIdx] : null;
   const cw = W / vis.length; // largeur de carte adaptative
   for (let slot = 0; slot < vis.length; slot++) {
     const i = vis[slot];
     const cx = cw * slot + cw / 2;
-    const a = ANIMALS[i];
+    const a = CHARACTERS[i];
     const code = "Digit" + (slot + 1);
     const isTaken = taken.has(i);
     if (!isTaken) hit(cx, 240, cw, 336, code);
@@ -974,10 +967,10 @@ function drawSelectAnimal() {
     const preview = {
       x: cx, y: previewY, groundY: previewY,
       side: selPlayer, color: pcolor, darkColor: pdark,
-      onGround: true, vx: 0, walkPhase: 0, squash: 0, animal: i, molt: 0
+      onGround: true, vx: 0, walkPhase: 0, squash: 0, charId: i
     };
     if (isTaken) ctx.globalAlpha = 0.35;
-    drawAnimal(preview);
+    drawCharacter(preview);
     ctx.globalAlpha = 1;
     ctx.textAlign = "center";
     ctx.fillStyle = isTaken ? "rgba(255,255,255,0.35)" : UI.ink;
@@ -1027,7 +1020,7 @@ function drawSelectTerrain() {
   uiTitle("Choisis le terrain", UI.mx, 74, 30);
   uiRule(UI.mx, UI.mx + 100, 90, UI.gold);
 
-  const visT = visibleTerrainIdx();
+  const visT = terrainIndices();
   // largeur de vignette adaptée au nombre de terrains (tient sur 900px de large)
   const n = visT.length, gap = 20;
   const pw = Math.min(250, Math.floor((W - 40 - (n - 1) * gap) / n)), ph = 170, py = 130;

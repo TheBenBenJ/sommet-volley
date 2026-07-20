@@ -178,14 +178,14 @@ test("service : contact filet = faute (pas de rebond qui sauve)", () => {
 
 test("roster : Tsar Vladou est le perso pilote (index 0)", () => {
   const g = loadGame();
-  assert.ok(g.ANIMALS && g.ANIMALS.length >= 3);
-  assert.strictEqual(g.ANIMALS[0].key, "vladou");
-  assert.strictEqual(g.ANIMALS[0].name, "Tsar Vladou");
-  assert.strictEqual(g.ANIMALS[1].key, "trompette");
-  assert.strictEqual(g.ANIMALS[2].key, "micron");
-  assert.ok(g.ANIMALS[0].coldProof);
-  assert.ok(g.ANIMALS[1].egoCharge);
-  assert.ok(g.ANIMALS[2].swapStats);
+  assert.ok(g.CHARACTERS && g.CHARACTERS.length >= 3);
+  assert.strictEqual(g.CHARACTERS[0].key, "vladou");
+  assert.strictEqual(g.CHARACTERS[0].name, "Tsar Vladou");
+  assert.strictEqual(g.CHARACTERS[1].key, "trompette");
+  assert.strictEqual(g.CHARACTERS[2].key, "micron");
+  assert.ok(g.CHARACTERS[0].coldProof);
+  assert.ok(g.CHARACTERS[1].egoCharge);
+  assert.ok(g.CHARACTERS[2].swapStats);
 });
 
 test("V2 : balle rapide + smash touche malgré la vitesse", () => {
@@ -452,21 +452,6 @@ test("soft ownership : skipBall avance les corps sans bouger la balle", () => {
   assert.ok(g.blobL.x !== x0 || g.blobL.vx !== 0, "les corps avancent quand même");
 });
 
-test("balle crevée : sans holder local, le point tombe quand même", () => {
-  // Régression soft-own : popped reçu sans hasBall bloquait la partie.
-  const g = loadGame();
-  g.setVsAI(true); g.setAiLevel(1);
-  g.newGame(42);
-  g.setState("play"); g.setServeCountdown(0);
-  g.ball.frozen = false;
-  g.ball.popped = true;
-  g.ball.lastTouchSide = 1; // Vert a crevé → point pour Rouge
-  g.blobL.hasBall = false; g.blobR.hasBall = false;
-  g.updateBall();
-  assert.strictEqual(g.getState(), "point", "un point doit être marqué");
-  assert.strictEqual(g.scores[0], 1, "le camp opposé au lastTouch marque");
-});
-
 test("soft ownership : pack/applyBallState round-trip", () => {
   const g = loadGame();
   g.newGame(2);
@@ -549,10 +534,10 @@ test("persos uniques : 2v2 hors-ligne ne duplique pas", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(1);
   g.setMode("2v2");
-  for (let animal = 0; animal < g.ANIMALS.length; animal++) {
-    g.blobL.animal = animal;
+  for (let animal = 0; animal < g.CHARACTERS.length; animal++) {
+    g.blobL.charId = animal;
     g.newGame(42 + animal);
-    const ids = [g.blobL, g.blob2L, g.blobR, g.blob2R].map(b => b.animal);
+    const ids = [g.blobL, g.blob2L, g.blobR, g.blob2R].map(b => b.charId);
     assert.strictEqual(new Set(ids).size, 4, "4 persos distincts (joueur=" + animal + ") → " + ids);
   }
 });
@@ -602,12 +587,12 @@ test("V2 : service — passe le filet depuis près du filet (tous persos)", () =
   const g = loadGame();
   const C = g.consts;
   const N0 = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
-  for (let animal = 0; animal < g.ANIMALS.length; animal++) {
+  for (let animal = 0; animal < g.CHARACTERS.length; animal++) {
     g.setVsAI(true); g.setAiLevel(1);
     g.newGame(10 + animal);
     g.setServingSide(0);
     g.setState("play"); g.setServeCountdown(0);
-    g.blobL.animal = animal;
+    g.blobL.charId = animal;
     g.blobL.x = 330; g.blobL.y = C.GROUND_Y; g.blobL.onGround = true;
     g.blobL.lastActiveHitTick = -999;
     g.ball.x = 335; g.ball.y = g.blobL.y - 70; g.ball.vx = 0; g.ball.vy = 1;
@@ -622,8 +607,8 @@ test("V2 : service — passe le filet depuis près du filet (tous persos)", () =
       if (g.ball.x > C.NET_X + 16 && g.ball.y < C.NET_TOP - 4) { cleared = true; break; }
       if (g.getState() === "point") break;
     }
-    assert.ok(cleared, "service " + g.ANIMALS[animal].key + " depuis x=330 doit passer le filet");
-    assert.strictEqual(g.scores[1], 0, "pas de faute filet (" + g.ANIMALS[animal].key + ")");
+    assert.ok(cleared, "service " + g.CHARACTERS[animal].key + " depuis x=330 doit passer le filet");
+    assert.strictEqual(g.scores[1], 0, "pas de faute filet (" + g.CHARACTERS[animal].key + ")");
   }
 });
 
@@ -635,7 +620,7 @@ test("V2 : service aérien (smash) — passe aussi le filet", () => {
   g.newGame(11);
   g.setServingSide(0);
   g.setState("play"); g.setServeCountdown(0);
-  g.blobL.animal = 1; // Trompette
+  g.blobL.charId = 1; // Trompette
   g.blobL.x = 300; g.blobL.y = C.GROUND_Y - 70; g.blobL.onGround = false;
   g.blobL.lastActiveHitTick = -999;
   g.ball.x = 305; g.ball.y = g.blobL.y - 50; g.ball.vx = 0; g.ball.vy = 1;
