@@ -136,13 +136,15 @@ function drawResortCart(t) {
   const horn = !mapEventsQuiet &&
     (mapEvent.phase === "fire" || (mapEvent.phase === "flying" && mapEvent.t < 18));
   const img = horn && spriteReady(p.cartHorn) ? p.cartHorn : p.cart;
-  // fondu aux bords pour éviter l'apparition/disparition sèche
+  // Plus petit + plus loin (ligne des barrières Maison Blanche), pas au premier plan
+  const footY = GROUND_Y - 62;
+  const drawH = 42;
   let a = 1;
   if (cx < 50) a = Math.max(0, (cx + 70) / 120);
   if (cx > W - 50) a = Math.min(a, Math.max(0, (W + 70 - cx) / 120));
   ctx.save();
-  ctx.globalAlpha = a;
-  drawMapProp(img, cx, GROUND_Y + 2, 92);
+  ctx.globalAlpha = a * 0.95;
+  drawMapProp(img, cx, footY, drawH);
   ctx.restore();
 }
 

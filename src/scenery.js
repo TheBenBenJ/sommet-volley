@@ -206,7 +206,7 @@ let mapEvent = {
   timer: 0,
   x: 0, y: 0, vx: 0, vy: 0,
   hit: false,
-  cartX: 110,
+  cartX: 450,
   cartDir: 1,
   zoneX: 0,
   zoneW: 150,
@@ -219,7 +219,7 @@ function resetMapEvent() {
   mapEvent.timer = 900 + Math.floor(rng() * 900); // 1er event un peu plus tôt (~15–30 s)
   mapEvent.x = mapEvent.y = mapEvent.vx = mapEvent.vy = 0;
   mapEvent.hit = false;
-  mapEvent.cartX = 110;
+  mapEvent.cartX = W * 0.5;
   mapEvent.cartDir = 1;
   mapEvent.zoneX = 0;
   mapEvent.zoneW = 150;
@@ -232,8 +232,8 @@ function scheduleNextMapEvent() {
   mapEvent.timer = 1200 + Math.floor(rng() * 1200); // 20–40 s
   mapEvent.x = mapEvent.y = mapEvent.vx = mapEvent.vy = 0;
   mapEvent.hit = false;
-  // Resort : sorti à droite → rentrée douce depuis la gauche (pas de téléport visible)
-  mapEvent.cartX = (mapEventKind() === "cart") ? (W + 90) : -90;
+  // Resort : reste au centre (près des barrières) — pas de téléport hors écran
+  mapEvent.cartX = W * 0.5;
   mapEvent.cartDir = 1;
   mapEvent.zoneX = 0;
   mapEvent.balls = [];
@@ -244,21 +244,14 @@ function stepCartIdleMotion() {
   if (mapEventKind() !== "cart") return;
   if (mapEvent.phase !== "idle") return;
   if (mapEvent.cartDir !== 1 && mapEvent.cartDir !== -1) mapEvent.cartDir = 1;
-  // hors écran à droite → wrap invisible à gauche
-  if (mapEvent.cartX > W + 50) {
-    mapEvent.cartX = -90;
-    mapEvent.cartDir = 1;
-  }
-  // rentrée progressive
-  if (mapEvent.cartX < 90) {
-    mapEvent.cartX += 0.95;
-    mapEvent.cartDir = 1;
-    return;
-  }
-  // va-et-vient lent devant les palmiers
-  mapEvent.cartX += mapEvent.cartDir * 0.42;
-  if (mapEvent.cartX > 210) mapEvent.cartDir = -1;
-  if (mapEvent.cartX < 90) mapEvent.cartDir = 1;
+  // Va-et-vient lent au milieu, près des barrières (pas au premier plan)
+  const lo = W * 0.5 - 100;
+  const hi = W * 0.5 + 100;
+  if (mapEvent.cartX < lo) { mapEvent.cartX = lo; mapEvent.cartDir = 1; }
+  if (mapEvent.cartX > hi) { mapEvent.cartX = hi; mapEvent.cartDir = -1; }
+  mapEvent.cartX += mapEvent.cartDir * 0.28;
+  if (mapEvent.cartX > hi) mapEvent.cartDir = -1;
+  if (mapEvent.cartX < lo) mapEvent.cartDir = 1;
 }
 
 function mapEventKind() {
@@ -346,7 +339,7 @@ function stepMapEvent() {
       mapEvent.t = 0;
       mapEvent.hit = false;
       mapEvent.balls = [];
-      if (mapEvent.cartX < 0 || mapEvent.cartX > W) mapEvent.cartX = 110;
+      if (mapEvent.cartX < 0 || mapEvent.cartX > W) mapEvent.cartX = W * 0.5;
     }
     // décor : le caddie continue de patrouiller même en mode calme
     if (state === "play" || state === "serve") stepCartIdleMotion();
