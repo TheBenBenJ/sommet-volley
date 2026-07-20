@@ -329,9 +329,9 @@ function tickMenuActors() {
     if (b.x >= b.maxX) { b.x = b.maxX; b.dispVx = -Math.abs(b.dispVx); }
     b.vx = b.dispVx; // pour orientation sprite (charFaceRight)
     b._faceRight = b.dispVx >= 0;
-    // Même rythme qu'en jeu : 1 frame / 4 ticks → pas F/B visibles
+    // Même rythme qu'en jeu : 1 frame / 8 ticks (appui → passage → …)
     b._walkTick = (b._walkTick || 0) + 1;
-    if (b._walkTick % 4 === 0) b.walkPhase += 1;
+    if (b._walkTick % 8 === 0) b.walkPhase += 1;
     b.hopT--;
     if (b.hopT <= 0 && b.onGround) {
       b.vy = -4.2; b.onGround = false; b.hopT = 140 + Math.floor(Math.random() * 180);

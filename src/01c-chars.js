@@ -127,13 +127,12 @@ function charPickAnim(b) {
     return "receive";
   }
   if (charWantPanic(b) && charAnimReady(key, "panic")) return "panic";
-  // Marche avec hystérésis — évite idle↔walk qui clignote quand l'IA micro-ajuste.
-  // Slip (Trompette) : seuils plus collants + vx consigne (pas seulement dispVx).
+  // Marche avec hystérésis collante — évite idle↔walk qui clignote.
   const a = animOf(b);
   const disp = (a.slip && typeof b.dispVx === "number") ? b.dispVx : (b.vx || 0);
   const spd = Math.max(Math.abs(disp), a.slip ? Math.abs(b.vx || 0) * 0.85 : 0);
-  const enter = a.slip ? 0.35 : 0.75;
-  const exit = a.slip ? 0.08 : 0.25;
+  const enter = a.slip ? 0.30 : 0.55;
+  const exit = a.slip ? 0.06 : 0.15;
   if (b._walking) {
     if (spd < exit) b._walking = false;
   } else if (spd > enter) {
@@ -151,7 +150,7 @@ function charPickFrame(b, anim) {
   if (!frames || !frames.length) return null;
   let idx = 0;
   if (anim === "walk") {
-    // walkPhase entier (voir Blob.update) — cycle F/B/F/B dans les PNG
+    // walkPhase entier — cycle 4 frames : appui / passage / appui / passage
     idx = Math.floor(Math.abs(b.walkPhase || 0)) % frames.length;
   } else if (anim === "jump") {
     if (b.vy < -2) idx = 0;
@@ -224,18 +223,13 @@ function drawSpriteChar(b) {
   const lockAsp = pack.manifest && pack.manifest.lockAspect;
   const aspect = lockAsp || (img.naturalWidth / img.naturalHeight);
   const w = h * aspect * scaleX;
-  // Rebond de pas (lié au tick, walkPhase est entier)
-  const bob = (anim === "walk")
-    ? Math.abs(Math.sin(((b._walkTick || 0) / 4) * Math.PI)) * 2.5
-    : 0;
 
   ctx.save();
   ctx.translate(b.x, footY);
   if (!faceRight) ctx.scale(-1, 1);
-  // Centrer horizontalement dans la boîte lockAspect si l'image est plus étroite
   const natW = h * (img.naturalWidth / img.naturalHeight) * scaleX;
   const ox = -w / 2 + (w - natW) / 2;
-  ctx.drawImage(img, ox, -h + footPad - bob, natW, h);
+  ctx.drawImage(img, ox, -h + footPad, natW, h);
   ctx.restore();
   return true;
 }

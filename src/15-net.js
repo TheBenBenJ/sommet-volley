@@ -1127,7 +1127,8 @@ function guestApplyView() {
       const b1 = last.blobs[i]; if (!b1) return;
       b.x = b1.x + b1.vx * dt;
       b.y = b1.onGround ? b1.y : b1.y + b1.vy * dt + 0.5 * GRAV_BLOB * dt * dt;
-      b.walkPhase = b1.walkPhase + Math.abs(b1.vx) * 0.06 * dt;
+      // walkPhase = index de frame entier — ne pas extrapoler (sinon clignote)
+      b.walkPhase = b1.walkPhase;
       b.vx = b1.vx; b.onGround = b1.onGround; b.squash = b1.squash;
     });
     if (!ball.frozen) { ball.trail.push({ x: ball.x, y: ball.y }); if (ball.trail.length > 8) ball.trail.shift(); }
@@ -1152,7 +1153,8 @@ function guestApplyView() {
     if (!b0 || !b1) return;
     b.x = L(b0.x, b1.x);
     b.y = L(b0.y, b1.y);
-    b.walkPhase = L(b0.walkPhase, b1.walkPhase);
+    // Frame de marche discrète (lerp float → clignotement entre 2 images proches)
+    b.walkPhase = a < 0.5 ? b0.walkPhase : b1.walkPhase;
     b.vx = b1.vx; b.onGround = b1.onGround; b.squash = b1.squash;
   });
 

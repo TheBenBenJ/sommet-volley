@@ -2,7 +2,7 @@
   "anims": {
     "idle_face": 1,
     "idle": 2,
-    "walk": 8,
+    "walk": 4,
     "jump": 3,
     "receive": 2,
     "aim": 2,
@@ -14,5 +14,5 @@
   },
   "baseH": 110,
   "footPad": 2,
-  "lockAspect": 0.575
+  "lockAspect": 0.597
 }

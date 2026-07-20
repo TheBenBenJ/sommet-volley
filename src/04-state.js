@@ -285,9 +285,9 @@ class Blob {
     if (wantWalk) {
       const scrambling = a.slip;
       this.scramble = scrambling ? 1 : 0;
-      // Compteur entier : 1 frame toutes les 4 ticks → alternance F/B lisible
+      // Cycle 4 frames (appui → passage → appui → passage) : 1 frame / 8 ticks
       this._walkTick = (this._walkTick || 0) + 1;
-      if (this._walkTick % 4 === 0) this.walkPhase += 1;
+      if (this._walkTick % 8 === 0) this.walkPhase += 1;
       if (Math.random() < (scrambling ? 0.35 : 0.1)) {
         spawnSand(this.x - Math.sign(this.vx || moveVx) * 12, GROUND_Y, 1);
       }
