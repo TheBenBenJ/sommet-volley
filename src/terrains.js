@@ -136,14 +136,15 @@ function drawResortCart(t) {
   const horn = !mapEventsQuiet &&
     (mapEvent.phase === "fire" || (mapEvent.phase === "flying" && mapEvent.t < 18));
   const img = horn && spriteReady(p.cartHorn) ? p.cartHorn : p.cart;
-  // Plus petit + plus loin (ligne des barrières Maison Blanche), pas au premier plan
-  const footY = GROUND_Y - 62;
-  const drawH = 42;
+  // Midground : pelouse juste devant la clôture fer forgé (pas le sol joueurs)
+  // Clôture skyline ≈ GROUND_Y - 295 ; pieds du caddy un peu devant.
+  const footY = GROUND_Y - 200;
+  const drawH = 78;
   let a = 1;
   if (cx < 50) a = Math.max(0, (cx + 70) / 120);
   if (cx > W - 50) a = Math.min(a, Math.max(0, (W + 70 - cx) / 120));
   ctx.save();
-  ctx.globalAlpha = a * 0.95;
+  ctx.globalAlpha = a;
   drawMapProp(img, cx, footY, drawH);
   ctx.restore();
 }
