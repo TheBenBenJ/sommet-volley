@@ -155,7 +155,7 @@ function handleMenuKeys(code, key) {
     if (code === "Escape" || code === "Enter" || code === "Space") goMenu();
 
   } else if (state === "selectCharacter") {
-    const slot = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Digit5: 4, Digit6: 5, Digit7: 6 }[code];
+    const slot = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Digit5: 4, Digit6: 5, Digit7: 6, Digit8: 7, Digit9: 8 }[code];
     const vis = characterIndices();
     const n = slot !== undefined && slot < vis.length ? vis[slot] : undefined;
     if (n !== undefined && !takenCharacterSet().has(n)) {
@@ -181,7 +181,7 @@ function handleMenuKeys(code, key) {
     }
 
   } else if (state === "selectTerrain") {
-    const slotT = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Digit5: 4 }[code];
+    const slotT = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Digit5: 4, Digit6: 5, Digit7: 6, Digit8: 7, Digit9: 8 }[code];
     const visT = terrainIndices();
     const n = slotT !== undefined && slotT < visT.length ? visT[slotT] : undefined;
     if (n !== undefined) { terrain = n; state = "selectBall"; }
@@ -1475,10 +1475,10 @@ function drawSelectCharacter() {
     ctx.globalAlpha = 1;
     ctx.textAlign = "center";
     ctx.fillStyle = isTaken ? "rgba(255,255,255,0.35)" : UI.ink;
-    ctx.font = "800 " + (vis.length >= 6 ? 13 : vis.length === 5 ? 15 : 18) + "px " + UI.display;
+    ctx.font = "800 " + (vis.length >= 8 ? 11 : vis.length >= 6 ? 13 : vis.length === 5 ? 15 : 18) + "px " + UI.display;
     ctx.fillText(isTaken ? "Pris — " + a.name : (slot + 1) + " — " + a.name, cx, 205);
 
-    const gx = cx - 68, gy0 = 232;
+    const gx = cx - Math.min(68, cw / 2 - 8), gy0 = 232;
     drawStatGauge(gx, gy0,      "Vitesse",   a.stats.vitesse);
     drawStatGauge(gx, gy0 + 20, "Détente",   a.stats.detente);
     drawStatGauge(gx, gy0 + 40, "Puissance", a.stats.puissance);
@@ -1522,13 +1522,23 @@ function drawSelectTerrain() {
   uiRule(UI.mx, UI.mx + 100, 90, UI.gold);
 
   const visT = terrainIndices();
-  // largeur de vignette adaptée au nombre de terrains (tient sur 900px de large)
-  const n = visT.length, gap = 20;
-  const pw = Math.min(250, Math.floor((W - 40 - (n - 1) * gap) / n)), ph = 170, py = 130;
-  const rowW = n * pw + (n - 1) * gap, startX = (W - rowW) / 2;
+  // 1 rangée si ≤5, sinon 2 rangées pour garder des vignettes lisibles
+  const n = visT.length, cols = n <= 5 ? n : Math.ceil(n / 2);
+  const gap = 16;
+  const pw = Math.min(250, Math.floor((W - 40 - (cols - 1) * gap) / cols));
+  const ph = n <= 5 ? 170 : 120;
+  const rows = Math.ceil(n / cols);
+  const rowGap = 56;
+  const totalH = rows * ph + (rows - 1) * rowGap;
+  const py0 = Math.max(110, Math.floor((H - totalH) / 2) - 20);
   for (let slot = 0; slot < n; slot++) {
     const i = visT[slot];
-    const px = startX + slot * (pw + gap);
+    const row = Math.floor(slot / cols), col = slot % cols;
+    const colsInRow = row === rows - 1 ? n - row * cols : cols;
+    const rowW = colsInRow * pw + (colsInRow - 1) * gap;
+    const startX = (W - rowW) / 2;
+    const px = startX + col * (pw + gap);
+    const py = py0 + row * (ph + rowGap);
     // aperçu : thumb PNG dédié si dispo, sinon rendu live réduit
     ctx.save();
     ctx.beginPath();
@@ -1557,10 +1567,10 @@ function drawSelectTerrain() {
     ctx.textAlign = "center";
     ctx.fillStyle = sel ? UI.gold : UI.ink;
     ctx.font = "800 14px " + UI.display;
-    ctx.fillText(String(slot + 1), px + pw / 2, py + ph + 26);
+    ctx.fillText(String(slot + 1), px + pw / 2, py + ph + 22);
     ctx.fillStyle = UI.ink;
-    ctx.font = (n > 3 ? "800 14px " : "800 16px ") + UI.sans;
-    ctx.fillText(TERRAINS[i].name, px + pw / 2, py + ph + 46);
+    ctx.font = (n > 4 ? "800 13px " : "800 16px ") + UI.sans;
+    ctx.fillText(TERRAINS[i].name, px + pw / 2, py + ph + 40);
   }
 
   uiLabel("Choisis 1 – " + n + "   ·   C terrain calme : " + (mapEventsQuiet ? "ON" : "OFF") +

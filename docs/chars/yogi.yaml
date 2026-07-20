@@ -1,0 +1,10 @@
+key: yogi
+name: "Narendra Yogi"
+pays_theme: "Inde — ashram, orange, yoga"
+silhouette: "compact/stocky, gilet orange/safran, barbe blanche soignée, pose zen"
+palette: ["#ef6c00", "#ffffff", "#f5d0b0"]
+stats: { vitesse: 4, detente: 3, puissance: 2, controle: 4 }
+super:
+  nom: "Méditation"
+  effet: "gèle le camp adverse ~5 s"
+map: "Stade Ashram"

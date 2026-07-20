@@ -96,17 +96,17 @@ function maybeActivateSuper(blob, input) {
   crowdHype = Math.max(crowdHype, 45);
   spawnSuperBurst(blob);
   superSound(a.key);
-  if (a.key === "vladou") {
-    // Hiver Général : gèle le camp adverse
+  if (a.key === "vladou" || a.key === "yogi") {
+    // Hiver Général / Méditation : gèle le camp adverse
     superEffects.push({ kind: "ice", side: 1 - blob.side, t: blob.superT });
-  } else if (a.key === "trompette") {
-    // Le Mur : obstacle au milieu du camp adverse
+  } else if (a.key === "trompette" || a.key === "panda" || a.key === "jair") {
+    // Le Mur / Grande Muraille / Déforestation
     superEffects.push({ kind: "wall", side: 1 - blob.side, t: blob.superT });
   } else if (a.key === "micron") {
     // 49.3 : frappes immunisées au smash adverse (voir trySmashBall)
     blob.superSmash = false;
-  } else if (a.key === "houn") {
-    // Batterie AA : interdit de sauter au camp adverse
+  } else if (a.key === "houn" || a.key === "sultan") {
+    // Batterie AA / Séisme : interdit de sauter au camp adverse
     superEffects.push({ kind: "noground", side: 1 - blob.side, t: blob.superT });
   }
 }

@@ -1,0 +1,10 @@
+key: jair
+name: "Jair Tronço"
+pays_theme: "Brésil — amazonie, vert-jaune, tronçonneuse satirique"
+silhouette: "compact/stocky, maillot vert-jaune, casquette, attitude agressive"
+palette: ["#2e7d32", "#fbc02d", "#f5d0b0"]
+stats: { vitesse: 3, detente: 2, puissance: 5, controle: 2 }
+super:
+  nom: "Déforestation"
+  effet: "mur de troncs au camp adverse ~5 s"
+map: "Amazonie Dorée"

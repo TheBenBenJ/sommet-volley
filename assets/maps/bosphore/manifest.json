@@ -1,0 +1,10 @@
+{
+  "key": "bosphore",
+  "name": "Palais du Bosphore",
+  "layers": [
+    "far",
+    "skyline"
+  ],
+  "props": [],
+  "thumb": "thumb.png"
+}

@@ -1,0 +1,10 @@
+{
+  "key": "matin",
+  "name": "Place du Matin",
+  "layers": [
+    "far",
+    "skyline"
+  ],
+  "props": [],
+  "thumb": "thumb.png"
+}

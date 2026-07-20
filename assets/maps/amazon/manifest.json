@@ -1,0 +1,10 @@
+{
+  "key": "amazon",
+  "name": "Amazonie Dor\u00e9e",
+  "layers": [
+    "far",
+    "skyline"
+  ],
+  "props": [],
+  "thumb": "thumb.png"
+}

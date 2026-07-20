@@ -572,8 +572,9 @@ function drawBackground() {
   const key = TERRAINS[terrain].key;
   if (key === "plage") drawBgPlage();
   else if (key === "neige") drawBgNeige();
-  else if (key === "prairie") drawBgPrairie();
-  else if (key === "parade") drawBgParade();
+  else if (key === "prairie" || key === "matin" || key === "bosphore") drawBgPrairie();
+  else if (key === "parade" || key === "ashram") drawBgParade();
+  else if (key === "amazon") drawBgPlage();
   else drawBgPlage();
 }
 

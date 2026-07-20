@@ -19,7 +19,7 @@ function drawCharacter(b) {
     else if (key === "trompette") drawTrompette(b);
     else if (key === "micron") drawMicron(b);
     else if (key === "houn") drawHoun(b);
-    else drawVladou(b);
+    else drawGenericChar(b);
   }
   drawSuperOverlay(b);
   drawCharSuperFX(b);
@@ -145,6 +145,25 @@ function drawVladou(b) {
     c.beginPath(); c.moveTo(-10, -90); c.lineTo(10, -90); c.stroke();
     c.fillStyle = "#6a6e78";
     c.beginPath(); c.arc(0, -92, 14, Math.PI, 0); c.fill();
+  });
+}
+
+/** Fallback canvas pour les nouveaux persos (sprites pas encore prêts). */
+function drawGenericChar(b) {
+  const A = charOf(b);
+  const col = A.color || "#888";
+  const dark = A.darkColor || "#444";
+  drawCharBody(b, (c) => {
+    c.fillStyle = dark;
+    c.fillRect(-12, -28, 10, 28); c.fillRect(2, -28, 10, 28);
+    c.fillStyle = col;
+    c.beginPath(); c.ellipse(0, -50, 18, 22, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#f5d0b0";
+    c.beginPath(); c.arc(0, -84, 16, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#1a1a1a";
+    c.fillRect(-7, -88, 4, 2); c.fillRect(3, -88, 4, 2);
+    c.strokeStyle = dark; c.lineWidth = 2;
+    c.beginPath(); c.arc(0, -78, 5, 0.2, Math.PI - 0.2); c.stroke();
   });
 }
 

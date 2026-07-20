@@ -5,10 +5,14 @@
 // chaque terrain appartient à un perso (voir CHARACTERS) : son public des
 // tribunes est composé de ce perso, et le nom du terrain lui rend hommage.
 const TERRAINS = [
-  { key: "neige",   name: "Place Grand-Rouge",       character: 0 }, // Vladou
-  { key: "plage",   name: "Pelouse Oval",            character: 1 }, // Trompette
-  { key: "prairie", name: "Palais de l'Hexagone",    character: 2 }, // Micron
-  { key: "parade",  name: "Esplanade du Défilé",     character: 3 }, // Houn
+  { key: "neige",    name: "Place Grand-Rouge",       character: 0 }, // Vladou
+  { key: "plage",    name: "Pelouse Oval",            character: 1 }, // Trompette
+  { key: "prairie",  name: "Palais de l'Hexagone",    character: 2 }, // Micron
+  { key: "parade",   name: "Esplanade du Défilé",     character: 3 }, // Houn
+  { key: "matin",    name: "Place du Matin",          character: 4 }, // Panda
+  { key: "bosphore", name: "Palais du Bosphore",      character: 5 }, // Sultan
+  { key: "ashram",   name: "Stade Ashram",            character: 6 }, // Yogi
+  { key: "amazon",   name: "Amazonie Dorée",          character: 7 }  // Jair
 ];
 let terrain = 0;
 
@@ -57,6 +61,39 @@ const CHARACTERS = [
     clapDouble: true,
     trait: "Applaudissements : SUPER chargé en 2 points d'affilée.",
     superName: "Batterie AA", superDesc: "Interdit de sauter au camp adverse ~5 s."
+  },
+  {
+    key: "panda", name: "Président Panda",
+    color: "#c62828", darkColor: "#8e0000",
+    stats: { vitesse: 3, detente: 3, puissance: 3, controle: 5 },
+    speed: 1.06, jump: 1.06, power: 1.06, control: 1.0,
+    trait: "Mur invisible : contrôle max, placements précis.",
+    superName: "Grande Muraille", superDesc: "Mur au milieu du camp adverse ~5 s."
+  },
+  {
+    key: "sultan", name: "Recep Sultan",
+    color: "#6a1b9a", darkColor: "#4a148c",
+    stats: { vitesse: 3, detente: 4, puissance: 3, controle: 3 },
+    speed: 1.06, jump: 1.18, power: 1.06, control: 0.82,
+    trait: "Séisme : détente élevée, bons smashs aériens.",
+    superName: "Séisme", superDesc: "Interdit de sauter au camp adverse ~5 s."
+  },
+  {
+    key: "yogi", name: "Narendra Yogi",
+    color: "#ef6c00", darkColor: "#e65100",
+    stats: { vitesse: 4, detente: 3, puissance: 2, controle: 4 },
+    speed: 1.18, jump: 1.06, power: 0.94, control: 0.91,
+    trait: "Ashram : rapide et technique, peu de puissance brute.",
+    superName: "Méditation", superDesc: "Gèle le camp adverse ~5 s (glisse)."
+  },
+  {
+    key: "jair", name: "Jair Tronço",
+    color: "#2e7d32", darkColor: "#1b5e20",
+    stats: { vitesse: 3, detente: 2, puissance: 5, controle: 2 },
+    speed: 1.06, jump: 0.94, power: 1.28, control: 0.75,
+    egoCharge: true,
+    trait: "Tronçonneuse : puissance max, SUPER aussi en perdant un point.",
+    superName: "Déforestation", superDesc: "Mur de troncs au camp adverse ~5 s."
   }
 ];
 function charOf(b) { return CHARACTERS[b.charId]; }
@@ -203,6 +240,7 @@ const battle = {
 // ---------- Combos & techniques signature ----------
 // Chaque camp charge un SUPER en gagnant SUPER_NEED points d'affilée.
 //   Vladou → Hiver Général · Trompette → Le Mur · Micron → 49.3 · Houn → Batterie AA
+//   Panda → Grande Muraille · Sultan → Séisme · Yogi → Méditation · Jair → Déforestation
 const SUPER_NEED = 3;
 const streak = [0, 0];        // points d'affilée par camp
 const superCharge = [0, 0];   // 0 = vide, 1 = super prête
@@ -210,7 +248,11 @@ const SUPER_DUR = {
   vladou: 360,      // Hiver Général ~6 s
   trompette: 300,   // Le Mur ~5 s
   micron: 240,      // 49.3 ~4 s
-  houn: 300         // Batterie AA ~5 s
+  houn: 300,        // Batterie AA ~5 s
+  panda: 300,       // Grande Muraille ~5 s
+  sultan: 300,      // Séisme ~5 s
+  yogi: 300,        // Méditation ~5 s
+  jair: 300         // Déforestation ~5 s
 };
 
 // Effets de zone SUPER (Phase 4 — stubs jouables pour le pilote)

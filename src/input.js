@@ -205,7 +205,7 @@ function navOptions() {
       const taken = takenCharacterSet();
       return vis.map((_, slot) => "Digit" + (slot + 1)).filter((_, slot) => !taken.has(vis[slot]));
     }
-    case "selectTerrain": return ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5"].slice(0, terrainIndices().length);
+    case "selectTerrain": return ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9"].slice(0, terrainIndices().length);
     case "selectBall":    return ["Digit1", "Digit2"].slice(0, BALL_SKINS.length);
     default: return null;
   }

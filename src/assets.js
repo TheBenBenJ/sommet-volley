@@ -6,7 +6,11 @@ const SPRITES = {
   mapVladou: null,       // Place Grand-Rouge (pack PNG)
   mapTrompette: null,    // Pelouse Oval (pack PNG)
   mapMicron: null,       // Palais de l'Hexagone (pack PNG)
-  mapHoun: null          // Esplanade du Défilé (pack PNG)
+  mapHoun: null,         // Esplanade du Défilé (pack PNG)
+  mapMatin: null,        // Place du Matin (Panda)
+  mapBosphore: null,     // Palais du Bosphore (Sultan)
+  mapAshram: null,       // Stade Ashram (Yogi)
+  mapAmazon: null        // Amazonie Dorée (Jair)
 };
 
 function loadSprite(path) {
@@ -36,6 +40,10 @@ function initSprites() {
   initMapTrompette();
   initMapMicron();
   initMapHoun();
+  SPRITES.mapMatin = loadMapPack("matin", { skyline: "skyline.png", far: "far.png", thumb: "thumb.png" });
+  SPRITES.mapBosphore = loadMapPack("bosphore", { skyline: "skyline.png", far: "far.png", thumb: "thumb.png" });
+  SPRITES.mapAshram = loadMapPack("ashram", { skyline: "skyline.png", far: "far.png", thumb: "thumb.png" });
+  SPRITES.mapAmazon = loadMapPack("amazon", { skyline: "skyline.png", far: "far.png", thumb: "thumb.png" });
 }
 
 /** Pack fond / props Place Grand-Rouge (terrain Vladou). */
@@ -112,6 +120,18 @@ function drawTerrainMenuThumb(terrainIdx, dx, dy, dw, dh) {
   }
   if (t.key === "parade" && SPRITES.mapHoun && spriteReady(SPRITES.mapHoun.thumb)) {
     img = SPRITES.mapHoun.thumb;
+  }
+  if (t.key === "matin" && SPRITES.mapMatin && spriteReady(SPRITES.mapMatin.thumb)) {
+    img = SPRITES.mapMatin.thumb;
+  }
+  if (t.key === "bosphore" && SPRITES.mapBosphore && spriteReady(SPRITES.mapBosphore.thumb)) {
+    img = SPRITES.mapBosphore.thumb;
+  }
+  if (t.key === "ashram" && SPRITES.mapAshram && spriteReady(SPRITES.mapAshram.thumb)) {
+    img = SPRITES.mapAshram.thumb;
+  }
+  if (t.key === "amazon" && SPRITES.mapAmazon && spriteReady(SPRITES.mapAmazon.thumb)) {
+    img = SPRITES.mapAmazon.thumb;
   }
   if (!img) return false;
   const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height;

@@ -26,11 +26,44 @@ function drawHillLayer(baseY, color, depth, pts) {
 function drawBgPlage() {
   const storm = weather === "storm";
   const raining = weather === "rain" || storm;
-  if (typeof mapTrompetteReady === "function" && mapTrompetteReady()) {
+  const tk = TERRAINS[terrain] && TERRAINS[terrain].key;
+  if (tk === "amazon" && SPRITES.mapAmazon && spriteReady(SPRITES.mapAmazon.skyline)) {
+    drawBgSkylinePack(SPRITES.mapAmazon, performance.now() / 1000, raining, storm, {
+      ground0: raining ? "#5a7a40" : "#7a9a50",
+      ground1: raining ? "#3a5a28" : "#5a7a38"
+    });
+    return;
+  }
+  if (typeof mapTrompetteReady === "function" && mapTrompetteReady() && tk !== "amazon") {
     drawBgPlagePng(performance.now() / 1000, raining, storm);
     return;
   }
   drawBgPlageCanvas(raining, storm);
+}
+
+/** Fond générique far + skyline + sol (nouveaux terrains). */
+function drawBgSkylinePack(p, t, raining, storm, cols) {
+  if (spriteReady(p.far)) {
+    ctx.globalAlpha = storm ? 0.55 : 0.8;
+    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    ctx.globalAlpha = 1;
+  }
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+  if (storm) {
+    ctx.fillStyle = "rgba(60,70,80,0.3)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  } else if (raining) {
+    ctx.fillStyle = "rgba(90,100,110,0.14)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  }
+  const g = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
+  g.addColorStop(0, cols.ground0);
+  g.addColorStop(1, cols.ground1);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
+  ctx.fillStyle = "rgba(0,0,0,0.08)";
+  ctx.fillRect(0, GROUND_Y, W, 2);
+  if (raining) drawRain(storm ? 1 : 0.55);
 }
 
 /** Pelouse Oval PNG (Trompette) — pelouse + FX poussière en code. */
@@ -638,8 +671,22 @@ function drawBgPrairie() {
   const t = performance.now() / 1000;
   const storm = weather === "storm";
   const raining = weather === "rain" || storm;
-
-  if (typeof mapMicronReady === "function" && mapMicronReady()) {
+  const tk = TERRAINS[terrain] && TERRAINS[terrain].key;
+  if (tk === "matin" && SPRITES.mapMatin && spriteReady(SPRITES.mapMatin.skyline)) {
+    drawBgSkylinePack(SPRITES.mapMatin, t, raining, storm, {
+      ground0: raining ? "#9a9080" : "#d2c4a8",
+      ground1: raining ? "#6e6558" : "#b5a68a"
+    });
+    return;
+  }
+  if (tk === "bosphore" && SPRITES.mapBosphore && spriteReady(SPRITES.mapBosphore.skyline)) {
+    drawBgSkylinePack(SPRITES.mapBosphore, t, raining, storm, {
+      ground0: raining ? "#8a8070" : "#c8b898",
+      ground1: raining ? "#5a5040" : "#a09070"
+    });
+    return;
+  }
+  if (typeof mapMicronReady === "function" && mapMicronReady() && tk === "prairie") {
     drawBgPrairiePng(t, raining, storm);
     return;
   }
@@ -737,7 +784,15 @@ function drawBgParade() {
   const t = performance.now() / 1000;
   const storm = weather === "storm";
   const raining = weather === "rain" || storm;
-  if (typeof mapHounReady === "function" && mapHounReady()) {
+  const tk = TERRAINS[terrain] && TERRAINS[terrain].key;
+  if (tk === "ashram" && SPRITES.mapAshram && spriteReady(SPRITES.mapAshram.skyline)) {
+    drawBgSkylinePack(SPRITES.mapAshram, t, raining, storm, {
+      ground0: raining ? "#8a7a60" : "#c4a86a",
+      ground1: raining ? "#5a4a38" : "#9a7850"
+    });
+    return;
+  }
+  if (typeof mapHounReady === "function" && mapHounReady() && tk !== "ashram") {
     drawBgParadePng(t, raining, storm);
     return;
   }
