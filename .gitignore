@@ -11,6 +11,10 @@ npm-debug.log*
 # Divers
 *.log
 # Sources brutes / cutouts (trop volumineux pour git — seuls assets/ sont versionnés)
-raw/
+# Ignorer le contenu de raw/, mais versionner prompts .md et fiches .txt
+raw/**
+!raw/**/
+!raw/**/*.md
+!raw/**/*.txt
 # Sauvegardes locales des frames walk avant réordonnancement
 assets/*/_walk_bak/

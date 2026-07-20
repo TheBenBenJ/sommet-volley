@@ -358,7 +358,7 @@ const MAP_LAYOUT = {
   prairie:  { baselineFromBottom: 43,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false },
   parade:   { baselineFromBottom: 368, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
   matin:    { baselineFromBottom: 0,   netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: true, bgFullHeight: true },
-  bosphore: { baselineFromBottom: 73,  netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false },
+  bosphore: { baselineFromBottom: 0,   netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: true },
   ashram:   { baselineFromBottom: 48,  netPost: { footPad: 4, xOff: 0, scale: 1 }, codeSeam: false }
 };
 

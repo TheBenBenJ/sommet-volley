@@ -6,7 +6,7 @@ référence : tout nouveau perso suit ces 6 étapes dans l'ordre. Le premier
 perso (« pilote ») sert à valider le pipeline lui-même — chaque friction
 rencontrée doit être corrigée ICI, pas contournée en douce.
 
-> Leçons déjà payées (l’ancien moteur Crabby (fork)) qui motivent ce process :
+> Leçons déjà payées qui motivent ce process :
 > - une **planche** multi-poses à découper donne des cellules trop petites et
 >   des cadrages ratés → **une pose = une image** ;
 > - un détourage au seuil donne un **alpha binaire** (bords en escalier) →
@@ -14,7 +14,12 @@ rencontrée doit être corrigée ICI, pas contournée en douce.
 > - un PNG plus petit que sa taille d'affichage ×dpr est **flou sans remède**
 >   → générer grand, réduire ensuite (jamais l'inverse) ;
 > - du code de chargement/rendu **par perso** (drawX, SPRITES.xIdle…) ne
->   passe pas à l'échelle → **manifest générique** + un seul chemin de code.
+>   passe pas à l'échelle → **manifest générique** + un seul chemin de code ;
+> - un **jour blanc** entre bras et torse (ou jambe / manteau) devient un
+>   **trou** après `cutout.py` → silhouettes en **aplats solides**, pas de
+>   « triangle blanc » dans le corps (surtout `defeat`, `smash`, `super`) ;
+> - map attitrée : suivre aussi [`PIPELINE-MAP.md`](PIPELINE-MAP.md) (court,
+>   baseline, event), sinon le perso est beau mais le terrain est à refaire.
 
 ---
 
@@ -45,6 +50,10 @@ map: "Place Grand-Rouge (voir VISION.md)"
   gauche), SAUF `idle_face` (3/4 face, pour les menus) ;
 - **fond blanc pur #FFFFFF uni** (jamais de damier, jamais de décor), aucune
   ombre portée au sol, le personnage entier dans le cadre avec ~5 % de marge ;
+- **silhouette pleine** : bras, jambes et torse en aplats **continus** — pas
+  de trou / jour blanc entre un bras levé et le corps (le cutout le percera) ;
+  les blancs *internes* OK seulement s’ils sont des aplats de vêtement (chemise,
+  yeux) clairement entourés de couleur, pas des gaps de composition ;
 - **cohérence stricte** entre les poses : mêmes vêtements, mêmes couleurs,
   même épaisseur de trait (réutiliser la même description mot pour mot).
 
@@ -71,28 +80,43 @@ Soit **31 images** par personnage. Le cycle `walk` se génère pose par pose en
 décrivant la phase (« jambe droite en contact au sol, bras gauche en avant »…)
 — pas « génère un cycle de marche » en une image.
 
-## Étape 3 — Génération (Gemini CLI)
+## Étape 3 — Génération (Gemini)
 
-Template de prompt = `[STYLE GUIDE (étape 1)] + [FICHE (étape 0) : silhouette,
-palette, vêtements] + [POSE précise]`. Une image à la fois, garder la même
-formulation de base entre les poses. Rejeter et regénérer si : fond non blanc,
-personnage coupé, style incohérent, membres douteux. Stocker le prompt exact
-utilisé dans `raw/<key>/prompts.md` (reproductibilité).
+Template de prompt = **A (style) + B (perso) + POSE + C (négatif)** — voir
+`raw/vladou/prompts.md` comme référence complète ; pour un nouveau perso,
+copier cette structure dans `raw/<key>/prompts.md`.
 
-## Étape 4 — Post-traitement (`tools/cutout.py`, à créer en Phase 2)
+Une image à la fois ; après une bonne `idle_face_0`, la mettre en **référence**
+pour les poses suivantes. Rejeter et regénérer si : fond non blanc, ombre au
+sol, personnage coupé, style photo, **jour blanc dans la silhouette**,
+membres douteux, sheet multi-poses.
+
+**Bloc C à renforcer** (ajouter systématiquement) :
+
+```
+Avoid: white gaps between arm and torso, white triangles in armpits, hollow
+limbs, holes in the body silhouette, multiple characters, character sheet,
+model sheet, turnaround, lineup, photorealism, real celebrity likeness,
+cast shadow on ground, cropped limbs, text, watermark, grey background,
+transparent checkerboard.
+```
+
+Stocker le prompt exact dans `raw/<key>/prompts.md` (reproductibilité).
+
+## Étape 4 — Post-traitement (`tools/cutout.py`)
+
+```bash
+python3 tools/cutout.py raw/<key> assets/<key>
+```
 
 Entrée `raw/<key>/*.png` → sortie `assets/<key>/*.png` :
-1. détourage du fond blanc en **alpha anti-aliasé** : distance à blanc →
-   rampe d'alpha (pas de seuil binaire), en protégeant les blancs INTERNES
-   (yeux, chemise) par remplissage depuis les bords uniquement ;
-2. recadrage au contenu + marge fixe 4 % ;
-3. **ancrage pieds** : la ligne de sol détectée est alignée sur le bas du
-   canvas pour TOUTES les poses d'un même perso (sinon le perso « saute »
-   d'une frame à l'autre) ;
-4. normalisation : hauteur debout commune (512 px) — les poses aériennes
-   gardent leur échelle relative ;
-5. génération d'une **planche de contrôle** (`assets/<key>/_contact.png`)
-   pour valider d'un coup d'œil cohérence/ancrage/détourage.
+1. détourage fond blanc **anti-aliasé** (flood depuis les bords) ;
+2. **punch** des îlots blancs enfermés (jours bras/jambes) — d’où l’obligation
+   de générer des silhouettes pleines ;
+3. recadrage + **ancrage pieds** commun à toutes les poses debout ;
+4. normalisation hauteur debout (~512 px) ;
+5. planche `_contact.png` — **à relire** : trous torse/aisselles = regénérer
+   la pose raw, pas « retoucher à la main » frame par frame.
 
 ## Étape 5 — Intégration code (générique, AUCUN code par perso)
 
@@ -115,11 +139,13 @@ Entrée `raw/<key>/*.png` → sortie `assets/<key>/*.png` :
 ## Étape 6 — Checklist de validation (aucune étape sautée)
 
 - [ ] `npm test` vert (+ test roster du nouveau perso) ;
+- [ ] `_contact.png` : pas de trou torse / aisselle / entrejambes fantôme ;
 - [ ] sélection : carte propre, idle_face net, stats/traits affichés ;
 - [ ] en jeu : marche fluide (8 frames), pieds au sol ±2 px sur tout le cycle,
       aucun halo blanc sur fond sombre, netteté OK en fenêtre rétina ;
 - [ ] réception/visée/smash : la bonne anim au bon état ;
 - [ ] SUPER : effet + rendu + son, ET synchronisé en ligne (2 onglets) ;
+- [ ] map attitrée : checklist [`PIPELINE-MAP.md`](PIPELINE-MAP.md) étape 6 ;
 - [ ] perf : pas de chute de fps (images décodées une fois, pas de resize par
       frame) ;
 - [ ] partie complète vs IA + partie en ligne 2 onglets sans erreur console.

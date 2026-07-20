@@ -78,7 +78,7 @@ Structure principale :
 | `src/menus.js` | Menus & sélection |
 | `src/simulation.js` | Boucle de jeu déterministe |
 | `src/net.js` | Multijoueur PeerJS |
-| `docs/` | Vision, gameplay V2, architecture, pipeline perso |
+| `docs/` | Vision, gameplay V2, architecture, [pipeline perso](docs/PIPELINE-PERSONNAGE.md), [pipeline map](docs/PIPELINE-MAP.md) |
 
 Liste complète et ordre de dépendance : [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 

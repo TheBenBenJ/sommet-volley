@@ -5,7 +5,9 @@ caricaturées façon dessin de presse, s'affrontent au filet. Fork d’un
 moteur HTML5 existant (même base : physique déterministe, netcode soft-ownership,
 manettes, modes 1v1/2v2/Bombe/en ligne), avec un nouveau casting, un nouveau
 gameplay (voir GAMEPLAY-V2.md) et une direction artistique 100 % cartoon
-générée par IA via un pipeline reproductible (voir PIPELINE-PERSONNAGE.md).
+générée par IA via un pipeline reproductible (voir
+[`PIPELINE-PERSONNAGE.md`](PIPELINE-PERSONNAGE.md) et
+[`PIPELINE-MAP.md`](PIPELINE-MAP.md)).
 
 ## Ton de la satire
 
@@ -75,9 +77,12 @@ suivants (Kim, Boris, Silvio, Angela…) — chacun via la même fiche.
   qui punit sans prévenir.
 - **Déterministes** : déclenchés par le rng seedé de la partie (compatibles
   netcode et replays), jamais par `Math.random()`.
+- **Uniquement pendant un échange jouable** : pas pendant pause, écran de
+  service, célébration de point, ni Smash Battle (`mapEventsCanStep`).
 - Fréquence faible (1 événement / 20–40 s) pour rester un twist, pas le cœur
   du jeu. Désactivables dans les options de partie (« terrain calme »).
-
+- Specs prompts / props : [`PIPELINE-MAP.md`](PIPELINE-MAP.md) +
+  `raw/maps/<key>/prompts-event.md`.
 ## Roadmap (ordre volontaire)
 
 - **Phase 0 — Base saine** ✅ : fork nettoyé (roster hérité retiré), docs.
