@@ -68,11 +68,17 @@ def flood_bg_mask(im: Image.Image) -> Image.Image:
     return soft
 
 
-def punch_enclosed_white(im: Image.Image, thr: int = 250, min_size: int = 400) -> Image.Image:
+def punch_enclosed_white(
+    im: Image.Image,
+    thr: int = 250,
+    min_size: int = 300,
+    max_size: int = 11000,
+) -> Image.Image:
     """Percer les îlots de blanc ENFERMÉS hors torse (bras/jambes), pas la chemise.
 
-    La chemise blanche est aussi un îlot enfermé : on ne perce que les
-    composantes côté dos (perso face à droite) ou entre les jambes.
+    La chemise / kurta blanche est aussi un îlot enfermé : on ne perce que les
+    composantes dans les zones de trou (dos/bras arrière, entre-jambes), avec
+    un plafond de taille pour ne pas manger un pantalon / plastron blanc.
     """
     from collections import deque
     out = im.convert("RGBA")
@@ -115,16 +121,26 @@ def punch_enclosed_white(im: Image.Image, thr: int = 250, min_size: int = 400) -
                         if aa >= 8 and rr >= thr and gg >= thr and bb >= thr:
                             seen[ny][nx] = True
                             q.append((nx, ny))
-            if touch_border or len(cells) < min_size:
+            n = len(cells)
+            if touch_border or n < min_size or n > max_size:
                 continue
-            cx = sum(p[0] for p in cells) // len(cells)
-            cy = sum(p[1] for p in cells) // len(cells)
+            xs_c = [p[0] for p in cells]
+            ys_c = [p[1] for p in cells]
+            cx = sum(xs_c) // n
+            cy = sum(ys_c) // n
+            iw = max(xs_c) - min(xs_c) + 1
+            ih = max(ys_c) - min(ys_c) + 1
             rel_x = (cx - left) / bw
             rel_y = (cy - top) / bh
-            # dos / entre bras (face à droite) ou entre jambes — pas le plastron
-            back_arm = rel_x < 0.40 and 0.22 < rel_y < 0.78
-            between_legs = 0.28 < rel_x < 0.72 and rel_y > 0.70
-            if not (back_arm or between_legs):
+            # entre jambes uniquement (les « trous bras » mangent les manches
+            # blanches type kurta — le flood fill suffit pour les aisselles ouvertes)
+            between_legs = (
+                0.38 < rel_x < 0.62
+                and 0.65 < rel_y < 0.92
+                and iw < bw * 0.42
+                and ih > iw * 0.45
+            )
+            if not between_legs:
                 continue
             for px_, py_ in cells:
                 r, g, b, _ = px[px_, py_]
@@ -145,30 +161,122 @@ def apply_cutout(im: Image.Image) -> Image.Image:
             fade = bp[x, y] / 255.0
             na = int(a * (1.0 - fade))
             op[x, y] = (r, g, b, na)
-    return despill_white_fringe(out)
+    out = despill_white_fringe(out)
+    out = remove_foot_shadow(out)
+    return out
+
+
+def _has_transparent_neighbor(px, x, y, w, h, a_thr: int = 40) -> bool:
+    for nx, ny in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+        if 0 <= nx < w and 0 <= ny < h and px[nx, ny][3] < a_thr:
+            return True
+    return False
+
+
+def _white_neighbor_count(px, x, y, w, h, rad: int = 2) -> int:
+    """Combien de voisins quasi-blancs opaques (distingue frange fine vs tissu)."""
+    n = 0
+    for dy in range(-rad, rad + 1):
+        for dx in range(-rad, rad + 1):
+            if dx == 0 and dy == 0:
+                continue
+            nx, ny = x + dx, y + dy
+            if not (0 <= nx < w and 0 <= ny < h):
+                continue
+            r, g, b, a = px[nx, ny]
+            if a >= 180 and r >= 235 and g >= 235 and b >= 235:
+                n += 1
+    return n
 
 
 def despill_white_fringe(im: Image.Image) -> Image.Image:
-    """Supprime le halo blanc (matte) sur les bords semi-transparents."""
+    """Supprime le halo blanc (matte) sans manger chemise / kurta / barbe."""
     out = im.convert("RGBA")
     px = out.load()
     w, h = out.size
+
+    def has_dark_neighbor(x, y):
+        for nx, ny in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+            if not (0 <= nx < w and 0 <= ny < h):
+                continue
+            r, g, b, a = px[nx, ny]
+            if a >= 180 and (r + g + b) / 3.0 < 90:
+                return True
+        return False
+
+    # 1) bords semi-transparents quasi-blancs
     for y in range(h):
         for x in range(w):
             r, g, b, a = px[x, y]
             if a < 8 or a >= 250:
                 continue
-            # pixel de bord quasi-blanc → teinte vers transparent / assombri
             if r >= 230 and g >= 230 and b >= 230:
-                # plus c'est blanc et transparent, plus on coupe
                 whiteness = (r + g + b) / (3 * 255.0)
                 soft = a / 255.0
                 if whiteness > 0.92 and soft < 0.85:
                     px[x, y] = (r, g, b, int(a * 0.15))
                 elif whiteness > 0.88:
-                    # assombrit le fringe restant pour éviter le flash blanc
                     f = 0.55
                     px[x, y] = (int(r * f), int(g * f), int(b * f), a)
+
+    # 2) choke : blanc/gris clair opaque entre le perso sombre et le vide
+    #    (= vrai halo). On évite le bord d'un tissu blanc massif.
+    for _ in range(2):
+        doomed = []
+        for y in range(h):
+            for x in range(w):
+                r, g, b, a = px[x, y]
+                if a < 160:
+                    continue
+                lum = (r + g + b) / 3.0
+                sat = max(r, g, b) - min(r, g, b)
+                if lum < 200 or sat > 30:
+                    continue
+                if not _has_transparent_neighbor(px, x, y, w, h, 40):
+                    continue
+                # tissu blanc : beaucoup de voisins blancs → on garde
+                if _white_neighbor_count(px, x, y, w, h, 2) >= 10:
+                    continue
+                # halo typique : collé à un contour/vêtement sombre
+                if has_dark_neighbor(x, y) or lum >= 245:
+                    doomed.append((x, y))
+        for x, y in doomed:
+            r, g, b, _ = px[x, y]
+            px[x, y] = (r, g, b, 0)
+
+    # 3) assombrit les franges grises claires restantes en bordure
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a < 30 or a >= 250:
+                continue
+            if not _has_transparent_neighbor(px, x, y, w, h, 30):
+                continue
+            lum = (r + g + b) / 3.0
+            if lum > 200 and abs(r - g) < 18 and abs(g - b) < 18:
+                px[x, y] = (r, g, b, int(a * 0.2))
+    return out
+
+
+def remove_foot_shadow(im: Image.Image) -> Image.Image:
+    """Enlève l'ombre douce sous les pieds (souvent un halo gris/blanc)."""
+    out = im.convert("RGBA")
+    w, h = out.size
+    px = out.load()
+    y0 = int(h * 0.88)
+    for y in range(y0, h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a < 8:
+                continue
+            # opaque = chaussure / pantalon — ne jamais toucher
+            if a >= 230:
+                continue
+            lum = (r + g + b) / 3.0
+            sat = max(r, g, b) - min(r, g, b)
+            # ombre : gris clair/moyen, faible saturation, semi-transparent
+            if sat <= 22 and lum >= 100:
+                px[x, y] = (r, g, b, 0)
     return out
 
 
@@ -218,6 +326,9 @@ def process_one(src: Path, dst: Path):
     norm = normalize(cut)
     if FOOT_ALIGN:
         norm = anchor_feet(norm)
+    # le resize LANCZOS recrée un léger halo — second passage léger
+    norm = despill_white_fringe(norm)
+    norm = remove_foot_shadow(norm)
     dst.parent.mkdir(parents=True, exist_ok=True)
     norm.save(dst)
     print(f"  {src.name} → {dst}")

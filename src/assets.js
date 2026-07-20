@@ -42,8 +42,34 @@ function initSprites() {
   initMapHoun();
   initMapMatin();
   initMapAshram();
-  SPRITES.mapBosphore = loadMapPack("bosphore", { skyline: "skyline.png", far: "far.png", thumb: "thumb.png" });
-  SPRITES.mapAmazon = loadMapPack("amazon", { skyline: "skyline.png", far: "far.png", thumb: "thumb.png" });
+  initMapBosphore();
+  initMapAmazon();
+}
+
+/** Pack fond / props Amazonie Dorée (terrain Jair). */
+function initMapAmazon() {
+  SPRITES.mapAmazon = loadMapPack("amazon", {
+    skyline: "skyline.png", far: "far.png",
+    flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png"
+  });
+}
+
+function mapAmazonReady() {
+  const p = SPRITES.mapAmazon;
+  return !!(p && spriteReady(p.skyline));
+}
+
+/** Pack fond / props Palais du Bosphore (terrain Sultan). */
+function initMapBosphore() {
+  SPRITES.mapBosphore = loadMapPack("bosphore", {
+    skyline: "skyline.png", far: "far.png",
+    flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png"
+  });
+}
+
+function mapBosphoreReady() {
+  const p = SPRITES.mapBosphore;
+  return !!(p && spriteReady(p.skyline));
 }
 
 /** Pack fond / props Place du Matin (terrain Panda). */

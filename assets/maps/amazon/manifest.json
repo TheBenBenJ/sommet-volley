@@ -1,10 +1,8 @@
 {
   "key": "amazon",
-  "name": "Amazonie Dor\u00e9e",
-  "layers": [
-    "far",
-    "skyline"
-  ],
-  "props": [],
+  "name": "Amazonie Dorée",
+  "layers": ["far", "skyline"],
+  "props": ["flag", "warn", "net_post"],
+  "notes": "Amazonie Dorée — jungle / terre battue / vert-jaune. Public (crowd_0) en raw seulement, non affiché.",
   "thumb": "thumb.png"
 }

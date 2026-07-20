@@ -1,10 +1,8 @@
 {
   "key": "bosphore",
   "name": "Palais du Bosphore",
-  "layers": [
-    "far",
-    "skyline"
-  ],
-  "props": [],
+  "layers": ["far", "skyline"],
+  "props": ["flag", "warn", "net_post"],
+  "notes": "Palais du Bosphore — quay / mosquée / bannières pourpres. Public (crowd_0) en raw seulement, non affiché.",
   "thumb": "thumb.png"
 }

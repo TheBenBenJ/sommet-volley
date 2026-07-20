@@ -27,11 +27,8 @@ function drawBgPlage() {
   const storm = weather === "storm";
   const raining = weather === "rain" || storm;
   const tk = TERRAINS[terrain] && TERRAINS[terrain].key;
-  if (tk === "amazon" && SPRITES.mapAmazon && spriteReady(SPRITES.mapAmazon.skyline)) {
-    drawBgSkylinePack(SPRITES.mapAmazon, performance.now() / 1000, raining, storm, {
-      ground0: raining ? "#5a7a40" : "#7a9a50",
-      ground1: raining ? "#3a5a28" : "#5a7a38"
-    });
+  if (tk === "amazon" && typeof mapAmazonReady === "function" && mapAmazonReady()) {
+    drawBgAmazonPng(performance.now() / 1000, raining, storm);
     return;
   }
   if (typeof mapTrompetteReady === "function" && mapTrompetteReady() && tk !== "amazon") {
@@ -39,6 +36,62 @@ function drawBgPlage() {
     return;
   }
   drawBgPlageCanvas(raining, storm);
+}
+
+/** Amazonie Dorée PNG (Jair) — jungle, terre battue, bannières vert-jaune. */
+function drawBgAmazonPng(t, raining, storm) {
+  const p = SPRITES.mapAmazon;
+
+  if (spriteReady(p.far)) {
+    ctx.globalAlpha = storm ? 0.55 : 0.8;
+    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    ctx.globalAlpha = 1;
+  }
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+
+  if (storm) {
+    ctx.fillStyle = "rgba(40,60,30,0.35)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  } else if (raining) {
+    ctx.fillStyle = "rgba(50,70,40,0.18)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  }
+
+  // Public désactivé pour l’instant (crowd en raw seulement)
+
+  // Sol terre battue / herbe
+  const dirt = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
+  if (raining) {
+    dirt.addColorStop(0, "#5a7a40");
+    dirt.addColorStop(1, "#3a5a28");
+  } else {
+    dirt.addColorStop(0, "#8a9a50");
+    dirt.addColorStop(1, "#5a7a38");
+  }
+  ctx.fillStyle = dirt;
+  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
+  ctx.fillStyle = "rgba(0,0,0,0.08)";
+  ctx.fillRect(0, GROUND_Y, W, 2);
+
+  // bordure vert / or
+  ctx.fillStyle = "#2e7d32";
+  ctx.fillRect(0, GROUND_Y - 41, W, 3);
+  ctx.fillStyle = "#f9a825";
+  ctx.fillRect(0, GROUND_Y - 38, W, 1);
+
+  // Bannières vert-jaune
+  if (spriteReady(p.flag)) {
+    const bob = Math.sin(t * 2.05) * 2;
+    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, 96);
+    ctx.save();
+    ctx.translate(W - 70, 0);
+    ctx.scale(-1, 1);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, 96);
+    ctx.restore();
+  }
+
+  if (raining) drawRain(storm ? 1 : 0.55);
+  drawMapEventOverlay();
 }
 
 /** Fond générique far + skyline + sol (nouveaux terrains). */
@@ -115,6 +168,62 @@ function drawBgMatinPng(t, raining, storm) {
     ctx.translate(W - 72, 0);
     ctx.scale(-1, 1);
     drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, 96);
+    ctx.restore();
+  }
+
+  if (raining) drawRain(storm ? 1 : 0.55);
+  drawMapEventOverlay();
+}
+
+/** Palais du Bosphore PNG (Sultan) — quay, mosquée, bannières pourpres. */
+function drawBgBosphorePng(t, raining, storm) {
+  const p = SPRITES.mapBosphore;
+
+  if (spriteReady(p.far)) {
+    ctx.globalAlpha = storm ? 0.55 : 0.8;
+    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    ctx.globalAlpha = 1;
+  }
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+
+  if (storm) {
+    ctx.fillStyle = "rgba(50,60,80,0.32)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  } else if (raining) {
+    ctx.fillStyle = "rgba(70,80,100,0.16)";
+    ctx.fillRect(0, 0, W, GROUND_Y);
+  }
+
+  // Public désactivé pour l’instant (crowd en raw seulement)
+
+  // Sol pavé clair / pierre
+  const pave = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
+  if (raining) {
+    pave.addColorStop(0, "#8a8070");
+    pave.addColorStop(1, "#5a5040");
+  } else {
+    pave.addColorStop(0, "#d0c4b0");
+    pave.addColorStop(1, "#b0a090");
+  }
+  ctx.fillStyle = pave;
+  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
+  ctx.fillStyle = "rgba(0,0,0,0.08)";
+  ctx.fillRect(0, GROUND_Y, W, 2);
+
+  // bordure pourpre / or
+  ctx.fillStyle = "#6a1b9a";
+  ctx.fillRect(0, GROUND_Y - 41, W, 3);
+  ctx.fillStyle = "#c9a227";
+  ctx.fillRect(0, GROUND_Y - 38, W, 1);
+
+  // Bannières pourpres
+  if (spriteReady(p.flag)) {
+    const bob = Math.sin(t * 2.0) * 2;
+    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, 100);
+    ctx.save();
+    ctx.translate(W - 70, 0);
+    ctx.scale(-1, 1);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, 100);
     ctx.restore();
   }
 
@@ -854,11 +963,8 @@ function drawBgPrairie() {
     drawBgMatinPng(t, raining, storm);
     return;
   }
-  if (tk === "bosphore" && SPRITES.mapBosphore && spriteReady(SPRITES.mapBosphore.skyline)) {
-    drawBgSkylinePack(SPRITES.mapBosphore, t, raining, storm, {
-      ground0: raining ? "#8a8070" : "#c8b898",
-      ground1: raining ? "#5a5040" : "#a09070"
-    });
+  if (tk === "bosphore" && typeof mapBosphoreReady === "function" && mapBosphoreReady()) {
+    drawBgBosphorePng(t, raining, storm);
     return;
   }
   if (typeof mapMicronReady === "function" && mapMicronReady() && tk === "prairie") {
@@ -1173,6 +1279,12 @@ function terrainNetPostImg() {
   }
   if (key === "ashram" && SPRITES.mapAshram && spriteReady(SPRITES.mapAshram.netPost)) {
     return SPRITES.mapAshram.netPost;
+  }
+  if (key === "bosphore" && SPRITES.mapBosphore && spriteReady(SPRITES.mapBosphore.netPost)) {
+    return SPRITES.mapBosphore.netPost;
+  }
+  if (key === "amazon" && SPRITES.mapAmazon && spriteReady(SPRITES.mapAmazon.netPost)) {
+    return SPRITES.mapAmazon.netPost;
   }
   return null;
 }
