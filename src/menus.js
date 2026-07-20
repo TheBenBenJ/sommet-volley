@@ -314,14 +314,17 @@ function makeMenuActor(side, charIdx) {
   const a = CHARACTERS[charIdx];
   const minX = side === 0 ? 70 : NET_X + 55;
   const maxX = side === 0 ? NET_X - 55 : W - 70;
+  // Vitesse en px/frame rendu — assez pour que la foulée soit visible
+  const spd = 1.4;
   return {
     x: side === 0 ? W * 0.22 : W * 0.78,
     y: GROUND_Y, side, charId: charIdx,
     color: a.color, darkColor: a.darkColor,
     onGround: true, vx: 0, vy: 0,
-    dispVx: side === 0 ? 1.0 : -1.0,
+    dispVx: side === 0 ? spd : -spd,
     walkPhase: Math.random() * 24, squash: 0,
     _walking: true, _faceRight: side === 0, _faceLock: 0,
+    _walkAcc: 0,
     minX, maxX, hopT: 90 + Math.floor(Math.random() * 160)
   };
 }
@@ -332,17 +335,26 @@ function ensureMenuBackdrop() {
 }
 
 function tickMenuActors() {
+  // ~16 px par frame d'anim → ~64 px / cycle (4 frames) : plus de « sur place »
+  const STRIDE = 16;
   for (const b of [menuActors.L, menuActors.R]) {
     if (!b) continue;
-    // ~0.22 px/frame : assez pour avancer, plus doux qu'en jeu
-    b.x += b.dispVx * 0.22;
-    if (b.x <= b.minX) { b.x = b.minX; b.dispVx = Math.abs(b.dispVx); }
-    if (b.x >= b.maxX) { b.x = b.maxX; b.dispVx = -Math.abs(b.dispVx); }
-    b.vx = b.dispVx; // pour orientation sprite (charFaceRight)
-    b._faceRight = b.dispVx >= 0;
-    // Cadence alignée sur le déplacement (~1 frame / 12 ticks)
-    b._walkTick = (b._walkTick || 0) + 1;
-    if (b._walkTick % 12 === 0) b.walkPhase += 1;
+    const spd = Math.max(1.2, Math.abs(b.dispVx) || 1.4);
+    let dir = b.dispVx >= 0 ? 1 : -1;
+    b.x += dir * spd;
+    if (b.x <= b.minX) { b.x = b.minX; dir = 1; }
+    if (b.x >= b.maxX) { b.x = b.maxX; dir = -1; }
+    b.dispVx = dir * spd;
+    b.vx = b.dispVx;
+    b._faceRight = dir > 0;
+    b._faceLock = 0;
+    b._walking = true;
+    // Animation pilotée par la distance (pas un timer découplé)
+    b._walkAcc = (b._walkAcc || 0) + spd;
+    while (b._walkAcc >= STRIDE) {
+      b._walkAcc -= STRIDE;
+      b.walkPhase += 1;
+    }
     b.hopT--;
     if (b.hopT <= 0 && b.onGround) {
       b.vy = -3.4; b.onGround = false; b.hopT = 200 + Math.floor(Math.random() * 220);
