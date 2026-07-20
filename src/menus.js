@@ -1642,7 +1642,7 @@ function drawSelectBall() {
     const px = startX + i * (pw + gap);
     const code = "Digit" + (i + 1);
     hit(px + pw / 2, py + ph / 2, pw, ph + 40, code);
-    const sel = (padConnected && navIdx === i) || isHover(code);
+    const sel = (navIdx === i) || isHover(code);
 
     ctx.fillStyle = "rgba(255,255,255,0.04)";
     ctx.beginPath();
