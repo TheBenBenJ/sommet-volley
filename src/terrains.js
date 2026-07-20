@@ -239,16 +239,16 @@ function drawResortCart(t) {
   const horn = !mapEventsQuiet &&
     (mapEvent.phase === "fire" || (mapEvent.phase === "flying" && mapEvent.t < 18));
   const img = horn && spriteReady(p.cartHorn) ? p.cartHorn : p.cart;
-  // Midground : un peu au-dessus du sol joueurs (plus bas qu'avant)
-  const footY = GROUND_Y - 110;
+  // Midground : entre le gazon du premier plan et la barrière
+  const footY = GROUND_Y - 148;
   const drawH = 78;
   let a = 1;
   if (cx < 50) a = Math.max(0, (cx + 70) / 120);
   if (cx > W - 50) a = Math.min(a, Math.max(0, (W + 70 - cx) / 120));
   ctx.save();
   ctx.globalAlpha = a;
-  // Sprite face droite : miroir si jamais cartDir < 0 (pas de marche arrière)
-  if (mapEvent.cartDir < 0) {
+  // Sprite PNG face à GAUCHE : miroir quand on roule vers la droite
+  if (mapEvent.cartDir > 0) {
     ctx.translate(cx, 0);
     ctx.scale(-1, 1);
     drawMapProp(img, 0, footY, drawH);
