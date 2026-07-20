@@ -27,9 +27,9 @@ const TOUCH_COOLDOWN = 12;   // ticks mini entre deux touches comptées (anti do
 // --- Gameplay V2 (réception / tir dirigé / smash) — voir docs/GAMEPLAY-V2.md ---
 // Toggle runtime : touche ` (Backquote) hors saisie de code.
 let GAMEPLAY_V2 = true;
-const RECEIVE_R = 52;          // smash/X intentionnel (fenêtre serrée)
-const AUTO_LOB_DX = 22;        // auto-cloche : balle quasi au-dessus du joueur
-const AUTO_LOB_R = 34;         // auto-cloche : rayon path tête (balle qui tombe dessus)
+const RECEIVE_R = 64;          // smash/X + cloche intentionnelle (fenêtre un peu généreuse)
+const AUTO_LOB_DX = 28;        // auto-cloche : balle quasi au-dessus du joueur
+const AUTO_LOB_R = 42;         // auto-cloche : rayon path tête (balle qui tombe dessus)
 const HOLD_MAX = 45;           // ~0,75 s de contrôle
 const HOLD_SPEED_MUL = 0.6;    // vitesse du porteur pendant le contrôle
 const AIM_CONE = (150 * Math.PI) / 180;
