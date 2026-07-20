@@ -206,10 +206,7 @@ function drawBgPlagePng(t, raining, storm) {
   // Public désactivé pour l’instant (pas de crowd_0 / pas de drawCrowd)
 
   drawCourtApron(raining ? "#6a8f4e" : "#8fbc6a", raining ? "#4a6a38" : "#6a9a48");
-
-  // balustrade décorative (au-dessus de la ligne de fond PNG)
-  ctx.fillStyle = "#c9a227";
-  ctx.fillRect(0, GROUND_Y - 41, W, 1);
+  // Pas de trait or code : la barrière est déjà dans le skyline PNG
   drawCourtSeam("#e8e4d8", "rgba(0,0,0,0.18)");
 
   // Pas de palmier « prop » : le fond a déjà ses éléments géants —
