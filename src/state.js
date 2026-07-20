@@ -61,7 +61,7 @@ const CHARACTERS = [
 ];
 function charOf(b) { return CHARACTERS[b.charId]; }
 
-// Charge les manifests sprites (01c-chars.js) une fois le roster connu
+// Charge les manifests sprites (char-sprites.js) une fois le roster connu
 if (typeof initCharSprites === "function") initCharSprites();
 
 function characterIndices() {

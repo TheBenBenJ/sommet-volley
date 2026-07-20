@@ -4,7 +4,7 @@
 // ---------- Audio (bips simples) ----------
 let audioCtx = null;
 // volume général (0..1, persisté — voir loadSettings/saveSettings dans
-// 17-main.js) : tous les sons/la musique passent par ce gain unique, pour
+// main.js) : tous les sons/la musique passent par ce gain unique, pour
 // qu'un seul réglage contrôle tout au lieu de recalculer chaque volume.
 let volume = 1;
 let masterGain = null;
@@ -26,7 +26,7 @@ function setVolume(v) {
 
 // ---------- Réglages persistés (son/musique/volume) ----------
 // Simple confort : sans ça, on repart à zéro (son ON, 100%) à chaque
-// rechargement de page — `muted` est déclaré plus tard (04-state.js), mais
+// rechargement de page — `muted` est déclaré plus tard (state.js), mais
 // ces fonctions ne s'exécutent qu'au runtime, une fois tous les modules
 // chargés, donc la référence est sûre.
 const SETTINGS_KEY = "sommetVolleySettings";

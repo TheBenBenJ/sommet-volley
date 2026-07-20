@@ -89,7 +89,7 @@ function render() {
   ctx.setTransform(viewScale, 0, 0, viewScale, 0, 0);
   // zones cliquables (souris) : celles de cette frame passent en "précédentes"
   // (utilisées pour le survol/clic), on repart de zéro pour en reconstruire
-  // de nouvelles au fil du tracé — voir hit()/isHover() dans 12-menus.js.
+  // de nouvelles au fil du tracé — voir hit()/isHover() dans menus.js.
   menuHitboxesPrev = menuHitboxes; menuHitboxes = [];
   // décroissance des éléments purement visuels
   // ola sonore : rugissement quand la ferveur bondit (point/smash)

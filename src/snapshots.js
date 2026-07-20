@@ -3,7 +3,7 @@
 
 // ---------- Instantanés (préparation du mode en ligne) ----------
 // L'hôte envoie périodiquement getSnapshot() ; l'invité applique les champs
-// discrets + interpole les poses (voir 15-net.js). Voir MULTIJOUEUR.md.
+// discrets + interpole les poses (voir net.js). Voir MULTIJOUEUR.md.
 
 // Soft ownership : la balle est-elle assez profondément dans le camp droit
 // pour que l'invité la simule ? (hôte exclusive près du filet)

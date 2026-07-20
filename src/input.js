@@ -20,14 +20,14 @@ window.addEventListener("keyup", e => { keys[e.code] = false; });
 
 // ---------- Souris (navigation des menus) ----------
 // Convertit une position écran (px CSS) en repère logique 900×500 : le canvas
-// est affiché à une taille CSS variable (voir resizeCanvas() dans 01-core.js),
+// est affiché à une taille CSS variable (voir resizeCanvas() dans core.js),
 // donc on ne peut pas comparer directement clientX/Y aux coordonnées de jeu.
 let mouseX = -1, mouseY = -1, mouseActive = false;
 function toGameXY(clientX, clientY) {
   const rect = canvas.getBoundingClientRect();
   return { x: (clientX - rect.left) / rect.width * W, y: (clientY - rect.top) / rect.height * H };
 }
-// portée globale (pas seulement dans le bloc ci-dessous) : les menus (12-menus.js)
+// portée globale (pas seulement dans le bloc ci-dessous) : les menus (menus.js)
 // s'en servent pour adapter le texte d'aide (clavier/manette/tactile).
 const hasTouch = (typeof window !== "undefined") &&
   (("ontouchstart" in window) || (navigator && navigator.maxTouchPoints > 0));

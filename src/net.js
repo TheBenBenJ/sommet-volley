@@ -704,7 +704,7 @@ function hostUpdate2v2() {
     pointTimer--;
     // n'importe quel joueur connecté (hôte ou invité) peut faire avancer
     // l'écran "Point pour ..." en appuyant sur saut/confirmation, comme
-    // hors-ligne (voir update() dans 13-simulation.js) — sinon, filet de
+    // hors-ligne (voir update() dans simulation.js) — sinon, filet de
     // sécurité au bout de POINT_MAX_WAIT.
     const elapsed = POINT_MAX_WAIT - pointTimer;
     const guestWants = guests.some(g => g.connected && g.in.jump);

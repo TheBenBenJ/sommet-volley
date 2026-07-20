@@ -64,20 +64,22 @@ Structure principale :
 
 | Fichier | Rôle |
 |---------|------|
-| `index.html` | Page d’accueil, charge les scripts `src/` |
-| `src/01-core.js` | Constantes, canvas, RNG seedé |
-| `src/01b-assets.js` | Sprites PNG (balle, maps) |
-| `src/01c-chars.js` | Pipeline sprites personnages |
-| `src/02-audio.js` | Sons, musique chiptune, volume |
-| `src/04-state.js` | Terrains, casting, Blob, supers |
-| `src/05-chars.js` | Rendu personnages (sprites + fallback) |
-| `src/06-physics.js` | Balle & collisions |
-| `src/08-ai.js` | IA |
-| `src/11-terrains.js` | Décors des maps |
-| `src/12-menus.js` | Menus & sélection |
-| `src/13-simulation.js` | Boucle de jeu déterministe |
-| `src/15-net.js` | Multijoueur PeerJS |
+| `index.html` | Page d’accueil, charge les scripts `src/` dans l’ordre |
+| `src/core.js` | Constantes, canvas, RNG seedé |
+| `src/assets.js` | Sprites PNG (balle, maps) |
+| `src/char-sprites.js` | Pipeline sprites personnages |
+| `src/audio.js` | Sons, musique chiptune, volume |
+| `src/state.js` | Terrains, casting, Blob, supers |
+| `src/characters.js` | Rendu personnages (sprites + fallback) |
+| `src/physics.js` | Balle & collisions |
+| `src/ai.js` | IA |
+| `src/terrains.js` | Décors des maps |
+| `src/menus.js` | Menus & sélection |
+| `src/simulation.js` | Boucle de jeu déterministe |
+| `src/net.js` | Multijoueur PeerJS |
 | `docs/` | Vision, gameplay V2, architecture, pipeline perso |
+
+Liste complète et ordre de dépendance : [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Déploiement
 

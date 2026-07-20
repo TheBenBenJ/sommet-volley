@@ -29,7 +29,7 @@
     max-height: 100vh;
   }
   /* Contrôles tactiles (mobile) : superposés au canvas, pilotés depuis
-     03-input.js. Masqués par défaut — affichés en JS uniquement sur un
+     input.js. Masqués par défaut — affichés en JS uniquement sur un
      appareil tactile et pendant une manche jouable (voir touchKeySet()). */
   #touchControls { position: absolute; inset: 0; display: none; pointer-events: none; }
   #touchControls.tc-visible { display: block; }
@@ -68,31 +68,30 @@
      Si le CDN est inaccessible, le jeu reste jouable hors ligne : seul le mode
      en ligne affichera un message d'erreur. -->
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<!-- Modules du jeu, chargés dans l’ordre de dépendance (voir README).
-     Scripts classiques : ils partagent le même scope global, comme
-     l’ancien fichier unique — le découpage est purement organisationnel. -->
+<!-- Modules du jeu — ordre de dépendance explicite (voir docs/ARCHITECTURE.md).
+     Scripts classiques : même scope global ; noms de fichiers sans préfixe numérique. -->
 <!-- ?v=DEV : anti-cache — remplacé par le SHA du commit au déploiement (voir
      .github/workflows/deploy.yml) pour que chaque push serve du frais, même
      à un navigateur qui aurait mis les scripts en cache. -->
-<script src="src/00-version.js?v=DEV"></script>
-<script src="src/01-core.js?v=DEV"></script>
-<script src="src/01b-assets.js?v=DEV"></script>
-<script src="src/01c-chars.js?v=DEV"></script>
-<script src="src/02-audio.js?v=DEV"></script>
-<script src="src/03-input.js?v=DEV"></script>
-<script src="src/04-state.js?v=DEV"></script>
-<script src="src/05-chars.js?v=DEV"></script>
-<script src="src/06-physics.js?v=DEV"></script>
-<script src="src/07-scoring.js?v=DEV"></script>
-<script src="src/08-ai.js?v=DEV"></script>
-<script src="src/09-particles.js?v=DEV"></script>
-<script src="src/10-scenery.js?v=DEV"></script>
-<script src="src/11-terrains.js?v=DEV"></script>
-<script src="src/12-menus.js?v=DEV"></script>
-<script src="src/13-simulation.js?v=DEV"></script>
-<script src="src/14-snapshots.js?v=DEV"></script>
-<script src="src/15-net.js?v=DEV"></script>
-<script src="src/16-render.js?v=DEV"></script>
-<script src="src/17-main.js?v=DEV"></script>
+<script src="src/version.js?v=DEV"></script>
+<script src="src/core.js?v=DEV"></script>
+<script src="src/assets.js?v=DEV"></script>
+<script src="src/char-sprites.js?v=DEV"></script>
+<script src="src/audio.js?v=DEV"></script>
+<script src="src/input.js?v=DEV"></script>
+<script src="src/state.js?v=DEV"></script>
+<script src="src/characters.js?v=DEV"></script>
+<script src="src/physics.js?v=DEV"></script>
+<script src="src/scoring.js?v=DEV"></script>
+<script src="src/ai.js?v=DEV"></script>
+<script src="src/particles.js?v=DEV"></script>
+<script src="src/scenery.js?v=DEV"></script>
+<script src="src/terrains.js?v=DEV"></script>
+<script src="src/menus.js?v=DEV"></script>
+<script src="src/simulation.js?v=DEV"></script>
+<script src="src/snapshots.js?v=DEV"></script>
+<script src="src/net.js?v=DEV"></script>
+<script src="src/render.js?v=DEV"></script>
+<script src="src/main.js?v=DEV"></script>
 </body>
 </html>

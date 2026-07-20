@@ -257,4 +257,4 @@ function drawSpriteCharMenu(b) {
   return drawSpriteChar(b);
 }
 
-// initCharSprites() est appelé depuis 04-state.js (après CHARACTERS).
+// initCharSprites() est appelé depuis state.js (après CHARACTERS).

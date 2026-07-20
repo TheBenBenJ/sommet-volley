@@ -6,7 +6,7 @@ name: Deploy
 #
 # Même serveur que crabby-volley, autre WEB_ROOT / URL (secrets DEPLOY_*).
 #
-# Versionnage (SemVer x.y.z, voir package.json + src/00-version.js) : le job
+# Versionnage (SemVer x.y.z, voir package.json + src/version.js) : le job
 # "deploy" incrémente automatiquement le PATCH à chaque push et repousse ce
 # commit sur main — le message contient "[skip ci]" pour ne pas redéclencher
 # une passe de test/déploiement sur ce commit-là (sinon boucle infinie). Les
@@ -50,7 +50,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Incrémente la version (patch) — package.json + src/00-version.js
+      - name: Incrémente la version (patch) — package.json + src/version.js
         run: |
           node -e "
             const fs = require('fs');
@@ -59,7 +59,7 @@ jobs:
             parts[2]++;
             pkg.version = parts.join('.');
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
-            fs.writeFileSync('src/00-version.js',
+            fs.writeFileSync('src/version.js',
               '// sommet-volley · version du jeu (générée automatiquement au déploiement\n' +
               '// — voir .github/workflows/deploy.yml — ne pas éditer à la main)\n' +
               '\"use strict\";\n' +
@@ -68,7 +68,7 @@ jobs:
           "
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add package.json src/00-version.js
+          git add package.json src/version.js
           git commit -m "chore: bump version to $(node -p "require('./package.json').version") [skip ci]"
           git push
 

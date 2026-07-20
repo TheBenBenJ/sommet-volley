@@ -3,7 +3,7 @@
 
 /**
  * Dessine un personnage (Blob de jeu ou aperçu menu).
- * Priorité : sprites PNG (`01c-chars.js`) ; sinon silhouettes canvas.
+ * Priorité : sprites PNG (`char-sprites.js`) ; sinon silhouettes canvas.
  */
 function drawCharacter(b) {
   const A = CHARACTERS[b.charId];

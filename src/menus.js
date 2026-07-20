@@ -58,8 +58,8 @@ function handleMenuKeys(code, key) {
     // (2v2 : toi + IA coéquipière vs 2 IA, en solo ; ou 2v2 hébergé, en ligne)
     // n'a de sens QUE là où deux formats existent réellement — pas en
     // multijoueur local, qui ne prend en charge que le 1v1 (voir
-    // update()/aiInput2v2 dans 08-ai.js/13-simulation.js, et hostStartMatch2v2
-    // dans 15-net.js). La Bombe est un MODIFICATEUR, pas un format à part :
+    // update()/aiInput2v2 dans ai.js/simulation.js, et hostStartMatch2v2
+    // dans net.js). La Bombe est un MODIFICATEUR, pas un format à part :
     // elle pose sa propre sous-question 1v1/équipes quand celle-ci a un sens
     // (voir "bombFormat"), sinon (local) va direct à la durée de mèche.
     const teamChoice = pendingMode.vsAI || pendingMode.online;
@@ -203,8 +203,8 @@ function startCharacterSelect() {
 }
 
 // bascule le format "en équipes" sur le bon champ selon qu'on est en ligne
-// (o2v2 -> lobby/hébergement 2v2, voir hostStartMatch2v2 dans 15-net.js) ou
-// solo vs IA (mode2v2 -> toi + IA coéquipière vs 2 IA, voir 13-simulation.js).
+// (o2v2 -> lobby/hébergement 2v2, voir hostStartMatch2v2 dans net.js) ou
+// solo vs IA (mode2v2 -> toi + IA coéquipière vs 2 IA, voir simulation.js).
 function setTeamMode(v) {
   if (pendingMode.online) pendingMode.o2v2 = v;
   else pendingMode.mode2v2 = v;
@@ -217,7 +217,7 @@ function commitSetup() {
   bombMode = !!pendingMode.bomb;
   bombTime = pendingMode.bombTime || BOMB_TIME;
   if (pendingMode.online) {
-    // l'hôte diffusera bombMode/bombTime dans son message "start" (voir 15-net.js)
+    // l'hôte diffusera bombMode/bombTime dans son message "start" (voir net.js)
     if (pendingMode.o2v2) { state = "hostLobby"; initHostPeer2v2(); }
     else { state = "hostWait"; initHostPeer(); }
   } else {

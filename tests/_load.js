@@ -1,13 +1,34 @@
 // Chargeur de test headless.
-// Concatène les modules de src/ DANS L'ORDRE (comme le navigateur charge les
-// <script>), les évalue dans un environnement Node avec un canvas factice,
-// et expose les internes du jeu pour les assertions.
-//
-// C'est le même code que celui servi au navigateur : si ces tests passent,
-// le découpage en modules n'a rien changé au comportement.
+// Concatène les modules de src/ DANS L'ORDRE (comme index.html), les évalue
+// dans un environnement Node avec un canvas factice, et expose les internes
+// du jeu pour les assertions.
 "use strict";
 const fs = require("fs");
 const path = require("path");
+
+/** Ordre de chargement — doit rester aligné avec index.html. */
+const SRC_ORDER = [
+  "version.js",
+  "core.js",
+  "assets.js",
+  "char-sprites.js",
+  "audio.js",
+  "input.js",
+  "state.js",
+  "characters.js",
+  "physics.js",
+  "scoring.js",
+  "ai.js",
+  "particles.js",
+  "scenery.js",
+  "terrains.js",
+  "menus.js",
+  "simulation.js",
+  "snapshots.js",
+  "net.js",
+  "render.js",
+  "main.js"
+];
 
 // --- canvas / navigateur factices (aucun rendu réel) ---
 const noopCtx = new Proxy({}, {
@@ -73,8 +94,16 @@ const EPILOGUE = `
 
 function srcConcat() {
   const dir = path.join(__dirname, "..", "src");
-  const files = fs.readdirSync(dir).filter(f => f.endsWith(".js")).sort();
-  return files.map(f => fs.readFileSync(path.join(dir, f), "utf8")).join("\n");
+  const present = new Set(fs.readdirSync(dir).filter(f => f.endsWith(".js")));
+  const missing = SRC_ORDER.filter(f => !present.has(f));
+  if (missing.length) {
+    throw new Error("SRC_ORDER: fichiers manquants dans src/ : " + missing.join(", "));
+  }
+  const extra = [...present].filter(f => !SRC_ORDER.includes(f));
+  if (extra.length) {
+    throw new Error("SRC_ORDER: fichiers non listés (ajoute-les à SRC_ORDER / index.html) : " + extra.join(", "));
+  }
+  return SRC_ORDER.map(f => fs.readFileSync(path.join(dir, f), "utf8")).join("\n");
 }
 
 // charge une instance NEUVE du jeu (état frais à chaque appel)
@@ -85,4 +114,4 @@ function loadGame() {
   return mod.exports;
 }
 
-module.exports = { loadGame };
+module.exports = { loadGame, SRC_ORDER };

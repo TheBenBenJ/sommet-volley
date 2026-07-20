@@ -6,28 +6,30 @@ revue externe (bibliothèques / forks).
 
 ## Modules (`src/`)
 
+Ordre de chargement (identique à `index.html` et `tests/_load.js`) :
+
 | Fichier | Responsabilité |
 |---------|----------------|
-| `00-version.js` | `GAME_VERSION` (bump CI) |
-| `01-core.js` | Constantes, canvas Hi-DPI, RNG seedé |
-| `01b-assets.js` | Chargement sprites maps / ballon |
-| `01c-chars.js` | Pipeline sprites personnages (`assets/<key>/`) |
-| `02-audio.js` | SFX + musique |
-| `03-input.js` | Clavier + Gamepad |
-| `04-state.js` | `CHARACTERS`, `TERRAINS`, `Blob`, état de partie |
-| `05-chars.js` | Rendu perso (sprites + fallback) + FX SUPER |
-| `06-physics.js` | Balle, collisions, service, filet |
-| `07-scoring.js` | Points, streaks, SUPER charge |
-| `08-ai.js` | IA (niveaux) |
-| `09-particles.js` | Particules / marqueurs |
-| `10-scenery.js` | Météo, grip, public |
-| `11-terrains.js` | Décors maps + HUD score |
-| `12-menus.js` | Menus / sélection |
-| `13-simulation.js` | Boucle `stepGame` déterministe |
-| `14-snapshots.js` | Snapshots net |
-| `15-net.js` | PeerJS / host–guest |
-| `16-render.js` | Compose le frame |
-| `17-main.js` | `requestAnimationFrame` |
+| `version.js` | `GAME_VERSION` (bump CI) |
+| `core.js` | Constantes, canvas Hi-DPI, RNG seedé |
+| `assets.js` | Chargement sprites maps / ballon |
+| `char-sprites.js` | Pipeline sprites personnages (`assets/<key>/`) |
+| `audio.js` | SFX + musique |
+| `input.js` | Clavier + Gamepad |
+| `state.js` | `CHARACTERS`, `TERRAINS`, `Blob`, état de partie |
+| `characters.js` | Rendu perso (sprites + fallback) + FX SUPER |
+| `physics.js` | Balle, collisions, service, filet |
+| `scoring.js` | Points, streaks, SUPER charge |
+| `ai.js` | IA (niveaux) |
+| `particles.js` | Particules / marqueurs |
+| `scenery.js` | Météo, grip, public |
+| `terrains.js` | Décors maps + HUD score |
+| `menus.js` | Menus / sélection |
+| `simulation.js` | Boucle `stepGame` déterministe |
+| `snapshots.js` | Snapshots net |
+| `net.js` | PeerJS / host–guest |
+| `render.js` | Compose le frame |
+| `main.js` | `requestAnimationFrame` |
 
 ## Conventions
 
@@ -35,7 +37,7 @@ revue externe (bibliothèques / forks).
 - Simulation à **tick fixe 60 Hz** (`STEP`) — pas d’horloge murale dans la logique.
 - Identifiant perso : `blob.charId` → entrée de `CHARACTERS[]`.
 - Terrains : `TERRAINS[].character` = index du perso « maison ».
-- Tests headless : `tests/_load.js` concatène `src/*.js` (tri alpha).
+- Tests headless : `tests/_load.js` concatène `src/` via `SRC_ORDER` (pas de tri alpha).
 
 ## Hors scope volontaire
 
