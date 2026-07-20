@@ -1468,13 +1468,13 @@ function drawSelectCharacter() {
   const n = vis.length;
   const grid = (typeof menuNavGrid === "function" ? menuNavGrid(n) : null) || { cols: n, rows: 1 };
   const cols = grid.cols, rows = grid.rows;
-  const gapX = 14, gapY = 12;
-  const pw = Math.min(200, Math.floor((W - 36 - (cols - 1) * gapX) / cols));
-  const ph = rows === 1 ? 340 : 168;
+  const gapX = 12, gapY = 10;
+  const pw = Math.min(210, Math.floor((W - 32 - (cols - 1) * gapX) / cols));
+  const ph = rows === 1 ? 340 : 188;
   const totalW = cols * pw + (cols - 1) * gapX;
   const totalH = rows * ph + (rows - 1) * gapY;
   const ox = (W - totalW) / 2;
-  const oy = Math.max(78, Math.floor((H - totalH) / 2) - 8);
+  const oy = Math.max(72, Math.floor((H - totalH) / 2) - 14);
 
   for (let slot = 0; slot < n; slot++) {
     const i = vis[slot];
@@ -1495,7 +1495,7 @@ function drawSelectCharacter() {
       ctx.stroke();
     }
 
-    const previewY = py + (rows === 1 ? 88 : 58);
+    const previewY = py + (rows === 1 ? 88 : 118);
     const preview = {
       x: cx, y: previewY, groundY: previewY,
       side: selPlayer, color: pcolor, darkColor: pdark,
@@ -1505,7 +1505,7 @@ function drawSelectCharacter() {
     if (isTaken) ctx.globalAlpha = 0.35;
     if (rows > 1) {
       ctx.translate(cx, previewY);
-      ctx.scale(0.72, 0.72);
+      ctx.scale(1.05, 1.05);
       preview.x = 0; preview.y = 0; preview.groundY = 0;
       drawCharacter(preview);
     } else {
@@ -1516,9 +1516,9 @@ function drawSelectCharacter() {
 
     ctx.textAlign = "center";
     ctx.fillStyle = isTaken ? "rgba(255,255,255,0.35)" : UI.ink;
-    const nameSize = rows > 1 ? 12 : (n >= 6 ? 13 : 16);
+    const nameSize = rows > 1 ? 13 : (n >= 6 ? 13 : 16);
     ctx.font = "800 " + nameSize + "px " + UI.display;
-    const nameY = rows > 1 ? py + ph - 48 : py + 118;
+    const nameY = rows > 1 ? py + ph - 42 : py + 118;
     ctx.fillText(isTaken ? "Pris — " + a.name : (slot + 1) + " — " + a.name, cx, nameY);
 
     if (rows === 1) {
@@ -1539,11 +1539,8 @@ function drawSelectCharacter() {
       wrapText(a.superDesc, cx, py + 296, pw - 18, 13);
     } else {
       ctx.fillStyle = UI.gold;
-      ctx.font = "700 11px " + UI.display;
-      ctx.fillText("★ " + a.superName, cx, py + ph - 28);
-      ctx.fillStyle = "rgba(255,246,232,0.75)";
-      ctx.font = "600 10px " + UI.sans;
-      wrapText(a.trait, cx, py + ph - 14, pw - 12, 11);
+      ctx.font = "700 12px " + UI.display;
+      ctx.fillText("★ " + a.superName, cx, py + ph - 22);
     }
   }
 
