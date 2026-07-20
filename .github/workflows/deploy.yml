@@ -114,7 +114,10 @@ jobs:
 
       - name: Vérifier que le site répond
         run: |
-          url="${DEPLOY_URL:-https://ns3104412.ip-37-187-139.eu/sommet-volley/}"
-          code=$(curl -s -o /dev/null -w '%{http_code}' "$url")
-          echo "GET $url → HTTP $code"
+          if [ -z "$DEPLOY_URL" ]; then
+            echo "DEPLOY_URL secret manquant — skip check HTTP"
+            exit 0
+          fi
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$DEPLOY_URL")
+          echo "GET $DEPLOY_URL → HTTP $code"
           test "$code" = "200"

@@ -91,33 +91,21 @@ multijoueur en ligne).
 
 Le workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
 lance les tests puis, s'ils passent, synchronise `index.html` + `src/` +
-`assets/` vers le serveur en SSH (`rsync` via `sudo`) — **même machine que
-Crabby Volley**, autre répertoire web / URL. Il se déclenche à chaque push sur
+`assets/` vers le serveur en SSH (`rsync`). Il se déclenche à chaque push sur
 `main` (ou manuellement via *Run workflow*). Au passage, il remplace le suffixe
 `?v=DEV` des balises `<script>` par le SHA du commit (anti-cache) et incrémente
 le patch SemVer.
 
-Secrets du dépôt (**Settings → Secrets and variables → Actions**) :
+Configurer les secrets du dépôt dans **Settings → Secrets and variables → Actions**
+(ne pas les committer ni les coller ici) :
 
-| Secret | Valeur |
-|--------|--------|
-| `DEPLOY_HOST` | `ns3104412.ip-37-187-139.eu` (même hôte que Crabby) |
-| `DEPLOY_USER` | `ubuntu` |
-| `DEPLOY_SSH_KEY` | même clé que Crabby (`~/.ssh/crabby_deploy`), **en base64** |
-| `DEPLOY_WEB_ROOT` | `/var/www/sommet-volley` |
-| `DEPLOY_URL` | `https://ns3104412.ip-37-187-139.eu/sommet-volley/` |
-
-Prod : <https://ns3104412.ip-37-187-139.eu/sommet-volley/>  
-(nginx : `location /sommet-volley/` → `/var/www/sommet-volley/`, staging `~/sommet-deploy/`)
-
-```bash
-# Une fois `gh auth login` fait, depuis la racine du dépôt :
-gh secret set DEPLOY_HOST -b 'ns3104412.ip-37-187-139.eu'
-gh secret set DEPLOY_USER -b 'ubuntu'
-gh secret set DEPLOY_WEB_ROOT -b '/var/www/sommet-volley'
-gh secret set DEPLOY_URL -b 'https://ns3104412.ip-37-187-139.eu/sommet-volley/'
-gh secret set DEPLOY_SSH_KEY < <(base64 -i ~/.ssh/crabby_deploy)
-```
+| Secret | Rôle |
+|--------|------|
+| `DEPLOY_HOST` | Hôte SSH |
+| `DEPLOY_USER` | Utilisateur SSH |
+| `DEPLOY_SSH_KEY` | Clé privée SSH, encodée en base64 |
+| `DEPLOY_WEB_ROOT` | Répertoire web distant |
+| `DEPLOY_URL` | URL publique après déploiement |
 
 ## Licence
 
