@@ -103,6 +103,7 @@ function render() {
   if (state === "bombFormat") { drawBombFormat(); return; }
   if (state === "bombDuration") { drawBombDuration(); return; }
   if (state === "rules") { drawRules(); return; }
+  if (state === "tutorial") { drawTutorial(); return; }
   if (state === "credits") { drawCredits(); return; }
   if (state === "selectCharacter") { drawSelectCharacter(); return; }
   if (state === "selectTerrain") { drawSelectTerrain(); return; }

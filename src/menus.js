@@ -41,11 +41,21 @@ function handleMenuKeys(code, key) {
       }
     }
     if (code === "KeyR") state = "rules";
+    if (code === "KeyT") { tutorialReset(); state = "tutorial"; }
     if (code === "KeyC") state = "credits";
 
   } else if (state === "credits") {
     if (code === "Escape" || code === "Enter" || code === "Space") goMenu();
 
+  } else if (state === "tutorial") {
+    if (code === "Escape" || code === "Enter" || code === "Space" || code === "KeyT") goMenu();
+    if (code === "TutKey") tutorialTab = "keyboard";
+    if (code === "TutPad") tutorialTab = "pad";
+    if (code === "TutTouch") tutorialTab = "touch";
+    if (code === "TutMouse") tutorialTab = "mouse";
+    if (code === "TutAuto") tutorialTab = "auto";
+    if (code === "TutAim") tutorialAimLob = !tutorialAimLob;
+    if (code === "TutSide") tutorialSide = tutorialSide === 0 ? 1 : 0;
   } else if (state === "aiDifficulty") {
     // Étape 2 (Solo vs IA) : la difficulté choisie amorce pendingMode, complété
     // ensuite par le mode de jeu dans "gameModeSelect".
@@ -622,10 +632,11 @@ function drawMenu() {
     "1  —  Solo",
     "2  —  Multijoueur local",
     "3  —  Multijoueur en ligne",
+    "T  —  Tutoriel",
     "R  —  Règles du jeu",
     "C  —  Crédits"
   ];
-  drawOptionList(items, 210, 42);
+  drawOptionList(items, 200, 38);
 
   uiLabel(controlsHint(), UI.mx, H - 52, 12, controlsHintColor(), 0.3);
   uiLabel("Premier à " + WIN_SCORE + " · 2 pts d'écart · " + MAX_TOUCHES + " touches max",
@@ -728,6 +739,336 @@ function drawBombDuration() {
     "3  —  Posé"
   ];
   drawOptionList(items, 240, 52);
+}
+
+// ---------- Tutoriel : commandes + démo de visée ----------
+let tutorialTab = "auto";       // auto | keyboard | pad | touch | mouse
+let tutorialAimLob = true;      // true = cloche, false = smash
+let tutorialSide = 0;           // 0 = gauche (face droite)
+
+function tutorialReset() {
+  tutorialTab = "auto";
+  tutorialAimLob = true;
+  tutorialSide = 0;
+}
+
+/** Device effectif affiché (auto → détection live). */
+function tutorialDevice() {
+  if (tutorialTab !== "auto") return tutorialTab;
+  if (padConnected) return "pad";
+  if (hasTouch) return "touch";
+  return "keyboard";
+}
+
+/** Entrée live pour la démo de visée (fidèle au device affiché). */
+function tutorialLiveInput() {
+  const dev = tutorialDevice();
+  if (dev === "pad" && padsNow[0]) {
+    const p = padsNow[0];
+    return {
+      left: p.left, right: p.right, up: p.up, down: p.down,
+      ax: p.ax || 0, ay: p.ay || 0,
+      smash: !!p.smash, jump: !!p.jump, super: !!p.superT
+    };
+  }
+  if (dev === "touch") {
+    // Les boutons tactiles écrivent déjà dans keys{}
+    return {
+      left: !!keys["KeyA"], right: !!keys["KeyD"],
+      up: false, down: false, ax: 0, ay: 0,
+      smash: !!(keys["KeyS"] || keys["KeyF"]),
+      jump: !!(keys["KeyW"] || keys["Space"]),
+      super: !!keys["KeyE"]
+    };
+  }
+  // Clavier (et onglet souris : pas de visée gameplay — on montre le clavier)
+  // En jeu réel, up/down clavier ne fillent pas la visée (seulement ←→).
+  const leftSide = tutorialSide === 0;
+  return {
+    left:  leftSide ? !!keys["KeyA"] : !!keys["ArrowLeft"],
+    right: leftSide ? !!keys["KeyD"] : !!keys["ArrowRight"],
+    up: false, down: false, ax: 0, ay: 0,
+    smash: leftSide ? !!(keys["KeyS"] || keys["KeyF"]) : !!(keys["ArrowDown"] || keys["Slash"]),
+    jump:  leftSide ? !!(keys["KeyW"] || keys["Space"]) : !!keys["ArrowUp"],
+    super: leftSide ? !!keys["KeyE"] : !!keys["ShiftRight"]
+  };
+}
+
+function tutorialDemoBlob() {
+  return {
+    x: 0, y: 0, side: tutorialSide, charId: 0,
+    color: CHARACTERS[0].color, darkColor: CHARACTERS[0].darkColor,
+    onGround: true, vx: 0, vy: 0, dispVx: 0, walkPhase: 0, squash: 0,
+    _walking: false, _faceRight: tutorialSide === 0,
+    poseT: 0, poseAnim: null, superT: 0
+  };
+}
+
+function drawTutorialTab(label, code, x, y, w, active) {
+  hit(x, y, w, 28, code);
+  const hov = isHover(code) || active;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(x - w / 2, y - 14, w, 28, 10);
+  else ctx.rect(x - w / 2, y - 14, w, 28);
+  ctx.fillStyle = active ? "rgba(255,216,74,0.95)" : hov ? "rgba(255,246,232,0.55)" : "rgba(255,246,232,0.22)";
+  ctx.fill();
+  ctx.strokeStyle = UI.stroke; ctx.lineWidth = active ? 2.5 : 1.5; ctx.stroke();
+  ctx.fillStyle = UI.stroke;
+  ctx.font = (active ? "800 " : "700 ") + "11px " + UI.sans;
+  ctx.textAlign = "center";
+  ctx.fillText(label, x, y + 4);
+}
+
+function drawTutorialControls(dev, x, y, maxW) {
+  const rows = {
+    keyboard: [
+      ["Déplacement", "Gauche : Q / D    ·    Droite : ← / →"],
+      ["Saut", "Gauche : Z / Espace    ·    Droite : ↑"],
+      ["Smash / cloche (X)", "Gauche : S / F    ·    Droite : ↓ / /"],
+      ["SUPER", "Gauche : E    ·    Droite : Shift droit"],
+      ["Visée", "Tiens ← ou → en frappant pour orienter dans le cône"],
+      ["Pause / son", "P pause · M son · N musique · Échap menu"]
+    ],
+    pad: [
+      ["Déplacement", "Stick gauche ou croix directionnelle"],
+      ["Saut", "Bouton A (ou croix haut)"],
+      ["Smash / cloche (X)", "Boutons X ou Y"],
+      ["SUPER", "Bouton B ou gâchettes"],
+      ["Visée", "Oriente le stick : la flèche suit ton angle dans le cône"],
+      ["Menus", "Stick/croix choisir · A valider · B retour"]
+    ],
+    touch: [
+      ["Déplacement", "Pavé ◀ ▶ en bas à gauche"],
+      ["Saut", "Bouton ⤒"],
+      ["Smash / cloche (X)", "Bouton ⚡"],
+      ["SUPER", "Bouton ★"],
+      ["Visée", "Comme au clavier : direction tenue + frappe"],
+      ["Note", "Pavé visible en partie (solo / en ligne)"]
+    ],
+    mouse: [
+      ["En jeu", "La souris ne pilote PAS le perso"],
+      ["Menus", "Survole et clique les boutons"],
+      ["Visée", "Utilise le clavier, une manette ou le tactile"],
+      ["Astuce", "Branche une manette pour la visée analogique"]
+    ]
+  };
+  const list = rows[dev] || rows.keyboard;
+  let yy = y;
+  ctx.textAlign = "left";
+  for (const [title, body] of list) {
+    ctx.fillStyle = "#7ed957";
+    ctx.font = "800 12px " + UI.sans;
+    ctx.fillText(title, x, yy);
+    yy += 16;
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.font = "12px " + UI.sans;
+    // wrap body
+    const words = body.split(" ");
+    let line = "";
+    for (const w of words) {
+      const test = line ? line + " " + w : w;
+      if (ctx.measureText(test).width > maxW && line) {
+        ctx.fillText(line, x, yy); yy += 15; line = w;
+      } else line = test;
+    }
+    if (line) { ctx.fillText(line, x, yy); yy += 15; }
+    yy += 8;
+  }
+  return yy;
+}
+
+function drawTutorialAimDemo(cx, cy) {
+  const blob = tutorialDemoBlob();
+  blob.x = cx;
+  blob.y = cy;
+
+  const input = tutorialLiveInput();
+  const center = tutorialAimLob
+    ? (blob.side === 0 ? -0.92 : Math.PI + 0.92)
+    : (blob.side === 0 ? -0.45 : Math.PI + 0.45);
+  const aim = tutorialAimLob
+    ? aimLobAngleFromInput(blob, input)
+    : aimAngleFromInput(blob, input);
+  const half = AIM_CONE / 2;
+  const originX = cx;
+  const originY = cy - 52;
+  const R = 78;
+
+  // Sol indicatif
+  ctx.strokeStyle = "rgba(255,246,232,0.25)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(cx - 70, cy + 2);
+  ctx.lineTo(cx + 70, cy + 2);
+  ctx.stroke();
+
+  // Cône de visée
+  ctx.beginPath();
+  ctx.moveTo(originX, originY);
+  ctx.arc(originX, originY, R, center - half, center + half);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(62,181,255,0.18)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(62,181,255,0.55)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Axe central (direction « naturelle »)
+  ctx.beginPath();
+  ctx.moveTo(originX, originY);
+  ctx.lineTo(originX + Math.cos(center) * R, originY + Math.sin(center) * R);
+  ctx.strokeStyle = "rgba(255,246,232,0.35)";
+  ctx.setLineDash([4, 4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Flèche d'aim live
+  const ax = originX + Math.cos(aim) * (R - 6);
+  const ay = originY + Math.sin(aim) * (R - 6);
+  ctx.beginPath();
+  ctx.moveTo(originX, originY);
+  ctx.lineTo(ax, ay);
+  ctx.strokeStyle = UI.gold;
+  ctx.lineWidth = 3.5;
+  ctx.stroke();
+  // pointe
+  const ang = aim;
+  ctx.beginPath();
+  ctx.moveTo(ax, ay);
+  ctx.lineTo(ax - Math.cos(ang - 0.4) * 12, ay - Math.sin(ang - 0.4) * 12);
+  ctx.lineTo(ax - Math.cos(ang + 0.4) * 12, ay - Math.sin(ang + 0.4) * 12);
+  ctx.closePath();
+  ctx.fillStyle = UI.gold;
+  ctx.fill();
+
+  // Trajectoire courte (préviz locale, sans filet réel)
+  ctx.beginPath();
+  ctx.moveTo(originX, originY - 2);
+  let px = originX, py = originY - 2;
+  let pvx = Math.cos(aim) * 9, pvy = Math.sin(aim) * 9;
+  for (let i = 0; i < 28; i++) {
+    pvy += 0.35;
+    px += pvx; py += pvy;
+    ctx.lineTo(px, py);
+    if (py > cy + 4) break;
+  }
+  ctx.strokeStyle = "rgba(255,77,61,0.75)";
+  ctx.lineWidth = 2;
+  ctx.setLineDash([3, 4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Perso
+  drawCharacter(blob);
+
+  // Stick / croix fantôme
+  const stickR = 28;
+  const sx = cx + (blob.side === 0 ? 96 : -96);
+  const sy = cy - 30;
+  ctx.beginPath();
+  ctx.arc(sx, sy, stickR, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,246,232,0.5)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  let sdx = input.ax || 0, sdy = input.ay || 0;
+  if (Math.hypot(sdx, sdy) < 0.18) {
+    sdx = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+    sdy = (input.down ? 1 : 0) - (input.up ? 1 : 0);
+  }
+  const slen = Math.hypot(sdx, sdy);
+  if (slen > 0.05) { sdx /= slen; sdy /= slen; }
+  ctx.beginPath();
+  ctx.arc(sx + sdx * 14, sy + sdy * 14, 9, 0, Math.PI * 2);
+  ctx.fillStyle = slen > 0.12 ? UI.gold : "rgba(255,246,232,0.45)";
+  ctx.fill();
+  ctx.strokeStyle = UI.stroke; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = UI.muted;
+  ctx.font = "700 10px " + UI.sans;
+  ctx.textAlign = "center";
+  ctx.fillText(tutorialDevice() === "pad" ? "STICK" : "DIR", sx, sy + stickR + 14);
+}
+
+function drawTutorial() {
+  drawMenuWorld();
+  menuVeil(false);
+  ctx.fillStyle = "rgba(12, 20, 42, 0.88)";
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(UI.mx - 16, 14, W - UI.mx * 2 + 32, H - 36, 18);
+  else ctx.rect(UI.mx - 16, 14, W - UI.mx * 2 + 32, H - 36);
+  ctx.fill();
+  ctx.strokeStyle = UI.stroke; ctx.lineWidth = 3; ctx.stroke();
+
+  uiLabel("Apprends les commandes", UI.mx, 36, 12, uiAccent(), 0.4);
+  uiTitle("Tutoriel", UI.mx, 60, 26);
+  uiRule(UI.mx, UI.mx + 90, 72, UI.gold);
+
+  // Onglets device
+  const tabs = [
+    ["Auto", "TutAuto"],
+    ["Clavier", "TutKey"],
+    ["Manette", "TutPad"],
+    ["Tactile", "TutTouch"],
+    ["Souris", "TutMouse"]
+  ];
+  const tw = 78;
+  const tabY = 96;
+  const tab0 = UI.mx + tw / 2;
+  tabs.forEach((t, i) => {
+    const active = tutorialTab === (
+      t[1] === "TutAuto" ? "auto" :
+      t[1] === "TutKey" ? "keyboard" :
+      t[1] === "TutPad" ? "pad" :
+      t[1] === "TutTouch" ? "touch" : "mouse"
+    );
+    drawTutorialTab(t[0], t[1], tab0 + i * (tw + 8), tabY, tw, active);
+  });
+
+  const dev = tutorialDevice();
+  const detected = padConnected ? "manette" : hasTouch ? "tactile" : "clavier";
+  uiLabel(
+    tutorialTab === "auto" ? ("Détecté : " + detected) : ("Affichage : " + (
+      { keyboard: "clavier", pad: "manette", touch: "tactile", mouse: "souris" }[dev]
+    )),
+    UI.mx, 122, 11, "#7ed957", 0.2
+  );
+
+  // Colonne gauche : commandes
+  const leftX = UI.mx;
+  const leftW = W * 0.42;
+  drawTutorialControls(dev, leftX, 148, leftW - 8);
+
+  // Colonne droite : démo aim
+  const demoCx = W * 0.72;
+  const demoCy = H * 0.58;
+  ctx.fillStyle = "rgba(255,246,232,0.08)";
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(W * 0.48, 140, W * 0.46, H - 210, 14);
+  else ctx.rect(W * 0.48, 140, W * 0.46, H - 210);
+  ctx.fill();
+
+  uiLabel("Visée live — oriente ton stick / tes flèches", W * 0.50, 158, 12, UI.gold, 0.2);
+
+  // Boutons mode aim + côté
+  drawTutorialTab(tutorialAimLob ? "Mode : Cloche" : "Mode : Smash", "TutAim", W * 0.58, 182, 120, true);
+  drawTutorialTab(tutorialSide === 0 ? "Camp : Gauche" : "Camp : Droite", "TutSide", W * 0.78, 182, 120, false);
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(W * 0.48 + 4, 200, W * 0.46 - 8, H - 280);
+  ctx.clip();
+  drawTutorialAimDemo(demoCx, demoCy);
+  ctx.restore();
+
+  uiLabel(
+    "Cône bleu = angles possibles · Flèche or = ta direction · Pointillés = trajectoire",
+    W * 0.50, H - 78, 10, UI.muted, 0.15
+  );
+
+  hit(UI.mx + 45, H - 32, 130, 24, "Escape");
+  uiLabel("Échap / Entrée ← Retour", UI.mx, H - 28, 12, UI.muted, 0.3);
+  uiLabel("Sommet Volley", W - UI.mx, H - 28, 12, UI.muted, 0.3, "right");
 }
 
 function drawRules() {

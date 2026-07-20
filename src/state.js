@@ -114,12 +114,13 @@ function sideColor(side) {
 }
 
 // ---------- État du jeu ----------
-// state: "menu" | "aiDifficulty" | "gameModeSelect"
+// state: "menu" | "aiDifficulty" | "gameModeSelect" | "rules" | "credits" | "tutorial"
 //        | "selectCharacter" | "selectTerrain" | "selectBall" | "serve" | "play" | "point" | "gameover"
 //        | états du mode en ligne : "onlineMenu" | "joinEntry" | "hostWait"
 //          | "connecting" | "netWait" | "netError"
 // Flux du menu : menu → (Solo IA : aiDifficulty → gameModeSelect) | (Local : gameModeSelect direct)
 //                     → selectCharacter → selectTerrain → selectBall → partie
+//                     | Tutoriel / Règles / Crédits (retour menu)
 let state = "menu";
 let vsAI = true;
 let pointTimer = 0;
