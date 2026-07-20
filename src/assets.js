@@ -49,7 +49,7 @@ function initSprites() {
 /** Pack fond / props Place du Matin (terrain Panda). */
 function initMapMatin() {
   SPRITES.mapMatin = loadMapPack("matin", {
-    skyline: "skyline.png", far: "far.png", crowd0: "crowd_0.png",
+    skyline: "skyline.png", far: "far.png",
     flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png"
   });
 }

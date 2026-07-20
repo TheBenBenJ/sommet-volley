@@ -85,20 +85,7 @@ function drawBgMatinPng(t, raining, storm) {
     ctx.fillRect(0, 0, W, GROUND_Y);
   }
 
-  // Foule (bande haute du crowd_0) — discrète derrière le portail
-  if (spriteReady(p.crowd0)) {
-    const crowd = p.crowd0;
-    const sw = crowd.naturalWidth || crowd.width;
-    const sh = crowd.naturalHeight || crowd.height;
-    const srcH = Math.max(1, Math.floor(sh * 0.42));
-    const cw = W * 0.92;
-    const ch = Math.min(72, cw * (srcH / sw) * 1.05);
-    const cx = (W - cw) / 2;
-    const cy = GROUND_Y - 108 - ch;
-    ctx.globalAlpha = storm ? 0.65 : 0.82;
-    ctx.drawImage(crowd, 0, 0, sw, srcH, cx, cy, cw, ch);
-    ctx.globalAlpha = 1;
-  }
+  // Public désactivé pour l’instant (crowd_0 raté)
 
   // Sol pavé gris-beige
   const pave = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
