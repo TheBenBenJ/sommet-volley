@@ -202,8 +202,7 @@ function navOptions() {
     case "onlineMenu":    return ["Digit1", "Digit2"];
     case "selectCharacter": {
       const vis = characterIndices();
-      const taken = takenCharacterSet();
-      return vis.map((_, slot) => "Digit" + (slot + 1)).filter((_, slot) => !taken.has(vis[slot]));
+      return vis.map((_, slot) => "Digit" + (slot + 1));
     }
     case "selectTerrain": return ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9"].slice(0, terrainIndices().length);
     case "selectBall":    return ["Digit1", "Digit2"].slice(0, BALL_SKINS.length);
@@ -211,13 +210,70 @@ function navOptions() {
   }
 }
 
+// Grille de navigation menus (persos / terrains) : { cols, rows } ou null = linéaire.
+function menuNavGrid(n) {
+  if (state === "selectCharacter") {
+    if (n <= 4) return { cols: n, rows: 1 };
+    const cols = Math.ceil(n / 2);
+    return { cols, rows: Math.ceil(n / cols) };
+  }
+  if (state === "selectTerrain") {
+    if (n <= 5) return { cols: n, rows: 1 };
+    const cols = Math.ceil(n / 2);
+    return { cols, rows: Math.ceil(n / cols) };
+  }
+  return null;
+}
+
+/** Déplace navIdx selon une grille 2D (haut/bas/gauche/droite). Retourne true si bougé. */
+function moveMenuNav(dir) {
+  const opts = navOptions();
+  if (!opts || !opts.length) return false;
+  if (navIdx >= opts.length) navIdx = 0;
+  const n = opts.length;
+  const grid = menuNavGrid(n);
+  let next = navIdx;
+  if (!grid || grid.rows <= 1) {
+    if (dir === "right" || dir === "down") next = (navIdx + 1) % n;
+    else if (dir === "left" || dir === "up") next = (navIdx - 1 + n) % n;
+    else return false;
+  } else {
+    const cols = grid.cols;
+    let row = Math.floor(navIdx / cols);
+    let col = navIdx % cols;
+    if (dir === "left") col = (col - 1 + cols) % cols;
+    else if (dir === "right") col = (col + 1) % cols;
+    else if (dir === "up") row = (row - 1 + grid.rows) % grid.rows;
+    else if (dir === "down") row = (row + 1) % grid.rows;
+    else return false;
+    next = row * cols + col;
+    if (next >= n) {
+      // dernière rangée plus courte : rester sur la dernière case de la rangée
+      next = Math.min(n - 1, row * cols + Math.min(col, (n - 1) % cols));
+      if (next >= n) next = n - 1;
+    }
+  }
+  if (next === navIdx) return false;
+  navIdx = next;
+  beep(500, 0.03, "square", 0.05);
+  return true;
+}
+
 function handlePadMenu() {
   const opts = navOptions();
   if (opts) {
-    const horiz = state === "selectCharacter" || state === "selectTerrain" || state === "selectBall";
     if (navIdx >= opts.length) navIdx = 0;
-    if (padEdge(horiz ? "right" : "down")) { navIdx = (navIdx + 1) % opts.length; beep(500, 0.03, "square", 0.05); }
-    if (padEdge(horiz ? "left" : "up"))    { navIdx = (navIdx - 1 + opts.length) % opts.length; beep(500, 0.03, "square", 0.05); }
+    const grid = menuNavGrid(opts.length);
+    if (grid && grid.rows > 1) {
+      if (padEdge("right")) moveMenuNav("right");
+      if (padEdge("left")) moveMenuNav("left");
+      if (padEdge("down")) moveMenuNav("down");
+      if (padEdge("up")) moveMenuNav("up");
+    } else {
+      const horiz = state === "selectCharacter" || state === "selectTerrain" || state === "selectBall";
+      if (padEdge(horiz ? "right" : "down")) moveMenuNav("right");
+      if (padEdge(horiz ? "left" : "up")) moveMenuNav("left");
+    }
     if (padEdge("confirm")) { const c = opts[navIdx]; navIdx = 0; handleMenuKeys(c, ""); return; }
     if (padEdge("back")) { navIdx = 0; handleMenuKeys("Escape", ""); }
   } else if (state === "rules" || state === "tutorialHelp" || state === "netError" || state === "credits") {

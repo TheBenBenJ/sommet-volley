@@ -10,6 +10,23 @@ function handleMenuKeys(code, key) {
   if (code === "NumpadEnter") code = "Enter"; // Entrée du pavé numérique = Entrée
   // (c'était le « je remplis le code et rien ne se passe » des claviers à pavé)
 
+  // Navigation grille (persos / terrains) : flèches / WASD
+  if (state === "selectCharacter" || state === "selectTerrain" || state === "selectBall") {
+    const dir =
+      (code === "ArrowRight" || code === "KeyD") ? "right" :
+      (code === "ArrowLeft"  || code === "KeyA") ? "left"  :
+      (code === "ArrowDown"  || code === "KeyS") ? "down"  :
+      (code === "ArrowUp"    || code === "KeyW") ? "up"    : null;
+    if (dir && moveMenuNav(dir)) return;
+    if (code === "Enter" || code === "Space") {
+      const opts = typeof navOptions === "function" ? navOptions() : null;
+      if (opts && opts[navIdx] != null) {
+        code = opts[navIdx];
+        // tombe dans les handlers Digit ci-dessous
+      }
+    }
+  }
+
   // M coupe le son — sauf pendant la saisie d'un code (M peut en faire partie).
   // code (position physique, norme QWERTY) ≠ lettre imprimée sur un clavier
   // AZERTY : la touche M y est déplacée à l'emplacement "Semicolon" (celle du
@@ -166,12 +183,15 @@ function handleMenuKeys(code, key) {
           sendRel({ t: "hello", charId: n });
           state = "netWait";
         } else {
+          navIdx = 0;
           state = "selectTerrain"; // l'hôte choisit aussi le terrain
         }
       } else if (selPlayer === 0 && !pendingMode.vsAI) {
         selPlayer = 1; // au joueur vert de choisir
+        navIdx = 0;
       } else {
         if (pendingMode.vsAI) blobR.charId = randomCharacterIdx([blobL.charId]);
+        navIdx = 0;
         state = "selectTerrain";
       }
     }
@@ -184,7 +204,7 @@ function handleMenuKeys(code, key) {
     const slotT = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Digit5: 4, Digit6: 5, Digit7: 6, Digit8: 7, Digit9: 8 }[code];
     const visT = terrainIndices();
     const n = slotT !== undefined && slotT < visT.length ? visT[slotT] : undefined;
-    if (n !== undefined) { terrain = n; state = "selectBall"; }
+    if (n !== undefined) { terrain = n; navIdx = 0; state = "selectBall"; }
     if (code === "KeyC") {
       mapEventsQuiet = !mapEventsQuiet;
       beep(mapEventsQuiet ? 360 : 520, 0.06, "square", 0.08);
@@ -232,6 +252,7 @@ function handleMenuKeys(code, key) {
 
 function startCharacterSelect() {
   selPlayer = 0;
+  navIdx = 0;
   state = "selectCharacter";
 }
 
@@ -1440,65 +1461,93 @@ function drawSelectCharacter() {
           UI.mx, 34, 13, uiAccent(), 0.4);
   const twoLocalHumans = !pendingMode.vsAI && !pendingMode.online;
   const pick = "Choisis ton personnage";
-  uiTitle(twoLocalHumans ? "Joueur " + sideName(selPlayer) + " — " + pick : pick, UI.mx, 62, 26);
+  uiTitle(twoLocalHumans ? "Joueur " + sideName(selPlayer) + " — " + pick : pick, UI.mx, 62, 24);
 
   const vis = characterIndices();
   const taken = takenCharacterSet();
-  const navOpts = typeof navOptions === "function" ? navOptions() : null;
-  const navCode = navOpts ? navOpts[navIdx] : null;
-  const cw = W / vis.length; // largeur de carte adaptative
-  for (let slot = 0; slot < vis.length; slot++) {
+  const n = vis.length;
+  const grid = (typeof menuNavGrid === "function" ? menuNavGrid(n) : null) || { cols: n, rows: 1 };
+  const cols = grid.cols, rows = grid.rows;
+  const gapX = 14, gapY = 12;
+  const pw = Math.min(200, Math.floor((W - 36 - (cols - 1) * gapX) / cols));
+  const ph = rows === 1 ? 340 : 168;
+  const totalW = cols * pw + (cols - 1) * gapX;
+  const totalH = rows * ph + (rows - 1) * gapY;
+  const ox = (W - totalW) / 2;
+  const oy = Math.max(78, Math.floor((H - totalH) / 2) - 8);
+
+  for (let slot = 0; slot < n; slot++) {
     const i = vis[slot];
-    const cx = cw * slot + cw / 2;
     const a = CHARACTERS[i];
+    const row = Math.floor(slot / cols), col = slot % cols;
+    const px = ox + col * (pw + gapX);
+    const py = oy + row * (ph + gapY);
+    const cx = px + pw / 2;
     const code = "Digit" + (slot + 1);
     const isTaken = taken.has(i);
-    if (!isTaken) hit(cx, 240, cw, 336, code);
-    if (!isTaken && ((padConnected && navCode === code) || isHover(code))) {
-      // carte surlignée (manette ou survol souris) — or : seule couleur de
-      // sélection dans tout le jeu (voir drawOptionList/drawSelectTerrain)
+    if (!isTaken) hit(cx, py + ph / 2, pw, ph, code);
+    const sel = (!isTaken && (navIdx === slot || isHover(code)));
+    if (sel) {
       ctx.strokeStyle = UI.gold;
       ctx.lineWidth = 3;
       ctx.beginPath();
-      const rx = cw * slot + 8, ry = 72, rw = cw - 16, rh = 336;
-      if (ctx.roundRect) ctx.roundRect(rx, ry, rw, rh, 10); else ctx.rect(rx, ry, rw, rh);
+      if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 10); else ctx.rect(px, py, pw, ph);
       ctx.stroke();
     }
-    // Sprites hauts : pieds plus bas pour ne pas couper la tête
-    const previewY = 168;
+
+    const previewY = py + (rows === 1 ? 88 : 58);
     const preview = {
       x: cx, y: previewY, groundY: previewY,
       side: selPlayer, color: pcolor, darkColor: pdark,
       onGround: true, vx: 0, walkPhase: 0, squash: 0, charId: i
     };
+    ctx.save();
     if (isTaken) ctx.globalAlpha = 0.35;
-    drawCharacter(preview);
+    if (rows > 1) {
+      ctx.translate(cx, previewY);
+      ctx.scale(0.72, 0.72);
+      preview.x = 0; preview.y = 0; preview.groundY = 0;
+      drawCharacter(preview);
+    } else {
+      drawCharacter(preview);
+    }
+    ctx.restore();
     ctx.globalAlpha = 1;
+
     ctx.textAlign = "center";
     ctx.fillStyle = isTaken ? "rgba(255,255,255,0.35)" : UI.ink;
-    ctx.font = "800 " + (vis.length >= 8 ? 11 : vis.length >= 6 ? 13 : vis.length === 5 ? 15 : 18) + "px " + UI.display;
-    ctx.fillText(isTaken ? "Pris — " + a.name : (slot + 1) + " — " + a.name, cx, 205);
+    const nameSize = rows > 1 ? 12 : (n >= 6 ? 13 : 16);
+    ctx.font = "800 " + nameSize + "px " + UI.display;
+    const nameY = rows > 1 ? py + ph - 48 : py + 118;
+    ctx.fillText(isTaken ? "Pris — " + a.name : (slot + 1) + " — " + a.name, cx, nameY);
 
-    const gx = cx - Math.min(68, cw / 2 - 8), gy0 = 232;
-    drawStatGauge(gx, gy0,      "Vitesse",   a.stats.vitesse);
-    drawStatGauge(gx, gy0 + 20, "Détente",   a.stats.detente);
-    drawStatGauge(gx, gy0 + 40, "Puissance", a.stats.puissance);
-    drawStatGauge(gx, gy0 + 60, "Contrôle",  a.stats.controle);
-
-    ctx.textAlign = "center";
-    ctx.font = "700 12px " + UI.sans;
-    ctx.fillStyle = UI.gold;
-    wrapText(a.trait, cx, 322, cw - 30, 14);
-
-    ctx.fillStyle = UI.gold;
-    ctx.font = "800 13px " + UI.display;
-    ctx.fillText("★ " + a.superName, cx, 372);
-    ctx.fillStyle = "rgba(255,246,232,0.85)";
-    ctx.font = "600 11px " + UI.sans;
-    wrapText(a.superDesc, cx, 388, cw - 26, 13);
+    if (rows === 1) {
+      const gx = cx - Math.min(68, pw / 2 - 8), gy0 = py + 140;
+      drawStatGauge(gx, gy0,      "Vitesse",   a.stats.vitesse);
+      drawStatGauge(gx, gy0 + 20, "Détente",   a.stats.detente);
+      drawStatGauge(gx, gy0 + 40, "Puissance", a.stats.puissance);
+      drawStatGauge(gx, gy0 + 60, "Contrôle",  a.stats.controle);
+      ctx.textAlign = "center";
+      ctx.font = "700 12px " + UI.sans;
+      ctx.fillStyle = UI.gold;
+      wrapText(a.trait, cx, py + 230, pw - 20, 14);
+      ctx.fillStyle = UI.gold;
+      ctx.font = "800 13px " + UI.display;
+      ctx.fillText("★ " + a.superName, cx, py + 280);
+      ctx.fillStyle = "rgba(255,246,232,0.85)";
+      ctx.font = "600 11px " + UI.sans;
+      wrapText(a.superDesc, cx, py + 296, pw - 18, 13);
+    } else {
+      ctx.fillStyle = UI.gold;
+      ctx.font = "700 11px " + UI.display;
+      ctx.fillText("★ " + a.superName, cx, py + ph - 28);
+      ctx.fillStyle = "rgba(255,246,232,0.75)";
+      ctx.font = "600 10px " + UI.sans;
+      wrapText(a.trait, cx, py + ph - 14, pw - 12, 11);
+    }
   }
 
-  uiLabel("3 points d'affilée chargent le SUPER (E / Shift)   ·   Choisis 1 – " + vis.length + "   ·   Échap ← retour",
+  uiLabel("↑↓←→ / stick pour naviguer   ·   Entrée pour valider   ·   Choisis 1 – " + n + "   ·   Échap ← retour",
           UI.mx, 466, 10, UI.muted, 1);
 }
 
@@ -1558,7 +1607,7 @@ function drawSelectTerrain() {
 
     const code = "Digit" + (slot + 1);
     hit(px + pw / 2, py + ph / 2, pw, ph + 40, code);
-    const sel = (padConnected && navIdx === slot) || isHover(code);
+    const sel = (navIdx === slot) || isHover(code);
     ctx.strokeStyle = sel ? UI.gold : UI.stroke;
     ctx.lineWidth = sel ? 5 : 3;
     ctx.beginPath();
@@ -1574,7 +1623,7 @@ function drawSelectTerrain() {
     ctx.fillText(TERRAINS[i].name, px + pw / 2, py + ph + 40);
   }
 
-  uiLabel("Choisis 1 – " + n + "   ·   C terrain calme : " + (mapEventsQuiet ? "ON" : "OFF") +
+  uiLabel("↑↓←→ / stick pour naviguer   ·   Entrée pour valider   ·   C terrain calme : " + (mapEventsQuiet ? "ON" : "OFF") +
           "   ·   Échap ← retour", UI.mx, 466, 10, UI.muted, 1);
 }
 
