@@ -43,15 +43,17 @@ const SERVE_TOSS_SPD = 10.5;   // lancer vertical au service (vraiment vers le h
 const SERVE_TOSS_GRACE = 10;   // ticks sans re-touche serveur juste après le lancer
 const ACTIVE_HIT_COOLDOWN = 16; // anti multi-frappe si on maintient le bouton
 
-// --- Écran "Point pour ..." ---
-// On reste dessus jusqu'à ce qu'un joueur appuie (saut/confirmation) — mieux
-// qu'un délai fixe qu'on peut rater. POINT_MIN_WAIT : affichage minimum avant
-// de considérer une pression (évite de sauter le message instantanément si
-// une touche de saut était encore enfoncée juste après avoir marqué le point).
-// POINT_MAX_WAIT : filet de sécurité si personne n'appuie (IA seule en solo,
-// AFK…) — la partie ne reste jamais bloquée indéfiniment.
-const POINT_MIN_WAIT = 20;  // ~0,33 s
-const POINT_MAX_WAIT = 240; // ~4 s
+// --- Écran "Point pour ..." / fin de match ---
+// Rythme volontairement posé : laisser lire le message + voir victory/defeat.
+// POINT_MIN_WAIT : impossible de skipper trop tôt (saut encore enfoncé).
+// POINT_MAX_WAIT : filet de sécurité (IA / AFK).
+const POINT_MIN_WAIT = 100;     // ~1,7 s avant skip
+const POINT_MAX_WAIT = 480;     // ~8 s max entre deux échanges
+const GAMEOVER_MIN_WAIT = 180;  // ~3 s avant de quitter / revanche
+// Décompte service : 3 · 2 · 1 (~0,85 s chacun) + GO (~0,5 s)
+const SERVE_BEAT = 51;
+const SERVE_GO = 30;
+const SERVE_COUNTDOWN_START = SERVE_BEAT * 3 + SERVE_GO;
 
 // --- Smash Battle (duel au filet) ---
 const BATTLE_TICKS = 78;     // durée du duel (~1,3 s)

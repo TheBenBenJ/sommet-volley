@@ -598,6 +598,62 @@ test("V2 : service — sauter dans le lancer sans X ne frappe pas", () => {
   assert.strictEqual(g.ball.serveAimLock, true, "lock toujours actif");
 });
 
+test("V2 : service — passe le filet depuis près du filet (tous persos)", () => {
+  const g = loadGame();
+  const C = g.consts;
+  const N0 = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  for (let animal = 0; animal < g.ANIMALS.length; animal++) {
+    g.setVsAI(true); g.setAiLevel(1);
+    g.newGame(10 + animal);
+    g.setServingSide(0);
+    g.setState("play"); g.setServeCountdown(0);
+    g.blobL.animal = animal;
+    g.blobL.x = 330; g.blobL.y = C.GROUND_Y; g.blobL.onGround = true;
+    g.blobL.lastActiveHitTick = -999;
+    g.ball.x = 335; g.ball.y = g.blobL.y - 70; g.ball.vx = 0; g.ball.vy = 1;
+    g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+    g.ball.serveAimLock = true; g.ball.serveFlight = false;
+    g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
+    g.scores[0] = 0; g.scores[1] = 0;
+    g.stepGame({ ...N0, smash:true }, N0);
+    let cleared = false;
+    for (let i = 0; i < 150; i++) {
+      g.updateBall();
+      if (g.ball.x > C.NET_X + 16 && g.ball.y < C.NET_TOP - 4) { cleared = true; break; }
+      if (g.getState() === "point") break;
+    }
+    assert.ok(cleared, "service " + g.ANIMALS[animal].key + " depuis x=330 doit passer le filet");
+    assert.strictEqual(g.scores[1], 0, "pas de faute filet (" + g.ANIMALS[animal].key + ")");
+  }
+});
+
+test("V2 : service aérien (smash) — passe aussi le filet", () => {
+  const g = loadGame();
+  const C = g.consts;
+  const N0 = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(11);
+  g.setServingSide(0);
+  g.setState("play"); g.setServeCountdown(0);
+  g.blobL.animal = 1; // Trompette
+  g.blobL.x = 300; g.blobL.y = C.GROUND_Y - 70; g.blobL.onGround = false;
+  g.blobL.lastActiveHitTick = -999;
+  g.ball.x = 305; g.ball.y = g.blobL.y - 50; g.ball.vx = 0; g.ball.vy = 1;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+  g.ball.serveAimLock = true; g.ball.serveFlight = false;
+  g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
+  g.scores[0] = 0; g.scores[1] = 0;
+  g.stepGame({ ...N0, smash:true }, N0);
+  let cleared = false;
+  for (let i = 0; i < 150; i++) {
+    g.updateBall();
+    if (g.ball.x > C.NET_X + 16 && g.ball.y < C.NET_TOP - 4) { cleared = true; break; }
+    if (g.getState() === "point") break;
+  }
+  assert.ok(cleared, "service aérien Trompette doit passer le filet");
+  assert.strictEqual(g.scores[1], 0, "pas de faute filet en smash de service");
+});
+
 test("V2 : service — cloche forcée vers l'adversaire", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(1);

@@ -79,6 +79,44 @@ Structure principale :
 | `src/15-net.js` | Multijoueur PeerJS |
 | `docs/` | Vision, gameplay V2, pipeline perso |
 
+## Déploiement
+
+Le jeu est un site statique : n'importe quel serveur web suffit. Copier
+`index.html` + les dossiers `src/` et `assets/` (et servir en HTTPS pour le
+multijoueur en ligne).
+
+### Déploiement continu (push sur `main` → prod)
+
+Le workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
+lance les tests puis, s'ils passent, synchronise `index.html` + `src/` +
+`assets/` vers le serveur en SSH (`rsync` via `sudo`) — **même machine que
+Crabby Volley**, autre répertoire web / URL. Il se déclenche à chaque push sur
+`main` (ou manuellement via *Run workflow*). Au passage, il remplace le suffixe
+`?v=DEV` des balises `<script>` par le SHA du commit (anti-cache) et incrémente
+le patch SemVer.
+
+Secrets du dépôt (**Settings → Secrets and variables → Actions**) :
+
+| Secret | Valeur |
+|--------|--------|
+| `DEPLOY_HOST` | `ns3104412.ip-37-187-139.eu` (même hôte que Crabby) |
+| `DEPLOY_USER` | `ubuntu` |
+| `DEPLOY_SSH_KEY` | même clé que Crabby (`~/.ssh/crabby_deploy`), **en base64** |
+| `DEPLOY_WEB_ROOT` | `/var/www/sommet-volley` |
+| `DEPLOY_URL` | `https://ns3104412.ip-37-187-139.eu/sommet-volley/` |
+
+Prod : <https://ns3104412.ip-37-187-139.eu/sommet-volley/>  
+(nginx : `location /sommet-volley/` → `/var/www/sommet-volley/`, staging `~/sommet-deploy/`)
+
+```bash
+# Une fois `gh auth login` fait, depuis la racine du dépôt :
+gh secret set DEPLOY_HOST -b 'ns3104412.ip-37-187-139.eu'
+gh secret set DEPLOY_USER -b 'ubuntu'
+gh secret set DEPLOY_WEB_ROOT -b '/var/www/sommet-volley'
+gh secret set DEPLOY_URL -b 'https://ns3104412.ip-37-187-139.eu/sommet-volley/'
+gh secret set DEPLOY_SSH_KEY < <(base64 -i ~/.ssh/crabby_deploy)
+```
+
 ## Licence
 
-MIT — voir `LICENSE`.
+MIT © Benjamin Mille — voir `LICENSE`.

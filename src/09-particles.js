@@ -78,7 +78,7 @@ function spawnConfetti(n, cx) {
 // bulle d'émotion au-dessus d'un joueur (kind: happy/sad/wow/star)
 function setEmote(side, kind) {
   if (noFx) return;
-  emotes[side] = { kind, t: 55 };
+  emotes[side] = { kind, t: 110 }; // ~1,8 s — lisible pendant la célébration
   // petit son d'émotion (beep est déjà coupé si muted/noFx)
   if (kind === "happy") { beep(660, 0.08, "square", 0.07); beep(990, 0.1, "square", 0.06, 0.08); }
   else if (kind === "sad") beep(420, 0.16, "sawtooth", 0.06, 0, 220);

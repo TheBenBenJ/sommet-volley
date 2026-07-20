@@ -13,9 +13,10 @@ function awardPoint(side, reason) {
   }
   ballScoreLock = false;
   scores[side]++;
-  scorePop[side] = 20;
-  shake = 8;
+  scorePop[side] = 48;
+  shake = 10;
   servingSide = side;
+  celebT = 0;
   sfxPoint(side);
 
   // le camp qui perd le point subit sa "punition" visuelle au maximum d'un
@@ -60,19 +61,27 @@ function awardPoint(side, reason) {
   }
   const name = sideLabel(side);
   pointMsg = reason ? reason + "  —  Point " + name : "Point pour " + name + " !";
-  // réactions : public en délire, confettis, émotions des joueurs
-  crowdHype = 60;
+  // réactions : public en délire, confettis, émotions + petits sauts de joie
+  crowdHype = 90;
   const smashy = reason && (reason.indexOf("SMASH") >= 0 || reason.indexOf("crevée") >= 0);
   if (!noFx) {
-    spawnConfetti(22, side === 0 ? W * 0.25 : W * 0.75);
+    spawnConfetti(36, side === 0 ? W * 0.25 : W * 0.75);
     setEmote(side, "happy");
     setEmote(1 - side, smashy ? "wow" : "sad");
+  }
+  for (const b of activeBlobs) {
+    b._celebHop = b.side === side ? (18 + (b === blobL || b === blobR ? 0 : 8)) : 0;
   }
   const lead = Math.abs(scores[0] - scores[1]);
   if (scores[side] >= WIN_SCORE && lead >= 2) {
     state = "gameover";
+    gameoverTimer = GAMEOVER_MIN_WAIT;
     pointMsg = name + " remporte le match " + scores[0] + " – " + scores[1] + " !";
-    if (!noFx) { spawnConfetti(90); setEmote(side, "happy"); sfxMatchWin(); }
+    if (!noFx) {
+      spawnConfetti(120); spawnConfetti(40, W * 0.5);
+      setEmote(side, "happy"); setEmote(1 - side, "sad");
+      sfxMatchWin();
+    }
   } else {
     state = "point";
     pointTimer = POINT_MAX_WAIT;
@@ -91,9 +100,32 @@ function startRally() {
   bombTimer = bombTime; // la mèche ne se consume qu'une fois la balle en jeu
   pendingNetPoint = null;
   ballScoreLock = false;
+  celebT = 0;
   // soft ownership : pas de balle fantôme au nouveau service
   if (typeof hostInvalidateGuestBall === "function") hostInvalidateGuestBall();
   state = "serve";
-  serveCountdown = 69; // 3·2·1 (63, ~0.35s chacun) + "GO !" (6)
+  serveCountdown = SERVE_COUNTDOWN_START;
+}
+
+/** Avance la célébration (anims victory/defeat, confettis, hops). */
+function tickCelebration() {
+  celebT++;
+  for (const b of activeBlobs) {
+    if (b._celebHop > 0) {
+      b._celebHop--;
+      if (b._celebHop === 0 && b.onGround) {
+        b.vy = -9;
+        b.onGround = false;
+        b.jumpsUsed = 1;
+      }
+    }
+  }
+  // confettis qui continuent de tomber pendant la pose
+  if (!noFx && celebT % 20 === 0) {
+    const winSide = state === "gameover"
+      ? (scores[0] > scores[1] ? 0 : 1)
+      : servingSide;
+    spawnConfetti(state === "gameover" ? 8 : 3, winSide === 0 ? W * 0.28 : W * 0.72);
+  }
 }
 

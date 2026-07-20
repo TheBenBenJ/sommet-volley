@@ -175,16 +175,17 @@ function handleMenuKeys(code, key) {
   } else if (state === "gameover") {
     if (online && mode === "2v2") {
       // 2v2 : l'hôte relance directement (renvoie "start" à tous) ; les invités attendent
-      if (netRole === "host" && (code === "Enter" || code === "Space" || code === "KeyR")) hostStartMatch2v2();
+      if (netRole === "host" && gameoverTimer <= 0 &&
+          (code === "Enter" || code === "Space" || code === "KeyR")) hostStartMatch2v2();
       if (code === "Escape") quitOnline();
     } else if (online) {
-      if (code === "KeyR" && !rematchMe) {
+      if (code === "KeyR" && !rematchMe && gameoverTimer <= 0) {
         rematchMe = true;
         sendRel({ t: "rematch" });
         if (netRole === "host" && rematchPeer) hostStartMatch();
       }
       if (code === "Escape") quitOnline();
-    } else if (code === "Space" || code === "Enter") {
+    } else if ((code === "Space" || code === "Enter") && gameoverTimer <= 0) {
       goMenu();
     }
 
@@ -308,10 +309,10 @@ function makeMenuActor(side, animalIdx) {
     y: GROUND_Y, side, animal: animalIdx,
     color: a.color, darkColor: a.darkColor,
     onGround: true, vx: 0, vy: 0,
-    dispVx: side === 0 ? 1.4 : -1.4,
+    dispVx: side === 0 ? 0.65 : -0.65,
     walkPhase: Math.random() * 24, squash: 0, molt: 0,
     _walking: true, _faceRight: side === 0, _faceLock: 0,
-    minX, maxX, hopT: 40 + Math.floor(Math.random() * 90)
+    minX, maxX, hopT: 90 + Math.floor(Math.random() * 160)
   };
 }
 
@@ -323,29 +324,31 @@ function ensureMenuBackdrop() {
 function tickMenuActors() {
   for (const b of [menuActors.L, menuActors.R]) {
     if (!b) continue;
-    b.x += b.dispVx * 0.55;
+    b.x += b.dispVx * 0.32;
     if (b.x <= b.minX) { b.x = b.minX; b.dispVx = Math.abs(b.dispVx); }
     if (b.x >= b.maxX) { b.x = b.maxX; b.dispVx = -Math.abs(b.dispVx); }
     b.vx = b.dispVx; // pour orientation sprite (charFaceRight)
     b._faceRight = b.dispVx >= 0;
-    b.walkPhase += 0.22;
+    // Même rythme qu'en jeu : 1 frame / 4 ticks → pas F/B visibles
+    b._walkTick = (b._walkTick || 0) + 1;
+    if (b._walkTick % 4 === 0) b.walkPhase += 1;
     b.hopT--;
     if (b.hopT <= 0 && b.onGround) {
-      b.vy = -6.5; b.onGround = false; b.hopT = 70 + Math.floor(Math.random() * 110);
+      b.vy = -4.2; b.onGround = false; b.hopT = 140 + Math.floor(Math.random() * 180);
     }
     if (!b.onGround) {
-      b.vy += 0.45; b.y += b.vy;
-      if (b.y >= GROUND_Y) { b.y = GROUND_Y; b.vy = 0; b.onGround = true; b.squash = 5; }
-    } else if (b.squash > 0) b.squash -= 0.4;
+      b.vy += 0.28; b.y += b.vy;
+      if (b.y >= GROUND_Y) { b.y = GROUND_Y; b.vy = 0; b.onGround = true; b.squash = 4; }
+    } else if (b.squash > 0) b.squash -= 0.25;
   }
   // Ballon qui rebondit doucement au-dessus du filet
-  menuBg.ballVy += 0.12;
+  menuBg.ballVy += 0.06;
   menuBg.ballY += menuBg.ballVy;
   if (menuBg.ballY > GROUND_Y - 160) {
     menuBg.ballY = GROUND_Y - 160;
-    menuBg.ballVy = -3.8 - Math.random() * 1.2;
+    menuBg.ballVy = -2.2 - Math.random() * 0.7;
   }
-  menuBg.ballX += Math.sin(performance.now() / 900) * 0.35;
+  menuBg.ballX += Math.sin(performance.now() / 1400) * 0.18;
 }
 
 function drawMenuWorld() {
@@ -413,6 +416,69 @@ function uiTitle(txt, x, y, size, align) {
   ctx.restore();
 }
 
+/** Découpe un texte en lignes qui tiennent dans maxW (font déjà posée sur ctx). */
+function uiWrapLines(txt, maxW) {
+  const words = String(txt || "").split(/\s+/).filter(Boolean);
+  if (!words.length) return [""];
+  const lines = [];
+  let line = "";
+  for (const w of words) {
+    const test = line ? line + " " + w : w;
+    if (ctx.measureText(test).width > maxW && line) {
+      lines.push(line);
+      line = w;
+    } else line = test;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+/**
+ * Titre cartoon qui reste dans une boîte : réduit la taille puis wrap (max 3 lignes).
+ * Retourne { lines, size, height } pour dimensionner le popup.
+ * fill : couleur de remplissage (défaut UI.ink — foncé sur popup crème).
+ */
+function uiTitleBoxed(txt, cx, cy, maxW, maxSize, opts) {
+  opts = opts || {};
+  const align = opts.align || "center";
+  const minSize = opts.minSize || 14;
+  const maxLines = opts.maxLines || 3;
+  const fill = opts.fill || UI.ink;
+  const stroke = opts.stroke || UI.stroke;
+  let size = maxSize;
+  let lines = [String(txt || "")];
+  while (size >= minSize) {
+    ctx.font = "700 " + size + "px " + UI.display;
+    lines = uiWrapLines(txt, maxW);
+    const widest = lines.reduce((m, l) => Math.max(m, ctx.measureText(l).width), 0);
+    if (lines.length <= maxLines && widest <= maxW + 0.5) break;
+    size -= 1;
+  }
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines);
+    const last = lines[maxLines - 1];
+    ctx.font = "700 " + size + "px " + UI.display;
+    if (ctx.measureText(last + "…").width <= maxW) lines[maxLines - 1] = last + "…";
+  }
+  const lh = size * 1.18;
+  const totalH = lines.length * lh;
+  const y0 = cy - (lines.length - 1) * lh * 0.5;
+  ctx.save();
+  ctx.textAlign = align;
+  ctx.font = "700 " + size + "px " + UI.display;
+  ctx.lineJoin = "round";
+  ctx.lineWidth = Math.max(4, size * 0.12);
+  ctx.strokeStyle = stroke;
+  ctx.fillStyle = fill;
+  for (let i = 0; i < lines.length; i++) {
+    const yy = y0 + i * lh;
+    ctx.strokeText(lines[i], cx, yy);
+    ctx.fillText(lines[i], cx, yy);
+  }
+  ctx.restore();
+  return { lines, size, height: totalH };
+}
+
 function uiRule(x1, x2, y, col) {
   ctx.strokeStyle = col || UI.faint;
   ctx.lineWidth = 3;
@@ -430,7 +496,11 @@ function menuScreenBase(o) {
   const mx = UI.mx, acc = uiAccent();
   const bounce = Math.sin(performance.now() / 280) * 2.5;
   uiLabel(o.kicker || "Sommet Volley", mx, 78, 13, acc, 0.5);
-  uiTitle(o.title, mx, 128 + bounce, o.titleSize || 44);
+  // Titre calé à gauche, borné à la largeur utile (pas de débordement)
+  const titleMax = o.titleSize || 44;
+  uiTitleBoxed(o.title, mx, 128 + bounce, W - mx - 48, titleMax, {
+    align: "left", fill: UI.ink, stroke: UI.stroke, maxLines: 2, minSize: 22
+  });
   uiRule(mx, mx + 120, 148, UI.gold);
   if (o.subtitle) uiLabel(o.subtitle, mx, 172, 14, UI.muted, 0.3);
 

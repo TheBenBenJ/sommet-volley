@@ -266,10 +266,13 @@ function update() {
 
   if (state === "point" || state === "gameover") {
     settleAirborneBlobs();
+    if (typeof tickCelebration === "function") tickCelebration();
     if (state === "point") {
       pointTimer--;
       const elapsed = POINT_MAX_WAIT - pointTimer;
       if ((elapsed >= POINT_MIN_WAIT && pointAdvanceRequested()) || pointTimer <= 0) startRally();
+    } else if (gameoverTimer > 0) {
+      gameoverTimer--;
     }
     return;
   }

@@ -221,7 +221,7 @@ function handlePadMenu() {
   } else if (state === "rules" || state === "netError" || state === "credits") {
     if (padEdge("confirm") || padEdge("back")) handleMenuKeys("Escape", "");
   } else if (state === "gameover") {
-    if (padEdge("confirm")) handleMenuKeys(online ? "KeyR" : "Space", "");
+    if (padEdge("confirm") && gameoverTimer <= 0) handleMenuKeys(online ? "KeyR" : "Space", "");
     if (padEdge("back")) handleMenuKeys("Escape", "");
   } else if (state === "hostWait" || state === "connecting" || state === "netWait" || state === "joinEntry") {
     if (padEdge("back")) handleMenuKeys("Escape", "");

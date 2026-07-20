@@ -34,10 +34,10 @@ function aiV2TouchRole(side) {
 /** Vise selon le rôle (réception ≠ tir). */
 function aiV2FillAim(side, lvl, me, opp, input, role) {
   const fwd = side === 0 ? 1 : -1;
-  // Service : cloche vers l'adversaire (jamais piqué vers le bas)
+  // Service : cloche haute vers l'adversaire (évite le filet)
   if (ball.serveAimLock && side === servingSide) {
-    input.ax = fwd * 0.85;
-    input.ay = -0.55;
+    input.ax = fwd * 0.7;
+    input.ay = -0.85;
     return;
   }
   if (role === 0) {

@@ -173,37 +173,108 @@ function render() {
   if (online && netConnected) drawNetHUD();
 
   if (state === "point") {
-    const pw = 480, ph = 64, px = (W - pw) / 2, py = H / 2 - 32;
-    ctx.fillStyle = "rgba(10,12,18,0.82)";
-    ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 10);
-    else ctx.rect(px, py, pw, ph);
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255,204,0,0.35)"; ctx.lineWidth = 1; ctx.stroke();
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#ffcc00";
-    ctx.font = "800 26px " + UI.sans;
-    ctx.fillText(pointMsg, W / 2, H / 2 + 8);
+    drawPointCelebBanner();
   } else if (state === "gameover") {
-    if (online) {
-      const mySide = netRole === "host" ? 0 : (mode === "2v2" ? (mySlot < 2 ? 0 : 1) : 1);
-      const win = (scores[0] > scores[1] ? 0 : 1) === mySide;
-      overlay(pointMsg, win ? "Victoire !" : "Défaite…");
-      let line;
-      if (mode === "2v2") {
-        line = netRole === "host" ? "Entrée · rejouer    ·    Échap · quitter"
-                                  : "En attente de l'hôte…    ·    Échap · quitter";
-      } else {
-        line = "R · revanche";
-        if (rematchMe) line += " ✓ toi";
-        if (rematchPeer) line += " ✓ adversaire";
-        line += "    ·    Échap · quitter";
-      }
-      uiLabel(line, W / 2, H / 2 + 88, 11, "rgba(255,255,255,0.7)", 1, "center");
-    } else {
-      hit(W / 2, H / 2, W, H, "Space"); // clic n'importe où = retour au menu
-      overlay(pointMsg, "Espace ou Entrée pour revenir au menu");
+    drawGameoverCeleb();
+  }
+}
+
+/** Bandeau de point : message + indices Gagné / Perdu + hint skip. */
+function drawPointCelebBanner() {
+  const elapsed = POINT_MAX_WAIT - pointTimer;
+  const canSkip = elapsed >= POINT_MIN_WAIT;
+  const bounce = Math.sin((celebT || 0) / 8) * 3;
+  const pw = Math.min(720, W - 40);
+  const maxTextW = pw - 40;
+
+  // Hauteur selon le message (1–2 lignes)
+  let msgSize = 20, msgLines = [pointMsg];
+  if (typeof uiWrapLines === "function") {
+    ctx.font = "700 20px " + UI.display;
+    let size = 20;
+    while (size >= 13) {
+      ctx.font = "700 " + size + "px " + UI.display;
+      msgLines = uiWrapLines(pointMsg, maxTextW);
+      const widest = msgLines.reduce((m, l) => Math.max(m, ctx.measureText(l).width), 0);
+      if (msgLines.length <= 2 && widest <= maxTextW + 0.5) { msgSize = size; break; }
+      size -= 1;
+      msgSize = size;
     }
+    if (msgLines.length > 2) msgLines = msgLines.slice(0, 2);
+  }
+  const msgH = msgLines.length * msgSize * 1.18;
+  const ph = Math.max(96, 52 + msgH + 28);
+  const px = (W - pw) / 2, py = 36 + bounce;
+
+  ctx.fillStyle = "rgba(12,20,42,0.45)";
+  ctx.fillRect(0, 0, W, Math.min(H * 0.28, py + ph + 16));
+
+  ctx.fillStyle = "rgba(255,246,232,0.95)";
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 18); else ctx.rect(px, py, pw, ph);
+  ctx.fill();
+  ctx.strokeStyle = "#1b1730"; ctx.lineWidth = 4; ctx.stroke();
+
+  ctx.textAlign = "center";
+  ctx.font = "700 12px " + UI.sans;
+  ctx.fillStyle = UI.accent;
+  ctx.fillText("POINT !", W / 2, py + 22);
+
+  const titleCy = py + 28 + msgH * 0.55;
+  if (typeof uiTitleBoxed === "function") {
+    uiTitleBoxed(pointMsg, W / 2, titleCy, maxTextW, msgSize, {
+      fill: UI.stroke, stroke: "rgba(255,246,232,0.95)", maxLines: 2, minSize: 13
+    });
+  } else {
+    ctx.fillStyle = "#1b1730";
+    ctx.font = "800 " + msgSize + "px " + UI.sans;
+    ctx.fillText(pointMsg, W / 2, titleCy);
+  }
+
+  ctx.font = "700 12px " + UI.sans;
+  ctx.fillStyle = canSkip ? "rgba(27,23,48,0.65)" : "rgba(27,23,48,0.35)";
+  ctx.fillText(canSkip ? "Saut / Espace — continuer" : "…", W / 2, py + ph - 14);
+
+  const font = UI.display || UI.sans;
+  ctx.font = "800 14px " + font;
+  const winL = servingSide === 0;
+  ctx.fillStyle = winL ? "#7ed957" : "rgba(255,120,100,0.9)";
+  ctx.fillText(winL ? "★ Gagné" : "Perdu…", W * 0.22, H - 28);
+  ctx.fillStyle = !winL ? "#7ed957" : "rgba(255,120,100,0.9)";
+  ctx.fillText(!winL ? "★ Gagné" : "Perdu…", W * 0.78, H - 28);
+}
+
+function drawGameoverCeleb() {
+  const winSide = scores[0] > scores[1] ? 0 : 1;
+  const ready = gameoverTimer <= 0;
+  const sub = online
+    ? ((winSide === (netRole === "host" ? 0 : (mode === "2v2" ? (mySlot < 2 ? 0 : 1) : 1)))
+        ? "Gagné !" : "Perdu…")
+    : (ready ? "Espace ou Entrée — menu" : "Gagné !");
+
+  if (online) {
+    overlay(pointMsg, sub);
+    let line;
+    if (!ready) {
+      line = "Célébration…";
+    } else if (mode === "2v2") {
+      line = netRole === "host" ? "Entrée · rejouer    ·    Échap · quitter"
+                                : "En attente de l'hôte…    ·    Échap · quitter";
+    } else {
+      line = "R · revanche";
+      if (rematchMe) line += " ✓ toi";
+      if (rematchPeer) line += " ✓ adversaire";
+      line += "    ·    Échap · quitter";
+    }
+    // Sous la carte (pas dedans) pour ne pas chevaucher un titre long
+    uiLabel(line, W / 2, H * 0.78, 12, ready ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.4)", 0.3, "center");
+  } else {
+    if (ready) hit(W / 2, H / 2, W, H, "Space");
+    overlay(pointMsg, sub);
+    ctx.textAlign = "center";
+    ctx.font = "800 15px " + (UI.display || UI.sans);
+    ctx.fillStyle = winSide === 0 ? "#7ed957" : "rgba(255,120,100,0.95)";
+    ctx.fillText(winSide === 0 ? "★ Camp gauche" : "★ Camp droite", W / 2, H * 0.78);
   }
 }
 

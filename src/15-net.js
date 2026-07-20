@@ -698,6 +698,7 @@ function hostUpdate2v2() {
 
   if (state === "point" || state === "gameover") {
     if (typeof settleAirborneBlobs === "function") settleAirborneBlobs();
+    if (typeof tickCelebration === "function") tickCelebration();
   }
   if (state === "point") {
     pointTimer--;
@@ -708,6 +709,8 @@ function hostUpdate2v2() {
     const elapsed = POINT_MAX_WAIT - pointTimer;
     const guestWants = guests.some(g => g.connected && g.in.jump);
     if ((elapsed >= POINT_MIN_WAIT && (pointAdvanceRequested() || guestWants)) || pointTimer <= 0) startRally();
+  } else if (state === "gameover") {
+    if (gameoverTimer > 0) gameoverTimer--;
   } else if (state === "play" || state === "serve") {
     const bySlot = {}; for (const g of guests) if (g.connected) bySlot[g.slot] = g;
     const ins = activeBlobs.map((b, s) => {
@@ -743,6 +746,7 @@ function netUpdate() {
     if (!netFrozen) {
       if (state === "point" || state === "gameover") {
         if (typeof settleAirborneBlobs === "function") settleAirborneBlobs();
+        if (typeof tickCelebration === "function") tickCelebration();
       }
       if (state === "point") {
         pointTimer--;
@@ -751,6 +755,8 @@ function netUpdate() {
         // de sécurité au bout de POINT_MAX_WAIT.
         const elapsed = POINT_MAX_WAIT - pointTimer;
         if ((elapsed >= POINT_MIN_WAIT && (pointAdvanceRequested() || guestIn.jump)) || pointTimer <= 0) startRally();
+      } else if (state === "gameover") {
+        if (gameoverTimer > 0) gameoverTimer--;
       } else if (state === "play" || state === "serve") {
         // Soft ownership : invité revendique (own:1) + balle déjà à droite.
         if (hostUsesGuestBall()) {
@@ -874,6 +880,13 @@ function netUpdate() {
       if (ballPkt) msg.b = ballPkt;
       sendFast(msg);
     }
+
+    // Célébration locale (anims victory/defeat + confettis) pendant point / fin
+    if (state === "point" || state === "gameover") {
+      if (typeof settleAirborneBlobs === "function") settleAirborneBlobs();
+      if (typeof tickCelebration === "function") tickCelebration();
+      if (state === "gameover" && gameoverTimer > 0) gameoverTimer--;
+    }
   }
 }
 
@@ -930,6 +943,10 @@ function applyDiscrete(d) {
     ball.touches = [d.ball.touches[0], d.ball.touches[1]];
     ball.trail.length = 0;
     if (d.serveCountdown !== undefined) serveCountdown = d.serveCountdown;
+    if (d.state === "point" || d.state === "gameover") {
+      celebT = 0;
+      if (d.state === "gameover") gameoverTimer = GAMEOVER_MIN_WAIT;
+    }
   }
   if (d.streak) { streak[0] = d.streak[0]; streak[1] = d.streak[1]; }
   if (d.superCharge) { superCharge[0] = d.superCharge[0]; superCharge[1] = d.superCharge[1]; }

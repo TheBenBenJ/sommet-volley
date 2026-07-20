@@ -110,20 +110,71 @@ function isServeHit(blob) {
 function aimLobAngleFromInput(blob, input) {
   // Service : cloche forcée vers l'adversaire (pas de multi-touche dans son camp).
   // Échange : l'angle du stick est respecté dans le cône.
-  const center = blob.side === 0 ? -0.78 : Math.PI + 0.78;
+  const center = blob.side === 0 ? -0.92 : Math.PI + 0.92;
   if (isServeHit(blob)) return center;
   return clampAimToCone(blob, stickAimRaw(blob, input, center), center);
 }
 
-/** Service : force la portée ; échange : conserve l'angle du stick. */
+/** Simu rapide : passe au-dessus du bord du filet (face collision), avec marge. */
+function serveArcClearsNet(x0, y0, vx, vy, dir) {
+  // Même plan que resolveNetBall (leftC / rightC), pas le centre NET_X
+  const faceX = dir > 0
+    ? NET_X - NET_W / 2 - BALL_R
+    : NET_X + NET_W / 2 + BALL_R;
+  const needY = NET_TOP - BALL_R - 10;
+  let x = x0, y = y0, vyy = vy;
+  const lift = (typeof ballLift === "function") ? ballLift() : 1;
+  for (let i = 0; i < 140; i++) {
+    const ox = x, oy = y;
+    vyy += GRAV_BALL * lift;
+    x += vx;
+    y += vyy;
+    const crossed = dir > 0 ? (ox < faceX && x >= faceX) : (ox > faceX && x <= faceX);
+    if (crossed) {
+      const t = Math.abs(x - ox) < 1e-6 ? 1 : (faceX - ox) / (x - ox);
+      const yFace = oy + (y - oy) * t;
+      return yFace <= needY;
+    }
+    if (y + BALL_R >= GROUND_Y) return false;
+  }
+  return false;
+}
+
+/**
+ * Service : impose une cloche qui passe vraiment le filet (tous persos / toutes
+ * positions). Appeler APRÈS applyDirectedHit (serveAimLock déjà levé).
+ */
+function forceServeClearsNet(blob) {
+  const dir = blob.side === 0 ? 1 : -1;
+  const faceX = dir > 0
+    ? NET_X - NET_W / 2 - BALL_R
+    : NET_X + NET_W / 2 + BALL_R;
+  // Évite de partir déjà collé à la face du filet (après reposition frappe)
+  if (dir > 0 && ball.x > faceX - 28) ball.x = faceX - 28;
+  if (dir < 0 && ball.x < faceX + 28) ball.x = faceX + 28;
+  if (ball.y > NET_TOP - 40) ball.y = NET_TOP - 40;
+
+  const dist = Math.abs(faceX - ball.x);
+  // Près du filet → cloche très verticale
+  const steep = dist < 100 ? 1.35 : dist < 180 ? 1.2 : dist < 260 ? 1.05 : 0.98;
+  const ang = dir > 0 ? -steep : Math.PI + steep;
+  let spd = Math.max(HOLD_LOB_SPD * 1.15, Math.hypot(ball.vx, ball.vy));
+  const serveCap = MAX_BALL_SPEED * 1.25;
+  for (let n = 0; n < 20; n++) {
+    ball.vx = Math.cos(ang) * spd;
+    ball.vy = Math.sin(ang) * spd;
+    ball.aimAngle = ang;
+    if (serveArcClearsNet(ball.x, ball.y, ball.vx, ball.vy, dir)) break;
+    spd *= 1.09;
+    if (spd >= serveCap) { spd = serveCap; break; }
+  }
+  ball.vx = Math.cos(ang) * Math.min(spd, serveCap);
+  ball.vy = Math.sin(ang) * Math.min(spd, serveCap);
+}
+
+/** Échange : conserve l'angle du stick, assure une portée mini. */
 function ensureLobClearsNet(blob) {
   const dir = blob.side === 0 ? 1 : -1;
-  if (isServeHit(blob)) {
-    if (ball.vx * dir < 6.2) ball.vx = dir * 6.2;
-    if (ball.vy > -7.2) ball.vy = -7.2;
-    clampBallSpeed();
-    return;
-  }
   let ang = Math.atan2(ball.vy, ball.vx);
   if (Math.cos(ang) * dir < 0) {
     ang = Math.atan2(-1, dir * 0.08);
@@ -271,10 +322,12 @@ function tryLobBall(blob) {
   if (ballPathDistToBlob(blob) > RECEIVE_R) return false;
   if (!canActiveHit(blob)) return false;
   const a = animOf(blob);
+  const serving = isServeHit(blob);
   const ang = aimLobAngleFromInput(blob, blob._input);
   const spd = HOLD_LOB_SPD * (0.95 + a.control * 0.12);
   applyDirectedHit(blob, ang, spd, 0);
-  ensureLobClearsNet(blob);
+  if (serving) forceServeClearsNet(blob);
+  else ensureLobClearsNet(blob);
   markActiveHit(blob);
   return true;
 }
@@ -294,10 +347,17 @@ function trySmashBall(blob) {
   if (ball.y > blob.y - 36) return false;
   if (ballPathDistToBlob(blob) > RECEIVE_R) return false;
   if (!canActiveHit(blob)) return false;
-  const ang = aimAngleFromInput(blob, blob._input);
+  const serving = isServeHit(blob);
+  // Service aérien : même cloche forcée (évite les smashs plats dans le filet)
+  const ang = serving
+    ? aimLobAngleFromInput(blob, blob._input)
+    : aimAngleFromInput(blob, blob._input);
   const pow = blob.kitPower != null ? blob.kitPower : animOf(blob).power;
-  const spd = HIT_SPEED * pow * SMASH_MUL;
+  const spd = serving
+    ? HOLD_LOB_SPD * 1.05
+    : HIT_SPEED * pow * SMASH_MUL;
   applyDirectedHit(blob, ang, spd, 0); // smashTicks=0 → pas de slowMo / zoom
+  if (serving) forceServeClearsNet(blob);
   markActiveHit(blob);
   shake = Math.max(shake, 4);
   if (typeof setCharPose === "function") setCharPose(blob, "smash", 28);

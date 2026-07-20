@@ -126,6 +126,8 @@ let pointTimer = 0;
 let serveCountdown = 0;   // décompte avant service (ticks)
 let pointMsg = "";
 let paused = false;
+let celebT = 0;           // ticks depuis le début de la célébration (point / fin)
+let gameoverTimer = 0;    // ticks restants avant skip fin de match
 let shake = 0;                 // intensité du tremblement d'écran
 let muted = false;
 let noFx = false;             // coupe sons/particules (re-simulations réseau)
@@ -238,6 +240,7 @@ class Blob {
     this.poseT = 0;
     this.poseDur = 0;
     this._faceRight = this.side === 0; // orientation visuelle (suit le déplacement)
+    this._celebHop = 0;      // petit saut de joie après un point
   }
   // deux cercles de collision : corps + tête (alignés sur le dessin)
   get bodyCircle() { return { x: this.x, y: this.y - 30, r: 28 }; }
@@ -274,17 +277,23 @@ class Blob {
     }
     const moveVx = a.slip ? this.dispVx : this.vx;
 
-    if (this.onGround && moveVx !== 0) {
+    // Marche : avancer le cycle dès qu'on veut bouger (slip) ou qu'on glisse.
+    // Sinon Trompette reste bloqué / alterne idle↔walk sur 1–2 frames.
+    const wantWalk = this.onGround && (
+      Math.abs(this.vx) > 0.01 || Math.abs(moveVx) > 0.12
+    );
+    if (wantWalk) {
       const scrambling = a.slip;
       this.scramble = scrambling ? 1 : 0;
-      // Rythme de marche stable pour les sprites (8 frames) — le slip
-      // ne doit plus accélérer le cycle (sinon flicker / « 2 images »).
-      this.walkPhase += 0.28;
+      // Compteur entier : 1 frame toutes les 4 ticks → alternance F/B lisible
+      this._walkTick = (this._walkTick || 0) + 1;
+      if (this._walkTick % 4 === 0) this.walkPhase += 1;
       if (Math.random() < (scrambling ? 0.35 : 0.1)) {
         spawnSand(this.x - Math.sign(this.vx || moveVx) * 12, GROUND_Y, 1);
       }
     } else {
       this.scramble = 0;
+      this._walkTick = 0;
     }
     const jumpPressed = input.jump && !this.prevJump; // front montant
     this._jumpEdge = jumpPressed;

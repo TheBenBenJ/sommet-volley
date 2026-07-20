@@ -13,5 +13,6 @@
     "defeat": 2
   },
   "baseH": 110,
-  "footPad": 2
+  "footPad": 2,
+  "lockAspect": 0.672
 }

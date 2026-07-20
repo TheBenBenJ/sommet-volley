@@ -127,11 +127,16 @@ function charPickAnim(b) {
     return "receive";
   }
   if (charWantPanic(b) && charAnimReady(key, "panic")) return "panic";
-  // Marche avec hystérésis — évite idle↔walk qui clignote quand l'IA micro-ajuste
-  const spd = Math.abs((animOf(b).slip && typeof b.dispVx === "number") ? b.dispVx : (b.vx || 0));
+  // Marche avec hystérésis — évite idle↔walk qui clignote quand l'IA micro-ajuste.
+  // Slip (Trompette) : seuils plus collants + vx consigne (pas seulement dispVx).
+  const a = animOf(b);
+  const disp = (a.slip && typeof b.dispVx === "number") ? b.dispVx : (b.vx || 0);
+  const spd = Math.max(Math.abs(disp), a.slip ? Math.abs(b.vx || 0) * 0.85 : 0);
+  const enter = a.slip ? 0.35 : 0.75;
+  const exit = a.slip ? 0.08 : 0.25;
   if (b._walking) {
-    if (spd < 0.25) b._walking = false;
-  } else if (spd > 0.75) {
+    if (spd < exit) b._walking = false;
+  } else if (spd > enter) {
     b._walking = true;
   }
   if (b._walking && charAnimReady(key, "walk")) return "walk";
@@ -146,8 +151,8 @@ function charPickFrame(b, anim) {
   if (!frames || !frames.length) return null;
   let idx = 0;
   if (anim === "walk") {
-    // ~4 ticks / frame à walkPhase += 0.28 → cycle 8 frames lisible
-    idx = Math.floor(Math.abs(b.walkPhase || 0) * 0.9) % frames.length;
+    // walkPhase entier (voir Blob.update) — cycle F/B/F/B dans les PNG
+    idx = Math.floor(Math.abs(b.walkPhase || 0)) % frames.length;
   } else if (anim === "jump") {
     if (b.vy < -2) idx = 0;
     else if (b.vy > 2) idx = Math.min(2, frames.length - 1);
@@ -164,7 +169,9 @@ function charPickFrame(b, anim) {
       idx = Math.floor((tick || 0) / 8) % frames.length;
     }
   } else if (anim === "victory" || anim === "defeat") {
-    idx = Math.floor((tick || 0) / 16) % frames.length;
+    // celebT avance pendant point/fin (tick de simu est figé)
+    const ct = typeof celebT === "number" ? celebT : (tick || 0);
+    idx = Math.floor(ct / 28) % frames.length;
   } else if (frames.length > 1) {
     idx = Math.floor((tick || 0) / 20) % frames.length;
   }
@@ -213,13 +220,22 @@ function drawSpriteChar(b) {
   const footY = b.groundY != null ? b.groundY : b.y;
   const faceRight = charFaceRight(b);
   const h = baseH * (b.squash > 0 ? 1 - b.squash * 0.02 : 1);
-  const aspect = img.naturalWidth / img.naturalHeight;
+  // Largeur stable (évite le « pulse » quand les PNG walk ont des largeurs différentes)
+  const lockAsp = pack.manifest && pack.manifest.lockAspect;
+  const aspect = lockAsp || (img.naturalWidth / img.naturalHeight);
   const w = h * aspect * scaleX;
+  // Rebond de pas (lié au tick, walkPhase est entier)
+  const bob = (anim === "walk")
+    ? Math.abs(Math.sin(((b._walkTick || 0) / 4) * Math.PI)) * 2.5
+    : 0;
 
   ctx.save();
   ctx.translate(b.x, footY);
   if (!faceRight) ctx.scale(-1, 1);
-  ctx.drawImage(img, -w / 2, -h + footPad, w, h);
+  // Centrer horizontalement dans la boîte lockAspect si l'image est plus étroite
+  const natW = h * (img.naturalWidth / img.naturalHeight) * scaleX;
+  const ox = -w / 2 + (w - natW) / 2;
+  ctx.drawImage(img, ox, -h + footPad - bob, natW, h);
   ctx.restore();
   return true;
 }

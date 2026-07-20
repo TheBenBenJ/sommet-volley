@@ -1223,51 +1223,68 @@ function drawHUD() {
   }
   if (bombMode && (state === "play" || state === "serve")) drawBombHUD();
 
-  // ---- tableau de score : UN panneau plein par camp (label, chiffre,
-  // touches, jauge de combo) — plutôt que des éléments séparés dont certains
-  // flottaient nus sur le décor (illisibles dès que le fond était clair).
-  const MONO = "'Space Mono', ui-monospace, monospace";
-  const SANS = "'Inter', system-ui, sans-serif";
-  const sideLbl = s => (mode === "2v2" ? (s === 0 ? "ÉQUIPE 1" : "ÉQUIPE 2") : sideLabel(s)).toUpperCase();
+  // ---- tableau de score cartoon, panneaux légers (la balle haute doit rester lisible)
+  const DISP = (typeof UI !== "undefined" ? UI.display : "'Fredoka', sans-serif");
+  const SANS = (typeof UI !== "undefined" ? UI.sans : "'Nunito', sans-serif");
+  const STROKE = (typeof UI !== "undefined" ? UI.stroke : "#1b1730");
+  const CREAM = "rgba(255,246,232,0.38)";
+  const sideLbl = s => (mode === "2v2" ? (s === 0 ? "Équipe 1" : "Équipe 2") : sideLabel(s));
   for (const s of [0, 1]) {
     const cx = s === 0 ? W * 0.25 : W * 0.75;
     const col = sideColor(s);
-    // panneau plein (assez opaque pour rester lisible sur n'importe quel
-    // terrain/ciel derrière, clair ou sombre)
-    ctx.fillStyle = "rgba(10,12,18,0.6)";
+    const pop = scorePop[s] || 0;
+    const pw = 140, ph = 118, px = cx - pw / 2, py = 10;
+    ctx.fillStyle = CREAM;
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(cx - 68, 14, 136, 112, 12);
-    else ctx.rect(cx - 68, 14, 136, 112);
+    if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 16);
+    else ctx.rect(px, py, pw, ph);
     ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,0.12)"; ctx.lineWidth = 1; ctx.stroke();
-    // label mono (toujours blanc plein, jamais une teinte qui pourrait se
-    // fondre dans le panneau sombre)
-    ctx.textAlign = "center";
-    ctx.fillStyle = "rgba(255,255,255,0.85)";
-    ctx.font = "700 10px " + MONO;
-    ctx.save(); try { ctx.letterSpacing = "2px"; } catch (e) {}
-    ctx.fillText(sideLbl(s), cx, 32);
-    ctx.restore();
-    // chiffre (Inter 900, grossit sur un point marqué)
+    ctx.strokeStyle = "rgba(27,23,48,0.35)"; ctx.lineWidth = 2.5; ctx.stroke();
+    // bandeau couleur camp (semi-transparent)
+    ctx.globalAlpha = 0.72;
     ctx.fillStyle = col;
-    ctx.font = "900 " + (30 + scorePop[s] * 1.0) + "px " + SANS;
-    ctx.fillText(scores[s], cx, 62);
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(px + 3, py + 3, pw - 6, 22, 12);
+    else ctx.rect(px + 3, py + 3, pw - 6, 22);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#fff6e8";
+    ctx.font = "700 12px " + SANS;
+    ctx.strokeStyle = "rgba(27,23,48,0.55)"; ctx.lineWidth = 3; ctx.lineJoin = "round";
+    ctx.strokeText(sideLbl(s), cx, py + 19);
+    ctx.fillText(sideLbl(s), cx, py + 19);
+    // gros score (contour pour rester lisible sur fond transparent)
+    const scSize = 36 + pop * 1.4;
+    ctx.font = "700 " + scSize + "px " + DISP;
+    ctx.strokeStyle = "rgba(27,23,48,0.75)"; ctx.lineWidth = 5;
+    ctx.strokeText(String(scores[s]), cx, py + 58);
+    ctx.fillStyle = col;
+    ctx.fillText(String(scores[s]), cx, py + 58);
     if (scorePop[s] > 0) scorePop[s]--;
   }
-  // séparateur central mono
+  // pastille VS légère
   ctx.textAlign = "center";
-  ctx.fillStyle = "rgba(255,255,255,0.42)";
-  ctx.font = "700 12px " + MONO;
-  ctx.fillText("VS", NET_X, 46);
+  ctx.fillStyle = CREAM;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(NET_X - 22, 36, 44, 28, 12);
+  else ctx.rect(NET_X - 22, 36, 44, 28);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(27,23,48,0.35)"; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = STROKE;
+  ctx.font = "700 14px " + DISP;
+  ctx.fillText("VS", NET_X, 55);
 
-  // indicateur de touches (petits points, dans le panneau)
+  // indicateur de touches (pastilles)
   for (const side of [0, 1]) {
-    const baseX = side === 0 ? W * 0.25 - 24 : W * 0.75 - 24;
+    const baseX = side === 0 ? W * 0.25 - 26 : W * 0.75 - 26;
     for (let i = 0; i < MAX_TOUCHES; i++) {
+      const on = i < ball.touches[side];
       ctx.beginPath();
-      ctx.arc(baseX + i * 24, 84, 5, 0, Math.PI * 2);
-      ctx.fillStyle = i < ball.touches[side] ? sideColor(side) : "rgba(255,255,255,0.35)";
+      ctx.arc(baseX + i * 26, 86, 6.5, 0, Math.PI * 2);
+      ctx.fillStyle = on ? sideColor(side) : "rgba(27,23,48,0.18)";
       ctx.fill();
+      ctx.strokeStyle = STROKE; ctx.lineWidth = 2; ctx.stroke();
     }
   }
 
@@ -1275,29 +1292,32 @@ function drawHUD() {
   for (const s of [0, 1]) {
     const cx = s === 0 ? W * 0.25 : W * 0.75;
     const col = sideColor(s);
-    const bw = 108, bx = cx - bw / 2, by = 98;
+    const bw = 108, bx = cx - bw / 2, by = 100;
     const ready = superCharge[s] === 1;
     const frac = ready ? 1 : (streak[s] % SUPER_NEED) / SUPER_NEED;
-    // cadre
-    ctx.fillStyle = "rgba(0,0,0,0.35)";
-    ctx.fillRect(bx - 1, by - 1, bw + 2, 9);
-    // remplissage
-    if (ready) {
-      const t = performance.now() / 300;
-      ctx.fillStyle = (Math.sin(t * 6) > 0) ? "#ffd93d" : "#fff2a0";
-    } else ctx.fillStyle = col;
-    ctx.fillRect(bx, by, bw * frac, 7);
-    // libellé mono — toujours blanc plein (85%), jamais une teinte pâle qui
-    // pourrait se fondre dans le fond du panneau
+    ctx.fillStyle = "rgba(27,23,48,0.12)";
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, by, bw, 8, 4); else ctx.rect(bx, by, bw, 8);
+    ctx.fill();
+    ctx.strokeStyle = STROKE; ctx.lineWidth = 1.5; ctx.stroke();
+    if (frac > 0) {
+      if (ready) {
+        const t = performance.now() / 300;
+        ctx.fillStyle = (Math.sin(t * 6) > 0) ? "#ffd84a" : "#fff2a0";
+      } else ctx.fillStyle = col;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(bx, by, Math.max(4, bw * frac), 8, 4);
+      else ctx.rect(bx, by, bw * frac, 8);
+      ctx.fill();
+    }
     ctx.textAlign = "center";
+    ctx.font = "800 11px " + SANS;
     if (ready) {
-      ctx.fillStyle = "#ffd93d";
-      ctx.font = "700 10px " + MONO;
-      ctx.fillText("SUPER — " + (s === 0 ? "E" : "Shift"), cx, by + 22);
+      ctx.fillStyle = "#c48a00";
+      ctx.fillText("SUPER — " + (s === 0 ? "E" : "Shift"), cx, by + 20);
     } else {
-      ctx.fillStyle = "rgba(255,255,255,0.85)";
-      ctx.font = "700 10px " + MONO;
-      ctx.fillText("COMBO " + (streak[s] % SUPER_NEED) + "/" + SUPER_NEED, cx, by + 22);
+      ctx.fillStyle = "rgba(27,23,48,0.7)";
+      ctx.fillText("Combo " + (streak[s] % SUPER_NEED) + "/" + SUPER_NEED, cx, by + 20);
     }
   }
 
@@ -1305,27 +1325,26 @@ function drawHUD() {
   if (superFlashT > 0 && superFlash) {
     ctx.textAlign = "center";
     ctx.globalAlpha = Math.min(1, superFlashT / 12);
-    ctx.fillStyle = "#ffd93d";
-    ctx.strokeStyle = "rgba(0,0,0,0.5)";
-    ctx.lineWidth = 4; ctx.lineJoin = "round";
-    ctx.font = "bold 34px 'Inter', system-ui, sans-serif";
+    ctx.fillStyle = "#ffd84a";
+    ctx.strokeStyle = STROKE;
+    ctx.lineWidth = 5; ctx.lineJoin = "round";
+    ctx.font = "700 34px " + DISP;
     ctx.strokeText(superFlash, NET_X, 150);
     ctx.fillText(superFlash, NET_X, 150);
     ctx.globalAlpha = 1;
   }
 
-  // balle de match — liseré sombre systématique : sans lui, la couleur de
-  // le perso (pas toujours claire) peut se fondre dans le décor.
+  // balle de match
   if (state === "play" || state === "serve") {
     for (const s of [0, 1]) {
       if (scores[s] >= WIN_SCORE - 1 && scores[s] - scores[1 - s] >= 1) {
         const txt = "★ Balle de match — " + sideLabel(s) + " ★";
         ctx.textAlign = "center";
-        ctx.font = "bold 16px 'Inter', system-ui, sans-serif";
-        ctx.strokeStyle = "rgba(0,0,0,0.6)"; ctx.lineWidth = 3; ctx.lineJoin = "round";
-        ctx.strokeText(txt, NET_X, 128);
+        ctx.font = "700 16px " + DISP;
+        ctx.strokeStyle = STROKE; ctx.lineWidth = 4; ctx.lineJoin = "round";
+        ctx.strokeText(txt, NET_X, 148);
         ctx.fillStyle = sideColor(s);
-        ctx.fillText(txt, NET_X, 128);
+        ctx.fillText(txt, NET_X, 148);
       }
     }
   }
@@ -1334,21 +1353,30 @@ function drawHUD() {
   // systématique : jamais de texte flottant nu directement sur le décor
   // (illisible dès que le fond est clair ou que sa couleur varie).
   if (state === "serve" && serveCountdown > 0) {
-    const n = Math.ceil((serveCountdown - 6) / 21); // 3 → 2 → 1 → (GO)
+    const beat = typeof SERVE_BEAT !== "undefined" ? SERVE_BEAT : 51;
+    const go = typeof SERVE_GO !== "undefined" ? SERVE_GO : 30;
+    const n = Math.ceil((serveCountdown - go) / beat); // 3 → 2 → 1 → (GO)
     const label = n <= 0 ? "GO !" : String(n);
+    const bounce = Math.sin(performance.now() / 120) * 4;
     ctx.textAlign = "center";
-    const bw = n <= 0 ? 220 : 140, bh = 110, bx = NET_X - bw / 2, by = H / 2 - 70;
-    ctx.fillStyle = "rgba(10,12,18,0.6)";
+    const bw = n <= 0 ? 240 : 150, bh = 120, bx = NET_X - bw / 2, by = H / 2 - 74;
+    ctx.fillStyle = "rgba(12,20,42,0.72)";
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, 18); else ctx.rect(bx, by, bw, bh);
+    if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, 20); else ctx.rect(bx, by, bw, bh);
     ctx.fill();
-    ctx.fillStyle = "#ffcc00";
-    ctx.font = "bold 88px 'Inter', system-ui, sans-serif";
-    ctx.fillText(label, NET_X, H / 2 + 20);
+    ctx.strokeStyle = "#1b1730"; ctx.lineWidth = 4; ctx.stroke();
+    const font = typeof UI !== "undefined" ? UI.display : "'Fredoka', sans-serif";
+    ctx.font = "700 84px " + font;
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = "#1b1730";
+    ctx.strokeText(label, NET_X, H / 2 + 22 + bounce);
+    ctx.fillStyle = n <= 0 ? "#7ed957" : "#ffd84a";
+    ctx.fillText(label, NET_X, H / 2 + 22 + bounce);
   } else if (state === "serve") {
     const txt = "Service : " + sideLabel(servingSide) + " — X lancer, puis X frapper (pas le saut) !";
     ctx.textAlign = "center";
-    ctx.font = "700 17px 'Inter', system-ui, sans-serif";
+    ctx.font = "700 17px " + (typeof UI !== "undefined" ? UI.sans : "sans-serif");
     const tw = ctx.measureText(txt).width;
     // sous les panneaux de score (qui vont jusqu'à y=126) : avec le nom de
     // le perso (souvent plus long que "Gauche"/"Droite"), la pastille est
@@ -1372,26 +1400,67 @@ function drawHUD() {
 function overlay(title, subtitle) {
   ctx.fillStyle = "rgba(12, 20, 42, 0.72)";
   ctx.fillRect(0, 0, W, H);
-  const pw = 520, ph = 160, px = (W - pw) / 2, py = (H - ph) / 2 - 8;
+
+  const pw = Math.min(640, W - 48);
+  const maxTextW = pw - 48;
+  // Mesure le titre pour dimensionner la carte (wrap + taille adaptée)
+  let titleH = 40, titleSize = 28;
+  if (typeof uiTitleBoxed === "function") {
+    ctx.save();
+    // dry-run : même logique sans dessiner — on mesure via une passe
+    let size = 28;
+    const minSize = 15;
+    let lines = [String(title || "")];
+    while (size >= minSize) {
+      ctx.font = "700 " + size + "px " + UI.display;
+      lines = uiWrapLines(title, maxTextW);
+      const widest = lines.reduce((m, l) => Math.max(m, ctx.measureText(l).width), 0);
+      if (lines.length <= 3 && widest <= maxTextW + 0.5) break;
+      size -= 1;
+    }
+    if (lines.length > 3) lines = lines.slice(0, 3);
+    titleSize = size;
+    titleH = lines.length * size * 1.18;
+    ctx.restore();
+  }
+
+  let subLines = [];
+  if (subtitle) {
+    ctx.font = "700 15px " + UI.sans;
+    subLines = typeof uiWrapLines === "function" ? uiWrapLines(subtitle, maxTextW) : [subtitle];
+    if (subLines.length > 2) subLines = subLines.slice(0, 2);
+  }
+  const subH = subLines.length ? subLines.length * 20 + 8 : 0;
+  const ph = Math.max(160, 56 + titleH + subH + 36);
+  const px = (W - pw) / 2, py = (H - ph) / 2 - 8;
+
   ctx.fillStyle = "rgba(255,246,232,0.95)";
   ctx.beginPath();
   if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 18);
   else ctx.rect(px, py, pw, ph);
   ctx.fill();
   ctx.strokeStyle = UI.stroke; ctx.lineWidth = 4; ctx.stroke();
-  uiLabel("Sommet Volley", W / 2, py + 32, 13, uiAccent(), 0.4, "center");
-  if (typeof uiTitle === "function") uiTitle(title, W / 2, py + 82, 34, "center");
-  else {
+
+  uiLabel("Sommet Volley", W / 2, py + 28, 13, uiAccent(), 0.4, "center");
+  const titleCy = py + 36 + titleH * 0.55;
+  if (typeof uiTitleBoxed === "function") {
+    uiTitleBoxed(title, W / 2, titleCy, maxTextW, titleSize, {
+      fill: UI.stroke, stroke: "rgba(255,246,232,0.9)", maxLines: 3, minSize: 15
+    });
+  } else {
     ctx.textAlign = "center";
     ctx.fillStyle = UI.stroke;
-    ctx.font = "800 34px " + UI.sans;
-    ctx.fillText(title, W / 2, py + 82);
+    ctx.font = "800 " + titleSize + "px " + UI.sans;
+    ctx.fillText(title, W / 2, titleCy);
   }
-  if (subtitle) {
+  if (subLines.length) {
     ctx.textAlign = "center";
     ctx.font = "700 15px " + UI.sans;
     ctx.fillStyle = "rgba(27,23,48,0.7)";
-    ctx.fillText(subtitle, W / 2, py + 118);
+    const subY0 = py + ph - 28 - (subLines.length - 1) * 20;
+    for (let i = 0; i < subLines.length; i++) {
+      ctx.fillText(subLines[i], W / 2, subY0 + i * 20);
+    }
   }
 }
 
