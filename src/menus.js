@@ -10,6 +10,13 @@ function handleMenuKeys(code, key) {
   if (code === "NumpadEnter") code = "Enter"; // Entrée du pavé numérique = Entrée
   // (c'était le « je remplis le code et rien ne se passe » des claviers à pavé)
 
+  // Mode Histoire : hub, dialogues, cartes d'acte et écran de fin absorbent les touches en amont.
+  if ((state === "storyMenu" || state === "storyScene" || state === "storyActIntro" || state === "storyEnding") &&
+      typeof storyHandleKeys === "function") {
+    if (storyHandleKeys(code)) return;
+  }
+  if (typeof storyHandleClickCode === "function" && storyHandleClickCode(code)) return;
+
   // Navigation grille (persos / terrains) : flèches / WASD
   if (state === "selectCharacter" || state === "selectTerrain") {
     const dir =
@@ -69,6 +76,7 @@ function handleMenuKeys(code, key) {
         state = "onlineMenu";
       }
     }
+    if (code === "Digit4" && typeof storyOpen === "function") storyOpen();          // Mode Histoire
     if (code === "KeyR") state = "rules";
     if (code === "KeyT") startTutorial();
     if (code === "KeyH") { tutorialReset(); state = "tutorialHelp"; }
@@ -225,7 +233,8 @@ function handleMenuKeys(code, key) {
       }
       if (code === "Escape") quitOnline();
     } else if ((code === "Space" || code === "Enter") && gameoverTimer <= 0) {
-      goMenu();
+      if (storyActive && storyInMatch && typeof storyOnMatchEnd === "function") storyOnMatchEnd();
+      else goMenu();
     }
 
   } else if ((state === "serve" || state === "play") && tutorialMode &&
@@ -330,6 +339,8 @@ let menuActors = { L: null, R: null };
 function goMenu() {
   tutorialMode = false;
   tutorialStep = 0;
+  // sortie complète du flux histoire (ex. Échap pendant un match d'histoire)
+  if (typeof storyActive !== "undefined") { storyActive = false; storyInMatch = false; storyScene = null; }
   state = "menu";
   shuffleMenuBackdrop();
   if (shouldShowTutorialInvite()) tutorialInviteOpen = true;
@@ -815,12 +826,13 @@ function drawMenu() {
     "1  —  Solo",
     "2  —  Multijoueur local",
     "3  —  Multijoueur en ligne",
+    "4  —  Mode Histoire  ·  Les Jeux du Sommet",
     "T  —  Tutoriel" + (tutorialDone ? "" : "  · Nouveau"),
     "H  —  Aide commandes",
     "R  —  Règles du jeu",
     "C  —  Crédits"
   ];
-  drawOptionList(items, 188, 34);
+  drawOptionList(items, 182, 32);
 
   uiLabel(controlsHint(), UI.mx, H - 52, 12, controlsHintColor(), 0.3);
   uiLabel("Premier à " + WIN_SCORE + " · 2 pts d'écart · " + MAX_TOUCHES + " touches max",

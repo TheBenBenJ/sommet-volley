@@ -114,6 +114,10 @@ function render() {
   if (state === "connecting") { drawNetScreen("Connexion", "Recherche de la partie"); return; }
   if (state === "netWait") { drawNetScreen("Tu joues à droite", "En attente du lancement par l'hôte"); return; }
   if (state === "netError") { drawNetError(); return; }
+  if (state === "storyMenu") { drawStoryHub(); return; }
+  if (state === "storyActIntro") { drawStoryActIntro(); return; }
+  if (state === "storyScene") { drawStoryScene(); return; }
+  if (state === "storyEnding") { drawStoryEnding(); return; }
 
   // invité : le monde affiché vient de l'interpolation des instantanés
   if (online && netRole === "guest") guestApplyView();
@@ -162,6 +166,8 @@ function render() {
       b.draw();
     }
   }
+  // Mode Histoire : aura rouge « dopé » autour des blobs concernés (repère caméra)
+  if (typeof storyDrawAuras === "function") storyDrawAuras();
   // Service inclus : balle au premier plan (sur les bras receive)
   drawBallLayer();
   if (typeof drawTutorialAimPreview === "function") drawTutorialAimPreview();
@@ -176,8 +182,10 @@ function render() {
 
   if (state === "point") {
     drawPointCelebBanner();
+    if (typeof storyDrawBark === "function") storyDrawBark();
   } else if (state === "gameover") {
     drawGameoverCeleb();
+    if (typeof storyDrawGameoverTag === "function") storyDrawGameoverTag();
   }
 }
 

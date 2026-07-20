@@ -1052,5 +1052,127 @@ test("events map : pas de trigger en pause / service / point", () => {
   assert.strictEqual(g.mapEvent.phase, "warn", "event démarre en play");
 });
 
+// ---------- Mode Histoire ----------
+test("campagne : chapitres cohérents (persos, terrain, mode, dopage, dialogues)", () => {
+  const g = loadGame();
+  assert.ok(Array.isArray(g.STORY) && g.STORY.length >= 6, "au moins 6 chapitres");
+  const keys = new Set(g.CHARACTERS.map(c => c.key));
+  g.STORY.forEach((ch, i) => {
+    assert.ok(keys.has(ch.left), "ch" + i + " left invalide: " + ch.left);
+    assert.ok(keys.has(ch.right), "ch" + i + " right invalide: " + ch.right);
+    assert.notStrictEqual(ch.left, ch.right, "ch" + i + " oppose un perso à lui-même");
+    assert.ok(ch.terrain >= 0 && ch.terrain < g.TERRAINS.length, "ch" + i + " terrain hors bornes");
+    assert.ok(ch.mode === "volley" || ch.mode === "bomb", "ch" + i + " mode invalide");
+    assert.ok(ch.ai >= 0 && ch.ai <= 3, "ch" + i + " niveau IA hors bornes");
+    // design : le joueur (gauche) AFFRONTE des dopés — il ne joue jamais le dopé.
+    assert.ok(ch.doped === null || ch.doped === "R", "ch" + i + " : seul l'adversaire (R) peut être dopé");
+    for (const phase of ["pre", "win", "lose"]) {
+      assert.ok(Array.isArray(ch[phase]) && ch[phase].length > 0, "ch" + i + " dialogue " + phase + " vide");
+      for (const line of ch[phase]) {
+        assert.ok(typeof line.t === "string" && line.t.length > 0, "ch" + i + " réplique vide");
+        const okSpeaker = line.s === "narrator" || keys.has(line.s);
+        assert.ok(okSpeaker, "ch" + i + " locuteur inconnu: " + line.s);
+      }
+    }
+  });
+});
+
+test("story : le premier chapitre est débloqué, les suivants verrouillés", () => {
+  const g = loadGame();
+  g.setStoryProgress({ unlocked: 0, completed: [] });
+  g.setStoryChapter(0);
+  g.storySelectChapter(0); // ch0 = début d'acte → carte d'intro d'acte
+  assert.strictEqual(g.getState(), "storyActIntro");
+  g.storyBeginScene("pre"); // (via avance de la carte) → dialogue d'avant-match
+  assert.strictEqual(g.getState(), "storyScene");
+  assert.ok(g.getStoryScene() && g.getStoryScene().phase === "pre");
+  // chapitre verrouillé : reste ignoré
+  g.setState("storyMenu");
+  g.storySelectChapter(3);
+  assert.strictEqual(g.getState(), "storyMenu", "chapitre verrouillé non jouable");
+});
+
+test("storyStartMatch configure persos / terrain / mode / dopage", () => {
+  const g = loadGame();
+  // trouve un chapitre Bombe avec adversaire dopé
+  const dopedIdx = g.STORY.findIndex(c => c.mode === "bomb" && c.doped === "R");
+  assert.ok(dopedIdx >= 0, "au moins un chapitre bombe+dopé");
+  const ch = g.STORY[dopedIdx];
+  g.setStoryChapter(dopedIdx);
+  g.storyStartMatch();
+  assert.strictEqual(g.blobL.charId, g.storyCharIdx(ch.left), "protagoniste à gauche");
+  assert.strictEqual(g.blobR.charId, g.storyCharIdx(ch.right), "adversaire à droite");
+  assert.strictEqual(g.getTerrain(), ch.terrain, "terrain du chapitre");
+  assert.strictEqual(g.getBombMode(), true, "mode bombe actif");
+  assert.strictEqual(g.blobR.doped, true, "adversaire dopé");
+  assert.ok(g.blobR.speedMul >= 1.5, "dopé = vitesse impitoyable");
+  assert.strictEqual(g.getStoryFlags().inMatch, true);
+
+  // chapitre volley non dopé
+  const volIdx = g.STORY.findIndex(c => c.mode === "volley" && !c.doped);
+  const chV = g.STORY[volIdx];
+  g.setStoryChapter(volIdx);
+  g.storyStartMatch();
+  assert.strictEqual(g.getBombMode(), false, "volley = pas de bombe");
+  assert.strictEqual(g.blobR.doped, false, "pas de dopage en rivalité légère");
+});
+
+test("progression : victoire débloque le chapitre suivant, défaite non", () => {
+  const g = loadGame();
+  g.setStoryProgress({ unlocked: 0, completed: [] });
+  // défaite au chapitre 0 : rien ne se débloque
+  g.setStoryChapter(0);
+  g.storyAfterPostScene(false);
+  assert.strictEqual(g.getStoryProgress().unlocked, 0, "défaite ne débloque pas");
+  assert.ok(!g.getStoryProgress().completed[0], "défaite ne complète pas");
+  // victoire au chapitre 0 : complète 0 et débloque 1
+  g.setStoryChapter(0);
+  g.storyAfterPostScene(true);
+  assert.strictEqual(g.getStoryProgress().completed[0], true, "victoire complète le chapitre");
+  assert.strictEqual(g.getStoryProgress().unlocked, 1, "victoire débloque le suivant");
+});
+
+test("story : chaque début d'acte affiche une carte d'intro, pas les autres", () => {
+  const g = loadGame();
+  g.setStoryProgress({ unlocked: 8, completed: [] });
+  const firsts = [];
+  for (let i = 0; i < g.STORY.length; i++) {
+    if (i === 0 || g.STORY[i].act !== g.STORY[i - 1].act) firsts.push(i);
+  }
+  assert.ok(firsts.length === 3, "3 débuts d'acte");
+  // début d'acte → carte d'intro
+  g.setState("storyMenu"); g.storySelectChapter(firsts[1]);
+  assert.strictEqual(g.getState(), "storyActIntro");
+  // chapitre au milieu d'un acte → dialogue direct
+  const mid = firsts[1] + 1;
+  g.setState("storyMenu"); g.storySelectChapter(mid);
+  assert.strictEqual(g.getState(), "storyScene");
+});
+
+test("story : gagner la finale ouvre l'écran de fin ; sinon retour au hub", () => {
+  const g = loadGame();
+  const last = g.STORY.length - 1;
+  g.setStoryProgress({ unlocked: last, completed: [] });
+  g.setStoryChapter(last);
+  g.storyAfterPostScene(true); // victoire en finale
+  assert.strictEqual(g.getState(), "storyEnding");
+  assert.strictEqual(g.getStoryProgress().completed[last], true);
+  // victoire hors finale → hub
+  g.setStoryChapter(0);
+  g.storyAfterPostScene(true);
+  assert.strictEqual(g.getState(), "storyMenu");
+});
+
+test("storyOnMatchEnd choisit la bonne branche selon le score", () => {
+  const g = loadGame();
+  g.setStoryChapter(0);
+  g.scores[0] = 15; g.scores[1] = 8; // joueur (gauche) gagne
+  g.storyOnMatchEnd();
+  assert.strictEqual(g.getStoryScene().phase, "win");
+  g.scores[0] = 9; g.scores[1] = 15; // joueur perd
+  g.storyOnMatchEnd();
+  assert.strictEqual(g.getStoryScene().phase, "lose");
+});
+
 console.log("\n" + pass + " réussis, " + fail + " échoués");
 process.exit(fail ? 1 : 0);

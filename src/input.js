@@ -191,7 +191,7 @@ function navOptions() {
   switch (state) {
     case "menu":          return tutorialInviteOpen
       ? ["TutPlay", "TutLater", "TutNever"]
-      : ["Digit1", "Digit2", "Digit3", "KeyT", "KeyH", "KeyR", "KeyC"];
+      : ["Digit1", "Digit2", "Digit3", "Digit4", "KeyT", "KeyH", "KeyR", "KeyC"];
     case "aiDifficulty":  return ["Digit1", "Digit2", "Digit3", "Digit4"];
     case "bombDuration":  return ["Digit1", "Digit2", "Digit3"];
     case "bombFormat":    return ["Digit1", "Digit2"];
@@ -275,6 +275,14 @@ function handlePadMenu() {
     }
     if (padEdge("confirm")) { const c = opts[navIdx]; navIdx = 0; handleMenuKeys(c, ""); return; }
     if (padEdge("back")) { navIdx = 0; handleMenuKeys("Escape", ""); }
+  } else if (state === "storyMenu") {
+    if (padEdge("down")) handleMenuKeys("ArrowDown", "");
+    if (padEdge("up")) handleMenuKeys("ArrowUp", "");
+    if (padEdge("confirm")) handleMenuKeys("Enter", "");
+    if (padEdge("back")) handleMenuKeys("Escape", "");
+  } else if (state === "storyScene" || state === "storyActIntro" || state === "storyEnding") {
+    if (padEdge("confirm")) handleMenuKeys("Enter", "");
+    if (padEdge("back")) handleMenuKeys("Escape", "");
   } else if (state === "rules" || state === "tutorialHelp" || state === "netError" || state === "credits") {
     if (padEdge("confirm") || padEdge("back")) handleMenuKeys("Escape", "");
   } else if ((state === "serve" || state === "play") && tutorialMode) {
