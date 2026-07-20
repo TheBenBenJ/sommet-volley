@@ -1444,8 +1444,8 @@ function drawHUD() {
   const STROKE = (typeof UI !== "undefined" ? UI.stroke : "#1b1730");
   const CREAM = "rgba(255,246,232,0.55)";
   const sideLbl = s => (mode === "2v2" ? (s === 0 ? "Équipe 1" : "Équipe 2") : sideLabel(s));
-  const pw = 132, ph = 56;
-  const py = GROUND_Y + 18; // sous la ligne de fond du terrain
+  const pw = 132, ph = 62;
+  const py = GROUND_Y + 14; // sous la ligne de fond du terrain
   // Fond de bande score (plus léger si le décor PNG descend jusqu'en bas)
   ctx.fillStyle = currentMapLayout().bgFullHeight
     ? "rgba(18,22,32,0.42)"
@@ -1465,35 +1465,35 @@ function drawHUD() {
     ctx.globalAlpha = 0.75;
     ctx.fillStyle = col;
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(px + 3, py + 3, pw - 6, 16, 8);
-    else ctx.rect(px + 3, py + 3, pw - 6, 16);
+    if (ctx.roundRect) ctx.roundRect(px + 3, py + 3, pw - 6, 15, 8);
+    else ctx.rect(px + 3, py + 3, pw - 6, 15);
     ctx.fill();
     ctx.globalAlpha = 1;
     ctx.textAlign = "center";
     ctx.fillStyle = "#fff6e8";
     ctx.font = "700 10px " + SANS;
     ctx.strokeStyle = "rgba(27,23,48,0.55)"; ctx.lineWidth = 2.5; ctx.lineJoin = "round";
-    ctx.strokeText(sideLbl(s), cx, py + 15);
-    ctx.fillText(sideLbl(s), cx, py + 15);
-    const scSize = 26 + pop * 1.2;
+    ctx.strokeText(sideLbl(s), cx, py + 14);
+    ctx.fillText(sideLbl(s), cx, py + 14);
+    const scSize = 24 + pop * 1.2;
     ctx.font = "700 " + scSize + "px " + DISP;
     ctx.strokeStyle = "rgba(27,23,48,0.75)"; ctx.lineWidth = 4;
-    ctx.strokeText(String(scores[s]), cx, py + 46);
+    ctx.strokeText(String(scores[s]), cx, py + 40);
     ctx.fillStyle = col;
-    ctx.fillText(String(scores[s]), cx, py + 46);
+    ctx.fillText(String(scores[s]), cx, py + 40);
     if (scorePop[s] > 0) scorePop[s]--;
   }
   // pastille VS
   ctx.textAlign = "center";
   ctx.fillStyle = CREAM;
   ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(NET_X - 20, py + 16, 40, 24, 10);
-  else ctx.rect(NET_X - 20, py + 16, 40, 24);
+  if (ctx.roundRect) ctx.roundRect(NET_X - 20, py + 18, 40, 24, 10);
+  else ctx.rect(NET_X - 20, py + 18, 40, 24);
   ctx.fill();
   ctx.strokeStyle = "rgba(27,23,48,0.35)"; ctx.lineWidth = 2; ctx.stroke();
   ctx.fillStyle = STROKE;
   ctx.font = "700 12px " + DISP;
-  ctx.fillText("VS", NET_X, py + 33);
+  ctx.fillText("VS", NET_X, py + 35);
 
   // touches (pastilles) dans la bande score, sous la ligne de terrain
   for (const side of [0, 1]) {
@@ -1501,21 +1501,21 @@ function drawHUD() {
     for (let i = 0; i < MAX_TOUCHES; i++) {
       const on = i < ball.touches[side];
       ctx.beginPath();
-      ctx.arc(baseX + i * 24, GROUND_Y + 10, 5, 0, Math.PI * 2);
+      ctx.arc(baseX + i * 24, GROUND_Y + 8, 5, 0, Math.PI * 2);
       ctx.fillStyle = on ? sideColor(side) : "rgba(255,255,255,0.2)";
       ctx.fill();
       ctx.strokeStyle = STROKE; ctx.lineWidth = 1.5; ctx.stroke();
     }
   }
 
-  // jauges SUPER — petite barre sous le score
+  // jauges SUPER — clairement sous le chiffre du score
   for (const s of [0, 1]) {
     const cx = s === 0 ? W * 0.22 : W * 0.78;
     const col = sideColor(s);
     const bw = 100, bx = cx - bw / 2, by = py + ph - 12;
     const ready = superCharge[s] === 1;
     const frac = ready ? 1 : (streak[s] % SUPER_NEED) / SUPER_NEED;
-    ctx.fillStyle = "rgba(27,23,48,0.15)";
+    ctx.fillStyle = "rgba(27,23,48,0.18)";
     ctx.beginPath();
     if (ctx.roundRect) ctx.roundRect(bx, by, bw, 6, 3); else ctx.rect(bx, by, bw, 6);
     ctx.fill();
