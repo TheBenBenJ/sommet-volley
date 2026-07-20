@@ -1,8 +1,9 @@
 key: jair
 name: "Jair Tronço"
 pays_theme: "Brésil — amazonie, vert-jaune, tronçonneuse satirique"
-silhouette: "compact/stocky, maillot vert-jaune, casquette, attitude agressive"
+silhouette: "stocky, casquette vert/jaune TOUJOURS, maillot vert zébrures jaunes, short vert bandes jaunes, baskets vertes bandes jaunes"
 palette: ["#2e7d32", "#fbc02d", "#f5d0b0"]
+look_lock: "Casquette toujours portée. Kit vert/jaune unique — pas de short bleu ni maillot jaune uni."
 stats: { vitesse: 3, detente: 2, puissance: 5, controle: 2 }
 super:
   nom: "Déforestation"

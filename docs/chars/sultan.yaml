@@ -1,8 +1,9 @@
 key: sultan
 name: "Recep Sultan"
 pays_theme: "Turquie — palais, Bosphore, moustache"
-silhouette: "compact/stocky, costume sombre, moustache épaisse, gestuelle autoritaire"
+silhouette: "stocky, costume navy, cravate + pochette violettes, moustache épaisse, pin Turquie, chaussures noires — PAS de cape ni turban"
 palette: ["#6a1b9a", "#c9a227", "#f5d0b0"]
+look_lock: "Costume moderne violet, jamais costume fantasy/turban rouge."
 stats: { vitesse: 3, detente: 4, puissance: 3, controle: 3 }
 super:
   nom: "Séisme"

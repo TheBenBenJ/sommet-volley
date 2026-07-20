@@ -2,8 +2,9 @@
 key: panda
 name: "Président Panda"
 pays_theme: "Chine — place du matin, muraille, rouge"
-silhouette: "compact/stocky, costume sombre, cheveux noirs peignés, expression impassible"
+silhouette: "humain stocky + petites oreilles panda, costume navy, chemise blanche, cravate rouge, pin drapeau Chine, chaussures noires"
 palette: ["#c62828", "#1a1a1a", "#f5d0b0"]
+look_lock: "Toujours humain (jamais panda anthropomorphe). Oreilles panda + cravate rouge + pin Chine sur toutes les poses."
 stats: { vitesse: 3, detente: 3, puissance: 3, controle: 5 }
 trait_passif: "Contrôle max"
 super:

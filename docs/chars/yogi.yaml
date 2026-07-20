@@ -1,8 +1,9 @@
 key: yogi
 name: "Narendra Yogi"
 pays_theme: "Inde — ashram, orange, yoga"
-silhouette: "compact/stocky, gilet orange/safran, barbe blanche soignée, pose zen"
+silhouette: "stocky, gilet safran boutons or, kurta blanc, pantalon blanc, mocassins bruns, barbe blanche, lunettes"
 palette: ["#ef6c00", "#ffffff", "#f5d0b0"]
+look_lock: "Toujours mocassins bruns (jamais baskets). Gilet safran + kurta blanc."
 stats: { vitesse: 4, detente: 3, puissance: 2, controle: 4 }
 super:
   nom: "Méditation"
