@@ -102,7 +102,7 @@ smash…). Framework technique :
 
 ## Stratégie de développement
 
-- Feature flag `GAMEPLAY_V2` (const dans 01-core) : V1 reste jouable pendant
+- Feature flag `GAMEPLAY_V2` (const dans `core.js`) : V1 reste jouable pendant
   toute la transition ; bascule via menu dev (touche cachée) pour comparer.
 - Ordre : 1) état balle contrôlée + réception, 2) tir dirigé + préviz,
   3) smash au timing, 4) affaiblissement du contact passif, 5) IA, 6) supers
