@@ -82,14 +82,19 @@ jobs:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
         run: |
           mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           # Le secret peut être collé en base64 (recommandé) OU en clé brute.
           # 1) on tente le base64 en retirant tout espace/retour (GNU base64 est
           #    strict) ; 2) sinon on retombe sur le contenu brut.
+          # IMPORTANT : chmod 600 AVANT tout ssh-keygen — sinon la clé (créée en
+          # 644 par le runner) est refusée « permissions too open », ce qui fait
+          # basculer à tort sur le fallback brut et corrompt une clé valide.
           printf '%s' "$DEPLOY_SSH_KEY" | tr -d '[:space:]' | base64 --decode > ~/.ssh/deploy_key 2>/dev/null || true
+          chmod 600 ~/.ssh/deploy_key
           if ! ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null 2>&1; then
             printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+            chmod 600 ~/.ssh/deploy_key
           fi
-          chmod 600 ~/.ssh/deploy_key
           # validation finale : message clair si le secret est inutilisable
           ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null 2>&1 || { echo "::error::DEPLOY_SSH_KEY invalide (colle la clé privée, en base64 ou brute)"; exit 1; }
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
