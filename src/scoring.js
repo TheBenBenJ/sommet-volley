@@ -63,11 +63,11 @@ function awardPoint(side, reason) {
       const readyBlob = activeBlobs.find(b => b.side === side);
       if (readyBlob) {
         const a = charOf(readyBlob);
-        superFlashSub = "Appuie sur SUPER — " + (a.superName || "technique") + " : " + (a.superDesc || "");
+        superFlashSub = "Appuie sur SUPER (E) — " + (a.superName || "technique") + " : " + (a.superDesc || "");
       } else {
-        superFlashSub = "Appuie sur SUPER pour lancer ta technique.";
+        superFlashSub = "Appuie sur SUPER (E) pour lancer ta technique.";
       }
-      superFlashT = 90;
+      superFlashT = typeof SUPER_READY_FLASH_T !== "undefined" ? SUPER_READY_FLASH_T : 180;
     }
   }
   const name = sideLabel(side);

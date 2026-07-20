@@ -32,7 +32,8 @@ const CHARACTERS = [
     speed: 1.06, jump: 1.06, power: 1.18, control: 0.91,
     coldProof: true,
     trait: "Sang froid : insensible au gel / ralentissement.",
-    superName: "Hiver Général", superDesc: "Gèle le camp adverse ~6 s : glisse extrême + flocons."
+    superName: "Hiver Général",
+    superDesc: "Gèle le camp adverse ~6 s : ils glissent comme sur de la glace. Visuel : voile bleu glacial + flocons qui tombent sur leur moitié."
   },
   {
     key: "trompette", name: "Ronald Trompette",
@@ -41,7 +42,8 @@ const CHARACTERS = [
     speed: 1.06, jump: 0.94, power: 1.18, control: 0.82,
     egoCharge: true, slip: true,
     trait: "Ego en béton : la jauge SUPER monte aussi quand il perd un point.",
-    superName: "Le Mur", superDesc: "Mur doré au milieu du camp adverse ~5 s."
+    superName: "Le Mur",
+    superDesc: "Mur doré au milieu du camp adverse ~5 s : bloque les courses au sol. Visuel : colonne d’or lumineuse + halo au pied du mur."
   },
   {
     key: "micron", name: "Manu Micron",
@@ -50,7 +52,8 @@ const CHARACTERS = [
     speed: 1.18, jump: 1.06, power: 1.06, control: 0.91,
     swapStats: true,
     trait: "En même temps : après chaque point, échange vitesse ↔ puissance.",
-    superName: "49.3", superDesc: "4 s : ses frappes ne peuvent pas être smashées en retour."
+    superName: "49.3",
+    superDesc: "~4 s : tes frappes ne peuvent plus être smashées en retour. Visuel : aura bleue autour de toi pendant l’effet."
   },
   {
     key: "houn", name: "Kim Jong Houn",
@@ -59,7 +62,8 @@ const CHARACTERS = [
     speed: 1.06, jump: 0.94, power: 1.18, control: 0.82,
     clapDouble: true,
     trait: "Applaudissements : SUPER chargé en 2 points d'affilée.",
-    superName: "Batterie AA", superDesc: "Interdit de sauter au camp adverse ~5 s."
+    superName: "Batterie AA",
+    superDesc: "Interdit de sauter au camp adverse ~5 s — collés au sol. Visuel : bande rouge au sol + pulses d’alerte sur leur camp."
   },
   {
     key: "panda", name: "Président Panda",
@@ -67,7 +71,8 @@ const CHARACTERS = [
     stats: { vitesse: 3, detente: 3, puissance: 3, controle: 5 },
     speed: 1.06, jump: 1.06, power: 1.06, control: 1.0,
     trait: "Mur invisible : contrôle max, placements précis.",
-    superName: "Grande Muraille", superDesc: "Mur au milieu du camp adverse ~5 s."
+    superName: "Grande Muraille",
+    superDesc: "Mur au milieu du camp adverse ~5 s : coupe le terrain en deux. Visuel : même muraille dorée lumineuse que Le Mur."
   },
   {
     key: "sultan", name: "Recep Sultan",
@@ -75,7 +80,8 @@ const CHARACTERS = [
     stats: { vitesse: 3, detente: 4, puissance: 3, controle: 3 },
     speed: 1.06, jump: 1.18, power: 1.06, control: 0.82,
     trait: "Séisme : détente élevée, bons smashs aériens.",
-    superName: "Séisme", superDesc: "Interdit de sauter au camp adverse ~5 s."
+    superName: "Séisme",
+    superDesc: "Interdit de sauter au camp adverse ~5 s. Visuel : tremblement d’écran + bande rouge d’alerte au sol (comme Batterie AA)."
   },
   {
     key: "yogi", name: "Narendra Yogi",
@@ -83,7 +89,8 @@ const CHARACTERS = [
     stats: { vitesse: 4, detente: 3, puissance: 2, controle: 4 },
     speed: 1.18, jump: 1.06, power: 0.94, control: 0.91,
     trait: "Ashram : rapide et technique, peu de puissance brute.",
-    superName: "Méditation", superDesc: "Gèle le camp adverse ~5 s (glisse)."
+    superName: "Méditation",
+    superDesc: "Gèle le camp adverse ~5 s (glisse extrême). Visuel : voile clair + particules, façon Hiver Général zen."
   },
   {
     key: "jair", name: "Jair Tronço",
@@ -92,8 +99,9 @@ const CHARACTERS = [
     speed: 1.06, jump: 0.94, power: 1.28, control: 0.75,
     egoCharge: true,
     trait: "Tronçonneuse : puissance max, SUPER aussi en perdant un point.",
-    superName: "Déforestation", superDesc: "Mur de troncs au camp adverse ~5 s."
-  }
+    superName: "Déforestation",
+    superDesc: "Mur de troncs au camp adverse ~5 s : bloque les courses. Visuel : mur épais façon forêt + lueur verte."
+  },
 ];
 function charOf(b) { return CHARACTERS[b.charId]; }
 
@@ -241,6 +249,8 @@ const battle = {
 //   Vladou → Hiver Général · Trompette → Le Mur · Micron → 49.3 · Houn → Batterie AA
 //   Panda → Grande Muraille · Sultan → Séisme · Yogi → Méditation · Jair → Déforestation
 const SUPER_NEED = 3;
+const SUPER_FLASH_T = 240;      // ~4 s pour lire nom + description
+const SUPER_READY_FLASH_T = 180; // ~3 s quand la jauge est prête
 const streak = [0, 0];        // points d'affilée par camp
 const superCharge = [0, 0];   // 0 = vide, 1 = super prête
 const SUPER_DUR = {
@@ -300,6 +310,7 @@ class Blob {
     this.poseDur = 0;
     this._faceRight = this.side === 0; // orientation visuelle (suit le déplacement)
     this._celebHop = 0;      // petit saut de joie après un point
+    this.battleStunT = 0;    // stun post Smash Battle (perdant)
   }
   // deux cercles de collision : corps + tête (alignés sur le dessin)
   get bodyCircle() { return { x: this.x, y: this.y - 30, r: 28 }; }
@@ -310,6 +321,35 @@ class Blob {
     if (this.poseT > 0) {
       this.poseT--;
       if (this.poseT <= 0) { this.poseAnim = ""; this.poseDur = 0; }
+    }
+    // Stun post-duel : pas de contrôle, juste l'inertie du knockback
+    if (this.battleStunT > 0) {
+      this.battleStunT--;
+      input = { left: false, right: false, jump: false, smash: false, super: false, ax: 0, ay: 0 };
+      this._input = input;
+      this._smashEdge = false;
+      this.prevSmashBtn = false;
+      this._jumpEdge = false;
+      this.prevJump = false;
+      this.vx *= 0.88;
+      this.dispVx = this.vx;
+      if (!this.onGround) this.vy += GRAV_BLOB;
+      this.x += this.vx;
+      this.y += this.vy;
+      const half = 34;
+      let minX = this.side === 0 ? half : NET_X + NET_W / 2 + half - 6;
+      let maxX = this.side === 0 ? NET_X - NET_W / 2 - half + 6 : W - half;
+      this.x = Math.max(minX, Math.min(maxX, this.x));
+      if (this.y >= GROUND_Y) {
+        this.y = GROUND_Y;
+        this.vy = 0;
+        this.onGround = true;
+        this.jumpsUsed = 0;
+        this.vx *= 0.5;
+        this.dispVx = this.vx;
+      }
+      if (this.squash > 0) this.squash -= 0.5;
+      return;
     }
     this._input = input || null;
     const smashDown = !!(input && input.smash);

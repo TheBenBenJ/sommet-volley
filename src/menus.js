@@ -1421,12 +1421,12 @@ function drawRules() {
   p("Service : F pour lancer, puis contact auto. Double saut en l'air.");
   y += 4;
   h("★ SUPER", "#ffd93d");
-  p("3 points d'affilée chargent la jauge (Houn : 2). Puis la technique du perso (à droite).");
+  p("3 points d'affilée chargent la jauge (Houn : 2). E / B lance la technique : un bandeau explique l'effet et le visuel ~4 s.");
   y += 4;
   h("Météo & événements", "#4db3ff");
-  p("Pluie / tempête : sol glissant, balle plus lourde.");
-  p("Place Grand-Rouge : canon. Pelouse Oval : voiturette. Palais / Esplanade : décors PNG.");
-  p("Deux joueurs au filet + balle proche = Smash Battle.");
+  p("Pluie / tempête : sol glissant, balle plus lourde (sauf Pelouse Oval, toujours au beau fixe).");
+  p("Place Grand-Rouge : canon. Pelouse Oval : voiturette. Palais : cortège. Esplanade : radar. Matin : lanternes. Bosphore : tapis. Ashram : vache. Amazonie : aras.");
+  p("Deux joueurs au filet + balle proche = Smash Battle (le gagnant smash mortel, le perdant est stun).");
   ctx.restore();
 
   // --- Colonne droite (clip) : persos en liste ---

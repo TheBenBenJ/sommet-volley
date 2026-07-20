@@ -50,7 +50,8 @@ function initSprites() {
 function initMapAmazon() {
   SPRITES.mapAmazon = loadMapPack("amazon", {
     skyline: "skyline.png", far: "far.png",
-    flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png"
+    flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png",
+    macaw: "macaw.png"
   });
 }
 
@@ -63,7 +64,8 @@ function mapAmazonReady() {
 function initMapBosphore() {
   SPRITES.mapBosphore = loadMapPack("bosphore", {
     skyline: "skyline.png", far: "far.png",
-    flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png"
+    flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png",
+    carpet: "carpet.png"
   });
 }
 
@@ -76,7 +78,8 @@ function mapBosphoreReady() {
 function initMapMatin() {
   SPRITES.mapMatin = loadMapPack("matin", {
     skyline: "skyline.png", far: "far.png",
-    flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png"
+    flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png",
+    lantern: "lantern.png"
   });
 }
 
@@ -89,7 +92,8 @@ function mapMatinReady() {
 function initMapAshram() {
   SPRITES.mapAshram = loadMapPack("ashram", {
     skyline: "skyline.png", far: "far.png",
-    flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png"
+    flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png",
+    cow: "cow.png"
   });
 }
 

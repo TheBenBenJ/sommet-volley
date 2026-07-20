@@ -47,28 +47,35 @@ function stepBattle(inL, inR) {
   else winner = rng() < 0.5 ? 0 : 1; // égalité parfaite : tirage seedé
   const dir = winner === 0 ? 1 : -1;
 
-  // smash destructeur : la balle plonge en flammes dans le camp adverse
-  ball.x = NET_X + dir * (BALL_R + NET_W);
-  ball.y = NET_TOP - 30;
+  // smash destructeur : plonge vite vers le fond du camp adverse
+  // (le perdant est stun + projeté — il ne digue presque jamais)
+  ball.x = NET_X + dir * (BALL_R + NET_W + 6);
+  ball.y = NET_TOP - 6;
   ball.vx = dir * SMASH_VX;
   ball.vy = SMASH_VY;
-  ball.smash = 60;
-  ball.slowMo = 60; // ralenti / zoom réservés au duel au filet
-  ball.spin = dir * 0.3;
+  ball.smash = 90;
+  ball.slowMo = 50;
+  ball.spin = dir * 0.35;
   ball.lastTouchSide = winner;
   ball.lastTouchTick = tick;
   ball.touches[winner] = 1;
   ball.touches[1 - winner] = 0;
 
-  // le perdant est projeté loin du filet
+  // le perdant est projeté au fond de son camp + stun (pas de dig)
   const winnerBlob = winner === 0 ? blobL : blobR;
   const loser = winner === 0 ? blobR : blobL;
-  loser.x += dir * 45;
-  loser.vy = -5;
+  const half = 34;
+  const loserMin = loser.side === 0 ? half : NET_X + NET_W / 2 + half - 6;
+  const loserMax = loser.side === 0 ? NET_X - NET_W / 2 - half + 6 : W - half;
+  loser.x = Math.max(loserMin, Math.min(loserMax, loser.x + dir * 120));
+  loser.vx = dir * 7;
+  loser.vy = 3;
+  loser.dispVx = loser.vx;
   loser.onGround = false;
+  loser.battleStunT = BATTLE_STUN_T;
   if (typeof setCharPose === "function") {
     setCharPose(winnerBlob, "smash", 36);
-    setCharPose(loser, "panic", 40);
+    setCharPose(loser, "panic", BATTLE_STUN_T);
   }
 
   shake = 14;
@@ -95,7 +102,7 @@ function maybeActivateSuper(blob, input) {
   blob.superT = SUPER_DUR[a.key] || 50;
   superFlash = a.superName || (a.name + " !");
   superFlashSub = a.superDesc || "";
-  superFlashT = 110;
+  superFlashT = SUPER_FLASH_T;
   shake = Math.max(shake, 7);
   crowdHype = Math.max(crowdHype, 45);
   spawnSuperBurst(blob);

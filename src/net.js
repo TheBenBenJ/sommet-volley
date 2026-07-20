@@ -1006,7 +1006,7 @@ function guestDetectEvents(prev, d) {
       const ch = CHARACTERS[cb.charId];
       superFlash = (ch && ch.superName) || ((ch && ch.name) ? ch.name + " !" : "SUPER !");
       superFlashSub = (ch && ch.superDesc) || "";
-      superFlashT = 110;
+      superFlashT = typeof SUPER_FLASH_T !== "undefined" ? SUPER_FLASH_T : 240;
       spawnSuperBurst(activeBlobs[i]);
     }
   }

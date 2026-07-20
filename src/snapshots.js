@@ -64,6 +64,7 @@ function getSnapshot() {
       p: mapEvent.phase, t: mapEvent.t | 0, tm: mapEvent.timer | 0,
       x: mapEvent.x, y: mapEvent.y, vx: mapEvent.vx, vy: mapEvent.vy,
       h: mapEvent.hit ? 1 : 0,
+      lh: mapEvent.lastHitTick | 0,
       cx: mapEvent.cartX || 0, cd: mapEvent.cartDir || 1,
       zx: mapEvent.zoneX || 0, zw: mapEvent.zoneW || 150,
       balls: (mapEvent.balls || []).map(b => ({
@@ -91,7 +92,8 @@ function getSnapshot() {
       walkPhase: b.walkPhase, squash: b.squash,
       charId: b.charId, scramble: b.scramble,
       superT: b.superT, superKind: b.superKind, superSmash: b.superSmash,
-      poseAnim: b.poseAnim || "", poseT: b.poseT | 0, poseDur: b.poseDur | 0
+      poseAnim: b.poseAnim || "", poseT: b.poseT | 0, poseDur: b.poseDur | 0,
+      battleStunT: b.battleStunT | 0
     }))
   };
 }
@@ -113,6 +115,7 @@ function applySnapshot(s) {
     mapEvent.x = s.mapEvent.x || 0; mapEvent.y = s.mapEvent.y || 0;
     mapEvent.vx = s.mapEvent.vx || 0; mapEvent.vy = s.mapEvent.vy || 0;
     mapEvent.hit = !!s.mapEvent.h;
+    if (s.mapEvent.lh !== undefined) mapEvent.lastHitTick = s.mapEvent.lh | 0;
     mapEvent.cartX = s.mapEvent.cx || 0;
     mapEvent.cartDir = s.mapEvent.cd === -1 ? -1 : 1;
     mapEvent.zoneX = s.mapEvent.zx || 0;
@@ -156,5 +159,6 @@ function applySnapshot(s) {
     if (s.blobs[i].poseAnim !== undefined) b.poseAnim = s.blobs[i].poseAnim || "";
     if (s.blobs[i].poseT !== undefined) b.poseT = s.blobs[i].poseT | 0;
     if (s.blobs[i].poseDur !== undefined) b.poseDur = s.blobs[i].poseDur | 0;
+    b.battleStunT = s.blobs[i].battleStunT | 0;
   });
 }

@@ -67,6 +67,7 @@ if (typeof Image === "undefined") {
 const EPILOGUE = `
 ;module.exports = {
   newGame, stepGame, startRally, update, getSnapshot, applySnapshot,
+  startBattle, stepBattle,
   ball, blobL, blobR, blob2L, blob2R, scores, battle, aiInput, aiInput2v2, keys,
   setMode, getActiveBlobs: () => activeBlobs,
   getState: () => state, setState: v => { state = v; },
@@ -78,7 +79,12 @@ const EPILOGUE = `
   getBombTimer: () => bombTimer, setBombTimer: v => { bombTimer = v; },
   setBombTime: v => { bombTime = v; }, getBombTime: () => bombTime,
   mapEvent, getMapEvent: () => mapEvent,
+  mapEventKind: typeof mapEventKind === "function" ? mapEventKind : () => null,
+  mapEventsCanStep: typeof mapEventsCanStep === "function" ? mapEventsCanStep : () => false,
+  setTerrain: v => { terrain = Math.max(0, Math.min(TERRAINS.length - 1, v | 0)); },
+  getTerrain: () => terrain,
   setMapEventsQuiet: v => { mapEventsQuiet = !!v; }, getMapEventsQuiet: () => mapEventsQuiet,
+  setPaused: v => { paused = !!v; }, getPaused: () => paused,
   MAP_EVENT_WARN_T: typeof MAP_EVENT_WARN_T !== "undefined" ? MAP_EVENT_WARN_T : 120,
   updateBall,
   ballInGuestOwnZone, packBallState, applyBallState,

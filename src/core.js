@@ -66,7 +66,9 @@ const BATTLE_TICKS = 78;     // durée du duel (~1,3 s)
 const BATTLE_COOLDOWN = 240; // délai mini entre deux duels (4 s)
 const BATTLE_NET_DIST = 95;  // distance max des joueurs au filet pour déclencher
 const BATTLE_BALL_DIST = 90; // distance max de la balle au filet
-const SMASH_VX = 14, SMASH_VY = 12; // vitesse du smash destructeur
+const BATTLE_STUN_T = 52;    // perdant du duel : stun ~0,85 s (ne digue pas)
+// Smash destructeur post-duel : rapide et plongeant vers le fond de cour
+const SMASH_VX = 16, SMASH_VY = 11;
 
 // --- Mode Bombe ---
 const BOMB_TIME = 600;      // 10 s à 60 Hz : durée de la mèche avant explosion

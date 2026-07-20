@@ -114,12 +114,16 @@ function keyboardGeomAimAngle(blob, mode) {
     const push = 0.38 + 0.22 * deep + Math.max(-0.14, Math.min(0.42, relX * 0.014));
     return clampAimToCone(blob, Math.atan2(loft, fwd * push), center);
   }
-  // Smash : balle haute / devant → piqué vers le bas ; contact bas → plus plat
-  // (y écran vers le bas : sin>0 = piqué). Ancienne formule inversait relY.
-  const centerSmash = blob.side === 0 ? 0.22 : Math.PI - 0.22;
+  // Smash : près du filet + balle haute → piqué ; en fond de cour →
+  // trajectoire plus montante / portée pour passer le filet.
+  const deep = Math.max(0, Math.min(1, (Math.abs(NET_X - blob.x) - 120) / 200));
+  const centerSmash = blob.side === 0
+    ? 0.22 - 1.05 * deep
+    : Math.PI - (0.22 - 1.05 * deep);
   const spike = Math.max(-0.22, Math.min(0.95, -relY * 0.014));
-  const down = 0.10 + spike + Math.max(0, Math.min(0.28, relX * 0.009));
-  const push = 0.70 + Math.max(-0.2, Math.min(0.52, relX * 0.017));
+  const down = 0.10 + spike * (1 - 0.9 * deep) - 1.05 * deep
+    + Math.max(0, Math.min(0.28, relX * 0.009));
+  const push = 0.65 + 0.28 * deep + Math.max(-0.2, Math.min(0.52, relX * 0.017));
   return clampAimToCone(blob, Math.atan2(down, fwd * push), centerSmash);
 }
 
@@ -562,6 +566,7 @@ function applyHitExtras(blob, a) {
 
 function ballBlobCollision(blob) {
   if (ball.heldBy >= 0) return; // balle contrôlée : pas de collision passive
+  if (blob.battleStunT > 0) return; // perdant du Smash Battle : ne digue pas
   const a = charOf(blob);
 
   // Gameplay V2 :

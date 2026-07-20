@@ -838,17 +838,43 @@ test("V2 : clavier — smash piqué quand la balle est haute", () => {
   g.setVsAI(true); g.setAiLevel(1);
   g.newGame(59);
   g.setState("play"); g.setServeCountdown(0);
-  // Balle au-dessus de la tête, un peu devant → doit piquer (pas cloche)
-  g.blobL.x = 300; g.blobL.y = g.consts.GROUND_Y - 90; g.blobL.onGround = false;
+  // Près du filet : balle au-dessus de la tête → piqué
+  g.blobL.x = 360; g.blobL.y = g.consts.GROUND_Y - 90; g.blobL.onGround = false;
   g.blobL.vy = 0; g.blobL.lastActiveHitTick = -999;
   const headY = g.blobL.y - 64;
-  g.ball.x = 315; g.ball.y = headY - 20; g.ball.vx = 0; g.ball.vy = 1;
+  g.ball.x = 375; g.ball.y = headY - 20; g.ball.vx = 0; g.ball.vy = 1;
   g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
   g.ball.serveAimLock = false;
   g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
   g.stepGame({ ...N0 }, N0);
   assert.ok(g.ball.vx > 4, "smash vers l'adversaire (vx=" + g.ball.vx + ")");
-  assert.ok(g.ball.vy > 1, "balle haute → piqué vers le bas (vy=" + g.ball.vy + ")");
+  assert.ok(g.ball.vy > 1, "près du filet + balle haute → piqué (vy=" + g.ball.vy + ")");
+});
+
+test("V2 : clavier — smash depuis le fond passe le filet", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(60);
+  g.setState("play"); g.setServeCountdown(0);
+  g.blobL.x = 130; g.blobL.y = g.consts.GROUND_Y - 85; g.blobL.onGround = false;
+  g.blobL.vy = 0; g.blobL.lastActiveHitTick = -999;
+  const headY = g.blobL.y - 64;
+  g.ball.x = 145; g.ball.y = headY - 18; g.ball.vx = 0; g.ball.vy = 1;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+  g.ball.serveAimLock = false;
+  g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
+  g.scores[0] = 0; g.scores[1] = 0;
+  g.stepGame({ ...N0 }, N0);
+  assert.ok(g.ball.vx > 5, "smash fond vers l'adversaire (vx=" + g.ball.vx + ")");
+  assert.ok(g.ball.vy < 0, "depuis le fond → trajectoire montante (vy=" + g.ball.vy + ")");
+  let cleared = false;
+  for (let i = 0; i < 150; i++) {
+    g.updateBall();
+    if (g.ball.x > g.consts.NET_X + 20 && g.ball.y < g.consts.NET_TOP) { cleared = true; break; }
+    if (g.getState() === "point") break;
+  }
+  assert.ok(cleared, "smash depuis le fond doit passer le filet");
+  assert.strictEqual(g.scores[1], 0, "pas de faute filet");
 });
 
 test("V2 : cloche depuis le fond passe au-dessus du filet", () => {
@@ -926,6 +952,104 @@ test("terrain calme : aucun événement canon", () => {
   g.mapEvent.timer = 1;
   g.stepGame(N, N);
   assert.strictEqual(g.mapEvent.phase, "idle");
+});
+
+test("event cortège : Palais de l'Hexagone traverse le terrain", () => {
+  const g = freshRally(77);
+  const N = { left:false, right:false, jump:false };
+  g.setTerrain(2); // prairie / Micron
+  assert.strictEqual(g.mapEventKind(), "march");
+  g.setMapEventsQuiet(false);
+  g.mapEvent.phase = "idle";
+  g.mapEvent.timer = 1;
+  g.stepGame(N, N);
+  assert.strictEqual(g.mapEvent.phase, "warn");
+  g.mapEvent.t = (g.MAP_EVENT_WARN_T || 120) - 1;
+  g.stepGame(N, N);
+  assert.strictEqual(g.mapEvent.phase, "fire");
+  const x0 = g.mapEvent.cartX;
+  for (let i = 0; i < 20; i++) g.stepGame(N, N);
+  assert.ok(g.mapEvent.cartX > x0, "le cortège avance");
+});
+
+test("chaque terrain a un événement de map", () => {
+  const g = loadGame();
+  const kinds = new Set();
+  for (let i = 0; i < g.TERRAINS.length; i++) {
+    g.setTerrain(i);
+    const k = g.mapEventKind();
+    assert.ok(k, "terrain " + g.TERRAINS[i].key + " doit avoir un event");
+    kinds.add(k);
+  }
+  assert.strictEqual(kinds.size, g.TERRAINS.length, "un kind unique par terrain");
+});
+
+test("Smash Battle : le gagnant marque — le perdant est stun et ne digue pas", () => {
+  const g = freshRally(55);
+  const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  g.setMapEventsQuiet(true);
+  // Place les deux au filet en l'air, balle au milieu
+  const { NET_X, GROUND_Y, NET_TOP } = g.consts;
+  g.blobL.x = NET_X - 40; g.blobL.y = GROUND_Y - 80; g.blobL.onGround = false;
+  g.blobR.x = NET_X + 40; g.blobR.y = GROUND_Y - 80; g.blobR.onGround = false;
+  g.ball.x = NET_X; g.ball.y = NET_TOP; g.ball.vx = 0; g.ball.vy = 0;
+  g.ball.frozen = false; g.ball.popped = false; g.ball.heldBy = -1;
+  g.battle.cooldown = 0;
+  g.startBattle(N, N);
+  // Gauche martèle, droite pas
+  g.battle.t = 1;
+  g.battle.count = [0, 0];
+  g.battle.prevJump = [false, false];
+  g.stepBattle({ ...N, jump:true }, N);
+  assert.strictEqual(g.battle.active, false, "duel résolu");
+  assert.ok(g.ball.vx > 0, "balle vers la droite (gagnant = gauche)");
+  assert.ok(g.blobR.battleStunT > 0, "perdant stun");
+  assert.ok(g.blobR.x > NET_X + 80, "perdant projeté au fond");
+  const scoresBefore = [g.scores[0], g.scores[1]];
+  // Simuler jusqu'au sol : le perdant stun ne doit pas diguer
+  for (let i = 0; i < 90 && g.getState() === "play"; i++) {
+    g.stepGame(N, { ...N, jump:true, smash:true, left:true }); // perdant spam sans effet
+  }
+  assert.ok(g.getState() === "point" || g.getState() === "gameover", "point marqué");
+  assert.ok(g.scores[0] > scoresBefore[0], "le gagnant du duel marque le point");
+});
+
+test("events map : pas de trigger en pause / service / point", () => {
+  const g = freshRally(12);
+  const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  g.setMapEventsQuiet(false);
+  g.setTerrain(0); // Place Grand-Rouge / canon
+  g.mapEvent.phase = "idle";
+  g.mapEvent.timer = 1;
+
+  g.setPaused(true);
+  assert.strictEqual(g.mapEventsCanStep(), false, "pause = gel");
+  g.stepGame(N, N);
+  assert.strictEqual(g.mapEvent.phase, "idle", "pas d'event en pause");
+  assert.strictEqual(g.mapEvent.timer, 1, "timer figé en pause");
+  g.setPaused(false);
+
+  g.ball.frozen = true; // reste en service (sinon stepGame force play)
+  g.setState("serve");
+  g.setServeCountdown(90);
+  assert.strictEqual(g.mapEventsCanStep(), false, "service = transition");
+  g.stepGame(N, N);
+  assert.strictEqual(g.mapEvent.phase, "idle", "pas d'event au service");
+  assert.strictEqual(g.mapEvent.timer, 1, "timer figé au service");
+
+  g.setServeCountdown(0);
+  g.setState("point");
+  assert.strictEqual(g.mapEventsCanStep(), false, "point = transition");
+  g.stepGame(N, N);
+  assert.strictEqual(g.mapEvent.phase, "idle");
+  assert.strictEqual(g.mapEvent.timer, 1);
+
+  g.ball.frozen = false;
+  g.setState("play");
+  g.mapEvent.timer = 1;
+  assert.strictEqual(g.mapEventsCanStep(), true, "play = ok");
+  g.stepGame(N, N);
+  assert.strictEqual(g.mapEvent.phase, "warn", "event démarre en play");
 });
 
 console.log("\n" + pass + " réussis, " + fail + " échoués");

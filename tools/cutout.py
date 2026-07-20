@@ -140,7 +140,17 @@ def punch_enclosed_white(
                 and iw < bw * 0.42
                 and ih > iw * 0.45
             )
-            if not between_legs:
+            # Crook bras/torse fermé (ex. défaite à genoux) : gros îlot blanc
+            # latéral enfermé — distinct des manchettes (<< 800 px).
+            arm_gap = (
+                not between_legs
+                and 800 <= n <= 4500
+                and iw < bw * 0.40
+                and ih < bh * 0.40
+                and 0.30 < rel_y < 0.78
+                and (rel_x < 0.42 or rel_x > 0.58)
+            )
+            if not between_legs and not arm_gap:
                 continue
             for px_, py_ in cells:
                 r, g, b, _ = px[px_, py_]
@@ -444,8 +454,11 @@ def main():
     PROP_NAMES = {
         "flag", "warn", "flower", "palm", "net_post", "cart_0", "cart_1",
         "cannon", "cannon_fire", "snowman", "radar_0", "radar_1", "pigeon",
+        "lantern", "carpet", "cow", "macaw", "whistle", "marchers_0", "marchers_1",
     }
-    FLAG_KEEP_WHITE = {"flag"}  # bandes blanches du drapeau
+    # Drapeaux avec bandes blanches (FR / US / RU…) : ne pas percer les îlots.
+    # Les autres (matin, houn, ashram…) : percer le blanc entre mât et toile.
+    FLAG_KEEP_WHITE_MAPS = {"trompette", "plage", "micron", "prairie", "vladou", "neige"}
     outs = []
     for src in sorted(raw_dir.glob("*.png")):
         if src.name.startswith("_"):
@@ -453,7 +466,8 @@ def main():
         dst = out_dir / src.name
         stem = src.stem
         if stem in PROP_NAMES or src.name in {n + ".png" for n in PROP_NAMES}:
-            process_prop(src, dst, preserve_white=(stem in FLAG_KEEP_WHITE))
+            keep_w = stem == "flag" and raw_dir.name in FLAG_KEEP_WHITE_MAPS
+            process_prop(src, dst, preserve_white=keep_w)
         else:
             process_one(src, dst)
         outs.append(dst)

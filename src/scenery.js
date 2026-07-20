@@ -191,13 +191,18 @@ function resetWeather() {
 }
 
 // ---------- Événements de map ----------
-// Place Grand-Rouge : canon d'apparat. Resort Doré : voiturette + pluie de balles.
-// Annonce ~2 s, déterministe (rng + snapshots). Désactivable via mapEventsQuiet.
+// Chaque terrain a un event (canon, caddie, cortège, radar, lanternes, tapis,
+// vache, aras). Annonce ~2 s, déterministe (rng + snapshots).
+// Désactivable via mapEventsQuiet.
 const MAP_EVENT_WARN_T = 120;  // ~2 s à 60 Hz
 const MAP_EVENT_FIRE_T = 10;
 const MAP_SHOT_R = 16;
 const MAP_GOLF_R = 9;
 const MAP_CART_RAIN_T = 90; // ~1,5 s de pluie
+const MAP_MACAW_T = 200;    // vol horizontal un peu plus long / lent
+const MAP_MACAW_R = 16;
+const MAP_CROSSER_HIT_CD = 18;
+const MAP_RADAR_PULSE_T = 100;
 
 let mapEventsQuiet = false;
 let mapEvent = {
@@ -206,6 +211,7 @@ let mapEvent = {
   timer: 0,
   x: 0, y: 0, vx: 0, vy: 0,
   hit: false,
+  lastHitTick: -999,
   cartX: 450,
   cartDir: 1,
   zoneX: 0,
@@ -219,6 +225,7 @@ function resetMapEvent() {
   mapEvent.timer = 900 + Math.floor(rng() * 900); // 1er event un peu plus tôt (~15–30 s)
   mapEvent.x = mapEvent.y = mapEvent.vx = mapEvent.vy = 0;
   mapEvent.hit = false;
+  mapEvent.lastHitTick = -999;
   mapEvent.cartX = W * 0.5;
   mapEvent.cartDir = 1;
   mapEvent.zoneX = 0;
@@ -233,7 +240,7 @@ function scheduleNextMapEvent() {
   mapEvent.timer = 1200 + Math.floor(rng() * 1200); // 20–40 s
   mapEvent.x = mapEvent.y = mapEvent.vx = mapEvent.vy = 0;
   mapEvent.hit = false;
-  // Resort : reste au centre (près des barrières) — pas de téléport hors écran
+  mapEvent.lastHitTick = -999;
   mapEvent.cartX = W * 0.5;
   mapEvent.cartDir = 1;
   mapEvent.zoneX = 0;
@@ -241,24 +248,40 @@ function scheduleNextMapEvent() {
   mapEventFlash = ""; mapEventFlashSub = ""; mapEventFlashT = 0;
 }
 
-/** Déplacement continu du caddie hors event (une seule position, jamais de pop).
- *  Va-et-vient lent ; le rendu miroite le sprite selon cartDir (jamais en marche arrière). */
-function stepCartIdleMotion() {
-  if (mapEventKind() !== "cart") return;
-  if (mapEvent.phase !== "idle") return;
-  if (mapEvent.cartDir !== 1 && mapEvent.cartDir !== -1) mapEvent.cartDir = 1;
-  const lo = W * 0.5 - 100;
-  const hi = W * 0.5 + 100;
-  mapEvent.cartX += mapEvent.cartDir * 0.28;
-  if (mapEvent.cartX >= hi) { mapEvent.cartX = hi; mapEvent.cartDir = -1; }
-  else if (mapEvent.cartX <= lo) { mapEvent.cartX = lo; mapEvent.cartDir = 1; }
-}
-
 function mapEventKind() {
   const k = TERRAINS[terrain] && TERRAINS[terrain].key;
   if (k === "neige") return "cannon";
   if (k === "plage") return "cart";
+  if (k === "prairie") return "march";
+  if (k === "parade") return "radar";
+  if (k === "matin") return "lantern";
+  if (k === "bosphore") return "carpet";
+  if (k === "ashram") return "cow";
+  if (k === "amazon") return "macaw";
   return null;
+}
+
+function mapEventIsRain(kind) {
+  return kind === "cart" || kind === "lantern";
+}
+
+function mapEventIsCrosser(kind) {
+  return kind === "march" || kind === "carpet" || kind === "cow";
+}
+
+/** Déplacement continu hors event (caddie / tapis / vache). */
+function stepCartIdleMotion() {
+  const kind = mapEventKind();
+  if (kind !== "cart" && kind !== "carpet" && kind !== "cow") return;
+  if (mapEvent.phase !== "idle") return;
+  if (mapEvent.cartDir !== 1 && mapEvent.cartDir !== -1) mapEvent.cartDir = 1;
+  // Vache : promenade large devant le public ; caddie/tapis : petit va-et-vient central
+  const lo = kind === "cow" ? 70 : W * 0.5 - 100;
+  const hi = kind === "cow" ? W - 70 : W * 0.5 + 100;
+  const spd = kind === "cart" ? 0.28 : kind === "cow" ? 0.22 : 0.18;
+  mapEvent.cartX += mapEvent.cartDir * spd;
+  if (mapEvent.cartX >= hi) { mapEvent.cartX = hi; mapEvent.cartDir = -1; }
+  else if (mapEvent.cartX <= lo) { mapEvent.cartX = lo; mapEvent.cartDir = 1; }
 }
 
 /** Textes d'annonce pour l'événement de map courant. */
@@ -270,10 +293,7 @@ function mapEventAnnounceCopy(kind, phase) {
         sub: "Un boulet va traverser le terrain — il dévie la balle au contact."
       };
     }
-    return {
-      title: "Boulet en vol !",
-      sub: "Évite le projectile — collision = déviation."
-    };
+    return { title: "Boulet en vol !", sub: "Évite le projectile — collision = déviation." };
   }
   if (kind === "cart") {
     if (phase === "warn") {
@@ -282,10 +302,61 @@ function mapEventAnnounceCopy(kind, phase) {
         sub: "Zone orange dangereuse — pluie de balles de golf imminente."
       };
     }
-    return {
-      title: "Pluie de golf !",
-      sub: "Les balles de golf dévient la volley au contact."
-    };
+    return { title: "Pluie de golf !", sub: "Les balles de golf dévient la volley au contact." };
+  }
+  if (kind === "march") {
+    if (phase === "warn") {
+      return {
+        title: "Cortège en marche !",
+        sub: "Les manifestants traversent le terrain — contact = déviation."
+      };
+    }
+    return { title: "Ça défile !", sub: "Ne te fais pas bousculer par le cortège." };
+  }
+  if (kind === "radar") {
+    if (phase === "warn") {
+      return {
+        title: "Radar Batterie AA !",
+        sub: "Zone de détection — la balle sera déviée si elle y entre."
+      };
+    }
+    return { title: "Impulsion radar !", sub: "Sors la balle de la zone orange." };
+  }
+  if (kind === "lantern") {
+    if (phase === "warn") {
+      return {
+        title: "Lanternes en approche !",
+        sub: "Pluie de lanternes dans la zone — elles dévient la balle."
+      };
+    }
+    return { title: "Pluie de lanternes !", sub: "Évite les lanternes qui tombent." };
+  }
+  if (kind === "carpet") {
+    if (phase === "warn") {
+      return {
+        title: "Tapis volant !",
+        sub: "Un tapis traverse le terrain — contact = déviation."
+      };
+    }
+    return { title: "Tapis en vol !", sub: "Ne te fais pas balayer." };
+  }
+  if (kind === "cow") {
+    if (phase === "warn") {
+      return {
+        title: "Vache sacrée en promenade !",
+        sub: "Elle traverse le terrain — contact = déviation."
+      };
+    }
+    return { title: "Attention vache !", sub: "Laisse-la passer sans la toucher avec la balle." };
+  }
+  if (kind === "macaw") {
+    if (phase === "warn") {
+      return {
+        title: "Vol de aras !",
+        sub: "Les perroquets traversent le terrain en vol horizontal — contact = déviation."
+      };
+    }
+    return { title: "Aras en vol !", sub: "Évite le passage des aras." };
   }
   return { title: "Événement de map !", sub: "" };
 }
@@ -299,6 +370,16 @@ function flashMapEventAnnounce(kind, phase) {
 
 function mapEventActiveTerrain() {
   return mapEventKind() != null;
+}
+
+/** Events / idle décoratif : uniquement en échange actif (pas pause, ni transition). */
+function mapEventsCanStep() {
+  if (typeof paused !== "undefined" && paused) return false;
+  if (typeof battle !== "undefined" && battle.active) return false;
+  if (state !== "play") return false;
+  // Décompte 3-2-1 encore affiché (sécurité si state passe trop tôt)
+  if (typeof serveCountdown !== "undefined" && serveCountdown > 0) return false;
+  return true;
 }
 
 function deflectBallFromMap(px, py, pvx, pvy, pr) {
@@ -354,6 +435,20 @@ function spawnGolfBall() {
   });
 }
 
+function spawnMacaw() {
+  // Vol horizontal lent, hauteur variable (pas une chute)
+  const y = 70 + rng() * (GROUND_Y - 150);
+  mapEvent.balls.push({
+    x: -50 - rng() * 80,
+    y,
+    vx: 1.25 + rng() * 0.45,
+    vy: (rng() - 0.5) * 0.28,
+    bob: rng() * Math.PI * 2,
+    hit: false,
+    dead: false
+  });
+}
+
 function stepGolfBalls() {
   let alive = 0;
   for (const b of mapEvent.balls) {
@@ -368,6 +463,119 @@ function stepGolfBalls() {
   return alive;
 }
 
+function stepMacaws() {
+  let alive = 0;
+  for (const b of mapEvent.balls) {
+    if (b.dead) continue;
+    b.bob = (b.bob || 0) + 0.07;
+    b.x += b.vx;
+    b.y += b.vy + Math.sin(b.bob) * 0.22;
+    if (b.y < 36) { b.y = 36; b.vy = Math.abs(b.vy) * 0.4; }
+    if (b.y > GROUND_Y - 24) { b.y = GROUND_Y - 24; b.vy = -Math.abs(b.vy) * 0.4; }
+    if (!b.hit && deflectBallFromMap(b.x, b.y, b.vx, b.vy * 0.4, MAP_MACAW_R)) b.hit = true;
+    if (b.x > W + 60) b.dead = true;
+    else alive++;
+  }
+  return alive;
+}
+
+function collideMapCrosser(kind) {
+  if (tick - (mapEvent.lastHitTick || -999) < MAP_CROSSER_HIT_CD) return;
+  const cx = mapEvent.cartX;
+  const halfW = kind === "march" ? 120 : kind === "carpet" ? 70 : kind === "cow" ? 58 : 55;
+  const topY = kind === "carpet" ? GROUND_Y - 110
+    : kind === "cow" ? GROUND_Y - 88
+    : GROUND_Y - 95;
+  if (ball.x < cx - halfW || ball.x > cx + halfW) return;
+  if (ball.y < topY || ball.y > GROUND_Y + 8) return;
+  const dir = mapEvent.cartDir || 1;
+  if (deflectBallFromMap(cx, GROUND_Y - 50, dir * 2.5, -1.5, halfW * 0.55)) {
+    mapEvent.lastHitTick = tick;
+  }
+}
+
+function stepMapCrosserEvent(kind) {
+  if (mapEvent.phase !== "fire" && mapEvent.phase !== "flying") return;
+  mapEvent.t++;
+  mapEvent.cartDir = 1;
+  const spd = kind === "march" ? 2.6 : kind === "carpet" ? 3.4 : 2.2;
+  mapEvent.cartX += spd;
+  if (mapEvent.phase === "fire" && mapEvent.t === 1) {
+    sfxCannonFire();
+    shake = Math.max(shake, 3);
+  }
+  if (mapEvent.phase === "fire" && mapEvent.t >= MAP_EVENT_FIRE_T) {
+    mapEvent.phase = "flying";
+  }
+  collideMapCrosser(kind);
+  if (mapEvent.cartX > W + 120) scheduleNextMapEvent();
+}
+
+function stepMapRadarEvent() {
+  if (mapEvent.phase !== "fire" && mapEvent.phase !== "flying") return;
+  mapEvent.t++;
+  if (mapEvent.phase === "fire" && mapEvent.t === 1) {
+    sfxCannonFire();
+    shake = Math.max(shake, 4);
+  }
+  if (mapEvent.phase === "fire" && mapEvent.t >= MAP_EVENT_FIRE_T) {
+    mapEvent.phase = "flying";
+  }
+  const zx = mapEvent.zoneX || W * 0.5;
+  const zw = mapEvent.zoneW || 160;
+  if (ball.x > zx - zw / 2 && ball.x < zx + zw / 2 &&
+      ball.y < GROUND_Y && ball.y > NET_TOP - 40) {
+    if (tick - (mapEvent.lastHitTick || -999) >= 16) {
+      if (deflectBallFromMap(zx, GROUND_Y - 80, 0, -4, zw * 0.4)) {
+        mapEvent.lastHitTick = tick;
+      }
+    }
+  }
+  if (mapEvent.t >= MAP_RADAR_PULSE_T) scheduleNextMapEvent();
+}
+
+function stepMapRainEvent(kind) {
+  if (mapEvent.phase !== "fire" && mapEvent.phase !== "flying") return;
+  mapEvent.t++;
+  if (kind === "cart") mapEvent.cartX += 3.2;
+  if (mapEvent.phase === "fire" && mapEvent.t === 1) {
+    sfxCannonFire();
+    shake = Math.max(shake, 4);
+    spawnGolfBall();
+  }
+  if (mapEvent.t > 1 && mapEvent.t < MAP_CART_RAIN_T && mapEvent.t % 12 === 0) {
+    spawnGolfBall();
+  }
+  if (mapEvent.phase === "fire" && mapEvent.t >= MAP_EVENT_FIRE_T) {
+    mapEvent.phase = "flying";
+  }
+  const alive = stepGolfBalls();
+  const cartGone = kind !== "cart" || mapEvent.cartX > W + 60;
+  if (mapEvent.t > MAP_CART_RAIN_T && alive === 0 && cartGone) {
+    scheduleNextMapEvent();
+  }
+}
+
+function stepMapMacawEvent() {
+  if (mapEvent.phase !== "fire" && mapEvent.phase !== "flying") return;
+  mapEvent.t++;
+  if (mapEvent.phase === "fire" && mapEvent.t === 1) {
+    sfxCannonFire();
+    shake = Math.max(shake, 2);
+    spawnMacaw();
+    spawnMacaw();
+  }
+  // Spawn plus espacé → vol plus lisible / moins dense
+  if (mapEvent.t > 1 && mapEvent.t < MAP_MACAW_T && mapEvent.t % 28 === 0) {
+    spawnMacaw();
+  }
+  if (mapEvent.phase === "fire" && mapEvent.t >= MAP_EVENT_FIRE_T) {
+    mapEvent.phase = "flying";
+  }
+  const alive = stepMacaws();
+  if (mapEvent.t > MAP_MACAW_T && alive === 0) scheduleNextMapEvent();
+}
+
 function stepMapEvent() {
   if (mapEventsQuiet || !mapEventActiveTerrain()) {
     if (mapEvent.phase !== "idle") {
@@ -377,11 +585,11 @@ function stepMapEvent() {
       mapEvent.balls = [];
       if (mapEvent.cartX < 0 || mapEvent.cartX > W) mapEvent.cartX = W * 0.5;
     }
-    // décor : le caddie continue de patrouiller même en mode calme
-    if (state === "play" || state === "serve") stepCartIdleMotion();
+    if (mapEventsCanStep()) stepCartIdleMotion();
     return;
   }
-  if (state !== "play" && state !== "serve") return;
+  // Pause / point / service / duel : on fige (pas de nouveau trigger, pas d'avance)
+  if (!mapEventsCanStep()) return;
 
   const kind = mapEventKind();
 
@@ -391,17 +599,22 @@ function stepMapEvent() {
       mapEvent.phase = "warn";
       mapEvent.t = 0;
       flashMapEventAnnounce(kind, "warn");
-      if (kind === "cart") {
-        mapEvent.zoneW = 140 + Math.floor(rng() * 40);
+      mapEvent.balls = [];
+      mapEvent.lastHitTick = -999;
+      if (mapEventIsRain(kind) || kind === "radar") {
+        mapEvent.zoneW = 140 + Math.floor(rng() * 50);
         mapEvent.zoneX = 160 + Math.floor(rng() * (W - 320));
-        // garde la position courante — accélère vers la droite (pas de reset à -100)
+      }
+      if (kind === "cart") {
         mapEvent.cartDir = 1;
         if (mapEvent.cartX < -40) mapEvent.cartX = -40;
-        mapEvent.balls = [];
-        sfxCannonWarn();
-      } else {
-        sfxCannonWarn();
       }
+      if (mapEventIsCrosser(kind)) {
+        mapEvent.cartDir = 1;
+        mapEvent.cartX = -80;
+        mapEvent.zoneW = kind === "march" ? 180 : 120;
+      }
+      sfxCannonWarn();
     }
     return;
   }
@@ -412,6 +625,10 @@ function stepMapEvent() {
       mapEvent.cartDir = 1;
       mapEvent.cartX += 1.35;
     }
+    if (mapEventIsCrosser(kind)) {
+      mapEvent.cartDir = 1;
+      mapEvent.cartX += 0.9;
+    }
     if (mapEvent.t % 30 === 0) beep(180 + (mapEvent.t | 0), 0.05, "square", 0.06);
     if (mapEvent.t >= MAP_EVENT_WARN_T) {
       mapEvent.phase = "fire";
@@ -421,27 +638,20 @@ function stepMapEvent() {
     return;
   }
 
-  // --- Resort Doré : voiturette + pluie de balles ---
-  if (kind === "cart") {
-    if (mapEvent.phase === "fire" || mapEvent.phase === "flying") {
-      mapEvent.t++;
-      mapEvent.cartX += 3.2;
-      if (mapEvent.phase === "fire" && mapEvent.t === 1) {
-        sfxCannonFire();
-        shake = Math.max(shake, 4);
-        spawnGolfBall();
-      }
-      if (mapEvent.t > 1 && mapEvent.t < MAP_CART_RAIN_T && mapEvent.t % 12 === 0) {
-        spawnGolfBall();
-      }
-      if (mapEvent.phase === "fire" && mapEvent.t >= MAP_EVENT_FIRE_T) {
-        mapEvent.phase = "flying";
-      }
-      const alive = stepGolfBalls();
-      if (mapEvent.t > MAP_CART_RAIN_T && alive === 0 && mapEvent.cartX > W + 60) {
-        scheduleNextMapEvent();
-      }
-    }
+  if (mapEventIsRain(kind)) {
+    stepMapRainEvent(kind);
+    return;
+  }
+  if (kind === "macaw") {
+    stepMapMacawEvent();
+    return;
+  }
+  if (mapEventIsCrosser(kind)) {
+    stepMapCrosserEvent(kind);
+    return;
+  }
+  if (kind === "radar") {
+    stepMapRadarEvent();
     return;
   }
 
@@ -474,10 +684,16 @@ function stepMapEvent() {
 }
 
 // avancé une fois par tick DANS la simulation (déterministe).
-// Même machine à états sur les 4 terrains ; seul l'habillage change :
-//  plage → tempête de sable · banquise → chute de neige/blizzard
-//  prairie → averse
+// Même machine à états sur les terrains ; seul l'habillage change :
+//  banquise → chute de neige/blizzard · prairie → averse
+//  Pelouse Oval : toujours clair (pas de tempête de sable)
 function stepWeather() {
+  const key = TERRAINS[terrain] && TERRAINS[terrain].key;
+  if (key === "plage") {
+    weather = "clear";
+    weatherTimer = 99999;
+    return;
+  }
   if (--weatherTimer > 0) return;
   const r = rng();
   if (weather === "clear") {
