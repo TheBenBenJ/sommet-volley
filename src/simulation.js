@@ -86,6 +86,8 @@ function superReadyFor(blob) {
 function maybeActivateSuper(blob, input) {
   const pressed = input.super && !blob.prevSuper;
   blob.prevSuper = !!input.super;
+  // Tutoriel : seul le joueur (camp 0) peut déclencher un SUPER
+  if (tutorialMode && blob.side !== 0) return;
   if (!pressed || !superReadyFor(blob)) return;
   const a = charOf(blob);
   superCharge[blob.side] = 0;
@@ -219,12 +221,14 @@ function localInputs(side) {
   // comportement historique : manette n° i → joueur i (l'humain est en 0).
   const twoHumans = !vsAI && !online && mode === "1v1";
   const pad = twoHumans ? padForSide(side) : padGameInput(side);
-  // Gameplay V2 : contact = cloche · S/F ou ↓// = smash · E / Shift = SUPER
+  // Clavier : Q/D · Z/Espace · F (action) · E — visée géométrique (pas souris).
+  // Manette : inchangée (stick = visée, X/Y = frappe).
+  // ↑ réservé au joueur droit en 1v1 local 2 humains.
   const raw = side === 0 ? {
     left:  !!keys["KeyA"] || pad.left,
     right: !!keys["KeyD"] || pad.right,
-    jump:  !!(keys["KeyW"] || keys["Space"]) || pad.jump,
-    smash: !!(keys["KeyS"] || keys["KeyF"]) || !!pad.smash,
+    jump:  !!(keys["KeyW"] || keys["Space"] || (!twoHumans && keys["ArrowUp"])) || pad.jump,
+    smash: !!keys["KeyF"] || !!pad.smash,
     super: !!keys["KeyE"] || pad.super,
     up:    !!pad.up,
     down:  !!pad.down,

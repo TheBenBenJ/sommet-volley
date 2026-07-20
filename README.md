@@ -50,9 +50,10 @@ propres sous-choix plutôt qu'un mur d'options :
 
 ### Commandes & navigation
 
-Voir l’écran **Règles** en jeu (touche R). En résumé : Q/D ou flèches pour
-bouger, Z/Espace ou ↑ pour sauter, S/F ou ↓ pour smash/cloche, E / Shift pour
-SUPER. **P** pause · **M** son · **N** musique.
+Voir l’écran **Règles** en jeu (touche R). En résumé : Q/D pour bouger,
+Z / Espace pour sauter, **F** pour l’action (lancer au service ; au sol = cloche
+selon ta position ; en l’air = smash auto au contact), E pour SUPER. Manette :
+stick + X/Y. **P** pause · **M** son · **N** musique.
 
 ## Développement
 

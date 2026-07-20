@@ -107,7 +107,6 @@ function render() {
   if (state === "credits") { drawCredits(); return; }
   if (state === "selectCharacter") { drawSelectCharacter(); return; }
   if (state === "selectTerrain") { drawSelectTerrain(); return; }
-  if (state === "selectBall") { drawSelectBall(); return; }
   if (state === "onlineMenu") { drawOnlineMenu(); return; }
   if (state === "joinEntry") { drawJoinEntry(); return; }
   if (state === "hostWait") { drawHostWait(); return; }
@@ -165,14 +164,15 @@ function render() {
   }
   // Service inclus : balle au premier plan (sur les bras receive)
   drawBallLayer();
+  if (typeof drawTutorialAimPreview === "function") drawTutorialAimPreview();
   if (battle.active) drawBattleFx();
   drawParticles();
   ctx.restore();
-  drawBallMarker();
   drawHUD();
   drawBattleHUD();
   if (online && netConnected) drawNetHUD();
   if (typeof drawTutorialCoach === "function") drawTutorialCoach();
+  drawBallMarker();
 
   if (state === "point") {
     drawPointCelebBanner();

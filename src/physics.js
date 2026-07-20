@@ -92,32 +92,35 @@ function isKeyboardStyleAim(input) {
 }
 
 /**
- * Angle de base clavier : cloche/smash sûrs vers le camp adverse
- * (le stick analogique n'est pas disponible → on évite les bords du cône).
+ * Visée clavier : angle selon la position du joueur par rapport à la balle.
+ * (Manette : stick inchangé via stickAimRaw.)
+ * relX > 0 = balle plus vers le filet que le joueur ; relY > 0 = balle plus bas que la tête.
  */
-function keyboardAutoAimRaw(blob, mode) {
+function keyboardGeomAimAngle(blob, mode) {
+  const h = blob.headCircle;
   const fwd = blob.side === 0 ? 1 : -1;
-  if (mode === "lob") {
-    // Cloche haute avec un peu d'avance — passe le filet facilement
-    return Math.atan2(-0.88, fwd * 0.42);
-  }
-  // Smash : un peu plus tendu, toujours vers l'avant
-  return Math.atan2(-0.38, fwd * 0.82);
-}
+  const center = mode === "lob"
+    ? (blob.side === 0 ? -0.92 : Math.PI + 0.92)
+    : (blob.side === 0 ? -0.45 : Math.PI + 0.45);
 
-/** ← / → = léger réglage autour de l'auto-aim (pas les extrémités du cône). */
-function keyboardAimAngle(blob, input, center, mode) {
-  let ang = keyboardAutoAimRaw(blob, mode);
-  const left = !!(input && input.left);
-  const right = !!(input && input.right);
-  if (left !== right) {
-    // P1 : ← = plus lobé, → = plus tendu ; P2 miroir
-    const loft = blob.side === 0
-      ? (left ? -0.34 : 0.30)
-      : (right ? -0.34 : 0.30);
-    ang += loft;
+  const relX = (ball.x - blob.x) * fwd;
+  const relY = ball.y - h.y;
+
+  if (mode === "lob") {
+    // Sous la balle / un peu en retrait → cloche haute ; plus vers le filet → plus tendue
+    // Depuis le fond : un peu plus de poussée pour passer le filet
+    const deep = Math.max(0, Math.min(1, (Math.abs(NET_X - blob.x) - 180) / 220));
+    const loft = -0.78 - 0.18 * deep - Math.max(-0.28, Math.min(0.22, -relY * 0.009));
+    const push = 0.38 + 0.22 * deep + Math.max(-0.14, Math.min(0.42, relX * 0.014));
+    return clampAimToCone(blob, Math.atan2(loft, fwd * push), center);
   }
-  return clampAimToCone(blob, ang, center);
+  // Smash : balle haute / devant → piqué vers le bas ; contact bas → plus plat
+  // (y écran vers le bas : sin>0 = piqué). Ancienne formule inversait relY.
+  const centerSmash = blob.side === 0 ? 0.22 : Math.PI - 0.22;
+  const spike = Math.max(-0.22, Math.min(0.95, -relY * 0.014));
+  const down = 0.10 + spike + Math.max(0, Math.min(0.28, relX * 0.009));
+  const push = 0.70 + Math.max(-0.2, Math.min(0.52, relX * 0.017));
+  return clampAimToCone(blob, Math.atan2(down, fwd * push), centerSmash);
 }
 
 function stickAimRaw(blob, input, center) {
@@ -138,9 +141,9 @@ function stickAimRaw(blob, input, center) {
 }
 
 function aimAngleFromInput(blob, input) {
-  // Smash / tir tendu : cône vers l'adversaire, stick = direction.
+  // Smash / tir tendu : cône vers l'adversaire.
   const center = blob.side === 0 ? -0.45 : Math.PI + 0.45;
-  if (isKeyboardStyleAim(input)) return keyboardAimAngle(blob, input, center, "smash");
+  if (isKeyboardStyleAim(input)) return keyboardGeomAimAngle(blob, "smash");
   return clampAimToCone(blob, stickAimRaw(blob, input, center), center);
 }
 
@@ -150,10 +153,10 @@ function isServeHit(blob) {
 
 function aimLobAngleFromInput(blob, input) {
   // Service : cloche forcée vers l'adversaire (pas de multi-touche dans son camp).
-  // Échange : l'angle du stick est respecté dans le cône.
+  // Clavier : géométrie joueur/balle. Manette : stick dans le cône.
   const center = blob.side === 0 ? -0.92 : Math.PI + 0.92;
   if (isServeHit(blob)) return center;
-  if (isKeyboardStyleAim(input)) return keyboardAimAngle(blob, input, center, "lob");
+  if (isKeyboardStyleAim(input)) return keyboardGeomAimAngle(blob, "lob");
   return clampAimToCone(blob, stickAimRaw(blob, input, center), center);
 }
 
@@ -289,7 +292,7 @@ function ballPathDistToBlob(blob) {
   return Math.hypot(x0 + sx * t - h.x, y0 + sy * t - h.y);
 }
 
-/** Balle qui retombe vraiment SUR le joueur au sol (jamais en l'air → laisse le smash). */
+/** Balle qui retombe vraiment SUR le joueur au sol (jamais en l'air → smash auto clavier). */
 function ballLandsOnPlayer(blob) {
   if (!blob.onGround) return false; // en saut : pas d'auto, il faut X
   if (ball.vy < 0.6) return false; // doit descendre
@@ -562,10 +565,9 @@ function ballBlobCollision(blob) {
   const a = charOf(blob);
 
   // Gameplay V2 :
-  // - Smash/X près de la balle → smash (air) sinon cloche
-  // - Sans appui → cloche auto SEULEMENT au sol si la balle tombe dessus
-  //   (jamais en l'air : laisse le temps de smash ; jamais au service)
-  // - Sinon la balle traverse (saut latéral, frôlement…)
+  // - Manette : X/Y près de la balle → smash (air) sinon cloche
+  // - Clavier : contact AUTO — sol = cloche, air = smash (géométrie joueur/balle)
+  //   y compris au service après le lancer (le lancer lui-même reste sur S)
   if (GAMEPLAY_V2) {
     if (ball.inHands && ball.frozen) {
       if (tryTossServe(blob)) return;
@@ -573,13 +575,32 @@ function ballBlobCollision(blob) {
     }
     // Grace post-lancer : pas de cloche accidentelle sur le serveur
     if (ball.tossGrace > 0 && blob.side === servingSide) return;
+
+    const aiBlob = !online && vsAI && blob !== blobL;
+    const kbHuman = !aiBlob && isKeyboardStyleAim(blob._input);
+
+    // Manette (ou appui S clavier) : frappe explicite
     if (wantSmash(blob)) {
       const near = ballPathDistToBlob(blob) <= RECEIVE_R;
       if (near && trySmashBall(blob)) { applyHitExtras(blob, a); return; }
       if (near && tryLobBall(blob)) applyHitExtras(blob, a);
       return;
     }
-    // Service : sauter dans le lancer ≠ frappe — il faut X
+
+    // Clavier humain : smash auto en l'air au contact (échange + service)
+    if (kbHuman && !blob.onGround) {
+      const d = ballPathDistToBlob(blob);
+      const aligned = Math.abs(ball.x - blob.x) < 40;
+      if (d <= 34 && aligned && trySmashBall(blob)) { applyHitExtras(blob, a); return; }
+    }
+
+    // Clavier humain : cloche auto au sol selon position (échange + service)
+    if (kbHuman && blob.onGround && ballLandsOnPlayer(blob) && tryLobBall(blob)) {
+      applyHitExtras(blob, a);
+      return;
+    }
+
+    // Manette / IA : pas de cloche auto pendant le service (il faut X)
     if (isServeHit(blob)) return;
     if (ballLandsOnPlayer(blob) && tryLobBall(blob)) applyHitExtras(blob, a);
     return;

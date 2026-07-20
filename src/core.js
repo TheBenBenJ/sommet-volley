@@ -20,7 +20,7 @@ const BLOB_SPEED = 5.2;
 // ~-17 → perso moyen : pieds au-dessus du filet.
 const BLOB_JUMP = -17;
 const DOUBLE_JUMP_MUL = 0.72; // 2e saut : encore utile pour finir un smash
-const BALL_R = 14;
+const BALL_R = 11;
 const HIT_SPEED = 10.5;
 const MAX_BALL_SPEED = 15;
 const WIN_SCORE = 15;

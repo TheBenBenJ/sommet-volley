@@ -159,9 +159,11 @@ function drawBallMarker() {
   const mx = Math.max(26, Math.min(W - 26, ball.x));
   const pulse = 1 + Math.sin(performance.now() / 120) * 0.12;
   const alt = Math.max(1, Math.round((-ball.y + BALL_R) / 45));
+  // Marqueur haute-balle en haut (le coach est en bas)
+  const topY = 24;
 
   ctx.save();
-  ctx.translate(mx, 24);
+  ctx.translate(mx, topY);
   ctx.scale(pulse, pulse);
   ctx.fillStyle = "#ffcc00";
   ctx.strokeStyle = "rgba(0,0,0,0.4)";
@@ -181,10 +183,10 @@ function drawBallMarker() {
 
   // altitude
   ctx.fillStyle = "rgba(20,20,40,0.65)";
-  ctx.fillRect(mx - 24, 44, 48, 20);
+  ctx.fillRect(mx - 24, topY + 20, 48, 20);
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.font = "700 13px " + (typeof UI !== "undefined" ? UI.sans : "sans-serif");
-  ctx.fillText(alt + " m", mx, 58);
+  ctx.fillText(alt + " m", mx, topY + 34);
 }
 

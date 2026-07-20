@@ -222,7 +222,7 @@ test("V2 : saut latéral sans smash → la balle traverse", () => {
   assert.ok(Math.abs(g.ball.vx - vx0) < 0.5, "pas de renvoi auto");
 });
 
-test("V2 : en l'air sans X, même balle sur la tête → pas d'auto (smash possible)", () => {
+test("V2 : en l'air sans X, balle sur la tête → smash auto clavier", () => {
   const g = freshRally(91);
   const idle = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
   g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y - 80; g.blobL.onGround = false;
@@ -231,7 +231,8 @@ test("V2 : en l'air sans X, même balle sur la tête → pas d'auto (smash possi
   g.ball.inHands = false; g.ball.tossGrace = 0;
   g.ball.serveAimLock = false;
   g.stepGame(idle, idle);
-  assert.strictEqual(g.ball.touches[0], 0, "en l'air : pas de cloche auto");
+  assert.strictEqual(g.ball.touches[0], 1, "clavier en l'air au contact = smash auto");
+  assert.ok(g.ball.vx > 0, "smash vers l'adversaire");
 });
 
 test("V2 : balle qui tombe sur le joueur → cloche auto", () => {
@@ -320,7 +321,7 @@ test("IA : le niveau Impitoyable bat un adversaire scripté moyen", () => {
     const close = Math.abs(b.x - me.x) < 46 && b.y < me.y - 34 && b.y > me.y - 150;
     g.keys.KeyW = (!b.frozen && b.x < NET_X && close && me.onGround) ||
                   (b.frozen && Math.abs(b.x - me.x) < 20 && me.onGround);
-    // Gameplay V2 : se placer sous la balle (contact = cloche) ; S = smash parfois
+    // Gameplay V2 : se placer sous la balle (contact = cloche) ; F = smash parfois
     if (!b.frozen && b.x < NET_X && Math.hypot(b.x - me.x, b.y - (me.y - 64)) < 70) {
       g.keys.KeyD = b.x > me.x + 6; g.keys.KeyA = b.x < me.x - 6;
     }
@@ -602,7 +603,26 @@ test("V2 : service — se retourner déplace la balle avec les mains", () => {
     "même écart aux mains (face=" + dxFace + " back=" + dxBack + ")");
 });
 
-test("V2 : service — sauter dans le lancer sans X ne frappe pas", () => {
+test("V2 : service — cloche auto au sol après lancer (clavier)", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(57);
+  g.setState("play"); g.setServeCountdown(0);
+  g.setServingSide(0);
+  g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y; g.blobL.onGround = true;
+  g.blobL.lastActiveHitTick = -999;
+  g.ball.x = 250; g.ball.y = g.blobL.y - 58; g.ball.vx = 0; g.ball.vy = 3;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+  g.ball.serveAimLock = true;
+  g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
+  g.stepGame(N0, N0);
+  assert.strictEqual(g.ball.touches[0], 1, "clavier : retombée au service = cloche auto");
+  assert.strictEqual(g.ball.serveAimLock, false, "lock levé");
+  assert.ok(g.ball.vx > 0, "vers l'adversaire");
+  assert.ok(g.ball.vy < 0, "cloche");
+});
+
+test("V2 : service — sauter dans le lancer (clavier) = smash auto", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(1);
   g.newGame(56);
@@ -610,14 +630,42 @@ test("V2 : service — sauter dans le lancer sans X ne frappe pas", () => {
   g.setServingSide(0);
   g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y - 60; g.blobL.onGround = false;
   g.blobL.lastActiveHitTick = -999;
-  // Retombée du lancer pile sur le serveur qui saute — sans smash
+  // Retombée du lancer pile sur le serveur qui saute — sans bouton smash
   g.ball.x = 250; g.ball.y = g.blobL.y - 58; g.ball.vx = 0; g.ball.vy = 3;
   g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
   g.ball.serveAimLock = true;
   g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
   g.stepGame(N0, N0);
-  assert.strictEqual(g.ball.touches[0], 0, "saut seul ≠ 1ʳᵉ frappe de service");
-  assert.strictEqual(g.ball.serveAimLock, true, "lock toujours actif");
+  assert.strictEqual(g.ball.touches[0], 1, "clavier : saut au contact = frappe de service");
+  assert.strictEqual(g.ball.serveAimLock, false, "lock levé après la frappe");
+  assert.ok(g.ball.vx > 0, "service vers l'adversaire");
+});
+
+test("V2 : service — F + saut immédiat interdit (anti-triche)", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(58);
+  g.setState("serve"); g.setServeCountdown(0);
+  g.setServingSide(0);
+  g.ball.reset(0);
+  // Même frame : lancer + saut
+  g.stepGame({ ...N0, smash:true, jump:true }, N0);
+  assert.strictEqual(g.ball.inHands, false, "F lance bien");
+  assert.ok(g.blobL.onGround, "pas de saut le frame du lancer");
+  // Tenir le saut pendant toute la montée
+  let leftGround = false;
+  for (let i = 0; i < 80; i++) {
+    g.stepGame({ ...N0, jump:true }, N0);
+    if (!g.blobL.onGround) leftGround = true;
+    if (!g.ball.serveAimLock) break;
+    if (g.ball.vy >= 0) break; // apex atteint
+  }
+  assert.ok(!leftGround, "tenir Espace pendant la montée ne fait pas sauter");
+  assert.ok(g.ball.vy >= 0 || !g.ball.serveAimLock, "balle au pic ou déjà frappée");
+  // Nouvel appui une fois en descente → saut OK
+  g.stepGame(N0, N0); // relâche
+  g.stepGame({ ...N0, jump:true }, N0);
+  assert.ok(!g.blobL.onGround, "après la descente, un nouvel appui saute");
 });
 
 test("V2 : service — passe le filet depuis près du filet (tous persos)", () => {
@@ -737,34 +785,70 @@ test("V2 : cloche suit l'angle du stick", () => {
   assert.ok(Math.abs(g.ball.vx) < Math.abs(g.ball.vy) * 0.35, "plein haut ≠ tir vers l'avant (vx=" + g.ball.vx + ", vy=" + g.ball.vy + ")");
 });
 
-test("V2 : clavier — visée assistée vers l'adversaire (sans stick)", () => {
+test("V2 : clavier — visée selon position relative joueur/balle", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(1);
   g.newGame(55);
   g.setState("play"); g.setServeCountdown(0);
-  const setup = () => {
+  const setup = (ballOffX) => {
     g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y; g.blobL.onGround = true;
     g.blobL.lastActiveHitTick = -999;
-    g.ball.x = 250; g.ball.y = g.blobL.y - 70; g.ball.vx = 0; g.ball.vy = 1;
+    g.ball.x = 250 + ballOffX; g.ball.y = g.blobL.y - 70; g.ball.vx = 0; g.ball.vy = 1;
     g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
     g.ball.serveAimLock = false;
     g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
   };
-  // Neutre clavier : doit partir vers l'adversaire (pas un angle extrême)
-  setup();
+  // Neutre : sous la balle → vers l'adversaire
+  setup(0);
   g.stepGame({ ...N0, smash:true }, N0);
-  assert.ok(g.ball.vx > 3, "clavier neutre → vers l'adversaire (vx=" + g.ball.vx + ")");
-  assert.ok(g.ball.vy < -2, "clavier neutre → cloche (vy=" + g.ball.vy + ")");
+  assert.ok(g.ball.vx > 3, "clavier sous la balle → vers l'adversaire (vx=" + g.ball.vx + ")");
+  assert.ok(g.ball.vy < -2, "clavier → cloche (vy=" + g.ball.vy + ")");
   const vxMid = g.ball.vx;
-  // ← = plus lobé (moins de vx), → = plus tendu
-  setup();
-  g.stepGame({ ...N0, smash:true, left:true }, N0);
-  const vxLeft = g.ball.vx;
-  setup();
-  g.stepGame({ ...N0, smash:true, right:true }, N0);
-  const vxRight = g.ball.vx;
-  assert.ok(vxRight > vxLeft + 0.4, "← plus lobé que → (vx L=" + vxLeft + " R=" + vxRight + ")");
-  assert.ok(vxMid > 2 && vxRight > 2, "les deux directions restent vers l'adversaire");
+  // Balle plus vers le filet → frappe plus tendue (plus de vx)
+  setup(36);
+  g.stepGame({ ...N0, smash:true }, N0);
+  const vxFront = g.ball.vx;
+  setup(-28);
+  g.stepGame({ ...N0, smash:true }, N0);
+  const vxBack = g.ball.vx;
+  assert.ok(vxFront > vxBack + 0.3, "balle devant plus tendue que derrière (F=" + vxFront + " B=" + vxBack + ")");
+  assert.ok(vxMid > 2 && vxFront > 2, "reste vers l'adversaire");
+});
+
+test("V2 : clavier — smash auto au contact en saut", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(56);
+  g.setState("play"); g.setServeCountdown(0);
+  g.blobL.x = 280; g.blobL.y = g.consts.GROUND_Y - 80; g.blobL.onGround = false;
+  g.blobL.vy = -2; g.blobL.lastActiveHitTick = -999;
+  g.ball.x = 285; g.ball.y = g.blobL.y - 50; g.ball.vx = 0; g.ball.vy = 2;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+  g.ball.serveAimLock = false;
+  g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
+  // Pas de smash enfoncé — le contact en l'air doit smash quand même
+  g.stepGame({ ...N0 }, N0);
+  assert.ok(g.ball.vx > 2 || g.ball.vy !== 2, "smash auto a dévié la balle");
+  assert.ok(g.blobL.poseAnim === "smash" || Math.hypot(g.ball.vx, g.ball.vy) > 4,
+    "contact aérien clavier → smash");
+});
+
+test("V2 : clavier — smash piqué quand la balle est haute", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(59);
+  g.setState("play"); g.setServeCountdown(0);
+  // Balle au-dessus de la tête, un peu devant → doit piquer (pas cloche)
+  g.blobL.x = 300; g.blobL.y = g.consts.GROUND_Y - 90; g.blobL.onGround = false;
+  g.blobL.vy = 0; g.blobL.lastActiveHitTick = -999;
+  const headY = g.blobL.y - 64;
+  g.ball.x = 315; g.ball.y = headY - 20; g.ball.vx = 0; g.ball.vy = 1;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+  g.ball.serveAimLock = false;
+  g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
+  g.stepGame({ ...N0 }, N0);
+  assert.ok(g.ball.vx > 4, "smash vers l'adversaire (vx=" + g.ball.vx + ")");
+  assert.ok(g.ball.vy > 1, "balle haute → piqué vers le bas (vy=" + g.ball.vy + ")");
 });
 
 test("V2 : cloche depuis le fond passe au-dessus du filet", () => {

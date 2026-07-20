@@ -16,10 +16,9 @@ const TERRAINS = [
 ];
 let terrain = 0;
 
-// Skins de balle : 0 = classique (dessin canvas), les autres pointent vers un sprite PNG.
+// Ballon unique : cartoon PNG (volley violet / crème).
 const BALL_SKINS = [
-  { key: "classic", name: "Classique", sprite: null },
-  { key: "purple",  name: "Violet",    sprite: "ballPurple" },
+  { key: "purple", name: "Cartoon", sprite: "ballPurple" },
 ];
 let ballSkin = 0;
 
@@ -152,11 +151,11 @@ function sideColor(side) {
 
 // ---------- État du jeu ----------
 // state: "menu" | "aiDifficulty" | "gameModeSelect" | "rules" | "credits" | "tutorialHelp"
-//        | "selectCharacter" | "selectTerrain" | "selectBall" | "serve" | "play" | "point" | "gameover"
+//        | "selectCharacter" | "selectTerrain" | "serve" | "play" | "point" | "gameover"
 //        | états du mode en ligne : "onlineMenu" | "joinEntry" | "hostWait"
 //          | "connecting" | "netWait" | "netError"
 // Flux du menu : menu → (Solo IA : aiDifficulty → gameModeSelect) | (Local : gameModeSelect direct)
-//                     → selectCharacter → selectTerrain → selectBall → partie
+//                     → selectCharacter → selectTerrain → partie
 //                     | Tutoriel (partie guidée) / Aide commandes / Règles / Crédits
 let state = "menu";
 let vsAI = true;
@@ -318,6 +317,7 @@ class Blob {
     this.prevSmashBtn = smashDown;
 
     const grip = groundGrip(this); // 1 sec, <1 pluie / Hiver Général
+
     this.vx = 0;
     const kitSp = this.kitSpeed != null ? this.kitSpeed : a.speed;
     const sp = BLOB_SPEED * this.speedMul * kitSp * grip;
@@ -352,12 +352,24 @@ class Blob {
       this.scramble = 0;
       this._walkTick = 0;
     }
-    const jumpPressed = input.jump && !this.prevJump; // front montant
+    // Service : pas de saut avec la balle en mains, ni pendant la montée du
+    // lancer (anti F+saut immédiat). Saut autorisé seulement une fois la
+    // balle en descente — et il faut un nouvel appui (pas tenir Espace).
+    const servePostToss = typeof GAMEPLAY_V2 !== "undefined" && GAMEPLAY_V2 &&
+      typeof ball !== "undefined" && this.side === servingSide &&
+      ball.serveAimLock && !ball.inHands;
+    const serveNoJump = typeof GAMEPLAY_V2 !== "undefined" && GAMEPLAY_V2 &&
+      typeof ball !== "undefined" && this.side === servingSide &&
+      ((ball.inHands && ball.frozen) || (servePostToss && ball.vy < 0));
+    const holdingJump = !!(input && input.jump);
+    const jumpIn = holdingJump && !serveNoJump;
+    const jumpPressed = jumpIn && !this.prevJump; // front montant
     this._jumpEdge = jumpPressed;
-    this.prevJump = !!input.jump;
+    this.prevJump = jumpIn || (serveNoJump && holdingJump);
     // Batterie AA (Houn) : camp ciblé ne peut plus sauter
     const noJump = typeof hasSuperEffect === "function" && hasSuperEffect("noground", this.side);
-    if (!noJump && input.jump && this.onGround) {
+    if (!noJump && !serveNoJump && this.onGround &&
+        (servePostToss ? jumpPressed : jumpIn)) {
       this.vy = BLOB_JUMP * a.jump * (0.85 + grip * 0.15);
       this.onGround = false;
       this.jumpsUsed = 1;

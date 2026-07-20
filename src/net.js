@@ -139,7 +139,7 @@ function onlineLocalInput() {
     left:  !!(keys["KeyA"] || keys["ArrowLeft"]) || pl,
     right: !!(keys["KeyD"] || keys["ArrowRight"]) || pr,
     jump:  !!(keys["KeyW"] || keys["Space"] || keys["ArrowUp"]) || pj,
-    smash: !!(keys["KeyS"] || keys["KeyF"] || keys["ArrowDown"] || keys["Slash"]) || psm,
+    smash: !!keys["KeyF"] || psm,
     super: !!(keys["KeyE"] || keys["ShiftRight"]) || ps,
     up:    pu,
     down:  pd,

@@ -225,7 +225,8 @@ function aiInput(side, lvlOverride, god) {
     aiErrTimer = 40;
   }
 
-  if (superCharge[side] === 1 && me.superT <= 0 && !ball.frozen && state === "play") {
+  if (!(typeof tutorialMode !== "undefined" && tutorialMode) &&
+      superCharge[side] === 1 && me.superT <= 0 && !ball.frozen && state === "play") {
     const key = charOf(me).key;
     const onMySide = side === 0 ? ball.x < NET_X : ball.x > NET_X;
     const hitReach = god ? 100 : 72;
@@ -398,7 +399,8 @@ function aiInput2v2(me, lvlOverride) {
   }
 
   // technique SUPER : charge partagée par l'équipe (superCharge[side])
-  if (iChase && superCharge[side] === 1 && me.superT <= 0 && !ball.frozen && state === "play") {
+  if (!(typeof tutorialMode !== "undefined" && tutorialMode) &&
+      iChase && superCharge[side] === 1 && me.superT <= 0 && !ball.frozen && state === "play") {
     const key = charOf(me).key;
     const nearHit = Math.abs(ball.x - me.x) < 72 && ball.y > me.y - 210 && ball.vy > -1;
     if (key === "vladou" || key === "trompette" || key === "micron") {

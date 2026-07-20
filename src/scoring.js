@@ -26,7 +26,8 @@ function awardPoint(side, reason) {
     if (b.side !== 1 - side) continue;
     const a = charOf(b);
     // Ego en béton (Trompette) : perdre un point charge aussi le SUPER
-    if (a.egoCharge && superCharge[b.side] === 0) {
+    // (désactivé pour l'adversaire en tutoriel)
+    if (a.egoCharge && superCharge[b.side] === 0 && !(tutorialMode && b.side !== 0)) {
       superCharge[b.side] = 1;
       beep(700, 0.1, "square", 0.12, 0, 900);
     }
@@ -53,18 +54,21 @@ function awardPoint(side, reason) {
     if (b.side === side && charOf(b).clapDouble) { need = 2; break; }
   }
   if (streak[side] % need === 0 && superCharge[side] === 0) {
-    superCharge[side] = 1;
-    beep(700, 0.12, "square", 0.16, 0, 1050);
-    beep(1050, 0.16, "square", 0.14, 0.1, 1500);
-    superFlash = "SUPER PRÊT — " + sideLabel(side) + " !";
-    const readyBlob = activeBlobs.find(b => b.side === side);
-    if (readyBlob) {
-      const a = charOf(readyBlob);
-      superFlashSub = "Appuie sur SUPER — " + (a.superName || "technique") + " : " + (a.superDesc || "");
-    } else {
-      superFlashSub = "Appuie sur SUPER pour lancer ta technique.";
+    // Tutoriel : pas de SUPER pour l'adversaire (camp 1)
+    if (!(tutorialMode && side !== 0)) {
+      superCharge[side] = 1;
+      beep(700, 0.12, "square", 0.16, 0, 1050);
+      beep(1050, 0.16, "square", 0.14, 0.1, 1500);
+      superFlash = "SUPER PRÊT — " + sideLabel(side) + " !";
+      const readyBlob = activeBlobs.find(b => b.side === side);
+      if (readyBlob) {
+        const a = charOf(readyBlob);
+        superFlashSub = "Appuie sur SUPER — " + (a.superName || "technique") + " : " + (a.superDesc || "");
+      } else {
+        superFlashSub = "Appuie sur SUPER pour lancer ta technique.";
+      }
+      superFlashT = 90;
     }
-    superFlashT = 90;
   }
   const name = sideLabel(side);
   pointMsg = reason ? reason + "  —  Point " + name : "Point pour " + name + " !";
@@ -81,8 +85,11 @@ function awardPoint(side, reason) {
   }
   const lead = Math.abs(scores[0] - scores[1]);
   const winNeed = typeof matchWinScore === "function" ? matchWinScore() : WIN_SCORE;
+  // Tutoriel : ne finit PAS tant que le coach n'est pas allé au bout,
+  // et seul le score du joueur (camp 0) peut conclure.
+  const coachOk = !tutorialMode || (typeof tutorialCoachComplete === "function" && tutorialCoachComplete());
   const winOk = tutorialMode
-    ? scores[side] >= winNeed
+    ? (side === 0 && scores[0] >= winNeed && coachOk)
     : (scores[side] >= winNeed && lead >= 2);
   if (winOk) {
     state = "gameover";

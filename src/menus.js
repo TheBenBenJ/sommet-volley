@@ -11,7 +11,7 @@ function handleMenuKeys(code, key) {
   // (c'était le « je remplis le code et rien ne se passe » des claviers à pavé)
 
   // Navigation grille (persos / terrains) : flèches / WASD
-  if (state === "selectCharacter" || state === "selectTerrain" || state === "selectBall") {
+  if (state === "selectCharacter" || state === "selectTerrain") {
     const dir =
       (code === "ArrowRight" || code === "KeyD") ? "right" :
       (code === "ArrowLeft"  || code === "KeyA") ? "left"  :
@@ -204,20 +204,12 @@ function handleMenuKeys(code, key) {
     const slotT = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Digit5: 4, Digit6: 5, Digit7: 6, Digit8: 7, Digit9: 8 }[code];
     const visT = terrainIndices();
     const n = slotT !== undefined && slotT < visT.length ? visT[slotT] : undefined;
-    if (n !== undefined) { terrain = n; navIdx = 0; state = "selectBall"; }
+    if (n !== undefined) { terrain = n; navIdx = 0; commitSetup(); }
     if (code === "KeyC") {
       mapEventsQuiet = !mapEventsQuiet;
       beep(mapEventsQuiet ? 360 : 520, 0.06, "square", 0.08);
     }
     if (code === "Escape") { selPlayer = 0; state = "selectCharacter"; }
-
-  } else if (state === "selectBall") {
-    const slotB = { Digit1: 0, Digit2: 1 }[code];
-    if (slotB !== undefined && slotB < BALL_SKINS.length) {
-      ballSkin = slotB;
-      commitSetup();
-    }
-    if (code === "Escape") state = "selectTerrain";
 
   } else if (state === "gameover") {
     if (online && mode === "2v2") {
@@ -237,9 +229,8 @@ function handleMenuKeys(code, key) {
     }
 
   } else if ((state === "serve" || state === "play") && tutorialMode &&
-             (code === "Enter" || code === "Space")) {
-    // Avance manuelle d'une étape coach (sans lancer la balle au service si inHands —
-    // Space est aussi saut : on avance seulement si l'étape le demande)
+             code === "Enter") {
+    // Entrée seule pour passer une étape (Espace n'est plus un saut)
     if (tutorialStepCanSkip()) advanceTutorialStep();
 
   } else if (code === "KeyP") {
@@ -264,10 +255,11 @@ function setTeamMode(v) {
   else pendingMode.mode2v2 = v;
 }
 
-// Valide la configuration choisie (fin de selectBall) et lance la partie
+// Valide la configuration choisie (fin de selectTerrain) et lance la partie
 // ou l'hébergement en ligne. Point unique : applique bombMode + bombTime
 // (5/7/10 s) pour TOUS les modes — 1v1, 2v2 et en ligne.
 function commitSetup() {
+  ballSkin = 0; // ballon cartoon unique
   bombMode = !!pendingMode.bomb;
   bombTime = pendingMode.bombTime || BOMB_TIME;
   if (pendingMode.online) {
@@ -349,6 +341,8 @@ function startTutorial() {
   tutorialInviteSessionDismissed = true;
   tutorialMode = true;
   tutorialStep = 0;
+  tutorialAdvanceLock = 0;
+  tutorialStepArmed = true;
   bombMode = false;
   mapEventsQuiet = true;
   vsAI = true;
@@ -364,29 +358,112 @@ function startTutorial() {
   newGame(42);
 }
 
+/** Étapes coach du match tutoriel (textes + touches à mettre en avant). */
+const TUTORIAL_STEPS = [
+  {
+    title: "Déplacement",
+    body: "Cours avec Q / D. Entrée = passer l'étape.",
+    keys: ["Q", "D"]
+  },
+  {
+    title: "Saut",
+    body: "Z, Espace ou ↑ pour sauter · en l'air, re-saute = double saut.",
+    keys: ["Z", "Espace"]
+  },
+  {
+    title: "Service",
+    body: "F : lance la balle. Ensuite contact auto — sol = cloche, saut = smash.",
+    keys: ["F", "Espace"]
+  },
+  {
+    title: "Cloche",
+    body: "Au sol, place-toi sous la balle : cloche auto selon ta position.",
+    keys: ["Q", "D"]
+  },
+  {
+    title: "Smash",
+    body: "Saute vers la balle : smash auto au contact selon ta position.",
+    keys: ["Espace", "Z"]
+  },
+  {
+    title: "SUPER",
+    body: "Gagne des points d'affilée pour remplir la jauge, puis E.",
+    keys: ["E"]
+  },
+  {
+    title: "Objectif",
+    body: "Valide toutes les étapes, puis marque " + TUTORIAL_WIN_SCORE + " points.",
+    keys: ["Q", "D", "F"]
+  }
+];
+
 function tutorialStepCanSkip() {
-  // Étapes « tip » dismissibles ; les étapes auto (mouvement détecté) aussi via Entrée
-  return tutorialStep >= 0 && tutorialStep <= 5;
+  // Entrée pour passer ; pas Espace (évite les skips accidentels)
+  return tutorialStep >= 0 && tutorialStep < TUTORIAL_STEPS.length - 1;
+}
+
+function tutorialCoachComplete() {
+  return tutorialStep >= TUTORIAL_STEPS.length - 1;
+}
+
+let tutorialAdvanceLock = 0; // tick jusqu'auquel on bloque l'auto-avance (anti-cascade)
+let tutorialStepArmed = true; // false = attendre que la condition soit fausse (action anticipée)
+
+function tutorialStepConditionMet(me) {
+  if (tutorialStep === 0) return Math.abs(me.vx) > 1.2;
+  if (tutorialStep === 1) return !me.onGround;
+  if (tutorialStep === 2) return servingSide === 0 && ball.tossGrace > 0;
+  if (tutorialStep === 3) return me.poseAnim === "receive";
+  if (tutorialStep === 4) return me.poseAnim === "smash";
+  // SUPER : uniquement l'activation (pas la jauge déjà pleine d'avant)
+  if (tutorialStep === 5) return me.superT > 0;
+  return false;
 }
 
 function advanceTutorialStep() {
   if (!tutorialMode) return;
-  if (tutorialStep < 5) {
+  if (tutorialStep < TUTORIAL_STEPS.length - 1) {
     tutorialStep++;
+    tutorialAdvanceLock = (typeof tick === "number" ? tick : 0) + 40;
+    // Tant que la condition est déjà vraie (ex. encore en l'air après un saut
+    // anticipé), on n'arme pas : il faudra la relâcher puis la refaire.
+    tutorialStepArmed = false;
     beep(520, 0.04, "square", 0.06);
+    // Si le score est déjà bon et qu'on arrive à l'objectif → terminer
+    if (typeof maybeFinishTutorialMatch === "function") maybeFinishTutorialMatch();
   }
 }
 
-/** Auto-progression du coach selon les actions du joueur. */
+/** Auto-progression du coach : uniquement une action fraîche sur l'étape courante. */
 function tickTutorialCoach() {
   if (!tutorialMode) return;
   if (state !== "serve" && state !== "play") return;
+  if (typeof tick === "number" && tick < tutorialAdvanceLock) return;
   const me = blobL;
-  if (tutorialStep === 0 && Math.abs(me.vx) > 1.2) advanceTutorialStep();
-  else if (tutorialStep === 1 && !me.onGround) advanceTutorialStep();
-  else if (tutorialStep === 2 && !ball.inHands && !ball.frozen) advanceTutorialStep();
-  else if (tutorialStep === 3 && scores[0] + scores[1] >= 1) advanceTutorialStep();
-  else if (tutorialStep === 4 && (me.superT > 0 || superCharge[0] > 0)) advanceTutorialStep();
+  const met = tutorialStepConditionMet(me);
+  if (!tutorialStepArmed) {
+    if (!met) tutorialStepArmed = true; // condition retombée → prêt pour une vraie action
+    return;
+  }
+  if (met) advanceTutorialStep();
+}
+
+/** Fin de match tutoriel seulement après le coach + score joueur. */
+function maybeFinishTutorialMatch() {
+  if (!tutorialMode || !tutorialCoachComplete()) return;
+  if (state === "gameover") return;
+  if (scores[0] < TUTORIAL_WIN_SCORE) return;
+  state = "gameover";
+  gameoverTimer = GAMEOVER_MIN_WAIT;
+  pointMsg = "Tutoriel terminé !  " + scores[0] + " – " + scores[1];
+  markTutorialDone();
+  if (typeof spawnConfetti === "function") {
+    spawnConfetti(120); spawnConfetti(40, W * 0.5);
+  }
+  if (typeof setEmote === "function") {
+    setEmote(0, "happy"); setEmote(1, "sad");
+  }
+  if (typeof sfxMatchWin === "function") sfxMatchWin();
 }
 
 function shuffleMenuBackdrop() {
@@ -788,7 +865,7 @@ function drawTutorialInvite() {
 function controlsHint() {
   if (padConnected) return "🎮 Manette — stick/croix choisir · A valider · B retour";
   if (hasTouch) return "📱 Tactile — pavé + SAUT / SMASH / SUPER à l'écran";
-  return "Gauche  Q/D + Z/Espace · S super        Droite  ← → + ↑ · ↓ super";
+  return "Solo  Q/D + Z/Espace · F action · E SUPER";
 }
 function controlsHintColor() { return (padConnected || hasTouch) ? "#7ed957" : UI.muted; }
 
@@ -808,7 +885,7 @@ function wizardTotal() {
        + 1                                                            /* Format */
        + (pendingMode.bomb && hasTeamChoice ? 1 : 0)                  /* Bombe : 1v1 ou équipes ? */
        + (pendingMode.bomb ? 1 : 0)                                   /* Durée de mèche */
-       + 3;                                                            /* Personnage + Terrain + Ballon */
+       + 2;                                                            /* Personnage + Terrain */
 }
 function wizardStep(idx, label) { return "Étape " + idx + "/" + wizardTotal() + " · " + label; }
 
@@ -859,7 +936,7 @@ function drawGameModeSelect() {
 }
 
 function drawBombFormat() {
-  menuScreenBase({ title: "Mode Bombe", kicker: wizardStep(wizardTotal() - 4, "Format"),
+  menuScreenBase({ title: "Mode Bombe", kicker: wizardStep(wizardTotal() - 3, "Format"),
                    subtitle: "1v1, ou en équipes ?" });
   const items = [
     "1  —  1v1",
@@ -869,7 +946,7 @@ function drawBombFormat() {
 }
 
 function drawBombDuration() {
-  menuScreenBase({ title: "Mode Bombe", kicker: wizardStep(wizardTotal() - 3, "Durée de mèche"),
+  menuScreenBase({ title: "Mode Bombe", kicker: wizardStep(wizardTotal() - 2, "Durée de mèche"),
                    subtitle: "Renvoie la bombe avant la fin de la mèche" });
   const items = [
     "1  —  Nerveux",
@@ -914,20 +991,21 @@ function tutorialLiveInput() {
     return {
       left: !!keys["KeyA"], right: !!keys["KeyD"],
       up: false, down: false, ax: 0, ay: 0,
-      smash: !!(keys["KeyS"] || keys["KeyF"]),
-      jump: !!(keys["KeyW"] || keys["Space"]),
+      smash: !!keys["KeyF"],
+      jump: !!(keys["KeyW"] || keys["Space"] || keys["ArrowUp"]),
       super: !!keys["KeyE"]
     };
   }
-  // Clavier (et onglet souris : pas de visée gameplay — on montre le clavier)
-  // En jeu réel, up/down clavier ne fillent pas la visée (seulement ←→).
+  // Clavier : visée démo = stick fictif neutre (géométrie en match)
   const leftSide = tutorialSide === 0;
   return {
     left:  leftSide ? !!keys["KeyA"] : !!keys["ArrowLeft"],
     right: leftSide ? !!keys["KeyD"] : !!keys["ArrowRight"],
     up: false, down: false, ax: 0, ay: 0,
-    smash: leftSide ? !!(keys["KeyS"] || keys["KeyF"]) : !!(keys["ArrowDown"] || keys["Slash"]),
-    jump:  leftSide ? !!(keys["KeyW"] || keys["Space"]) : !!keys["ArrowUp"],
+    smash: leftSide
+      ? !!keys["KeyF"]
+      : !!(keys["ArrowDown"] || keys["Slash"]),
+    jump:  leftSide ? !!(keys["KeyW"] || keys["Space"] || keys["ArrowUp"]) : !!keys["ArrowUp"],
     super: leftSide ? !!keys["KeyE"] : !!keys["ShiftRight"]
   };
 }
@@ -960,34 +1038,35 @@ function drawTutorialTab(label, code, x, y, w, active) {
 function drawTutorialControls(dev, x, y, maxW) {
   const rows = {
     keyboard: [
-      ["Déplacement", "Gauche : Q / D    ·    Droite : ← / →"],
-      ["Saut", "Gauche : Z / Espace    ·    Droite : ↑"],
-      ["Smash / cloche (X)", "Gauche : S / F    ·    Droite : ↓ / /"],
-      ["SUPER", "Gauche : E    ·    Droite : Shift droit"],
-      ["Visée", "Auto vers l'adversaire ; ← → ajuste un peu (manette = stick précis)"],
+      ["Bouger / sauter", "Q / D  bouger   ·   Z / Espace / ↑  sauter"],
+      ["Cloche (au sol)", "Place-toi sous la balle — cloche auto (angle = ta position)"],
+      ["Smash (en l'air)", "Saute au contact : smash automatique selon ta position"],
+      ["Service / action", "F pour lancer (service), puis contact auto (sol ou saut)"],
+      ["SUPER", "E  (jauge remplie par des points d'affilée)"],
+      ["Camp droite (local 1v1)", "← →  ·  ↑ saut  ·  ↓ ou / frappe  ·  Shift dr. SUPER"],
       ["Pause / son", "P pause · M son · N musique · Échap menu"]
     ],
     pad: [
       ["Déplacement", "Stick gauche ou croix directionnelle"],
       ["Saut", "Bouton A (ou croix haut)"],
-      ["Smash / cloche (X)", "Boutons X ou Y"],
+      ["Cloche / smash", "Boutons X ou Y  —  sol = cloche · air = smash"],
       ["SUPER", "Bouton B ou gâchettes"],
-      ["Visée", "Oriente le stick : la flèche suit ton angle dans le cône"],
+      ["Visée", "Oriente le stick : flèche + trajectoire suivent l'angle"],
       ["Menus", "Stick/croix choisir · A valider · B retour"]
     ],
     touch: [
       ["Déplacement", "Pavé ◀ ▶ en bas à gauche"],
       ["Saut", "Bouton ⤒"],
-      ["Smash / cloche (X)", "Bouton ⚡"],
+      ["Cloche / smash", "Bouton ⚡  —  sol = cloche · air = smash"],
       ["SUPER", "Bouton ★"],
       ["Visée", "Assistée comme au clavier ; manette = stick plus précis"],
       ["Note", "Pavé visible en partie (solo / en ligne)"]
     ],
     mouse: [
-      ["En jeu", "La souris ne pilote PAS le perso"],
-      ["Menus", "Survole et clique les boutons"],
-      ["Visée", "Utilise le clavier, une manette ou le tactile"],
-      ["Astuce", "Branche une manette pour la visée analogique"]
+      ["En match", "La souris ne vise plus — menus uniquement"],
+      ["Pour jouer", "Clavier : Q D bouger · Z/Espace saut · F action"],
+      ["Smash", "Saute au contact de la balle (auto)"],
+      ["Cloche", "Au sol, place-toi sous la balle"]
     ]
   };
   const list = rows[dev] || rows.keyboard;
@@ -1079,22 +1158,41 @@ function drawTutorialAimDemo(cx, cy) {
   ctx.fillStyle = UI.gold;
   ctx.fill();
 
-  // Trajectoire courte (préviz locale, sans filet réel)
-  ctx.beginPath();
-  ctx.moveTo(originX, originY - 2);
-  let px = originX, py = originY - 2;
-  let pvx = Math.cos(aim) * 9, pvy = Math.sin(aim) * 9;
-  for (let i = 0; i < 28; i++) {
-    pvy += 0.35;
-    px += pvx; py += pvy;
-    ctx.lineTo(px, py);
-    if (py > cy + 4) break;
+  // Trajectoire honnête (même intégrateur que le match)
+  if (typeof simulateArc === "function") {
+    const spd = tutorialAimLob ? 12.5 : 14.5;
+    const pts = simulateArc(
+      originX, originY - 2,
+      Math.cos(aim) * spd, Math.sin(aim) * spd, 50
+    );
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      ctx.lineTo(pts[i].x, pts[i].y);
+      if (pts[i].y > cy + 8) break;
+    }
+    ctx.strokeStyle = tutorialAimLob ? "rgba(255,216,74,0.8)" : "rgba(255,77,61,0.85)";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([3, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(originX, originY - 2);
+    let px = originX, py = originY - 2;
+    let pvx = Math.cos(aim) * 9, pvy = Math.sin(aim) * 9;
+    for (let i = 0; i < 28; i++) {
+      pvy += 0.35;
+      px += pvx; py += pvy;
+      ctx.lineTo(px, py);
+      if (py > cy + 4) break;
+    }
+    ctx.strokeStyle = "rgba(255,77,61,0.75)";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([3, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
   }
-  ctx.strokeStyle = "rgba(255,77,61,0.75)";
-  ctx.lineWidth = 2;
-  ctx.setLineDash([3, 4]);
-  ctx.stroke();
-  ctx.setLineDash([]);
 
   // Perso
   drawCharacter(blob);
@@ -1186,7 +1284,7 @@ function drawTutorial() {
   else ctx.rect(W * 0.48, 140, W * 0.46, H - 210);
   ctx.fill();
 
-  uiLabel("Visée live — oriente ton stick / tes flèches", W * 0.50, 158, 12, UI.gold, 0.2);
+  uiLabel("Visée live — bouge la souris, l'arc suit", W * 0.50, 158, 12, UI.gold, 0.2);
 
   // Boutons mode aim + côté
   drawTutorialTab(tutorialAimLob ? "Mode : Cloche" : "Mode : Smash", "TutAim", W * 0.58, 182, 120, true);
@@ -1200,7 +1298,7 @@ function drawTutorial() {
   ctx.restore();
 
   uiLabel(
-    "Cône bleu = angles possibles · Flèche or = ta direction · Pointillés = trajectoire",
+    "Clavier : place-toi pour viser · Sol = cloche · Air = smash auto · Manette = stick",
     W * 0.50, H - 78, 10, UI.muted, 0.15
   );
 
@@ -1209,48 +1307,54 @@ function drawTutorial() {
   drawTutorialTab("Jouer le tutoriel", "TutPlay", W - UI.mx - 90, H - 28, 160, true);
 }
 
-/** Bandeau coach pendant la partie tutoriel. */
+/** Bandeau coach pendant la partie tutoriel (bas d'écran, entre les scores). */
 function drawTutorialCoach() {
   if (!tutorialMode || (state !== "serve" && state !== "play")) return;
-  const tips = [
-    { title: "Déplacement", body: "Q / D (ou stick) pour bouger · Entrée pour continuer" },
-    { title: "Saut", body: "Z ou Espace (manette : A) pour sauter" },
-    { title: "Service", body: "X / S / F pour lancer la balle, puis frappe-la" },
-    { title: "Visée", body: "Tiens ← → (ou oriente le stick) en frappant" },
-    { title: "SUPER", body: "Remplis la jauge (points d'affilée) puis E" },
-    { title: "Objectif", body: "Marque " + TUTORIAL_WIN_SCORE + " points — Échap pour quitter" }
-  ];
-  const tip = tips[Math.min(tutorialStep, tips.length - 1)];
-  const pw = Math.min(520, W - 40);
-  const ph = 64;
-  const px = (W - pw) / 2, py = 8;
-  ctx.fillStyle = "rgba(12,20,42,0.88)";
+  const tip = TUTORIAL_STEPS[Math.min(tutorialStep, TUTORIAL_STEPS.length - 1)];
+  const pw = Math.min(340, W - 40);
+  const ph = 70;
+  const px = (W - pw) / 2;
+  // Dans la bande score, entre les deux pastilles (laisse le terrain libre en haut)
+  const py = GROUND_Y + 8;
+  ctx.fillStyle = "rgba(12,20,42,0.92)";
   ctx.beginPath();
   if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 14); else ctx.rect(px, py, pw, ph);
   ctx.fill();
   ctx.strokeStyle = UI.gold; ctx.lineWidth = 2.5; ctx.stroke();
   ctx.textAlign = "center";
   ctx.fillStyle = UI.gold;
-  ctx.font = "800 13px " + UI.sans;
-  ctx.fillText("Tutoriel · " + (tutorialStep + 1) + "/" + tips.length + "  —  " + tip.title, W / 2, py + 24);
-  ctx.fillStyle = "rgba(255,246,232,0.9)";
-  ctx.font = "600 13px " + UI.sans;
-  ctx.fillText(tip.body, W / 2, py + 46);
+  ctx.font = "800 12px " + UI.sans;
+  ctx.fillText(
+    "Tutoriel · " + (tutorialStep + 1) + "/" + TUTORIAL_STEPS.length + "  —  " + tip.title,
+    W / 2, py + 18
+  );
+  ctx.fillStyle = "rgba(255,246,232,0.92)";
+  ctx.font = "600 11px " + UI.sans;
+  // wrap court si besoin
+  const body = tip.body;
+  if (ctx.measureText(body).width > pw - 16) {
+    ctx.font = "600 10px " + UI.sans;
+  }
+  ctx.fillText(body, W / 2, py + 38);
 
-  // Mini-flèche d'aim pendant l'étape visée
-  if (tutorialStep === 3 && typeof aimLobAngleFromInput === "function") {
-    const input = localInputs(0);
-    const ang = aimLobAngleFromInput(blobL, input);
-    const ox = blobL.x, oy = blobL.y - 52;
-    const len = 56;
-    ctx.strokeStyle = "rgba(255,216,74,0.9)";
-    ctx.lineWidth = 3;
+  const keys = tip.keys || [];
+  let kx = W / 2 - (keys.length * 30 - 6) / 2;
+  for (const k of keys) {
+    const kw = Math.max(26, 6 + ctx.measureText(k).width);
+    ctx.fillStyle = "rgba(255,216,74,0.95)";
     ctx.beginPath();
-    ctx.moveTo(ox, oy);
-    ctx.lineTo(ox + Math.cos(ang) * len, oy + Math.sin(ang) * len);
-    ctx.stroke();
+    if (ctx.roundRect) ctx.roundRect(kx, py + 48, kw, 16, 5); else ctx.rect(kx, py + 48, kw, 16);
+    ctx.fill();
+    ctx.fillStyle = UI.stroke;
+    ctx.font = "800 9px " + UI.sans;
+    ctx.textAlign = "center";
+    ctx.fillText(k, kx + kw / 2, py + 60);
+    kx += kw + 6;
   }
 }
+
+/** Prévisualisation trajectoire désactivée (visée clavier géométrique). */
+function drawTutorialAimPreview() {}
 
 function drawRules() {
   drawMenuWorld();
@@ -1306,15 +1410,15 @@ function drawRules() {
   p("Fais tomber la balle dans le camp adverse. Premier à " + WIN_SCORE + " avec 2 d'écart. Max " + MAX_TOUCHES + " touches par camp.");
   y += 4;
   h("Commandes");
-  p("Gauche : Q/D · Z/Espace · S/F smash · E SUPER");
-  p("Droite : ← → · ↑ · ↓ ou / smash · Shift droit SUPER");
-  p("Manette : stick · A saut · X/Y smash · B SUPER");
+  p("Solo : Q/D bouger · Z/Espace saut · F action · E SUPER");
+  p("Clavier : contact auto — sol = cloche, air = smash (selon ta position).");
+  p("Manette : stick viser · A saut · X/Y frappe · B SUPER (inchangé).");
+  p("Droite local : ← → · ↑ · ↓ ou / frappe · Shift dr. SUPER");
   p("P pause · M son · N musique · Échap menu");
   y += 4;
   h("Gameplay");
-  p("Au sol, balle sur toi = cloche auto. En l'air sans smash, tu traverses la balle.");
-  p("Smash près de la balle : cloche au sol, smash en l'air (stick pour viser).");
-  p("Service : smash pour lancer, puis smash pour frapper. Double saut en l'air.");
+  p("Au sol, balle sur toi = cloche auto. En l'air = smash auto au contact.");
+  p("Service : F pour lancer, puis contact auto. Double saut en l'air.");
   y += 4;
   h("★ SUPER", "#ffd93d");
   p("3 points d'affilée chargent la jauge (Houn : 2). Puis la technique du perso (à droite).");
@@ -1457,7 +1561,7 @@ function drawSelectCharacter() {
   const pcolor = "#ffd36b";
   const pdark  = "#d99e18";
   const guestPicking = pendingMode.online && netRole === "guest";
-  uiLabel(guestPicking ? "En ligne · Ton personnage" : wizardStep(wizardTotal() - 2, "Perso"),
+  uiLabel(guestPicking ? "En ligne · Ton personnage" : wizardStep(wizardTotal() - 1, "Perso"),
           UI.mx, 34, 13, uiAccent(), 0.4);
   const twoLocalHumans = !pendingMode.vsAI && !pendingMode.online;
   const pick = "Choisis ton personnage";
@@ -1564,7 +1668,7 @@ function wrapText(text, cx, y, maxW, lh) {
 function drawSelectTerrain() {
   drawMenuWorld();
   menuVeil(false);
-  uiLabel(wizardStep(wizardTotal() - 1, "Terrain"), UI.mx, 40, 13, uiAccent(), 0.4);
+  uiLabel(wizardStep(wizardTotal(), "Terrain"), UI.mx, 40, 13, uiAccent(), 0.4);
   uiTitle("Choisis le terrain", UI.mx, 74, 30);
   uiRule(UI.mx, UI.mx + 100, 90, UI.gold);
 
@@ -1622,61 +1726,5 @@ function drawSelectTerrain() {
 
   uiLabel("↑↓←→ / stick pour naviguer   ·   Entrée pour valider   ·   C terrain calme : " + (mapEventsQuiet ? "ON" : "OFF") +
           "   ·   Échap ← retour", UI.mx, 466, 10, UI.muted, 1);
-}
-
-function drawSelectBall() {
-  drawMenuWorld();
-  menuVeil(false);
-  uiLabel(wizardStep(wizardTotal(), "Ballon"), UI.mx, 40, 13, uiAccent(), 0.4);
-  uiTitle("Choisis le ballon", UI.mx, 74, 30);
-  uiRule(UI.mx, UI.mx + 100, 90, UI.gold);
-
-  const n = BALL_SKINS.length, gap = 36;
-  const pw = 200, ph = 200, py = 130;
-  const rowW = n * pw + (n - 1) * gap, startX = (W - rowW) / 2;
-  for (let i = 0; i < n; i++) {
-    const skin = BALL_SKINS[i];
-    const px = startX + i * (pw + gap);
-    const code = "Digit" + (i + 1);
-    hit(px + pw / 2, py + ph / 2, pw, ph + 40, code);
-    const sel = (navIdx === i) || isHover(code);
-
-    ctx.fillStyle = "rgba(255,255,255,0.04)";
-    ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 12); else ctx.rect(px, py, pw, ph);
-    ctx.fill();
-    ctx.strokeStyle = sel ? UI.gold : "rgba(255,255,255,0.55)";
-    ctx.lineWidth = sel ? 4 : 2;
-    ctx.stroke();
-
-    // aperçu du ballon au centre de la carte (clip : l'ombre de drawBall part au sol)
-    ctx.save();
-    ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 12); else ctx.rect(px, py, pw, ph);
-    ctx.clip();
-    ctx.translate(px + pw / 2, py + ph / 2);
-    const prevSkin = ballSkin;
-    ballSkin = i;
-    const saved = { x: ball.x, y: ball.y, vx: ball.vx, vy: ball.vy, angle: ball.angle,
-                    trail: ball.trail, smash: ball.smash, frozen: ball.frozen, popped: ball.popped };
-    ball.x = 0; ball.y = 0; ball.vx = 0; ball.vy = 0;
-    ball.angle = performance.now() / 900;
-    ball.trail = []; ball.smash = 0; ball.frozen = false; ball.popped = false;
-    ctx.scale(2.6, 2.6);
-    drawBall();
-    Object.assign(ball, saved);
-    ballSkin = prevSkin;
-    ctx.restore();
-
-    ctx.textAlign = "center";
-    ctx.fillStyle = sel ? uiAccent() : UI.muted;
-    ctx.font = "700 12px " + UI.mono;
-    ctx.fillText(String(i + 1), px + pw / 2, py + ph + 24);
-    ctx.fillStyle = sel ? UI.ink : "rgba(244,245,247,0.85)";
-    ctx.font = "600 18px " + UI.sans;
-    ctx.fillText(skin.name, px + pw / 2, py + ph + 44);
-  }
-
-  uiLabel("Choisis 1 – " + n + "   ·   Échap ← retour", UI.mx, 466, 10, UI.muted, 1);
 }
 

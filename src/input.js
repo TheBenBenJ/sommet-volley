@@ -18,7 +18,7 @@ window.addEventListener("keydown", e => {
 });
 window.addEventListener("keyup", e => { keys[e.code] = false; });
 
-// ---------- Souris (navigation des menus) ----------
+// ---------- Souris (navigation des menus uniquement) ----------
 // Convertit une position écran (px CSS) en repère logique 900×500 : le canvas
 // est affiché à une taille CSS variable (voir resizeCanvas() dans core.js),
 // donc on ne peut pas comparer directement clientX/Y aux coordonnées de jeu.
@@ -53,11 +53,11 @@ if (typeof canvas.addEventListener === "function") { // absent en environnement 
     const tc = document.getElementById("touchControls");
     function touchKeySet() {
       if (online) {
-        if (mySlot === 0) return { left: "KeyA", right: "KeyD", jump: "KeyW", smash: "KeyS", super: "KeyE" };
-        if (mySlot === 1) return { left: "ArrowLeft", right: "ArrowRight", jump: "ArrowUp", smash: "ArrowDown", super: "ShiftRight" };
+        if (mySlot === 0) return { left: "KeyA", right: "KeyD", jump: "KeyW", smash: "KeyF", super: "KeyE" };
+        if (mySlot === 1) return { left: "ArrowLeft", right: "ArrowRight", jump: "ArrowUp", smash: "KeyF", super: "ShiftRight" };
         return null; // 2v2 en ligne (slots 2/3) : pas pris en charge au tactile
       }
-      if (vsAI || mode === "2v2") return { left: "KeyA", right: "KeyD", jump: "KeyW", smash: "KeyS", super: "KeyE" };
+      if (vsAI || mode === "2v2") return { left: "KeyA", right: "KeyD", jump: "KeyW", smash: "KeyF", super: "KeyE" };
       return null; // 2 joueurs locaux sur le même appareil : peu pertinent au tactile
     }
     function bindTouchBtn(sel, field) {
@@ -205,7 +205,6 @@ function navOptions() {
       return vis.map((_, slot) => "Digit" + (slot + 1));
     }
     case "selectTerrain": return ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9"].slice(0, terrainIndices().length);
-    case "selectBall":    return ["Digit1", "Digit2"].slice(0, BALL_SKINS.length);
     default: return null;
   }
 }
@@ -270,7 +269,7 @@ function handlePadMenu() {
       if (padEdge("down")) moveMenuNav("down");
       if (padEdge("up")) moveMenuNav("up");
     } else {
-      const horiz = state === "selectCharacter" || state === "selectTerrain" || state === "selectBall";
+      const horiz = state === "selectCharacter" || state === "selectTerrain";
       if (padEdge(horiz ? "right" : "down")) moveMenuNav("right");
       if (padEdge(horiz ? "left" : "up")) moveMenuNav("left");
     }

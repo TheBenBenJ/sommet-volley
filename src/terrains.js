@@ -155,23 +155,23 @@ function drawBgBosphorePng(t, raining, storm) {
   drawMapEventOverlay();
 }
 
-/** Stade Ashram PNG (Yogi) — arcs safran, sable, bannières orange. */
+/** Stade Ashram PNG (Yogi) — nuit étoilée, arcs terracotta, tente pourpre. */
 function drawBgAshramPng(t, raining, storm) {
   const p = SPRITES.mapAshram;
 
-  drawMapBackdrop(p, "#d4b878");
+  drawMapBackdrop(p, "#1a1430");
 
   if (storm) {
-    ctx.fillStyle = "rgba(80,55,30,0.32)";
+    ctx.fillStyle = "rgba(30,20,45,0.40)";
     ctx.fillRect(0, 0, W, GROUND_Y);
   } else if (raining) {
-    ctx.fillStyle = "rgba(120,90,50,0.16)";
+    ctx.fillStyle = "rgba(45,30,60,0.20)";
     ctx.fillRect(0, 0, W, GROUND_Y);
   }
 
   // Public désactivé pour l’instant (crowd en raw seulement)
 
-  drawCourtApron(raining ? "#8a7a60" : "#d4b878", raining ? "#5a4a38" : "#b09058");
+  drawCourtApron(raining ? "#5a4030" : "#7a5440", raining ? "#2a1c14" : "#4a3224");
   drawCourtSeam("#ef6c00", "#c9a227");
 
   // Bannières orange
@@ -385,11 +385,11 @@ const MAP_LAYOUT = {
   amazon:   { baselineFromBottom: 135, netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false },
   plage:    { baselineFromBottom: 132, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false },
   neige:    { baselineFromBottom: 0,   netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: true },
-  prairie:  { baselineFromBottom: 43,  netPost: { footPad: 2, xOff: -19, scale: 1 }, codeSeam: false },
+  prairie:  { baselineFromBottom: 43,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false },
   parade:   { baselineFromBottom: 368, netPost: { footPad: 2, xOff: -11, scale: 1 }, codeSeam: false },
   matin:    { baselineFromBottom: 0,   netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: true, bgFullHeight: true },
   bosphore: { baselineFromBottom: 130, netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false },
-  ashram:   { baselineFromBottom: 72,  netPost: { footPad: 4, xOff: 0, scale: 1 }, codeSeam: false }
+  ashram:   { baselineFromBottom: 48,  netPost: { footPad: 4, xOff: 0, scale: 1 }, codeSeam: false }
 };
 
 function currentMapLayout() {
@@ -1366,29 +1366,14 @@ function drawBall() {
   ctx.save();
   ctx.translate(ball.x, ball.y);
   ctx.rotate(ball.angle);
-  const skin = BALL_SKINS[ballSkin];
-  const spr = skin && skin.sprite ? SPRITES[skin.sprite] : null;
+  const spr = SPRITES.ballPurple;
   if (spriteReady(spr)) {
     const d = BALL_R * 2.15; // léger débord pour que le trait noir du PNG colle au rayon physique
     ctx.drawImage(spr, -d / 2, -d / 2, d, d);
   } else {
-    // volume : dégradé radial éclairé en haut-gauche + liseré (ballon classique)
-    const bgrad = ctx.createRadialGradient(-4, -5, 2, 0, 0, BALL_R);
-    bgrad.addColorStop(0, "#ffe98a");
-    bgrad.addColorStop(0.65, "#ffcc00");
-    bgrad.addColorStop(1, "#dfa300");
-    ctx.fillStyle = bgrad;
+    // Fallback minimal si le PNG n'est pas encore chargé
+    ctx.fillStyle = "#c9a0ff";
     ctx.beginPath(); ctx.arc(0, 0, BALL_R, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = "#c78f00";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.arc(0, 0, BALL_R - 0.5, 0, Math.PI * 2); ctx.stroke();
-    ctx.strokeStyle = "#e6a800";
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(0, 0, BALL_R - 1, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(0, 0, BALL_R - 1, BALL_R * 0.45, 0, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(0, 0, BALL_R * 0.45, BALL_R - 1, 0, 0, Math.PI * 2); ctx.stroke();
-    ctx.fillStyle = "rgba(255,255,255,0.5)";
-    ctx.beginPath(); ctx.arc(-4, -5, 4, 0, Math.PI * 2); ctx.fill();
   }
   ctx.restore();
 }
@@ -1628,8 +1613,9 @@ function drawHUD() {
     ctx.textAlign = "center";
     ctx.font = "700 17px " + (typeof UI !== "undefined" ? UI.sans : "sans-serif");
     const tw = ctx.measureText(txt).width;
-    // Haut d'écran libre (scores en bas) — invite de service bien lisible
-    const pw = tw + 36, ph = 34, px = NET_X - pw / 2, py = 28;
+    // Haut d'écran libre (coach tutoriel en bas)
+    const pw = tw + 36, ph = 34, px = NET_X - pw / 2;
+    const py = 28;
     // pastille pleine (au lieu de texte nu semi-transparent) : lisible sur
     // n'importe quel terrain/ciel, clair ou sombre, sans distinction à gérer.
     ctx.fillStyle = "rgba(10,12,18,0.68)";
