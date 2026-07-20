@@ -387,7 +387,7 @@ const MAP_LAYOUT = {
   neige:    { baselineFromBottom: 0,   netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: true },
   prairie:  { baselineFromBottom: 43,  netPost: { footPad: 2, xOff: -19, scale: 1 }, codeSeam: false },
   parade:   { baselineFromBottom: 368, netPost: { footPad: 2, xOff: -11, scale: 1 }, codeSeam: false },
-  matin:    { baselineFromBottom: 0,   netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: true },
+  matin:    { baselineFromBottom: 0,   netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: true, bgFullHeight: true },
   bosphore: { baselineFromBottom: 130, netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false },
   ashram:   { baselineFromBottom: 72,  netPost: { footPad: 4, xOff: 0, scale: 1 }, codeSeam: false }
 };
@@ -395,6 +395,11 @@ const MAP_LAYOUT = {
 function currentMapLayout() {
   const key = (typeof TERRAINS !== "undefined" && TERRAINS[terrain]) ? TERRAINS[terrain].key : "";
   return MAP_LAYOUT[key] || { baselineFromBottom: 0, netPost: { footPad: 0, xOff: 0, scale: 1 }, codeSeam: true };
+}
+
+/** Hauteur de dessin du décor : H si bgFullHeight (ex. Place du Matin). */
+function mapBgDrawH() {
+  return currentMapLayout().bgFullHeight ? H : BG_DRAW_H;
 }
 
 /** Dessine une image en couvrant [dx,dy,dw,dh], alignée en bas (sol).
@@ -415,7 +420,8 @@ function drawImgCoverBottom(img, dx, dy, dw, dh, parallaxX, baselineFromBottom) 
 
 /** Far / skyline de la map courante, baseline alignée sur GROUND_Y. */
 function drawMapBgLayer(img, parallaxX) {
-  drawImgCoverBottom(img, 0, 0, W, BG_DRAW_H, parallaxX || 0, currentMapLayout().baselineFromBottom);
+  const dh = mapBgDrawH();
+  drawImgCoverBottom(img, 0, 0, W, dh, parallaxX || 0, currentMapLayout().baselineFromBottom);
 }
 
 /**
@@ -423,8 +429,9 @@ function drawMapBgLayer(img, parallaxX) {
  * Évite le mélange far+skyline semi-transparent et les bandes blanches.
  */
 function drawMapBackdrop(pack, fillColor) {
+  const dh = mapBgDrawH();
   ctx.fillStyle = fillColor || "#6a8498";
-  ctx.fillRect(0, 0, W, BG_DRAW_H);
+  ctx.fillRect(0, 0, W, dh);
   if (spriteReady(pack.skyline)) drawMapBgLayer(pack.skyline, 0);
   else if (spriteReady(pack.far)) drawMapBgLayer(pack.far, 0);
 }
@@ -452,6 +459,17 @@ function drawCourtSeam(stroke, accent) {
  * (qui s'arrêtent à GROUND_Y via BG_DRAW_H).
  */
 function drawCourtApron(topColor, botColor) {
+  // Décor plein cadre (Place du Matin) : voile léger pour laisser voir le PNG sous le HUD
+  if (currentMapLayout().bgFullHeight) {
+    ctx.save();
+    ctx.globalAlpha = 0.28;
+    ctx.fillStyle = topColor;
+    ctx.fillRect(0, GROUND_Y + 2, W, H - GROUND_Y - 2);
+    ctx.restore();
+    ctx.fillStyle = "rgba(0,0,0,0.10)";
+    ctx.fillRect(0, GROUND_Y, W, 2);
+    return;
+  }
   const solid = ctx.createLinearGradient(0, GROUND_Y + 2, 0, H);
   solid.addColorStop(0, topColor);
   solid.addColorStop(1, botColor);
@@ -1428,8 +1446,10 @@ function drawHUD() {
   const sideLbl = s => (mode === "2v2" ? (s === 0 ? "Équipe 1" : "Équipe 2") : sideLabel(s));
   const pw = 132, ph = 56;
   const py = GROUND_Y + 18; // sous la ligne de fond du terrain
-  // Fond de bande score (masque tout reste de décor sous GROUND_Y)
-  ctx.fillStyle = "rgba(18,22,32,0.62)";
+  // Fond de bande score (plus léger si le décor PNG descend jusqu'en bas)
+  ctx.fillStyle = currentMapLayout().bgFullHeight
+    ? "rgba(18,22,32,0.42)"
+    : "rgba(18,22,32,0.62)";
   ctx.fillRect(0, GROUND_Y + 2, W, H - GROUND_Y - 2);
   for (const s of [0, 1]) {
     const cx = s === 0 ? W * 0.22 : W * 0.78;
