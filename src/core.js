@@ -3,10 +3,12 @@
 
 // ---------- Constantes ----------
 const W = 900, H = 500;
-// Plan de jeu remonté : les pieds sont DANS la bande terrain des PNG
-// (plus bas = marge pour le HUD score). Les décors se dessinent jusqu'à BG_DRAW_H.
-const GROUND_Y = H - 78;
-const BG_DRAW_H = H;
+// Bande score en bas ; plan de jeu juste au-dessus.
+// Les décors s'arrêtent à GROUND_Y → la ligne de fond du terrain PNG
+// coïncide avec les pieds / le pied du poteau (pas sous le HUD).
+const SCORE_BAND = 82;
+const GROUND_Y = H - SCORE_BAND;
+const BG_DRAW_H = GROUND_Y;
 const NET_X = W / 2;
 const NET_W = 10;
 const NET_TOP = GROUND_Y - 185;

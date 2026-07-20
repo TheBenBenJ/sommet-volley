@@ -446,26 +446,19 @@ function drawImgCoverBottom(img, dx, dy, dw, dh, parallaxX) {
 }
 
 /**
- * Bande de sol sous les pieds : laisse voir les lignes du PNG au-dessus
- * de GROUND_Y, n'opacifie vraiment que l'apron bas (HUD).
+ * Bande sous les pieds pour le HUD — n'empiète pas sur les lignes PNG
+ * (qui s'arrêtent à GROUND_Y via BG_DRAW_H).
  */
 function drawCourtApron(topColor, botColor) {
-  const join = GROUND_Y - 10;
-  const g = ctx.createLinearGradient(0, join, 0, H);
-  g.addColorStop(0, "rgba(0,0,0,0)");
-  // topColor / botColor sont hex — on les applique en alpha croissant
-  ctx.save();
-  ctx.globalAlpha = 0.22;
-  ctx.fillStyle = topColor;
-  ctx.fillRect(0, join, W, Math.max(1, GROUND_Y - join + 6));
-  ctx.globalAlpha = 0.82;
   const solid = ctx.createLinearGradient(0, GROUND_Y + 2, 0, H);
   solid.addColorStop(0, topColor);
   solid.addColorStop(1, botColor);
+  ctx.save();
+  ctx.globalAlpha = 0.88;
   ctx.fillStyle = solid;
   ctx.fillRect(0, GROUND_Y + 2, W, H - GROUND_Y - 2);
   ctx.restore();
-  ctx.fillStyle = "rgba(0,0,0,0.10)";
+  ctx.fillStyle = "rgba(0,0,0,0.14)";
   ctx.fillRect(0, GROUND_Y, W, 2);
 }
 
@@ -1202,19 +1195,21 @@ function terrainNetPostImg() {
 }
 
 function drawNet() {
-  // Uniforme : poteau PNG centré sur NET_X, sans maille. Sinon poteau canvas.
+  // Uniforme : poteau PNG centré sur NET_X, pied pile sur GROUND_Y
+  // (= croisement ligne médiane × ligne de fond du terrain).
   const img = terrainNetPostImg();
 
   ctx.fillStyle = "rgba(0,0,0,0.15)";
   ctx.beginPath();
-  ctx.ellipse(NET_X, GROUND_Y + 4, img ? 18 : 14, 4, 0, 0, Math.PI * 2);
+  ctx.ellipse(NET_X, GROUND_Y + 3, img ? 16 : 12, 3.5, 0, 0, Math.PI * 2);
   ctx.fill();
 
   if (img) {
-    const drawH = (GROUND_Y - NET_TOP) + 42;
+    const drawH = (GROUND_Y - NET_TOP) + 28;
     const aspect = (img.naturalWidth || img.width) / Math.max(1, img.naturalHeight || img.height);
-    const drawW = drawH * aspect * 0.8;
-    ctx.drawImage(img, NET_X - drawW / 2, GROUND_Y - drawH + 2, drawW, drawH);
+    const drawW = drawH * aspect * 0.78;
+    // Bas du PNG ancré exactement sur GROUND_Y (pas de +2 qui le décolle)
+    ctx.drawImage(img, NET_X - drawW / 2, GROUND_Y - drawH, drawW, drawH);
     return;
   }
 
@@ -1443,14 +1438,17 @@ function drawHUD() {
   }
   if (bombMode && (state === "play" || state === "serve")) drawBombHUD();
 
-  // ---- tableau de score en bas (ne gêne plus le ciel / smash)
+  // ---- scores strictement sous le terrain (bande SCORE_BAND)
   const DISP = (typeof UI !== "undefined" ? UI.display : "'Fredoka', sans-serif");
   const SANS = (typeof UI !== "undefined" ? UI.sans : "'Nunito', sans-serif");
   const STROKE = (typeof UI !== "undefined" ? UI.stroke : "#1b1730");
-  const CREAM = "rgba(255,246,232,0.42)";
+  const CREAM = "rgba(255,246,232,0.55)";
   const sideLbl = s => (mode === "2v2" ? (s === 0 ? "Équipe 1" : "Équipe 2") : sideLabel(s));
-  const pw = 132, ph = 64;
-  const py = H - ph - 8;
+  const pw = 132, ph = 56;
+  const py = GROUND_Y + 18; // sous la ligne de fond du terrain
+  // Fond de bande score (masque tout reste de décor sous GROUND_Y)
+  ctx.fillStyle = "rgba(18,22,32,0.62)";
+  ctx.fillRect(0, GROUND_Y + 2, W, H - GROUND_Y - 2);
   for (const s of [0, 1]) {
     const cx = s === 0 ? W * 0.22 : W * 0.78;
     const col = sideColor(s);
@@ -1495,14 +1493,14 @@ function drawHUD() {
   ctx.font = "700 12px " + DISP;
   ctx.fillText("VS", NET_X, py + 33);
 
-  // touches (pastilles) au-dessus des panneaux
+  // touches (pastilles) dans la bande score, sous la ligne de terrain
   for (const side of [0, 1]) {
     const baseX = side === 0 ? W * 0.22 - 24 : W * 0.78 - 24;
     for (let i = 0; i < MAX_TOUCHES; i++) {
       const on = i < ball.touches[side];
       ctx.beginPath();
-      ctx.arc(baseX + i * 24, py - 10, 5.5, 0, Math.PI * 2);
-      ctx.fillStyle = on ? sideColor(side) : "rgba(27,23,48,0.18)";
+      ctx.arc(baseX + i * 24, GROUND_Y + 10, 5, 0, Math.PI * 2);
+      ctx.fillStyle = on ? sideColor(side) : "rgba(255,255,255,0.2)";
       ctx.fill();
       ctx.strokeStyle = STROKE; ctx.lineWidth = 1.5; ctx.stroke();
     }
