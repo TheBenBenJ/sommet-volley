@@ -560,6 +560,9 @@ function drawRainbow() {
 
 // ---------- Terrains ----------
 function drawBackground() {
+  // Fond neutre plein cadre (évite bandes blanches si un calque rate)
+  ctx.fillStyle = "#2a3340";
+  ctx.fillRect(0, 0, W, H);
   const key = TERRAINS[terrain].key;
   if (key === "plage") drawBgPlage();
   else if (key === "neige") drawBgNeige();

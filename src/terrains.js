@@ -41,13 +41,7 @@ function drawBgPlage() {
 /** Amazonie Dorée PNG (Jair) — jungle, terre battue, bannières vert-jaune. */
 function drawBgAmazonPng(t, raining, storm) {
   const p = SPRITES.mapAmazon;
-
-  if (spriteReady(p.far)) {
-    ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawMapBgLayer(p.far, 0);
-    ctx.globalAlpha = 1;
-  }
-  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
+  drawMapBackdrop(p, "#4a6a38");
 
   if (storm) {
     ctx.fillStyle = "rgba(40,60,30,0.35)";
@@ -78,14 +72,9 @@ function drawBgAmazonPng(t, raining, storm) {
   drawMapEventOverlay();
 }
 
-/** Fond générique far + skyline + sol (nouveaux terrains). */
+/** Fond générique skyline + sol (nouveaux terrains). */
 function drawBgSkylinePack(p, t, raining, storm, cols) {
-  if (spriteReady(p.far)) {
-    ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawMapBgLayer(p.far, 0);
-    ctx.globalAlpha = 1;
-  }
-  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
+  drawMapBackdrop(p, cols.sky || "#6a8498");
   if (storm) {
     ctx.fillStyle = "rgba(60,70,80,0.3)";
     ctx.fillRect(0, 0, W, GROUND_Y);
@@ -102,12 +91,7 @@ function drawBgSkylinePack(p, t, raining, storm, cols) {
 function drawBgMatinPng(t, raining, storm) {
   const p = SPRITES.mapMatin;
 
-  if (spriteReady(p.far)) {
-    ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawMapBgLayer(p.far, 0);
-    ctx.globalAlpha = 1;
-  }
-  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
+  drawMapBackdrop(p, "#c8beb0");
 
   if (storm) {
     ctx.fillStyle = "rgba(60,50,45,0.32)";
@@ -141,12 +125,7 @@ function drawBgMatinPng(t, raining, storm) {
 function drawBgBosphorePng(t, raining, storm) {
   const p = SPRITES.mapBosphore;
 
-  if (spriteReady(p.far)) {
-    ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawMapBgLayer(p.far, 0);
-    ctx.globalAlpha = 1;
-  }
-  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
+  drawMapBackdrop(p, "#8aa0b8");
 
   if (storm) {
     ctx.fillStyle = "rgba(50,60,80,0.32)";
@@ -180,12 +159,7 @@ function drawBgBosphorePng(t, raining, storm) {
 function drawBgAshramPng(t, raining, storm) {
   const p = SPRITES.mapAshram;
 
-  if (spriteReady(p.far)) {
-    ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawMapBgLayer(p.far, 0);
-    ctx.globalAlpha = 1;
-  }
-  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
+  drawMapBackdrop(p, "#d4b878");
 
   if (storm) {
     ctx.fillStyle = "rgba(80,55,30,0.32)";
@@ -219,12 +193,7 @@ function drawBgAshramPng(t, raining, storm) {
 function drawBgPlagePng(t, raining, storm) {
   const p = SPRITES.mapTrompette;
 
-  if (spriteReady(p.far)) {
-    ctx.globalAlpha = storm ? 0.7 : 0.9;
-    drawMapBgLayer(p.far, 0);
-    ctx.globalAlpha = 1;
-  }
-  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
+  drawMapBackdrop(p, "#87b0d0");
 
   if (storm) {
     ctx.fillStyle = "rgba(140,110,50,0.28)";
@@ -433,16 +402,15 @@ function currentMapLayout() {
 }
 
 /** Dessine une image en couvrant [dx,dy,dw,dh], alignée en bas (sol).
+ *  Cover strict (bord à bord, pas de bandes latérales).
  *  baselineFromBottom : crop du bas source pour aligner la ligne de court. */
 function drawImgCoverBottom(img, dx, dy, dw, dh, parallaxX, baselineFromBottom) {
   const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height;
   if (!sw || !sh) return;
   const bl = Math.max(0, Math.min(sh - 8, baselineFromBottom | 0));
   const usefulH = sh - bl;
-  const cover = Math.max(dw / sw, dh / usefulH);
-  const fitH = dh / usefulH;
-  // Au plus ~10 % au-delà du fit-hauteur → montre plus du PNG source
-  const scale = Math.min(cover, fitH * 1.10);
+  // Cover strict : remplit toute la zone (crop haut si besoin), jamais de letterbox
+  const scale = Math.max(dw / sw, dh / usefulH);
   const tw = sw * scale, th = usefulH * scale;
   const ox = dx + (dw - tw) / 2 + (parallaxX || 0);
   const oy = dy + dh - th;
@@ -452,6 +420,17 @@ function drawImgCoverBottom(img, dx, dy, dw, dh, parallaxX, baselineFromBottom) 
 /** Far / skyline de la map courante, baseline alignée sur GROUND_Y. */
 function drawMapBgLayer(img, parallaxX) {
   drawImgCoverBottom(img, 0, 0, W, BG_DRAW_H, parallaxX || 0, currentMapLayout().baselineFromBottom);
+}
+
+/**
+ * Un seul décor map, plein cadre : fond uni puis skyline (ou far en secours).
+ * Évite le mélange far+skyline semi-transparent et les bandes blanches.
+ */
+function drawMapBackdrop(pack, fillColor) {
+  ctx.fillStyle = fillColor || "#6a8498";
+  ctx.fillRect(0, 0, W, BG_DRAW_H);
+  if (spriteReady(pack.skyline)) drawMapBgLayer(pack.skyline, 0);
+  else if (spriteReady(pack.far)) drawMapBgLayer(pack.far, 0);
 }
 
 /** Ligne de fond code (quand le PNG n'en a pas de fiable). */
@@ -501,12 +480,7 @@ function drawBgNeigePng(t, heavy, blizzard) {
   const p = SPRITES.mapVladou;
 
   // Un seul fond (skyline) — la météo se joue en overlays code, pas en 2e PNG
-  if (spriteReady(p.far)) {
-    ctx.globalAlpha = 0.85;
-    drawMapBgLayer(p.far, 0);
-    ctx.globalAlpha = 1;
-  }
-  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
+  drawMapBackdrop(p, "#d7e4ee");
 
   // Voile météo sur le décor (ciel plus plombé sans changer d'image)
   if (blizzard) {
@@ -1043,12 +1017,7 @@ function drawBgParade() {
 function drawBgParadePng(t, raining, storm) {
   const p = SPRITES.mapHoun;
 
-  if (spriteReady(p.far)) {
-    ctx.globalAlpha = storm ? 0.55 : 0.75;
-    drawMapBgLayer(p.far, 0);
-    ctx.globalAlpha = 1;
-  }
-  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
+  drawMapBackdrop(p, "#9aa2aa");
 
   if (storm) {
     ctx.fillStyle = "rgba(60,70,80,0.35)";
@@ -1095,12 +1064,7 @@ function drawBgPrairiePng(t, raining, storm) {
   const p = SPRITES.mapMicron;
 
   // far optionnel (scène différente) : léger voile seulement
-  if (spriteReady(p.far)) {
-    ctx.globalAlpha = storm ? 0.35 : 0.45;
-    drawMapBgLayer(p.far, 0);
-    ctx.globalAlpha = 1;
-  }
-  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
+  drawMapBackdrop(p, "#b5c4d2");
 
   if (storm) {
     ctx.fillStyle = "rgba(70,80,90,0.32)";
