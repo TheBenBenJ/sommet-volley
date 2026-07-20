@@ -3,10 +3,13 @@
 
 // ---------- Constantes ----------
 const W = 900, H = 500;
-const GROUND_Y = H - 40;
+// Plan de jeu remonté : les pieds sont DANS la bande terrain des PNG
+// (plus bas = marge pour le HUD score). Les décors se dessinent jusqu'à BG_DRAW_H.
+const GROUND_Y = H - 78;
+const BG_DRAW_H = H;
 const NET_X = W / 2;
 const NET_W = 10;
-const NET_TOP = GROUND_Y - 190;
+const NET_TOP = GROUND_Y - 185;
 
 const GRAV_BALL = 0.22;
 const GRAV_BLOB = 0.65;

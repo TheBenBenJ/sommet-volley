@@ -44,10 +44,10 @@ function drawBgAmazonPng(t, raining, storm) {
 
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(40,60,30,0.35)";
@@ -59,25 +59,12 @@ function drawBgAmazonPng(t, raining, storm) {
 
   // Public désactivé pour l’instant (crowd en raw seulement)
 
-  // Sol terre battue / herbe
-  const dirt = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  if (raining) {
-    dirt.addColorStop(0, "#5a7a40");
-    dirt.addColorStop(1, "#3a5a28");
-  } else {
-    dirt.addColorStop(0, "#8a9a50");
-    dirt.addColorStop(1, "#5a7a38");
-  }
-  ctx.fillStyle = dirt;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.fillStyle = "rgba(0,0,0,0.08)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
-
-  // bordure vert / or
+  // Sol : PNG visible ; apron léger sous les pieds
+  drawCourtApron(raining ? "#5a7a40" : "#8a9a50", raining ? "#3a5a28" : "#5a7a38");
   ctx.fillStyle = "#2e7d32";
-  ctx.fillRect(0, GROUND_Y - 41, W, 3);
+  ctx.fillRect(0, GROUND_Y - 3, W, 2);
   ctx.fillStyle = "#f9a825";
-  ctx.fillRect(0, GROUND_Y - 38, W, 1);
+  ctx.fillRect(0, GROUND_Y - 1, W, 1);
 
   // Bannières vert-jaune
   if (spriteReady(p.flag)) {
@@ -98,10 +85,10 @@ function drawBgAmazonPng(t, raining, storm) {
 function drawBgSkylinePack(p, t, raining, storm, cols) {
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
   if (storm) {
     ctx.fillStyle = "rgba(60,70,80,0.3)";
     ctx.fillRect(0, 0, W, GROUND_Y);
@@ -109,13 +96,7 @@ function drawBgSkylinePack(p, t, raining, storm, cols) {
     ctx.fillStyle = "rgba(90,100,110,0.14)";
     ctx.fillRect(0, 0, W, GROUND_Y);
   }
-  const g = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  g.addColorStop(0, cols.ground0);
-  g.addColorStop(1, cols.ground1);
-  ctx.fillStyle = g;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.fillStyle = "rgba(0,0,0,0.08)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
+  drawCourtApron(cols.ground0, cols.ground1);
   if (raining) drawRain(storm ? 1 : 0.55);
 }
 
@@ -125,10 +106,10 @@ function drawBgMatinPng(t, raining, storm) {
 
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(60,50,45,0.32)";
@@ -140,25 +121,13 @@ function drawBgMatinPng(t, raining, storm) {
 
   // Public désactivé pour l’instant (crowd_0 raté)
 
-  // Sol pavé gris-beige
-  const pave = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  if (raining) {
-    pave.addColorStop(0, "#8a8278");
-    pave.addColorStop(1, "#5e5850");
-  } else {
-    pave.addColorStop(0, "#c8beb0");
-    pave.addColorStop(1, "#a89e90");
-  }
-  ctx.fillStyle = pave;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.fillStyle = "rgba(0,0,0,0.08)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
+  drawCourtApron(raining ? "#8a8278" : "#c8beb0", raining ? "#5e5850" : "#a89e90");
 
   // bordure rouge / or
   ctx.fillStyle = "#c62828";
-  ctx.fillRect(0, GROUND_Y - 41, W, 3);
+  ctx.fillRect(0, GROUND_Y - 3, W, 2);
   ctx.fillStyle = "#c9a227";
-  ctx.fillRect(0, GROUND_Y - 38, W, 1);
+  ctx.fillRect(0, GROUND_Y - 1, W, 1);
 
   // Bannières cérémonielles
   if (spriteReady(p.flag)) {
@@ -181,10 +150,10 @@ function drawBgBosphorePng(t, raining, storm) {
 
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(50,60,80,0.32)";
@@ -196,25 +165,13 @@ function drawBgBosphorePng(t, raining, storm) {
 
   // Public désactivé pour l’instant (crowd en raw seulement)
 
-  // Sol pavé clair / pierre
-  const pave = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  if (raining) {
-    pave.addColorStop(0, "#8a8070");
-    pave.addColorStop(1, "#5a5040");
-  } else {
-    pave.addColorStop(0, "#d0c4b0");
-    pave.addColorStop(1, "#b0a090");
-  }
-  ctx.fillStyle = pave;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.fillStyle = "rgba(0,0,0,0.08)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
+  drawCourtApron(raining ? "#8a8070" : "#d0c4b0", raining ? "#5a5040" : "#b0a090");
 
   // bordure pourpre / or
   ctx.fillStyle = "#6a1b9a";
-  ctx.fillRect(0, GROUND_Y - 41, W, 3);
+  ctx.fillRect(0, GROUND_Y - 3, W, 2);
   ctx.fillStyle = "#c9a227";
-  ctx.fillRect(0, GROUND_Y - 38, W, 1);
+  ctx.fillRect(0, GROUND_Y - 1, W, 1);
 
   // Bannières pourpres
   if (spriteReady(p.flag)) {
@@ -237,10 +194,10 @@ function drawBgAshramPng(t, raining, storm) {
 
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(80,55,30,0.32)";
@@ -252,25 +209,13 @@ function drawBgAshramPng(t, raining, storm) {
 
   // Public désactivé pour l’instant (crowd en raw seulement)
 
-  // Sol sable / ocre
-  const sand = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  if (raining) {
-    sand.addColorStop(0, "#8a7a60");
-    sand.addColorStop(1, "#5a4a38");
-  } else {
-    sand.addColorStop(0, "#d4b878");
-    sand.addColorStop(1, "#b09058");
-  }
-  ctx.fillStyle = sand;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.fillStyle = "rgba(0,0,0,0.08)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
+  drawCourtApron(raining ? "#8a7a60" : "#d4b878", raining ? "#5a4a38" : "#b09058");
 
   // bordure safran / or
   ctx.fillStyle = "#ef6c00";
-  ctx.fillRect(0, GROUND_Y - 41, W, 3);
+  ctx.fillRect(0, GROUND_Y - 3, W, 2);
   ctx.fillStyle = "#c9a227";
-  ctx.fillRect(0, GROUND_Y - 38, W, 1);
+  ctx.fillRect(0, GROUND_Y - 1, W, 1);
 
   // Bannières orange
   if (spriteReady(p.flag)) {
@@ -293,10 +238,10 @@ function drawBgPlagePng(t, raining, storm) {
 
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.7 : 0.9;
-    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(140,110,50,0.28)";
@@ -308,27 +253,15 @@ function drawBgPlagePng(t, raining, storm) {
 
   // Public désactivé pour l’instant (pas de crowd_0 / pas de drawCrowd)
 
-  // Sol pelouse / gravier clair jouable
-  const sand = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  if (raining) {
-    sand.addColorStop(0, "#6a8f4e");
-    sand.addColorStop(1, "#4a6a38");
-  } else {
-    sand.addColorStop(0, "#8fbc6a");
-    sand.addColorStop(1, "#6a9a48");
-  }
-  ctx.fillStyle = sand;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.fillStyle = "rgba(0,0,0,0.06)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
+  drawCourtApron(raining ? "#6a8f4e" : "#8fbc6a", raining ? "#4a6a38" : "#6a9a48");
 
   // barrière blanche / or au bord du terrain
   ctx.fillStyle = "#e8e4d8";
-  ctx.fillRect(0, GROUND_Y - 41, W, 4);
+  ctx.fillRect(0, GROUND_Y - 3, W, 2);
   ctx.fillStyle = "#c9a227";
   ctx.fillRect(0, GROUND_Y - 41, W, 1);
   ctx.fillStyle = "rgba(0,0,0,0.18)";
-  ctx.fillRect(0, GROUND_Y - 37, W, 1);
+  ctx.fillRect(0, GROUND_Y - 1, W, 1);
 
   // Pas de palmier « prop » : le fond a déjà ses éléments géants —
   // le doublon miniature au premier plan cassait la perspective.
@@ -420,19 +353,7 @@ function drawBgPlageCanvas(raining, storm) {
   ctx.fillStyle = "rgba(255,255,255,0.25)";
   ctx.fillRect(0, GROUND_Y - 55, W, 3);
 
-  // sable : clair par beau temps, terni/voilé de poussière pendant la tempête
-  const sand = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  if (raining) {
-    sand.addColorStop(0, "#c9a25a");
-    sand.addColorStop(1, "#a07f3f");
-  } else {
-    sand.addColorStop(0, "#f4d58d");
-    sand.addColorStop(1, "#d9b25f");
-  }
-  ctx.fillStyle = sand;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.fillStyle = "rgba(0,0,0,0.06)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
+  drawCourtApron(raining ? "#c9a25a" : "#f4d58d", raining ? "#a07f3f" : "#d9b25f");
 
   // grains de sable (positions fixes, purement décoratif)
   ctx.fillStyle = "rgba(120,90,30,0.18)";
@@ -524,6 +445,30 @@ function drawImgCoverBottom(img, dx, dy, dw, dh, parallaxX) {
   ctx.drawImage(img, ox, oy, tw, th);
 }
 
+/**
+ * Bande de sol sous les pieds : laisse voir les lignes du PNG au-dessus
+ * de GROUND_Y, n'opacifie vraiment que l'apron bas (HUD).
+ */
+function drawCourtApron(topColor, botColor) {
+  const join = GROUND_Y - 10;
+  const g = ctx.createLinearGradient(0, join, 0, H);
+  g.addColorStop(0, "rgba(0,0,0,0)");
+  // topColor / botColor sont hex — on les applique en alpha croissant
+  ctx.save();
+  ctx.globalAlpha = 0.22;
+  ctx.fillStyle = topColor;
+  ctx.fillRect(0, join, W, Math.max(1, GROUND_Y - join + 6));
+  ctx.globalAlpha = 0.82;
+  const solid = ctx.createLinearGradient(0, GROUND_Y + 2, 0, H);
+  solid.addColorStop(0, topColor);
+  solid.addColorStop(1, botColor);
+  ctx.fillStyle = solid;
+  ctx.fillRect(0, GROUND_Y + 2, W, H - GROUND_Y - 2);
+  ctx.restore();
+  ctx.fillStyle = "rgba(0,0,0,0.10)";
+  ctx.fillRect(0, GROUND_Y, W, 2);
+}
+
 /** Prop ancré aux pieds (x centre, y = ligne de sol). */
 function drawMapProp(img, x, footY, drawH) {
   if (!spriteReady(img)) return;
@@ -538,10 +483,10 @@ function drawBgNeigePng(t, heavy, blizzard) {
   // Un seul fond (skyline) — la météo se joue en overlays code, pas en 2e PNG
   if (spriteReady(p.far)) {
     ctx.globalAlpha = 0.85;
-    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
 
   // Voile météo sur le décor (ciel plus plombé sans changer d'image)
   if (blizzard) {
@@ -567,14 +512,7 @@ function drawBgNeigePng(t, heavy, blizzard) {
     ctx.globalAlpha = 1;
   }
 
-  // Sol jouable (bande sous les pieds)
-  const snow = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  snow.addColorStop(0, "#fbfdff");
-  snow.addColorStop(1, "#d7e4ee");
-  ctx.fillStyle = snow;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.fillStyle = "rgba(0,0,0,0.05)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
+  drawCourtApron("#fbfdff", "#d7e4ee");
 
   // Canon d'apparat (gauche) — idle / tir piloté par l'événement de map
   const firing = typeof mapEvent !== "undefined" &&
@@ -905,14 +843,7 @@ function drawBgNeige() {
   ctx.fillStyle = "rgba(255,255,255,0.5)";
   ctx.fillRect(0, GROUND_Y - 55, W, 3);
 
-  // neige au sol
-  const snow = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  snow.addColorStop(0, "#fbfdff");
-  snow.addColorStop(1, "#d7e4ee");
-  ctx.fillStyle = snow;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.fillStyle = "rgba(0,0,0,0.05)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
+  drawCourtApron("#fbfdff", "#d7e4ee");
 
   // sapins
   for (const [px, sc] of [[50, 1], [110, 0.7], [815, 0.9]]) {
@@ -1034,18 +965,11 @@ function drawBgPrairie() {
   }
 
   // herbe : vive par beau temps, sombre et terne sous la pluie
-  const grass = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  if (raining) { grass.addColorStop(0, "#5a7a3e"); grass.addColorStop(1, "#425c2c"); }
-  else { grass.addColorStop(0, "#7ed957"); grass.addColorStop(1, "#5aab3c"); }
-  ctx.fillStyle = grass;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
+  drawCourtApron(raining ? "#5a7a3e" : "#7ed957", raining ? "#425c2c" : "#5aab3c");
   if (raining) {
-    // flaques luisantes sur l'herbe détrempée
     ctx.fillStyle = "rgba(255,255,255,0.10)";
     ctx.fillRect(0, GROUND_Y, W, 6);
   }
-  ctx.fillStyle = "rgba(0,0,0,0.08)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
 
   // brins d'herbe (positions fixes, purement décoratif) qui se penchent
   ctx.strokeStyle = raining ? "rgba(30,50,15,0.5)" : "rgba(40,90,20,0.45)";
@@ -1091,8 +1015,7 @@ function drawBgParade() {
   ctx.fillStyle = "#8a9aaa";
   ctx.fillRect(0, 0, W, GROUND_Y);
   drawCrowd();
-  ctx.fillStyle = "#7a8088";
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
+  drawCourtApron("#7a8088", "#5a6068");
   if (raining) drawRain(storm ? 1 : 0.55);
 }
 
@@ -1101,10 +1024,10 @@ function drawBgParadePng(t, raining, storm) {
 
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.55 : 0.75;
-    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(60,70,80,0.35)";
@@ -1116,25 +1039,13 @@ function drawBgParadePng(t, raining, storm) {
 
   // Public calque désactivé (déjà dans le skyline)
 
-  // Sol pavé
-  const pave = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  if (raining) {
-    pave.addColorStop(0, "#6a7078");
-    pave.addColorStop(1, "#4a5058");
-  } else {
-    pave.addColorStop(0, "#9aa2aa");
-    pave.addColorStop(1, "#7a828a");
-  }
-  ctx.fillStyle = pave;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.fillStyle = "rgba(0,0,0,0.08)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
+  drawCourtApron(raining ? "#6a7078" : "#9aa2aa", raining ? "#4a5058" : "#7a828a");
 
   // bordure rouge / or
   ctx.fillStyle = "#c62828";
-  ctx.fillRect(0, GROUND_Y - 41, W, 3);
+  ctx.fillRect(0, GROUND_Y - 3, W, 2);
   ctx.fillStyle = "#c9a227";
-  ctx.fillRect(0, GROUND_Y - 38, W, 1);
+  ctx.fillRect(0, GROUND_Y - 1, W, 1);
 
   // Bannière
   if (spriteReady(p.flag)) {
@@ -1170,10 +1081,10 @@ function drawBgPrairiePng(t, raining, storm) {
   // far optionnel (scène différente) : léger voile seulement
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.35 : 0.45;
-    drawImgCoverBottom(p.far, 0, 0, W, GROUND_Y, 0);
+    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, GROUND_Y, 0);
+  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(70,80,90,0.32)";
@@ -1185,25 +1096,13 @@ function drawBgPrairiePng(t, raining, storm) {
 
   // Public PNG désactivé pour l’instant (même raison que Resort)
 
-  // Sol graviers / cour jouable
-  const gravel = ctx.createLinearGradient(0, GROUND_Y - 38, 0, H);
-  if (raining) {
-    gravel.addColorStop(0, "#9a9080");
-    gravel.addColorStop(1, "#6e6558");
-  } else {
-    gravel.addColorStop(0, "#d2c4a8");
-    gravel.addColorStop(1, "#b5a68a");
-  }
-  ctx.fillStyle = gravel;
-  ctx.fillRect(0, GROUND_Y - 37, W, H - GROUND_Y + 37);
-  ctx.fillStyle = "rgba(0,0,0,0.07)";
-  ctx.fillRect(0, GROUND_Y, W, 2);
+  drawCourtApron(raining ? "#9a9080" : "#d2c4a8", raining ? "#6e6558" : "#b5a68a");
 
   // bordure institutionnelle
   ctx.fillStyle = "#1a237e";
-  ctx.fillRect(0, GROUND_Y - 41, W, 3);
+  ctx.fillRect(0, GROUND_Y - 3, W, 2);
   ctx.fillStyle = "#c9a227";
-  ctx.fillRect(0, GROUND_Y - 38, W, 1);
+  ctx.fillRect(0, GROUND_Y - 1, W, 1);
 
   // Drapeaux (gauche / droite)
   if (spriteReady(p.flag)) {
@@ -1544,101 +1443,91 @@ function drawHUD() {
   }
   if (bombMode && (state === "play" || state === "serve")) drawBombHUD();
 
-  // ---- tableau de score cartoon, panneaux légers (la balle haute doit rester lisible)
+  // ---- tableau de score en bas (ne gêne plus le ciel / smash)
   const DISP = (typeof UI !== "undefined" ? UI.display : "'Fredoka', sans-serif");
   const SANS = (typeof UI !== "undefined" ? UI.sans : "'Nunito', sans-serif");
   const STROKE = (typeof UI !== "undefined" ? UI.stroke : "#1b1730");
-  const CREAM = "rgba(255,246,232,0.38)";
+  const CREAM = "rgba(255,246,232,0.42)";
   const sideLbl = s => (mode === "2v2" ? (s === 0 ? "Équipe 1" : "Équipe 2") : sideLabel(s));
+  const pw = 132, ph = 64;
+  const py = H - ph - 8;
   for (const s of [0, 1]) {
-    const cx = s === 0 ? W * 0.25 : W * 0.75;
+    const cx = s === 0 ? W * 0.22 : W * 0.78;
     const col = sideColor(s);
     const pop = scorePop[s] || 0;
-    const pw = 140, ph = 118, px = cx - pw / 2, py = 10;
+    const px = cx - pw / 2;
     ctx.fillStyle = CREAM;
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 16);
+    if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 12);
     else ctx.rect(px, py, pw, ph);
     ctx.fill();
-    ctx.strokeStyle = "rgba(27,23,48,0.35)"; ctx.lineWidth = 2.5; ctx.stroke();
-    // bandeau couleur camp (semi-transparent)
-    ctx.globalAlpha = 0.72;
+    ctx.strokeStyle = "rgba(27,23,48,0.35)"; ctx.lineWidth = 2; ctx.stroke();
+    ctx.globalAlpha = 0.75;
     ctx.fillStyle = col;
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(px + 3, py + 3, pw - 6, 22, 12);
-    else ctx.rect(px + 3, py + 3, pw - 6, 22);
+    if (ctx.roundRect) ctx.roundRect(px + 3, py + 3, pw - 6, 16, 8);
+    else ctx.rect(px + 3, py + 3, pw - 6, 16);
     ctx.fill();
     ctx.globalAlpha = 1;
     ctx.textAlign = "center";
     ctx.fillStyle = "#fff6e8";
-    ctx.font = "700 12px " + SANS;
-    ctx.strokeStyle = "rgba(27,23,48,0.55)"; ctx.lineWidth = 3; ctx.lineJoin = "round";
-    ctx.strokeText(sideLbl(s), cx, py + 19);
-    ctx.fillText(sideLbl(s), cx, py + 19);
-    // gros score (contour pour rester lisible sur fond transparent)
-    const scSize = 36 + pop * 1.4;
+    ctx.font = "700 10px " + SANS;
+    ctx.strokeStyle = "rgba(27,23,48,0.55)"; ctx.lineWidth = 2.5; ctx.lineJoin = "round";
+    ctx.strokeText(sideLbl(s), cx, py + 15);
+    ctx.fillText(sideLbl(s), cx, py + 15);
+    const scSize = 26 + pop * 1.2;
     ctx.font = "700 " + scSize + "px " + DISP;
-    ctx.strokeStyle = "rgba(27,23,48,0.75)"; ctx.lineWidth = 5;
-    ctx.strokeText(String(scores[s]), cx, py + 58);
+    ctx.strokeStyle = "rgba(27,23,48,0.75)"; ctx.lineWidth = 4;
+    ctx.strokeText(String(scores[s]), cx, py + 46);
     ctx.fillStyle = col;
-    ctx.fillText(String(scores[s]), cx, py + 58);
+    ctx.fillText(String(scores[s]), cx, py + 46);
     if (scorePop[s] > 0) scorePop[s]--;
   }
-  // pastille VS légère
+  // pastille VS
   ctx.textAlign = "center";
   ctx.fillStyle = CREAM;
   ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(NET_X - 22, 36, 44, 28, 12);
-  else ctx.rect(NET_X - 22, 36, 44, 28);
+  if (ctx.roundRect) ctx.roundRect(NET_X - 20, py + 16, 40, 24, 10);
+  else ctx.rect(NET_X - 20, py + 16, 40, 24);
   ctx.fill();
   ctx.strokeStyle = "rgba(27,23,48,0.35)"; ctx.lineWidth = 2; ctx.stroke();
   ctx.fillStyle = STROKE;
-  ctx.font = "700 14px " + DISP;
-  ctx.fillText("VS", NET_X, 55);
+  ctx.font = "700 12px " + DISP;
+  ctx.fillText("VS", NET_X, py + 33);
 
-  // indicateur de touches (pastilles)
+  // touches (pastilles) au-dessus des panneaux
   for (const side of [0, 1]) {
-    const baseX = side === 0 ? W * 0.25 - 26 : W * 0.75 - 26;
+    const baseX = side === 0 ? W * 0.22 - 24 : W * 0.78 - 24;
     for (let i = 0; i < MAX_TOUCHES; i++) {
       const on = i < ball.touches[side];
       ctx.beginPath();
-      ctx.arc(baseX + i * 26, 86, 6.5, 0, Math.PI * 2);
+      ctx.arc(baseX + i * 24, py - 10, 5.5, 0, Math.PI * 2);
       ctx.fillStyle = on ? sideColor(side) : "rgba(27,23,48,0.18)";
       ctx.fill();
-      ctx.strokeStyle = STROKE; ctx.lineWidth = 2; ctx.stroke();
+      ctx.strokeStyle = STROKE; ctx.lineWidth = 1.5; ctx.stroke();
     }
   }
 
-  // jauges de SUPER (combo) dans le panneau, sous les touches
+  // jauges SUPER — petite barre sous le score
   for (const s of [0, 1]) {
-    const cx = s === 0 ? W * 0.25 : W * 0.75;
+    const cx = s === 0 ? W * 0.22 : W * 0.78;
     const col = sideColor(s);
-    const bw = 108, bx = cx - bw / 2, by = 100;
+    const bw = 100, bx = cx - bw / 2, by = py + ph - 12;
     const ready = superCharge[s] === 1;
     const frac = ready ? 1 : (streak[s] % SUPER_NEED) / SUPER_NEED;
-    ctx.fillStyle = "rgba(27,23,48,0.12)";
+    ctx.fillStyle = "rgba(27,23,48,0.15)";
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(bx, by, bw, 8, 4); else ctx.rect(bx, by, bw, 8);
+    if (ctx.roundRect) ctx.roundRect(bx, by, bw, 6, 3); else ctx.rect(bx, by, bw, 6);
     ctx.fill();
-    ctx.strokeStyle = STROKE; ctx.lineWidth = 1.5; ctx.stroke();
     if (frac > 0) {
       if (ready) {
         const t = performance.now() / 300;
         ctx.fillStyle = (Math.sin(t * 6) > 0) ? "#ffd84a" : "#fff2a0";
       } else ctx.fillStyle = col;
       ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(bx, by, Math.max(4, bw * frac), 8, 4);
-      else ctx.rect(bx, by, bw * frac, 8);
+      if (ctx.roundRect) ctx.roundRect(bx, by, Math.max(3, bw * frac), 6, 3);
+      else ctx.rect(bx, by, bw * frac, 6);
       ctx.fill();
-    }
-    ctx.textAlign = "center";
-    ctx.font = "800 11px " + SANS;
-    if (ready) {
-      ctx.fillStyle = "#c48a00";
-      ctx.fillText("SUPER — " + (s === 0 ? "E" : "Shift"), cx, by + 20);
-    } else {
-      ctx.fillStyle = "rgba(27,23,48,0.7)";
-      ctx.fillText("Combo " + (streak[s] % SUPER_NEED) + "/" + SUPER_NEED, cx, by + 20);
     }
   }
 
@@ -1663,9 +1552,9 @@ function drawHUD() {
         ctx.textAlign = "center";
         ctx.font = "700 16px " + DISP;
         ctx.strokeStyle = STROKE; ctx.lineWidth = 4; ctx.lineJoin = "round";
-        ctx.strokeText(txt, NET_X, 148);
+        ctx.strokeText(txt, NET_X, 36);
         ctx.fillStyle = sideColor(s);
-        ctx.fillText(txt, NET_X, 148);
+        ctx.fillText(txt, NET_X, 36);
       }
     }
   }
@@ -1699,10 +1588,8 @@ function drawHUD() {
     ctx.textAlign = "center";
     ctx.font = "700 17px " + (typeof UI !== "undefined" ? UI.sans : "sans-serif");
     const tw = ctx.measureText(txt).width;
-    // sous les panneaux de score (qui vont jusqu'à y=126) : avec le nom de
-    // le perso (souvent plus long que "Gauche"/"Droite"), la pastille est
-    // parfois plus large qu'eux — la garder plus haut la faisait chevaucher.
-    const pw = tw + 36, ph = 34, px = NET_X - pw / 2, py = 134;
+    // Haut d'écran libre (scores en bas) — invite de service bien lisible
+    const pw = tw + 36, ph = 34, px = NET_X - pw / 2, py = 28;
     // pastille pleine (au lieu de texte nu semi-transparent) : lisible sur
     // n'importe quel terrain/ciel, clair ou sombre, sans distinction à gérer.
     ctx.fillStyle = "rgba(10,12,18,0.68)";
