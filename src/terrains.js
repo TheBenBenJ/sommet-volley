@@ -500,11 +500,17 @@ function drawPalm(px, storm) {
   ctx.restore();
 }
 
-/** Dessine une image en couvrant [dx,dy,dw,dh], alignée en bas (sol). */
+/** Dessine une image en couvrant [dx,dy,dw,dh], alignée en bas (sol).
+ *  Zoom modéré : on privilégie la hauteur du décor (ciels / monuments)
+ *  plutôt qu'un crop agressif du haut — les grands formats panoramiques
+ *  restent lisibles. Léger letterbox latéral possible (fond déjà peint). */
 function drawImgCoverBottom(img, dx, dy, dw, dh, parallaxX) {
   const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height;
   if (!sw || !sh) return;
-  const scale = Math.max(dw / sw, dh / sh);
+  const cover = Math.max(dw / sw, dh / sh);
+  const fitH = dh / sh;
+  // Au plus ~10 % au-delà du fit-hauteur → montre plus du PNG source
+  const scale = Math.min(cover, fitH * 1.10);
   const tw = sw * scale, th = sh * scale;
   const ox = dx + (dw - tw) / 2 + (parallaxX || 0);
   const oy = dy + dh - th;

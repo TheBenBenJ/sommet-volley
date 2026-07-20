@@ -148,8 +148,54 @@ def punch_enclosed_white(
     return out
 
 
-def apply_cutout(im: Image.Image) -> Image.Image:
-    rgba = punch_enclosed_white(im.convert("RGBA"))
+def punch_enclosed_white_prop(
+    im: Image.Image,
+    thr: int = 248,
+    min_size: int = 40,
+    max_size: int = 250000,
+) -> Image.Image:
+    """Percer TOUS les îlots de blanc enfermés (drapeaux, props).
+
+    Contrairement au mode perso, on ne protège pas les tissus blancs :
+    un drapeau / une bannière n'a pas de chemise à préserver.
+    """
+    from collections import deque
+    out = im.convert("RGBA")
+    w, h = out.size
+    px = out.load()
+    seen = [[False] * w for _ in range(h)]
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if seen[y][x] or a < 8 or not (r >= thr and g >= thr and b >= thr):
+                continue
+            q = deque([(x, y)])
+            seen[y][x] = True
+            cells = []
+            touch_border = False
+            while q:
+                cx, cy = q.popleft()
+                cells.append((cx, cy))
+                if cx == 0 or cy == 0 or cx == w - 1 or cy == h - 1:
+                    touch_border = True
+                for nx, ny in ((cx - 1, cy), (cx + 1, cy), (cx, cy - 1), (cx, cy + 1)):
+                    if 0 <= nx < w and 0 <= ny < h and not seen[ny][nx]:
+                        rr, gg, bb, aa = px[nx, ny]
+                        if aa >= 8 and rr >= thr and gg >= thr and bb >= thr:
+                            seen[ny][nx] = True
+                            q.append((nx, ny))
+            n = len(cells)
+            if touch_border or n < min_size or n > max_size:
+                continue
+            for px_, py_ in cells:
+                r, g, b, _ = px[px_, py_]
+                px[px_, py_] = (r, g, b, 0)
+    return out
+
+
+def apply_cutout(im: Image.Image, prop: bool = False) -> Image.Image:
+    rgba = im.convert("RGBA")
+    rgba = punch_enclosed_white_prop(rgba) if prop else punch_enclosed_white(rgba)
     bg = flood_bg_mask(rgba)
     out = rgba.copy()
     op, bp = out.load(), bg.load()
@@ -162,8 +208,33 @@ def apply_cutout(im: Image.Image) -> Image.Image:
             na = int(a * (1.0 - fade))
             op[x, y] = (r, g, b, na)
     out = despill_white_fringe(out)
-    out = remove_foot_shadow(out)
+    if not prop:
+        out = remove_foot_shadow(out)
     return out
+
+
+def process_prop(src: Path, dst: Path, target_h: int = 720):
+    """Détourage prop (drapeau…) : pas d'ancrage pieds, punch blancs agressif."""
+    im = Image.open(src)
+    cut = apply_cutout(im, prop=True)
+    # crop contenu + scale hauteur
+    bb = content_bbox(cut)
+    cropped = cut.crop(bb)
+    mw = max(4, int(cropped.width * 0.03))
+    mh = max(4, int(cropped.height * 0.03))
+    padded = Image.new(
+        "RGBA",
+        (cropped.width + 2 * mw, cropped.height + 2 * mh),
+        (0, 0, 0, 0),
+    )
+    padded.paste(cropped, (mw, mh), cropped)
+    scale = target_h / padded.height
+    nw, nh = max(1, int(padded.width * scale)), target_h
+    norm = padded.resize((nw, nh), Image.Resampling.LANCZOS)
+    norm = despill_white_fringe(norm)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    norm.save(dst)
+    print(f"  {src.name} → {dst} (prop)")
 
 
 def _has_transparent_neighbor(px, x, y, w, h, a_thr: int = 40) -> bool:
