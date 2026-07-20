@@ -14,5 +14,9 @@
   },
   "baseH": 110,
   "footPad": 2,
-  "lockAspect": 0.612
+  "lockAspect": 0.612,
+  "serveHands": {
+    "dx": 19.8,
+    "dy": -32.9
+  }
 }

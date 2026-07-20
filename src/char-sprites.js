@@ -171,6 +171,10 @@ function charPickFrame(b, anim) {
     // celebT avance pendant point/fin (tick de simu est figé)
     const ct = typeof celebT === "number" ? celebT : (tick || 0);
     idx = Math.floor(ct / 28) % frames.length;
+  } else if (anim === "receive" && typeof ball !== "undefined" &&
+             ball.inHands && ball.frozen) {
+    // Service : pose stable (sinon receive_0/1 alterne et la balle décroche)
+    idx = 0;
   } else if (frames.length > 1) {
     idx = Math.floor((tick || 0) / 20) % frames.length;
   }

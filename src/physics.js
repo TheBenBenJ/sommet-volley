@@ -264,9 +264,18 @@ function serverBlob() {
 }
 
 function serveHandsPos(blob) {
-  // Devant le perso (bras tendus de la pose receive), un peu écarté du corps
+  // Ancré sur la pose receive_0 du perso (manifest.serveHands), face adversaire.
   const face = blob.side === 0 ? 1 : -1;
-  return { x: blob.x + face * 28, y: blob.y - 48 };
+  let dx = 28, dy = -48;
+  if (typeof charOf === "function" && typeof charPack === "function") {
+    const pack = charPack(charOf(blob).key);
+    const sh = pack && pack.manifest && pack.manifest.serveHands;
+    if (sh) {
+      if (sh.dx != null) dx = +sh.dx;
+      if (sh.dy != null) dy = +sh.dy;
+    }
+  }
+  return { x: blob.x + face * dx, y: blob.y + dy };
 }
 
 function attachBallToServerHands() {
