@@ -309,7 +309,7 @@ function makeMenuActor(side, charIdx) {
     y: GROUND_Y, side, charId: charIdx,
     color: a.color, darkColor: a.darkColor,
     onGround: true, vx: 0, vy: 0,
-    dispVx: side === 0 ? 0.65 : -0.65,
+    dispVx: side === 0 ? 0.35 : -0.35,
     walkPhase: Math.random() * 24, squash: 0,
     _walking: true, _faceRight: side === 0, _faceLock: 0,
     minX, maxX, hopT: 90 + Math.floor(Math.random() * 160)
@@ -324,17 +324,17 @@ function ensureMenuBackdrop() {
 function tickMenuActors() {
   for (const b of [menuActors.L, menuActors.R]) {
     if (!b) continue;
-    b.x += b.dispVx * 0.32;
+    b.x += b.dispVx * 0.18;
     if (b.x <= b.minX) { b.x = b.minX; b.dispVx = Math.abs(b.dispVx); }
     if (b.x >= b.maxX) { b.x = b.maxX; b.dispVx = -Math.abs(b.dispVx); }
     b.vx = b.dispVx; // pour orientation sprite (charFaceRight)
     b._faceRight = b.dispVx >= 0;
-    // Même rythme qu'en jeu : 1 frame / 8 ticks (appui → passage → …)
+    // Plus lent qu'en jeu : 1 frame / 18 ticks (ambiance menu)
     b._walkTick = (b._walkTick || 0) + 1;
-    if (b._walkTick % 8 === 0) b.walkPhase += 1;
+    if (b._walkTick % 18 === 0) b.walkPhase += 1;
     b.hopT--;
     if (b.hopT <= 0 && b.onGround) {
-      b.vy = -4.2; b.onGround = false; b.hopT = 140 + Math.floor(Math.random() * 180);
+      b.vy = -3.4; b.onGround = false; b.hopT = 200 + Math.floor(Math.random() * 220);
     }
     if (!b.onGround) {
       b.vy += 0.28; b.y += b.vy;
