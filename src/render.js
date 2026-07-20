@@ -237,13 +237,19 @@ function drawPointCelebBanner() {
   ctx.fillStyle = canSkip ? "rgba(27,23,48,0.65)" : "rgba(27,23,48,0.35)";
   ctx.fillText(canSkip ? "Saut / Espace — continuer" : "…", W / 2, py + ph - 14);
 
+  // Au-dessus de la bande score (pas superposé aux chiffres)
+  const statusY = GROUND_Y - 8;
   const font = UI.display || UI.sans;
-  ctx.font = "800 14px " + font;
+  ctx.font = "800 15px " + font;
+  ctx.lineWidth = 4; ctx.lineJoin = "round";
   const winL = servingSide === 0;
-  ctx.fillStyle = winL ? "#7ed957" : "rgba(255,120,100,0.9)";
-  ctx.fillText(winL ? "★ Gagné" : "Perdu…", W * 0.22, H - 28);
-  ctx.fillStyle = !winL ? "#7ed957" : "rgba(255,120,100,0.9)";
-  ctx.fillText(!winL ? "★ Gagné" : "Perdu…", W * 0.78, H - 28);
+  for (const [cx, won] of [[W * 0.22, winL], [W * 0.78, !winL]]) {
+    const label = won ? "★ Gagné" : "Perdu…";
+    ctx.strokeStyle = "rgba(12,20,42,0.85)";
+    ctx.strokeText(label, cx, statusY);
+    ctx.fillStyle = won ? "#7ed957" : "rgba(255,140,120,0.95)";
+    ctx.fillText(label, cx, statusY);
+  }
 }
 
 function drawGameoverCeleb() {

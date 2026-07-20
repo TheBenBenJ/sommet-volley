@@ -44,10 +44,10 @@ function drawBgAmazonPng(t, raining, storm) {
 
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
+    drawMapBgLayer(p.far, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
+  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(40,60,30,0.35)";
@@ -61,10 +61,7 @@ function drawBgAmazonPng(t, raining, storm) {
 
   // Sol : PNG visible ; apron léger sous les pieds
   drawCourtApron(raining ? "#5a7a40" : "#8a9a50", raining ? "#3a5a28" : "#5a7a38");
-  ctx.fillStyle = "#2e7d32";
-  ctx.fillRect(0, GROUND_Y - 3, W, 2);
-  ctx.fillStyle = "#f9a825";
-  ctx.fillRect(0, GROUND_Y - 1, W, 1);
+  drawCourtSeam("#2e7d32", "#f9a825");
 
   // Bannières vert-jaune
   if (spriteReady(p.flag)) {
@@ -85,10 +82,10 @@ function drawBgAmazonPng(t, raining, storm) {
 function drawBgSkylinePack(p, t, raining, storm, cols) {
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
+    drawMapBgLayer(p.far, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
+  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
   if (storm) {
     ctx.fillStyle = "rgba(60,70,80,0.3)";
     ctx.fillRect(0, 0, W, GROUND_Y);
@@ -97,6 +94,7 @@ function drawBgSkylinePack(p, t, raining, storm, cols) {
     ctx.fillRect(0, 0, W, GROUND_Y);
   }
   drawCourtApron(cols.ground0, cols.ground1);
+  drawCourtSeam();
   if (raining) drawRain(storm ? 1 : 0.55);
 }
 
@@ -106,10 +104,10 @@ function drawBgMatinPng(t, raining, storm) {
 
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
+    drawMapBgLayer(p.far, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
+  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(60,50,45,0.32)";
@@ -122,12 +120,7 @@ function drawBgMatinPng(t, raining, storm) {
   // Public désactivé pour l’instant (crowd_0 raté)
 
   drawCourtApron(raining ? "#8a8278" : "#c8beb0", raining ? "#5e5850" : "#a89e90");
-
-  // bordure rouge / or
-  ctx.fillStyle = "#c62828";
-  ctx.fillRect(0, GROUND_Y - 3, W, 2);
-  ctx.fillStyle = "#c9a227";
-  ctx.fillRect(0, GROUND_Y - 1, W, 1);
+  drawCourtSeam("#c62828", "#c9a227");
 
   // Bannières cérémonielles
   if (spriteReady(p.flag)) {
@@ -150,10 +143,10 @@ function drawBgBosphorePng(t, raining, storm) {
 
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
+    drawMapBgLayer(p.far, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
+  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(50,60,80,0.32)";
@@ -166,12 +159,7 @@ function drawBgBosphorePng(t, raining, storm) {
   // Public désactivé pour l’instant (crowd en raw seulement)
 
   drawCourtApron(raining ? "#8a8070" : "#d0c4b0", raining ? "#5a5040" : "#b0a090");
-
-  // bordure pourpre / or
-  ctx.fillStyle = "#6a1b9a";
-  ctx.fillRect(0, GROUND_Y - 3, W, 2);
-  ctx.fillStyle = "#c9a227";
-  ctx.fillRect(0, GROUND_Y - 1, W, 1);
+  drawCourtSeam("#6a1b9a", "#c9a227");
 
   // Bannières pourpres
   if (spriteReady(p.flag)) {
@@ -194,10 +182,10 @@ function drawBgAshramPng(t, raining, storm) {
 
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.55 : 0.8;
-    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
+    drawMapBgLayer(p.far, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
+  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(80,55,30,0.32)";
@@ -210,12 +198,7 @@ function drawBgAshramPng(t, raining, storm) {
   // Public désactivé pour l’instant (crowd en raw seulement)
 
   drawCourtApron(raining ? "#8a7a60" : "#d4b878", raining ? "#5a4a38" : "#b09058");
-
-  // bordure safran / or
-  ctx.fillStyle = "#ef6c00";
-  ctx.fillRect(0, GROUND_Y - 3, W, 2);
-  ctx.fillStyle = "#c9a227";
-  ctx.fillRect(0, GROUND_Y - 1, W, 1);
+  drawCourtSeam("#ef6c00", "#c9a227");
 
   // Bannières orange
   if (spriteReady(p.flag)) {
@@ -238,10 +221,10 @@ function drawBgPlagePng(t, raining, storm) {
 
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.7 : 0.9;
-    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
+    drawMapBgLayer(p.far, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
+  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(140,110,50,0.28)";
@@ -255,13 +238,10 @@ function drawBgPlagePng(t, raining, storm) {
 
   drawCourtApron(raining ? "#6a8f4e" : "#8fbc6a", raining ? "#4a6a38" : "#6a9a48");
 
-  // barrière blanche / or au bord du terrain
-  ctx.fillStyle = "#e8e4d8";
-  ctx.fillRect(0, GROUND_Y - 3, W, 2);
+  // balustrade décorative (au-dessus de la ligne de fond PNG)
   ctx.fillStyle = "#c9a227";
   ctx.fillRect(0, GROUND_Y - 41, W, 1);
-  ctx.fillStyle = "rgba(0,0,0,0.18)";
-  ctx.fillRect(0, GROUND_Y - 1, W, 1);
+  drawCourtSeam("#e8e4d8", "rgba(0,0,0,0.18)");
 
   // Pas de palmier « prop » : le fond a déjà ses éléments géants —
   // le doublon miniature au premier plan cassait la perspective.
@@ -428,21 +408,68 @@ function drawPalm(px, storm) {
   ctx.restore();
 }
 
+/**
+ * Layout visuel par map (clé TERRAINS.key).
+ * baselineFromBottom : px sous la ligne de fond du court dans le skyline —
+ *   on les croppe pour que cette ligne tombe pile sur GROUND_Y
+ *   (score en dessous, pieds + poteau sur le croisement).
+ * netPost : compensations du PNG (padding transparent / poteau décentré).
+ * codeSeam : dessiner une ligne de fond code (maps sans traits PNG fiables).
+ */
+const MAP_LAYOUT = {
+  amazon:   { baselineFromBottom: 135, netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false },
+  plage:    { baselineFromBottom: 132, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false },
+  neige:    { baselineFromBottom: 0,   netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: true },
+  prairie:  { baselineFromBottom: 43,  netPost: { footPad: 2, xOff: -19, scale: 1 }, codeSeam: false },
+  parade:   { baselineFromBottom: 368, netPost: { footPad: 2, xOff: -11, scale: 1 }, codeSeam: false },
+  matin:    { baselineFromBottom: 0,   netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: true },
+  bosphore: { baselineFromBottom: 130, netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false },
+  ashram:   { baselineFromBottom: 72,  netPost: { footPad: 4, xOff: 0, scale: 1 }, codeSeam: false }
+};
+
+function currentMapLayout() {
+  const key = (typeof TERRAINS !== "undefined" && TERRAINS[terrain]) ? TERRAINS[terrain].key : "";
+  return MAP_LAYOUT[key] || { baselineFromBottom: 0, netPost: { footPad: 0, xOff: 0, scale: 1 }, codeSeam: true };
+}
+
 /** Dessine une image en couvrant [dx,dy,dw,dh], alignée en bas (sol).
- *  Zoom modéré : on privilégie la hauteur du décor (ciels / monuments)
- *  plutôt qu'un crop agressif du haut — les grands formats panoramiques
- *  restent lisibles. Léger letterbox latéral possible (fond déjà peint). */
-function drawImgCoverBottom(img, dx, dy, dw, dh, parallaxX) {
+ *  baselineFromBottom : crop du bas source pour aligner la ligne de court. */
+function drawImgCoverBottom(img, dx, dy, dw, dh, parallaxX, baselineFromBottom) {
   const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height;
   if (!sw || !sh) return;
-  const cover = Math.max(dw / sw, dh / sh);
-  const fitH = dh / sh;
+  const bl = Math.max(0, Math.min(sh - 8, baselineFromBottom | 0));
+  const usefulH = sh - bl;
+  const cover = Math.max(dw / sw, dh / usefulH);
+  const fitH = dh / usefulH;
   // Au plus ~10 % au-delà du fit-hauteur → montre plus du PNG source
   const scale = Math.min(cover, fitH * 1.10);
-  const tw = sw * scale, th = sh * scale;
+  const tw = sw * scale, th = usefulH * scale;
   const ox = dx + (dw - tw) / 2 + (parallaxX || 0);
   const oy = dy + dh - th;
-  ctx.drawImage(img, ox, oy, tw, th);
+  ctx.drawImage(img, 0, 0, sw, usefulH, ox, oy, tw, th);
+}
+
+/** Far / skyline de la map courante, baseline alignée sur GROUND_Y. */
+function drawMapBgLayer(img, parallaxX) {
+  drawImgCoverBottom(img, 0, 0, W, BG_DRAW_H, parallaxX || 0, currentMapLayout().baselineFromBottom);
+}
+
+/** Ligne de fond code (quand le PNG n'en a pas de fiable). */
+function drawCourtSeam(stroke, accent) {
+  if (!currentMapLayout().codeSeam) return;
+  ctx.fillStyle = stroke || "rgba(255,248,230,0.92)";
+  ctx.fillRect(0, GROUND_Y - 2, W, 2);
+  if (accent) {
+    ctx.fillStyle = accent;
+    ctx.fillRect(0, GROUND_Y - 1, W, 1);
+  }
+  // Trait médian court pour matérialiser le croisement avec le poteau
+  ctx.strokeStyle = stroke || "rgba(255,248,230,0.75)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(NET_X, GROUND_Y - 70);
+  ctx.lineTo(NET_X, GROUND_Y - 1);
+  ctx.stroke();
 }
 
 /**
@@ -476,10 +503,10 @@ function drawBgNeigePng(t, heavy, blizzard) {
   // Un seul fond (skyline) — la météo se joue en overlays code, pas en 2e PNG
   if (spriteReady(p.far)) {
     ctx.globalAlpha = 0.85;
-    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
+    drawMapBgLayer(p.far, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
+  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
 
   // Voile météo sur le décor (ciel plus plombé sans changer d'image)
   if (blizzard) {
@@ -506,6 +533,7 @@ function drawBgNeigePng(t, heavy, blizzard) {
   }
 
   drawCourtApron("#fbfdff", "#d7e4ee");
+  drawCourtSeam("rgba(180,200,220,0.95)", "rgba(100,130,160,0.55)");
 
   // Canon d'apparat (gauche) — idle / tir piloté par l'événement de map
   const firing = typeof mapEvent !== "undefined" &&
@@ -1017,10 +1045,10 @@ function drawBgParadePng(t, raining, storm) {
 
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.55 : 0.75;
-    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
+    drawMapBgLayer(p.far, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
+  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(60,70,80,0.35)";
@@ -1033,12 +1061,7 @@ function drawBgParadePng(t, raining, storm) {
   // Public calque désactivé (déjà dans le skyline)
 
   drawCourtApron(raining ? "#6a7078" : "#9aa2aa", raining ? "#4a5058" : "#7a828a");
-
-  // bordure rouge / or
-  ctx.fillStyle = "#c62828";
-  ctx.fillRect(0, GROUND_Y - 3, W, 2);
-  ctx.fillStyle = "#c9a227";
-  ctx.fillRect(0, GROUND_Y - 1, W, 1);
+  drawCourtSeam("#c62828", "#c9a227");
 
   // Bannière
   if (spriteReady(p.flag)) {
@@ -1074,10 +1097,10 @@ function drawBgPrairiePng(t, raining, storm) {
   // far optionnel (scène différente) : léger voile seulement
   if (spriteReady(p.far)) {
     ctx.globalAlpha = storm ? 0.35 : 0.45;
-    drawImgCoverBottom(p.far, 0, 0, W, BG_DRAW_H, 0);
+    drawMapBgLayer(p.far, 0);
     ctx.globalAlpha = 1;
   }
-  if (spriteReady(p.skyline)) drawImgCoverBottom(p.skyline, 0, 0, W, BG_DRAW_H, 0);
+  if (spriteReady(p.skyline)) drawMapBgLayer(p.skyline, 0);
 
   if (storm) {
     ctx.fillStyle = "rgba(70,80,90,0.32)";
@@ -1090,12 +1113,7 @@ function drawBgPrairiePng(t, raining, storm) {
   // Public PNG désactivé pour l’instant (même raison que Resort)
 
   drawCourtApron(raining ? "#9a9080" : "#d2c4a8", raining ? "#6e6558" : "#b5a68a");
-
-  // bordure institutionnelle
-  ctx.fillStyle = "#1a237e";
-  ctx.fillRect(0, GROUND_Y - 3, W, 2);
-  ctx.fillStyle = "#c9a227";
-  ctx.fillRect(0, GROUND_Y - 1, W, 1);
+  drawCourtSeam("#1a237e", "#c9a227");
 
   // Drapeaux (gauche / droite)
   if (spriteReady(p.flag)) {
@@ -1195,21 +1213,25 @@ function terrainNetPostImg() {
 }
 
 function drawNet() {
-  // Uniforme : poteau PNG centré sur NET_X, pied pile sur GROUND_Y
-  // (= croisement ligne médiane × ligne de fond du terrain).
+  // Poteau PNG : pied sur GROUND_Y (= ligne de fond map) × NET_X (= médiane).
   const img = terrainNetPostImg();
+  const np = (currentMapLayout().netPost) || {};
+  const footPad = np.footPad || 0;
+  const xOff = np.xOff || 0;
+  const sc = np.scale || 1;
+  const aspectMul = (np.aspectMul != null) ? np.aspectMul : 0.78;
 
   ctx.fillStyle = "rgba(0,0,0,0.15)";
   ctx.beginPath();
-  ctx.ellipse(NET_X, GROUND_Y + 3, img ? 16 : 12, 3.5, 0, 0, Math.PI * 2);
+  ctx.ellipse(NET_X + xOff, GROUND_Y + 3, img ? 16 : 12, 3.5, 0, 0, Math.PI * 2);
   ctx.fill();
 
   if (img) {
-    const drawH = (GROUND_Y - NET_TOP) + 28;
+    const drawH = ((GROUND_Y - NET_TOP) + 28) * sc;
     const aspect = (img.naturalWidth || img.width) / Math.max(1, img.naturalHeight || img.height);
-    const drawW = drawH * aspect * 0.78;
-    // Bas du PNG ancré exactement sur GROUND_Y (pas de +2 qui le décolle)
-    ctx.drawImage(img, NET_X - drawW / 2, GROUND_Y - drawH, drawW, drawH);
+    const drawW = drawH * aspect * aspectMul;
+    // footPad compense le padding transparent bas du PNG
+    ctx.drawImage(img, NET_X - drawW / 2 + xOff, GROUND_Y - drawH + footPad, drawW, drawH);
     return;
   }
 
