@@ -383,7 +383,7 @@ const TUTORIAL_STEPS = [
   },
   {
     title: "Service",
-    body: "F : lance la balle. Ensuite contact auto — sol = cloche, saut = smash.",
+    body: "F : lance la balle. Puis F à nouveau pour servir (sol = cloche, saut = smash).",
     keys: ["F", "Espace"]
   },
   {
@@ -1062,7 +1062,7 @@ function drawTutorialControls(dev, x, y, maxW) {
       ["Bouger / sauter", "Q / D  bouger   ·   Z / Espace / ↑  sauter"],
       ["Cloche (au sol)", "Place-toi sous la balle — cloche auto (angle = ta position)"],
       ["Smash (en l'air)", "Saute au contact : smash automatique selon ta position"],
-      ["Service / action", "F pour lancer (service), puis contact auto (sol ou saut)"],
+      ["Service / action", "F pour lancer, puis F pour servir (pas d'auto)"],
       ["SUPER", "E  (jauge remplie par des points d'affilée)"],
       ["Camp droite (local 1v1)", "← →  ·  ↑ saut  ·  ↓ ou / frappe  ·  Shift dr. SUPER"],
       ["Pause / son", "P pause · M son · N musique · Échap menu"]
@@ -1439,7 +1439,7 @@ function drawRules() {
   y += 4;
   h("Gameplay");
   p("Au sol, balle sur toi = cloche auto. En l'air = smash auto au contact.");
-  p("Service : F pour lancer, puis contact auto. Double saut en l'air.");
+  p("Service : F pour lancer, puis F à nouveau pour servir. Double saut en l'air.");
   y += 4;
   h("★ SUPER", "#ffd93d");
   p("3 points d'affilée chargent la jauge (Houn : 2). E / B lance la technique : un bandeau explique l'effet et le visuel ~4 s.");

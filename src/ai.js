@@ -1,8 +1,8 @@
-// sommet-volley · intelligence artificielle (3 niveaux, chasse au duel)
+// sommet-volley · intelligence artificielle (4 niveaux, chasse au duel)
 "use strict";
 
 // ---------- IA · Gameplay V2 ----------
-// Volley : 1ʳᵉ touche = réception (passe haute), puis renvoi / smash.
+// Volley : 1ʳᵉ touche = réception (passe haute), puis set / smash.
 // Service : smash (X) pour lancer → frappe vers l'adversaire.
 
 /** Déplacement avec hystérésis : évite gauche↔droite à chaque tick (sprite qui tourne). */
@@ -10,9 +10,11 @@ function aiSteerToward(me, input, dx, step, lvl) {
   // Remplace tout déplacement précédent (évite left+right simultanés si appelé 2×).
   input.left = false;
   input.right = false;
-  // Seuil large (surtout IA rapide / Vladou) : évite gauche↔droite à chaque tick.
-  const enter = Math.max(16, step * 1.65, 14 - (lvl.react || 0) * 2);
-  const hold = enter * 0.55;
+  // Zone morte proportionnelle à la vitesse, mais assez petite pour se placer sous la balle.
+  // (Un plancher trop haut → l'IA s'arrête à 16 px et rate le contact.)
+  const react = lvl.react != null ? lvl.react : 0.8;
+  const enter = Math.max(7, Math.min(18, step * (1.05 + (1 - react) * 0.35)));
+  const hold = enter * 0.48;
   if (me._aiSteer === undefined) me._aiSteer = 0;
   if (me._aiSteer < 0) {
     if (dx > -hold) me._aiSteer = 0;
@@ -37,50 +39,50 @@ function aiV2FillAim(side, lvl, me, opp, input, role) {
   const fwd = side === 0 ? 1 : -1;
   // Service : cloche haute vers l'adversaire (évite le filet)
   if (ball.serveAimLock && side === servingSide) {
-    input.ax = fwd * 0.7;
-    input.ay = -0.85;
+    input.ax = fwd * 0.65;
+    input.ay = -0.88;
     return;
   }
   if (role === 0) {
-    // Réception : cloche haute avec un peu d'avance (évite de se remanger la balle)
-    input.ax = fwd * 0.28;
-    input.ay = -0.92;
+    // Réception : passe haute quasi verticale (laisse le temps de set / smash)
+    input.ax = fwd * 0.12;
+    input.ay = -0.96;
     return;
   }
   if (role === 1 && !lvl.aim) {
     // 2ᵉ touche facile : encore une passe / renvoi doux
-    input.ax = fwd * 0.55;
-    input.ay = -0.7;
+    input.ax = fwd * 0.5;
+    input.ay = -0.75;
     return;
   }
   if (role < 2 && lvl.aim) {
     // Set vers l'avant (prépare un smash)
-    input.ax = fwd * 0.35;
-    input.ay = -0.9;
+    input.ax = fwd * 0.32;
+    input.ay = -0.92;
     return;
   }
-  // Attaque / service / 3ᵉ touche : vers l'adversaire
+  // Attaque / 3ᵉ touche : vers l'adversaire
   if (!lvl.aim) {
-    input.ax = fwd * (0.8 + lvl.react * 0.15);
-    input.ay = -0.35;
+    input.ax = fwd * (0.82 + lvl.react * 0.12);
+    input.ay = -0.28;
     return;
   }
   const oppNearNet = side === 0 ? opp.x < NET_X + 150 : opp.x > NET_X - 150;
   const oppDeep = side === 0 ? opp.x > NET_X + 240 : opp.x < NET_X - 240;
   if (oppNearNet) {
-    input.ax = fwd * 0.55;
-    input.ay = -0.8;
+    input.ax = fwd * 0.5;
+    input.ay = -0.82;
   } else if (oppDeep) {
-    input.ax = fwd * 0.95;
-    input.ay = 0.15;
+    input.ax = fwd * 0.98;
+    input.ay = 0.22;
   } else {
-    input.ax = fwd * 0.85;
-    input.ay = -0.35;
+    input.ax = fwd * 0.88;
+    input.ay = -0.28;
   }
   if (opp) {
     const oppCourtMid = side === 0 ? (NET_X + W) * 0.5 : NET_X * 0.5;
-    if (side === 0) input.ax = opp.x > oppCourtMid ? 0.55 : 0.95;
-    else input.ax = opp.x < oppCourtMid ? -0.55 : -0.95;
+    if (side === 0) input.ax = opp.x > oppCourtMid ? 0.5 : 0.98;
+    else input.ax = opp.x < oppCourtMid ? -0.5 : -0.98;
   }
 }
 
@@ -95,7 +97,7 @@ function aiGameplayV2(side, lvl, me, opp, input) {
   if (ball.frozen && ball.inHands && servingSide === side && serveCountdown <= 0 &&
       (state === "serve" || state === "play")) {
     if (me._aiTossTick == null) {
-      me._aiTossTick = tick + 10 + Math.floor((1.05 - lvl.react) * 40) + (lvl.err > 20 ? 18 : 0);
+      me._aiTossTick = tick + 8 + Math.floor((1.05 - lvl.react) * 28) + (lvl.err > 18 ? 12 : 0);
     }
     if (tick >= me._aiTossTick) input.smash = true;
     input.jump = false;
@@ -112,77 +114,100 @@ function aiGameplayV2(side, lvl, me, opp, input) {
   const dist = Math.hypot(ball.x - me.x, ball.y - headY);
   const role = aiV2TouchRole(side);
   const servingHit = !!(ball.serveAimLock && side === servingSide);
-  const receiving = role === 0;           // 1ʳᵉ touche = passe, pas de tir
+  const receiving = role === 0;
   const mustClear = role >= 2 && !servingHit;
-  const descending = ball.vy > -1.5;
+  const descending = ball.vy > -1.2;
 
   // Grace post-lancer : placement laissé à aiInput (predictLandingX).
   if (ball.tossGrace > 0 && servingSide === side) return false;
 
-  // Placement déjà géré dans aiInput / aiInput2v2 (predictLandingX).
-  // Ici on ne re-steert pas : évite les cibles conflictuelles → zigzags.
-
-  if (dist > RECEIVE_R + 50) return false;
+  // Trop loin : pas encore d'action (le placement continue via aiInput)
+  if (dist > RECEIVE_R + 70) return false;
 
   aiV2FillAim(side, lvl, me, opp, input, role);
 
-  const aligned = Math.abs(ball.x - me.x) < 46;
-  // Saut seulement si vraiment hors de portée debout (évite les sauts inutiles type Yogi)
-  const tooHighToStand = ball.y < me.y - 145;
-  const goodSmashH = ball.y < me.y - 55 && ball.y > me.y - 160;
+  const alignSlop = 50 + (1 - (lvl.react || 0.8)) * 8;
+  const aligned = Math.abs(ball.x - me.x) < alignSlop;
+  const tooHighToStand = ball.y < me.y - 138;
+  const goodSmashH = ball.y < me.y - 48 && ball.y > me.y - 175;
+  const nearNet = Math.abs(me.x - NET_X) < (lvl.aim ? 155 : 120);
+  const fwd = side === 0 ? 1 : -1;
 
-  // Frapper un peu plus tôt / plus bas : moins de « balle collée aux mains »
-  const inHitWindow = dist <= RECEIVE_R + 6 && descending && aligned &&
-    (ball.y < me.y - 28) && (ball.y > me.y - 195);
+  // Fenêtre de frappe un peu généreuse : mieux frapper que « coller » / rater
+  const inHitWindow = dist <= RECEIVE_R + 10 && descending && aligned &&
+    (ball.y < me.y - 24) && (ball.y > me.y - 205);
+  const canReachHit = inHitWindow ||
+    (dist <= RECEIVE_R + 2 && descending && Math.abs(ball.x - me.x) < alignSlop + 8 &&
+     ball.y < me.y - 20 && ball.y > me.y - 210);
 
-  // Service : cloche au sol de préférence (pas de saut + smash piqué)
+  function tryJumpForBall() {
+    if (!me.onGround || !tooHighToStand || !descending || !aligned) return;
+    if (ball.vy < 0.4) return;
+    input.jump = true;
+  }
+
+  function tryDoubleJumpSmash() {
+    if (!lvl.dbl || me.onGround || me.jumpsUsed !== 1) return;
+    if (me.vy > -1.2 && goodSmashH && nearNet && aligned && dist < RECEIVE_R + 8) {
+      input.jump = true;
+    }
+  }
+
+  // Service : cloche au sol de préférence
   if (servingHit) {
-    if (me.onGround && tooHighToStand && descending && aligned && ball.vy > 0.5) input.jump = true;
-    if (inHitWindow) input.smash = true;
+    tryJumpForBall();
+    if (canReachHit) input.smash = true;
     return false;
   }
 
-  // Réception : rester au sol autant que possible ; X = cloche
+  // Réception : rester au sol ; passe haute
   if (receiving) {
-    if (me.onGround && tooHighToStand && descending && aligned && ball.vy > 1) input.jump = true;
-    // En l'air sur réception : ne pas « coller » — frapper dès que la balle est à portée
-    if (inHitWindow || (!me.onGround && dist <= RECEIVE_R + 2 && descending && aligned)) {
+    tryJumpForBall();
+    if (canReachHit || (!me.onGround && dist <= RECEIVE_R + 4 && descending && aligned)) {
       input.smash = true;
     }
     return false;
   }
 
-  // Dégagement / 3ᵉ touche : cloche vers l'adversaire — smash rare près du filet
-  if (mustClear) {
-    const fwd = side === 0 ? 1 : -1;
-    input.ax = fwd * 0.9;
-    input.ay = -0.45;
-    if (me.onGround && tooHighToStand && descending && aligned) input.jump = true;
-    const nearNet = Math.abs(me.x - NET_X) < 130;
-    if (!me.onGround && goodSmashH && nearNet && dist < RECEIVE_R + 4 && aligned &&
-        ball.y < NET_TOP + 50) {
+  // 2ᵉ touche : set ; niveaux aim peuvent smash tôt près du filet
+  if (role === 1) {
+    tryJumpForBall();
+    tryDoubleJumpSmash();
+    if (lvl.aim && !me.onGround && goodSmashH && nearNet && dist < RECEIVE_R + 6 && aligned &&
+        ball.y < NET_TOP + 55) {
       input.smash = true;
       input.ax = fwd * 0.95;
-      input.ay = -0.05;
-    } else if (inHitWindow) {
-      input.smash = true; // X = cloche
+      input.ay = 0.05;
+    } else if (canReachHit) {
+      input.smash = true;
     }
     return false;
   }
 
-  if (role === 1) {
-    // 2ᵉ touche : cloche, saut seulement si trop haut
-    if (me.onGround && tooHighToStand && descending && aligned) input.jump = true;
-    if (inHitWindow) input.smash = true;
+  // Dégagement / 3ᵉ touche : smash si possible, sinon cloche
+  if (mustClear) {
+    input.ax = fwd * 0.92;
+    input.ay = -0.4;
+    tryJumpForBall();
+    tryDoubleJumpSmash();
+    if (!me.onGround && goodSmashH && nearNet && dist < RECEIVE_R + 6 && aligned &&
+        ball.y < NET_TOP + 55) {
+      input.smash = true;
+      input.ax = fwd * 0.98;
+      input.ay = lvl.aim ? 0.12 : -0.05;
+    } else if (canReachHit) {
+      input.smash = true;
+    }
+    return false;
   }
+
   return false;
 }
 
 // ---------- IA ----------
 function predictLandingX() {
   // simulation de la trajectoire jusqu'à la hauteur de frappe, en tenant compte
-  // des murs ET du rebond sur le sommet du filet (l'IA ne se fait plus surprendre
-  // par une balle qui accroche la bande).
+  // des murs ET du rebond sur le sommet du filet.
   let x = ball.x, y = ball.y, vx = ball.vx, vy = ball.vy;
   const hitY = GROUND_Y - 75;
   const lift = (typeof ballLift === "function") ? ballLift() : 1;
@@ -197,6 +222,12 @@ function predictLandingX() {
     if (y >= hitY && vy > 0) return x;
   }
   return x;
+}
+
+/** La balle (re)tombera-t-elle dans mon camp ? */
+function aiBallLandsMySide(side) {
+  const land = predictLandingX();
+  return side === 0 ? land < NET_X - 8 : land > NET_X + 8;
 }
 
 // side (optionnel, défaut 1 = camp droit, comportement historique) : 0 pour
@@ -218,7 +249,7 @@ function aiInput(side, lvlOverride, god) {
   if (--aiErrTimer <= 0) {
     aiErr = (rng() - 0.5) * 2 * lvl.err;
     aiRush = rng() < lvl.rush;
-    aiErrTimer = 55; // moins souvent → moins de zigzags
+    aiErrTimer = 48 + Math.floor((1 - lvl.react) * 20);
   }
 
   if (!(typeof tutorialMode !== "undefined" && tutorialMode) &&
@@ -252,10 +283,13 @@ function aiInput(side, lvlOverride, god) {
     return input;
   }
 
-  // Anticiper plus tôt en V2 (sinon l'IA part trop tard et rate la retombée)
+  // Anticipation : lookahead selon react (niveaux forts partent plus tôt)
+  const look = GAMEPLAY_V2 ? (160 + lvl.react * 140) : 120;
   const ballComing = side === 0
-    ? (ball.x < NET_X + (GAMEPLAY_V2 ? 200 : 120) || (ball.vx < -0.3 && !ball.frozen && ball.x < NET_X + 280))
-    : (ball.x > NET_X - (GAMEPLAY_V2 ? 200 : 120) || (ball.vx > 0.3 && !ball.frozen && ball.x > NET_X - 280));
+    ? (ball.x < NET_X + look || (ball.vx < -0.2 && !ball.frozen && ball.x < NET_X + 320) ||
+       (!ball.frozen && aiBallLandsMySide(0)))
+    : (ball.x > NET_X - look || (ball.vx > 0.2 && !ball.frozen && ball.x > NET_X - 320) ||
+       (!ball.frozen && aiBallLandsMySide(1)));
   let targetX;
 
   if (ball.frozen && servingSide === side) {
@@ -267,16 +301,20 @@ function aiInput(side, lvlOverride, god) {
     const land = predictLandingX();
     const notReachingMe = side === 0 ? land >= NET_X : land <= NET_X;
     const shortNearNet = side === 0 ? land > NET_X - 90 : land < NET_X + 90;
-    if (notReachingMe) {
+    // Facile : réaction un peu tardive si la balle est encore très haute / montante
+    const lateReact = lvl.react < 0.75 && ball.vy < -2 && ball.y < GROUND_Y - 220 &&
+      (side === 0 ? ball.x > NET_X - 40 : ball.x < NET_X + 40);
+    if (notReachingMe || lateReact) {
       targetX = me.homeX;
     } else if (GAMEPLAY_V2) {
-      // Sous la retombée prévue (pas coller à ball.x live → zigzags)
-      const under = side === 0 ? -3 : 3;
-      targetX = land + under + aiErr * 0.2;
+      const under = side === 0 ? -2 : 2;
+      // Moins d'erreur sur les niveaux forts ; blend fin de chute pour coller le contact
+      const errScale = 0.12 + (1 - lvl.react) * 0.2;
+      targetX = land + under + aiErr * errScale;
       const onSide = side === 0 ? ball.x < NET_X : ball.x > NET_X;
-      // Fin de chute seulement : léger blend vers la X actuelle
-      if (onSide && ball.vy > 1.2 && ball.y > GROUND_Y - 180) {
-        targetX = land * 0.4 + ball.x * 0.6 + under + aiErr * 0.12;
+      if (onSide && ball.vy > 0.8 && ball.y > GROUND_Y - 200) {
+        const blend = 0.35 + lvl.react * 0.25; // plus fort → suit plus la X live en fin
+        targetX = land * (1 - blend) + ball.x * blend + under + aiErr * errScale * 0.5;
       }
     } else if (shortNearNet) {
       targetX = land + (side === 0 ? -8 : 8);
@@ -297,7 +335,6 @@ function aiInput(side, lvlOverride, god) {
 
   const dx = targetX - me.x;
   const step = BLOB_SPEED * lvl.speedMul * charOf(me).speed;
-  // Zone morte + hystérésis : évite l'oscillation gauche/droite (sprite qui tourne)
   aiSteerToward(me, input, dx, step, lvl);
 
   // V1 : sauts de frappe passifs. V2 : géré dans aiGameplayV2 (cloche / smash).
@@ -322,14 +359,11 @@ function aiInput(side, lvlOverride, god) {
 }
 
 // IA 2v2 : version « côté-agnostique » de aiInput, avec répartition d'équipe.
-// Chaque IA connaît son camp (me.side) et son coéquipier ; celui qui est le
-// plus proche du point de chute prend la balle, l'autre couvre sa zone (home).
-// Pas de Smash Battle en 2v2 → logique de duel retirée ici.
 function aiInput2v2(me, lvlOverride) {
   const lvl = lvlOverride || AI_LEVELS[aiLevel];
   const input = { left: false, right: false, jump: false, smash: false, super: false };
   const side = me.side;
-  const back = side === 0 ? -1 : 1;               // « derrière la balle » côté son mur
+  const back = side === 0 ? -1 : 1;
   const half = 34;
   const minX = side === 0 ? half : NET_X + NET_W / 2 + half - 6;
   const maxX = side === 0 ? NET_X - NET_W / 2 - half + 6 : W - half;
@@ -337,15 +371,15 @@ function aiInput2v2(me, lvlOverride) {
   const onMySide = side === 0 ? ball.x < NET_X : ball.x > NET_X;
   const mate = activeBlobs.find(b => b !== me && b.side === side);
 
-  // erreur de placement renouvelée régulièrement (seedée → déterministe)
   if (me._aiT === undefined) { me._aiT = 0; me._aiErr = 0; }
-  if (--me._aiT <= 0) { me._aiErr = (rng() - 0.5) * 2 * lvl.err; me._aiT = 40; }
+  if (--me._aiT <= 0) {
+    me._aiErr = (rng() - 0.5) * 2 * lvl.err;
+    me._aiT = 45 + Math.floor((1 - lvl.react) * 15);
+  }
 
-  // qui prend la balle : le plus proche du point de chute ; à égalité, l'avant
-  // (dont le camp est le plus proche du filet) couvre les balles proches du filet.
   const land = predictLandingX();
   let chaser = me;
-  if (mate && (onMySide || ball.frozen)) {
+  if (mate && (onMySide || ball.frozen || aiBallLandsMySide(side))) {
     const dMe = Math.abs(land - me.x), dMate = Math.abs(land - mate.x);
     if (dMate < dMe - 4) chaser = mate;
     else if (Math.abs(dMate - dMe) <= 4) {
@@ -361,18 +395,19 @@ function aiInput2v2(me, lvlOverride) {
     targetX = iChase ? (ball.inHands ? me.x : ball.x + back * 6) : me.homeX;
   } else if (GAMEPLAY_V2 && iChase && servingSide === side && ball.serveAimLock && !ball.inHands) {
     targetX = land + back * 4;
-  } else if (onMySide && iChase) {
-    // V2 : anticiper la retombée ; blend ball.x seulement en fin de chute
+  } else if ((onMySide || aiBallLandsMySide(side)) && iChase) {
     if (GAMEPLAY_V2) {
-      targetX = land + back * 3 + me._aiErr * 0.2;
-      if (ball.vy > 1.2 && ball.y > GROUND_Y - 180) {
-        targetX = land * 0.4 + ball.x * 0.6 + back * 3 + me._aiErr * 0.12;
+      const errScale = 0.12 + (1 - lvl.react) * 0.2;
+      targetX = land + back * 3 + me._aiErr * errScale;
+      if (ball.vy > 0.8 && ball.y > GROUND_Y - 200) {
+        const blend = 0.35 + lvl.react * 0.25;
+        targetX = land * (1 - blend) + ball.x * blend + back * 3 + me._aiErr * errScale * 0.5;
       }
     } else {
       targetX = land + back * lvl.attack + me._aiErr;
     }
   } else {
-    targetX = me.homeX;                                    // couvrir sa zone
+    targetX = me.homeX;
   }
   targetX = Math.max(minX + 6, Math.min(maxX - 6, targetX));
 
@@ -399,7 +434,6 @@ function aiInput2v2(me, lvlOverride) {
     aiGameplayV2(side, lvl, me, opp, input);
   }
 
-  // technique SUPER : charge partagée par l'équipe (superCharge[side])
   if (!(typeof tutorialMode !== "undefined" && tutorialMode) &&
       iChase && superCharge[side] === 1 && me.superT <= 0 && !ball.frozen && state === "play") {
     const key = charOf(me).key;
@@ -443,4 +477,3 @@ function xToggleLocal() {
 function xInput(idx, blob, raw) {
   return xOn[idx] ? xAI(blob) : raw;
 }
-

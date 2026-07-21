@@ -216,12 +216,10 @@ const AI_LEVELS = [
   // react : anticipation (0=lent, 1=parfait) · dbl : utilise le double saut
   // aim : 1 = place ses frappes LOIN de l'adversaire (drive profond / amorti court)
   // tous les réglages progressent de façon monotone d'un niveau à l'autre
-  // (chacun au moins aussi élevé que le précédent) — un niveau plus dur qui
-  // recule sur un critère se lit comme un oubli, pas comme un choix.
-  { name: "Facile",      speedMul: 0.82, err: 40, jumpDist: 100, rush: 0.25, attack: 8,  react: 0.55, dbl: false, aim: 0 },
-  { name: "Normale",     speedMul: 1.0,  err: 15, jumpDist: 118, rush: 0.5,  attack: 15, react: 0.8,  dbl: true,  aim: 0 },
-  { name: "Difficile",   speedMul: 1.22, err: 3,  jumpDist: 138, rush: 0.85, attack: 24, react: 1.0,  dbl: true,  aim: 1 },
-  { name: "Impitoyable", speedMul: 1.5,  err: 0,  jumpDist: 160, rush: 0.9,  attack: 28, react: 1.0,  dbl: true,  aim: 1 }
+  { name: "Facile",      speedMul: 0.9,  err: 26, jumpDist: 105, rush: 0.22, attack: 10, react: 0.65, dbl: false, aim: 0 },
+  { name: "Normale",     speedMul: 1.08, err: 10, jumpDist: 122, rush: 0.48, attack: 16, react: 0.85, dbl: true,  aim: 0 },
+  { name: "Difficile",   speedMul: 1.3,  err: 2,  jumpDist: 142, rush: 0.82, attack: 24, react: 1.0,  dbl: true,  aim: 1 },
+  { name: "Impitoyable", speedMul: 1.55, err: 0,  jumpDist: 165, rush: 0.92, attack: 28, react: 1.0,  dbl: true,  aim: 1 }
 ];
 let aiLevel = 1;
 let aiErr = 0, aiErrTimer = 0;  // erreur de placement volontaire de l'IA
@@ -303,6 +301,7 @@ class Blob {
     this.prevSuper = false;
     this.prevSmashBtn = false;
     this._jumpEdge = false;
+    this._serveAwaitRelease = false;
     this.lastActiveHitTick = -999;
     this._input = null;
     this.poseAnim = "";      // smash | panic (override sprite)
@@ -355,6 +354,8 @@ class Blob {
     const smashDown = !!(input && input.smash);
     this._smashEdge = smashDown && !this.prevSmashBtn;
     this.prevSmashBtn = smashDown;
+    // Service : dès que X/F est relâché après le lancer, on peut frapper
+    if (this._serveAwaitRelease && !smashDown) this._serveAwaitRelease = false;
 
     const grip = groundGrip(this); // 1 sec, <1 pluie / Hiver Général
 

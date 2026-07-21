@@ -20,7 +20,7 @@ const BLOB_JUMP = -16;
 const DOUBLE_JUMP_MUL = 0.72; // 2e saut : encore utile pour finir un smash
 const BALL_R = 11;
 const HIT_SPEED = 9.2;
-const MAX_BALL_SPEED = 17;     // tête de smash ; les cloches restent ~HOLD_LOB_SPD
+const MAX_BALL_SPEED = 15.5;   // tête de smash ; les cloches restent ~HOLD_LOB_SPD
 const WIN_SCORE = 15;
 const TUTORIAL_WIN_SCORE = 3; // premier à 3 en tutoriel (sans écart obligatoire)
 const MAX_TOUCHES = 3;
@@ -40,7 +40,7 @@ const SHOT_SPEED_SHORT = 9.5;
 const SHOT_SPEED_LONG = 12.5;
 const CHARGE_MAX = 24;         // ≤ 0,4 s de charge
 const CHARGE_SHOW_OPP = 12;    // au-delà, l'arc est visible pour l'adversaire
-const SMASH_MUL = 1.85;        // smash aérien bien plus piquant que la réception
+const SMASH_MUL = 1.68;        // smash piquant, sans missile
 const PASSIVE_SOFT_SPD = 7;
 const HOLD_LOB_SPD = 12.7;     // réception un cran plus franche (smashs restent au-dessus)
 const SERVE_TOSS_SPD = 9.5;
@@ -66,7 +66,7 @@ const BATTLE_NET_DIST = 95;  // distance max des joueurs au filet pour déclench
 const BATTLE_BALL_DIST = 90; // distance max de la balle au filet
 const BATTLE_STUN_T = 52;    // perdant du duel : stun ~0,85 s (ne digue pas)
 // Smash destructeur post-duel : rapide et plongeant vers le fond de cour
-const SMASH_VX = 16.5, SMASH_VY = 11;
+const SMASH_VX = 15.5, SMASH_VY = 10.5;
 
 // --- Mode Bombe ---
 const BOMB_TIME = 600;      // 10 s à 60 Hz : durée de la mèche avant explosion
