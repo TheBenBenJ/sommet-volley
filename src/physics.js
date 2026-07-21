@@ -204,19 +204,22 @@ function forceServeClearsNet(blob) {
   if (ball.y > NET_TOP - 40) ball.y = NET_TOP - 40;
 
   const dist = Math.abs(faceX - ball.x);
-  // Près du filet → cloche très verticale
-  const steep = dist < 100 ? 1.35 : dist < 180 ? 1.2 : dist < 260 ? 1.05 : 0.98;
-  const ang = dir > 0 ? -steep : Math.PI + steep;
-  let spd = Math.max(HOLD_LOB_SPD * 1.15, Math.hypot(ball.vx, ball.vy));
-  const serveCap = MAX_BALL_SPEED * 1.25;
-  for (let n = 0; n < 20; n++) {
+  // Près du filet → cloche très verticale ; on préfère monter l'angle avant la vitesse
+  let steep = dist < 100 ? 1.35 : dist < 180 ? 1.2 : dist < 260 ? 1.05 : 0.98;
+  let spd = Math.max(HOLD_LOB_SPD, Math.hypot(ball.vx, ball.vy));
+  // Plafond service : cloche jouable (indépendant du cap smash)
+  const serveCap = HOLD_LOB_SPD * 1.18;
+  for (let n = 0; n < 24; n++) {
+    const ang = dir > 0 ? -steep : Math.PI + steep;
     ball.vx = Math.cos(ang) * spd;
     ball.vy = Math.sin(ang) * spd;
     ball.aimAngle = ang;
     if (serveArcClearsNet(ball.x, ball.y, ball.vx, ball.vy, dir)) break;
-    spd *= 1.09;
-    if (spd >= serveCap) { spd = serveCap; break; }
+    if (steep < 1.45) steep += 0.04;
+    else spd = Math.min(serveCap, spd * 1.04);
+    if (spd >= serveCap && steep >= 1.45) break;
   }
+  const ang = dir > 0 ? -steep : Math.PI + steep;
   ball.vx = Math.cos(ang) * Math.min(spd, serveCap);
   ball.vy = Math.sin(ang) * Math.min(spd, serveCap);
 }
@@ -244,9 +247,19 @@ function applyDirectedHit(blob, ang, speed, smashTicks) {
   ball.frozen = false;
   ball.smash = smashTicks || 0;
   clearBallHold();
+  // Garde le point de contact (pas de téléport « collé aux mains ») :
+  // on ne sépare que si la balle chevauche encore la hitbox.
   const h = blob.headCircle;
-  ball.x = h.x + Math.cos(ang) * (BALL_R + h.r + 2);
-  ball.y = h.y + Math.sin(ang) * (BALL_R + h.r + 2);
+  const dx = ball.x - h.x, dy = ball.y - h.y;
+  const dist = Math.hypot(dx, dy);
+  const minSep = BALL_R + h.r + 1;
+  if (dist > 0.001 && dist < minSep) {
+    ball.x = h.x + (dx / dist) * minSep;
+    ball.y = h.y + (dy / dist) * minSep;
+  } else if (dist <= 0.001) {
+    ball.x = h.x + Math.cos(ang) * minSep;
+    ball.y = h.y + Math.sin(ang) * minSep;
+  }
   clampBallSpeed();
   registerTouch(blob);
   if (blob.side === servingSide && ball.serveAimLock) {
@@ -417,6 +430,7 @@ function trySmashBall(blob) {
     ? aimLobAngleFromInput(blob, blob._input)
     : aimAngleFromInput(blob, blob._input);
   const pow = blob.kitPower != null ? blob.kitPower : charOf(blob).power;
+  // Smash plein pot (réception / service restent sur HOLD_LOB_SPD)
   const spd = serving
     ? HOLD_LOB_SPD * 1.05
     : HIT_SPEED * pow * SMASH_MUL;
@@ -525,10 +539,10 @@ function collideCircle(c, blob, isHead) {
   // repousser la balle hors du cercle
   ball.x = c.x + nx * minDist;
   ball.y = c.y + ny * minDist;
-  // vitesse de frappe : direction normale * puissance du personnage + mouvement du joueur
-  const hs = HIT_SPEED * a.power;
+  // vitesse de frappe : direction normale * puissance (échelle douce) + mouvement
+  const hs = HIT_SPEED * (0.7 + a.power * 0.25);
   ball.vx = nx * hs + blob.vx * 0.55;
-  ball.vy = ny * hs + blob.vy * 0.35 - 2.5;
+  ball.vy = ny * hs + blob.vy * 0.35 - 2.0;
 
   // défaut de contrôle de base : légère déviation aléatoire (seedée).
   const baseSpread = (1 - a.control) * 0.6;
@@ -556,12 +570,12 @@ function applyHitExtras(blob, a) {
     spawnBoom(ball.x, ball.y);
     heavy = true;
   }
-  heavy = heavy || Math.hypot(ball.vx, ball.vy) > 11.5 ||
+  heavy = heavy || Math.hypot(ball.vx, ball.vy) > 10.5 ||
     (blob.poseAnim === "smash" && blob.poseT > 0);
   if (heavy) sfxBallSmash();
   else sfxBallHit();
   charHitSound(a, heavy);
-  if (Math.hypot(ball.vx, ball.vy) > 12) shake = Math.min(shake + 4, 9);
+  if (Math.hypot(ball.vx, ball.vy) > 11.5) shake = Math.min(shake + 4, 9);
 }
 
 function ballBlobCollision(blob) {

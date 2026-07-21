@@ -43,7 +43,7 @@ const CHARACTERS = [
     egoCharge: true, slip: true,
     trait: "Ego en béton : la jauge SUPER monte aussi quand il perd un point.",
     superName: "Le Mur",
-    superDesc: "Mur doré au milieu du camp adverse ~5 s : bloque les courses au sol. Visuel : colonne d’or lumineuse + halo au pied du mur."
+    superDesc: "Mur doré au milieu du camp adverse ~5 s : bloque les courses au sol (sauter par-dessus pour passer). Visuel : colonne d’or lumineuse + halo au pied du mur."
   },
   {
     key: "micron", name: "Manu Micron",
@@ -429,13 +429,20 @@ class Blob {
     const half = 34;
     let minX = this.side === 0 ? half : NET_X + NET_W / 2 + half - 6;
     let maxX = this.side === 0 ? NET_X - NET_W / 2 - half + 6 : W - half;
-    // Le Mur (Trompette) : bloque au sol le milieu du camp adverse
+    // Le Mur (Trompette / Panda / Jair) : barrière one-way au sol.
+    // On se base sur la position AVANT le pas : si on était derrière, on ne
+    // traverse pas en marchant ; si on a déjà sauté de l’autre côté, on ne
+    // reclame pas (pas de téléport à l’atterrissage).
     if (this.onGround && typeof hasSuperEffect === "function") {
       const wall = hasSuperEffect("wall", this.side);
       if (wall) {
         const wallX = this.side === 0 ? NET_X * 0.48 : NET_X + (W - NET_X) * 0.52;
-        if (this.side === 0) maxX = Math.min(maxX, wallX);
-        else minX = Math.max(minX, wallX);
+        const prevX = this.x - moveVx;
+        if (this.side === 0) {
+          if (prevX <= wallX) maxX = Math.min(maxX, wallX);
+        } else if (prevX >= wallX) {
+          minX = Math.max(minX, wallX);
+        }
       }
     }
     if (this.x <= minX || this.x >= maxX) this.dispVx = 0;

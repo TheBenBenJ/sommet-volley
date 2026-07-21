@@ -13,16 +13,14 @@ const NET_X = W / 2;
 const NET_W = 10;
 const NET_TOP = GROUND_Y - 185;
 
-const GRAV_BALL = 0.22;
+const GRAV_BALL = 0.25;
 const GRAV_BLOB = 0.65;
 const BLOB_SPEED = 5.2;
-// Saut assez haut pour smash au-dessus du filet (NET_TOP = GROUND_Y - 190).
-// ~-17 → perso moyen : pieds au-dessus du filet.
-const BLOB_JUMP = -17;
+const BLOB_JUMP = -16;
 const DOUBLE_JUMP_MUL = 0.72; // 2e saut : encore utile pour finir un smash
 const BALL_R = 11;
-const HIT_SPEED = 10.5;
-const MAX_BALL_SPEED = 15;
+const HIT_SPEED = 9.2;
+const MAX_BALL_SPEED = 17;     // tête de smash ; les cloches restent ~HOLD_LOB_SPD
 const WIN_SCORE = 15;
 const TUTORIAL_WIN_SCORE = 3; // premier à 3 en tutoriel (sans écart obligatoire)
 const MAX_TOUCHES = 3;
@@ -32,20 +30,20 @@ const TOUCH_COOLDOWN = 12;   // ticks mini entre deux touches comptées (anti do
 // --- Gameplay V2 (réception / tir dirigé / smash) — voir docs/GAMEPLAY-V2.md ---
 // Toggle runtime : touche ` (Backquote) hors saisie de code.
 let GAMEPLAY_V2 = true;
-const RECEIVE_R = 64;          // smash/X + cloche intentionnelle (fenêtre un peu généreuse)
+const RECEIVE_R = 56;          // smash/X + cloche : assez large, sans « aimant » trop fort
 const AUTO_LOB_DX = 28;        // auto-cloche : balle quasi au-dessus du joueur
 const AUTO_LOB_R = 42;         // auto-cloche : rayon path tête (balle qui tombe dessus)
 const HOLD_MAX = 45;           // ~0,75 s de contrôle
 const HOLD_SPEED_MUL = 0.6;    // vitesse du porteur pendant le contrôle
 const AIM_CONE = (150 * Math.PI) / 180;
-const SHOT_SPEED_SHORT = 11;
-const SHOT_SPEED_LONG = 14;
+const SHOT_SPEED_SHORT = 9.5;
+const SHOT_SPEED_LONG = 12.5;
 const CHARGE_MAX = 24;         // ≤ 0,4 s de charge
 const CHARGE_SHOW_OPP = 12;    // au-delà, l'arc est visible pour l'adversaire
-const SMASH_MUL = 1.6;
-const PASSIVE_SOFT_SPD = 7.5;  // renvoi mou → petite cloche vers l'adversaire
-const HOLD_LOB_SPD = 12.8;     // cloche de réception : doit passer le filet depuis le fond
-const SERVE_TOSS_SPD = 10.5;   // lancer vertical au service (vraiment vers le haut)
+const SMASH_MUL = 1.85;        // smash aérien bien plus piquant que la réception
+const PASSIVE_SOFT_SPD = 7;
+const HOLD_LOB_SPD = 12.7;     // réception un cran plus franche (smashs restent au-dessus)
+const SERVE_TOSS_SPD = 9.5;
 const SERVE_TOSS_GRACE = 10;   // ticks sans re-touche serveur juste après le lancer
 const ACTIVE_HIT_COOLDOWN = 16; // anti multi-frappe si on maintient le bouton
 
@@ -68,7 +66,7 @@ const BATTLE_NET_DIST = 95;  // distance max des joueurs au filet pour déclench
 const BATTLE_BALL_DIST = 90; // distance max de la balle au filet
 const BATTLE_STUN_T = 52;    // perdant du duel : stun ~0,85 s (ne digue pas)
 // Smash destructeur post-duel : rapide et plongeant vers le fond de cour
-const SMASH_VX = 16, SMASH_VY = 11;
+const SMASH_VX = 16.5, SMASH_VY = 11;
 
 // --- Mode Bombe ---
 const BOMB_TIME = 600;      // 10 s à 60 Hz : durée de la mèche avant explosion

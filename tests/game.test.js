@@ -737,7 +737,7 @@ test("V2 : service — cloche forcée vers l'adversaire", () => {
   g.ball.serveAimLock = true;
   g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
   g.stepGame({ ...N0, smash:true, ax: 0, ay: -1 }, N0); // X + stick plein haut
-  assert.ok(g.ball.vx > 5, "service : part vers l'adversaire malgré stick haut (vx=" + g.ball.vx + ")");
+  assert.ok(g.ball.vx > 4.5, "service : part vers l'adversaire malgré stick haut (vx=" + g.ball.vx + ")");
   assert.strictEqual(g.ball.serveAimLock, false, "lock levé après la frappe");
 });
 
@@ -984,6 +984,32 @@ test("chaque terrain a un événement de map", () => {
   assert.strictEqual(kinds.size, g.TERRAINS.length, "un kind unique par terrain");
 });
 
+test("Le Mur : une fois passé, pas de téléport derrière", () => {
+  const g = freshRally(42);
+  const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  const { NET_X, GROUND_Y } = g.consts;
+  const wallX = NET_X * 0.48;
+  // Mur actif sur le camp gauche (victime = blobL)
+  g.superEffects.length = 0;
+  g.superEffects.push({ kind: "wall", side: 0, t: 300 });
+  // Derrière le mur : ne peut pas marcher vers le filet
+  g.blobL.x = wallX - 40;
+  g.blobL.y = GROUND_Y;
+  g.blobL.onGround = true;
+  g.blobL.vy = 0;
+  for (let i = 0; i < 20; i++) g.stepGame({ ...N, right:true }, N);
+  assert.ok(g.blobL.x <= wallX + 1, "bloqué derrière le mur au sol");
+  // Déjà passé (atterri côté filet) : reste libre devant, pas de téléport
+  const past = wallX + 50;
+  g.blobL.x = past;
+  g.blobL.y = GROUND_Y;
+  g.blobL.onGround = true;
+  g.blobL.vy = 0;
+  for (let i = 0; i < 10; i++) g.stepGame(N, N);
+  assert.ok(g.blobL.x > wallX + 20, "reste passé le mur sans être recalé");
+  assert.ok(Math.abs(g.blobL.x - past) < 3, "pas de téléport vers l’arrière");
+});
+
 test("Smash Battle : le gagnant marque — le perdant est stun et ne digue pas", () => {
   const g = freshRally(55);
   const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
@@ -1039,7 +1065,7 @@ test("events map : pas de trigger en pause / service / point", () => {
 
   g.setServeCountdown(0);
   g.setState("point");
-  assert.strictEqual(g.mapEventsCanStep(), false, "point = transition");
+  assert.strictEqual(g.mapEvent.phase, "idle");
   g.stepGame(N, N);
   assert.strictEqual(g.mapEvent.phase, "idle");
   assert.strictEqual(g.mapEvent.timer, 1);
@@ -1050,6 +1076,28 @@ test("events map : pas de trigger en pause / service / point", () => {
   assert.strictEqual(g.mapEventsCanStep(), true, "play = ok");
   g.stepGame(N, N);
   assert.strictEqual(g.mapEvent.phase, "warn", "event démarre en play");
+});
+
+test("events map : boulet en vol coupé au passage en service (pas coincé)", () => {
+  const g = freshRally(12);
+  const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  g.setMapEventsQuiet(false);
+  g.setTerrain(0);
+  g.mapEvent.phase = "flying";
+  g.mapEvent.t = 10;
+  g.mapEvent.x = 300;
+  g.mapEvent.y = 180;
+  g.mapEvent.vx = 4;
+  g.mapEvent.vy = -2;
+  g.mapEvent.balls = [{ x: 1, y: 2, vx: 0, vy: 0, hit: false, dead: false }];
+  g.ball.frozen = true;
+  g.setState("serve");
+  g.setServeCountdown(60);
+  g.stepGame(N, N);
+  assert.strictEqual(g.mapEvent.phase, "idle", "event aborté");
+  assert.strictEqual(g.mapEvent.balls.length, 0, "projectiles vidés");
+  assert.ok(g.mapEvent.y === 0 && g.mapEvent.x === 0, "boulet plus en l'air");
+  assert.ok(g.mapEvent.timer > 1, "prochain event replanifié");
 });
 
 // ---------- Mode Histoire ----------

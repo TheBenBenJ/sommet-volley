@@ -77,8 +77,10 @@ suivants (Kim, Boris, Silvio, Angela…) — chacun via la même fiche.
   qui punit sans prévenir.
 - **Déterministes** : déclenchés par le rng seedé de la partie (compatibles
   netcode et replays), jamais par `Math.random()`.
-- **Uniquement pendant un échange jouable** : pas pendant pause, écran de
-  service, célébration de point, ni Smash Battle (`mapEventsCanStep`).
+- **Uniquement pendant un échange jouable** : pas de *nouveau* trigger pendant
+  pause, écran de service, célébration de point, ni Smash Battle
+  (`mapEventsCanStep`). Un event déjà lancé est **coupé proprement** (pas de
+  boulet / props figés à l'écran).
 - Fréquence faible (1 événement / 20–40 s) pour rester un twist, pas le cœur
   du jeu. Désactivables dans les options de partie (« terrain calme »).
 - Specs prompts / props : [`PIPELINE-MAP.md`](PIPELINE-MAP.md) +

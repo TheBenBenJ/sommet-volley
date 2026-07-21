@@ -564,17 +564,26 @@ function drawMenuWorld() {
   weather = "clear";
   drawBackground();
   drawNet();
-  // ballon déco (pas la balle de jeu)
+  // ballon déco = vrai sprite de jeu (pas un cercle canvas)
   {
     const bx = menuBg.ballX, by = menuBg.ballY;
-    ctx.save();
+    const shScale = Math.max(0.35, 1 - (GROUND_Y - by) / 400);
+    ctx.fillStyle = "rgba(0,0,0," + (0.22 * shScale) + ")";
     ctx.beginPath();
-    ctx.arc(bx, by, BALL_R * 0.95, 0, Math.PI * 2);
-    const g = ctx.createRadialGradient(bx - 4, by - 5, 2, bx, by, BALL_R);
-    g.addColorStop(0, "#fff6c8");
-    g.addColorStop(1, "#f0a020");
-    ctx.fillStyle = g; ctx.fill();
-    ctx.strokeStyle = UI.stroke; ctx.lineWidth = 2.5; ctx.stroke();
+    ctx.ellipse(bx, GROUND_Y + 6, BALL_R * shScale + 4, 5 * shScale + 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.save();
+    ctx.translate(bx, by);
+    // légère rotation liée au rebond
+    ctx.rotate((menuBg.ballVy || 0) * 0.08 + performance.now() / 900);
+    const spr = typeof SPRITES !== "undefined" ? SPRITES.ballPurple : null;
+    if (typeof spriteReady === "function" && spriteReady(spr)) {
+      const d = BALL_R * 2.15;
+      ctx.drawImage(spr, -d / 2, -d / 2, d, d);
+    } else {
+      ctx.fillStyle = "#c9a0ff";
+      ctx.beginPath(); ctx.arc(0, 0, BALL_R, 0, Math.PI * 2); ctx.fill();
+    }
     ctx.restore();
   }
   if (menuActors.L) drawCharacter(menuActors.L);

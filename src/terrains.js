@@ -601,6 +601,12 @@ function mapEventWarnPack(kind) {
   return null;
 }
 
+/** Icône d'annonce unique : celle de la map française (Micron), lisible partout. */
+function mapEventWarnIcon() {
+  const fr = SPRITES.mapMicron;
+  return (fr && spriteReady(fr.warn)) ? fr.warn : null;
+}
+
 function drawMapEventRainProp(kind, x, y, vx) {
   if (kind === "cart") { drawGolfBall(x, y); return; }
   const pack = mapEventWarnPack(kind);
@@ -663,12 +669,10 @@ function drawMapEventOverlay() {
     ctx.globalAlpha = pulse;
     ctx.translate(wx, wy);
     ctx.scale(scale, scale);
-    if (pWarn && spriteReady(pWarn.warn)) {
+    const warnImg = mapEventWarnIcon();
+    if (warnImg) {
       const wh = 42;
-      ctx.drawImage(pWarn.warn, -wh / 2, -wh, wh, wh);
-    } else if (kind === "march" && pWarn && spriteReady(pWarn.whistle)) {
-      const wh = 36;
-      ctx.drawImage(pWarn.whistle, -wh / 2, -wh, wh, wh);
+      ctx.drawImage(warnImg, -wh / 2, -wh, wh, wh);
     } else {
       ctx.fillStyle = showZone ? "#ff9800" : "#e53935";
       ctx.beginPath();
@@ -752,12 +756,13 @@ function drawEventDangerZone(zx, zw, t, pWarn) {
   ctx.ellipse(zx, cy, rx, ry, 0, 0, Math.PI * 2);
   ctx.stroke();
 
-  // petit warn flottant au centre
+  // petit warn flottant au centre (toujours l'icône FR)
   const bob = Math.sin(t * 0.35) * 3;
-  if (pWarn && spriteReady(pWarn.warn)) {
+  const warnImg = mapEventWarnIcon();
+  if (warnImg) {
     const wh = 28;
     ctx.globalAlpha = 0.85 * pulse;
-    ctx.drawImage(pWarn.warn, zx - wh / 2, cy - ry - wh - 4 + bob, wh, wh);
+    ctx.drawImage(warnImg, zx - wh / 2, cy - ry - wh - 4 + bob, wh, wh);
     ctx.globalAlpha = 1;
   } else {
     ctx.fillStyle = "rgba(255,193,7," + (0.9 * pulse).toFixed(2) + ")";

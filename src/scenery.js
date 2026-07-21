@@ -576,20 +576,24 @@ function stepMapMacawEvent() {
   if (mapEvent.t > MAP_MACAW_T && alive === 0) scheduleNextMapEvent();
 }
 
+/** Coupe un event en cours (warn/fire/flying) sans laisser props coincées à l'écran. */
+function abortMapEventInFlight() {
+  if (mapEvent.phase === "idle") return;
+  scheduleNextMapEvent();
+}
+
 function stepMapEvent() {
   if (mapEventsQuiet || !mapEventActiveTerrain()) {
-    if (mapEvent.phase !== "idle") {
-      mapEvent.phase = "idle";
-      mapEvent.t = 0;
-      mapEvent.hit = false;
-      mapEvent.balls = [];
-      if (mapEvent.cartX < 0 || mapEvent.cartX > W) mapEvent.cartX = W * 0.5;
-    }
+    if (mapEvent.phase !== "idle") abortMapEventInFlight();
     if (mapEventsCanStep()) stepCartIdleMotion();
     return;
   }
-  // Pause / point / service / duel : on fige (pas de nouveau trigger, pas d'avance)
-  if (!mapEventsCanStep()) return;
+  // Pause / point / service / duel : pas de NOUVEAU trigger, et on coupe
+  // tout event déjà lancé (sinon boulet / lanternes figés au service).
+  if (!mapEventsCanStep()) {
+    abortMapEventInFlight();
+    return;
+  }
 
   const kind = mapEventKind();
 
