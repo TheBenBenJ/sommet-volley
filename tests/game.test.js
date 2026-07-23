@@ -1396,6 +1396,53 @@ test("campagne : chapitres cohérents (persos, terrain, mode, dopage, dialogues)
   });
 });
 
+test("campagnes par personnage : 10 campagnes, chacune = les 9 rivaux, format valide", () => {
+  const g = loadGame();
+  assert.ok(g.STORY_BY_CHAR, "STORY_BY_CHAR chargé (src/story-campaigns.js)");
+  assert.ok(Array.isArray(g.STORY_CAMPAIGNS), "STORY_CAMPAIGNS présent");
+  // 1 campagne curée + 10 par personnage
+  assert.strictEqual(g.STORY_CAMPAIGNS.length, 11, "sommet + 10 persos");
+  const keys = g.CHARACTERS.map(c => c.key);
+  const keySet = new Set(keys);
+  for (const key of keys) {
+    const camp = g.STORY_BY_CHAR[key];
+    assert.ok(Array.isArray(camp) && camp.length === 9, key + " : 9 rencontres");
+    const rivals = camp.map(c => c.right).sort();
+    const expected = keys.filter(k => k !== key).sort();
+    assert.deepStrictEqual(rivals, expected, key + " : affronte exactement ses 9 rivaux");
+    camp.forEach((ch, i) => {
+      assert.strictEqual(ch.left, key, key + "[" + i + "] left doit être le protagoniste");
+      assert.ok(keySet.has(ch.right) && ch.right !== key, key + "[" + i + "] rival valide");
+      assert.ok(ch.terrain >= 0 && ch.terrain < g.TERRAINS.length, key + "[" + i + "] terrain hors bornes");
+      assert.ok(ch.mode === "volley" || ch.mode === "bomb", key + "[" + i + "] mode invalide");
+      assert.ok(ch.doped === null || ch.doped === "R", key + "[" + i + "] seul l'adversaire (R) est dopé");
+      for (const phase of ["pre", "win", "lose"]) {
+        assert.ok(Array.isArray(ch[phase]) && ch[phase].length > 0, key + "[" + i + "] " + phase + " vide");
+        for (const line of ch[phase]) {
+          assert.ok(typeof line.t === "string" && line.t.length > 0, key + "[" + i + "] réplique vide");
+          assert.ok(line.s === "narrator" || keySet.has(line.s), key + "[" + i + "] locuteur inconnu: " + line.s);
+        }
+      }
+    });
+  }
+});
+
+test("storySelectCampaign : bascule STORY sur la campagne du perso + progression dédiée", () => {
+  const g = loadGame();
+  if (!g.storySelectCampaign) return; // pas de campagnes par perso → skip
+  // index 1 = 1re campagne perso (ordre roster) ; STORY doit pointer dessus
+  g.storySelectCampaign(1);
+  const story = g.getSTORY();
+  const heroKey = g.CHARACTERS[0].key; // roster[0] = 1re campagne perso
+  assert.ok(story.every(ch => ch.left === heroKey), "tous les chapitres pilotés par le héros");
+  assert.strictEqual(g.getState(), "storyMenu", "sélection → hub");
+  // lancer le 1er match utilise bien la campagne active
+  g.setStoryChapter(0);
+  g.storyStartMatch();
+  assert.strictEqual(g.blobL.charId, g.storyCharIdx(story[0].left), "protagoniste à gauche");
+  assert.strictEqual(g.blobR.charId, g.storyCharIdx(story[0].right), "rival à droite");
+});
+
 test("story : le premier chapitre est débloqué, les suivants verrouillés", () => {
   const g = loadGame();
   g.setStoryProgress({ unlocked: 0, completed: [] });

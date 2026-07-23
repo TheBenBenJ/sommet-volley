@@ -114,6 +114,7 @@ function render() {
   if (state === "connecting") { drawNetScreen("Connexion", "Recherche de la partie"); return; }
   if (state === "netWait") { drawNetScreen("Tu joues à droite", "En attente du lancement par l'hôte"); return; }
   if (state === "netError") { drawNetError(); return; }
+  if (state === "storySelect") { drawStorySelect(); return; }
   if (state === "storyMenu") { drawStoryHub(); return; }
   if (state === "storyActIntro") { drawStoryActIntro(); return; }
   if (state === "storyScene") { drawStoryScene(); return; }

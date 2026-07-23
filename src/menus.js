@@ -11,7 +11,7 @@ function handleMenuKeys(code, key) {
   // (c'était le « je remplis le code et rien ne se passe » des claviers à pavé)
 
   // Mode Histoire : hub, dialogues, cartes d'acte et écran de fin absorbent les touches en amont.
-  if ((state === "storyMenu" || state === "storyScene" || state === "storyActIntro" || state === "storyEnding") &&
+  if ((state === "storySelect" || state === "storyMenu" || state === "storyScene" || state === "storyActIntro" || state === "storyEnding") &&
       typeof storyHandleKeys === "function") {
     if (storyHandleKeys(code)) return;
   }

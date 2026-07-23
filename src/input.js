@@ -275,7 +275,7 @@ function handlePadMenu() {
     }
     if (padEdge("confirm")) { const c = opts[navIdx]; navIdx = 0; handleMenuKeys(c, ""); return; }
     if (padEdge("back")) { navIdx = 0; handleMenuKeys("Escape", ""); }
-  } else if (state === "storyMenu") {
+  } else if (state === "storyMenu" || state === "storySelect") {
     if (padEdge("down")) handleMenuKeys("ArrowDown", "");
     if (padEdge("up")) handleMenuKeys("ArrowUp", "");
     if (padEdge("confirm")) handleMenuKeys("Enter", "");

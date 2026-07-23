@@ -86,22 +86,22 @@ Sous la vanne, il y a un joueur redoutable. Rustre, oui. Imprévisible, oui. Mai
 
 // ===================== ACTE II — Affaires, soja et méfiance (Volley musclé) =====================
 {
-  act: 2, title: "Le soja et le drapeau rouge", sub: "Tropicalia–Panguo · le partenaire qu'on insulte",
-  left: "jair", right: "panda", terrain: 4, mode: "volley", ai: 2, doped: null,
+  act: 2, title: "L'engrais et l'ours", sub: "Tropicalia–Bourassie · le fournisseur qu'on admire",
+  left: "jair", right: "vladou", terrain: 0, mode: "volley", ai: 2, doped: null,
   pre: [
-    { s: "narrator", t: "Cité du Matin, murs cramoisis et toits d'or. Le meilleur client de la Grande Forêt est aussi son ennemi idéologique préféré. Le business, lui, ne cligne pas des yeux." },
-    { s: "panda", t: "Tu m'insultes le jour, tu me vends ton soja la nuit. L'harmonie apprécie la constance, Capitaine. Toi, tu n'en as aucune." },
-    { s: "jair", t: "C'est ça le génie tropical, Timonier : je te traite de tous les noms ET je te livre à l'heure. Deux mains, deux métiers." },
-    { s: "panda", t: "Je contrôle le tempo du commerce mondial. Tes cargos partent quand je le décide. Sers doucement." },
-    { s: "jair", t: "Cause toujours du tempo. Moi je plante un mur, ton tempo il se prend un tronc dans les dents. On y va." }
+    { s: "narrator", t: "Place Écarlate, neige et briques cramoisies. Sans les sacs d'engrais du Tsar, la Grande Forêt ne pousse plus. Le Capitaine est venu payer sa dette — sans jamais le dire." },
+    { s: "vladou", t: "Tu ne jures que par ta liberté, Capitaine, mais c'est mon engrais qui fait pousser ton soja. L'hiver travaille pour moi ; ta terre aussi." },
+    { s: "jair", t: "T'es un dur, Tsar, ça je respecte. Deux vrais mâles alpha sur un terrain gelé. Mais mes bûches, elles gèlent pas, elles ÉCRASENT." },
+    { s: "vladou", t: "Le respect ne renvoie pas le ballon. Je vais geler ton camp, planter du givre entre tes troncs. Sers, et compte tes doigts." },
+    { s: "jair", t: "Geler la forêt tropicale ? Bonne chance mon frère. Ici on transpire même sous ton blizzard. On y va !" }
   ],
   win: [
-    { s: "jair", t: "Battu le grand patron avec mes propres bûches ! Et t'inquiète, je te livre le bois demain matin. Facturé." },
-    { s: "panda", t: "Un revers commercial. Temporaire. Tu reviendras vendre — on revient toujours à l'atelier. Je patiente." }
+    { s: "jair", t: "Fait tomber l'ours dans sa propre neige ! Et t'inquiète, je reprends une palette d'engrais la semaine pro. Entre durs, ça se paie." },
+    { s: "vladou", t: "Une défaite. Le froid n'a pas de rancune, il a de la mémoire. Tu reviendras acheter — tu reviens toujours." }
   ],
   lose: [
-    { s: "panda", t: "La patience broie l'agitation, même la plus bruyante. Range ta tronçonneuse et signe le contrat." },
-    { s: "jair", t: "Volé par un mur au milieu de MON camp ! Le communiste m'a fait le coup de la muraille. Vicieux, l'animal." }
+    { s: "vladou", t: "L'Hiver Général ne négocie pas, Capitaine. Ta jungle bruyante s'est figée d'un coup. Rentre te réchauffer." },
+    { s: "jair", t: "Gelé par le Tsar sur sa banquise ! Bon… au moins j'ai perdu contre un vrai dur. Ça compte, ça, non ?" }
   ]
 },
 {

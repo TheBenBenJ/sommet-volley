@@ -36,7 +36,12 @@ function storyCharName(key) {
 //   doped      : null | "R" (adversaire dopé → impitoyable + aura rouge)
 //   pre        : dialogue d'avant-match [{s:cléPerso|"narrator", t:"texte"}]
 //   win / lose : dialogue d'après-match selon le résultat du joueur
-const STORY = [
+//
+// Campagne « curée » d'origine (Les Jeux du Sommet). Les campagnes PAR PERSONNAGE
+// (le protagoniste affronte ses 9 rivaux) vivent dans STORY_BY_CHAR (généré depuis
+// docs/histoires/<key>.md → src/story-campaigns.js). `STORY` pointe sur la campagne
+// active choisie à l'écran de sélection.
+const STORY_SOMMET = [
   // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
     act: 1, title: "La poignée de main", sub: "Relation transatlantique · OTAN",
@@ -215,17 +220,47 @@ const STORY = [
   }
 ];
 
+// ---------- Registre des campagnes (sélection par personnage) ----------
+// La campagne curée + une campagne par personnage (si story-campaigns.js chargé).
+// Chaque entrée : { key, name, sub, chapters }.
+const STORY_CAMPAIGNS = (function () {
+  const list = [{
+    key: "sommet",
+    name: "Les Jeux du Sommet",
+    sub: "La campagne originale · 9 chapitres croisés",
+    chapters: STORY_SOMMET
+  }];
+  if (typeof STORY_BY_CHAR !== "undefined" && STORY_BY_CHAR) {
+    // ordre du roster CHARACTERS pour la cohérence d'affichage
+    const order = (typeof CHARACTERS !== "undefined")
+      ? CHARACTERS.map(c => c.key)
+      : Object.keys(STORY_BY_CHAR);
+    for (const key of order) {
+      const chapters = STORY_BY_CHAR[key];
+      if (!Array.isArray(chapters) || !chapters.length) continue;
+      const nm = (typeof CHARACTERS !== "undefined")
+        ? (CHARACTERS.find(c => c.key === key) || {}).name || key : key;
+      list.push({ key: "char:" + key, name: nm, sub: "9 rivaux · du volley amical au duel-bombe", chapters });
+    }
+  }
+  return list;
+})();
+
+// Campagne active : `STORY` pointe sur ses chapitres. Défaut = campagne curée.
+let storyCampaign = STORY_CAMPAIGNS[0];
+let STORY = storyCampaign.chapters;
+
 // ---------- Métadonnées des actes (cartes d'intro) ----------
 const ACT_META = [
   null,
   { num: "I",   title: "Petites rivalités",
-    tagline: "Le monde sourit encore. On règle ses comptes au filet, entre alliés.",
+    tagline: "Le monde sourit encore. On règle ses comptes au filet, entre rivaux.",
     color: "#3eb5ff" },
-  { num: "II",  title: "Le froid revient",
+  { num: "II",  title: "Les tensions montent",
     tagline: "Le ballon devient bombe. Les sourires tombent. Le premier se dope.",
     color: "#9ec9ff" },
-  { num: "III", title: "Jeux impitoyables",
-    tagline: "Seringues, bannières neutres, veines saillantes. Sauve l'esprit des Jeux.",
+  { num: "III", title: "Conflits ouverts",
+    tagline: "Seringues, veines saillantes, grands duels. Renverse tous tes rivaux.",
     color: "#ff5a4d" }
 ];
 
@@ -255,25 +290,74 @@ let storySceneFrame = 0;     // compteur de frames (typewriter, cosmétique)
 
 const STORY_KEY = "sommetStoryProgress";
 let storyProgress = { unlocked: 0, completed: [] };
+let storyAllProgress = null; // { [campaignKey]: {unlocked, completed[]} }
 
-function storyLoadProgress() {
+// Lit le blob localStorage complet (toutes campagnes) une seule fois.
+function storyReadAll() {
+  if (storyAllProgress) return storyAllProgress;
+  storyAllProgress = {};
   try {
     const raw = localStorage.getItem(STORY_KEY);
     if (raw) {
       const p = JSON.parse(raw);
-      storyProgress.unlocked = Math.max(0, Math.min(STORY.length - 1, p.unlocked | 0));
-      storyProgress.completed = Array.isArray(p.completed) ? p.completed.slice(0, STORY.length) : [];
+      // Rétro-compat : ancien format = { unlocked, completed } (campagne « sommet »).
+      if (p && (Array.isArray(p.completed) || typeof p.unlocked === "number") && !p.byCampaign) {
+        storyAllProgress.sommet = { unlocked: p.unlocked | 0, completed: Array.isArray(p.completed) ? p.completed : [] };
+      } else if (p && p.byCampaign) {
+        storyAllProgress = p.byCampaign;
+      }
     }
-  } catch (e) { storyProgress = { unlocked: 0, completed: [] }; }
+  } catch (e) { storyAllProgress = {}; }
+  return storyAllProgress;
+}
+
+// Charge la progression de la campagne active (storyCampaign.key).
+function storyLoadProgress() {
+  const all = storyReadAll();
+  const key = storyCampaign ? storyCampaign.key : "sommet";
+  const p = all[key] || { unlocked: 0, completed: [] };
+  storyProgress = {
+    unlocked: Math.max(0, Math.min(STORY.length - 1, p.unlocked | 0)),
+    completed: Array.isArray(p.completed) ? p.completed.slice(0, STORY.length) : []
+  };
 }
 function storySaveProgress() {
-  try { localStorage.setItem(STORY_KEY, JSON.stringify(storyProgress)); } catch (e) {}
+  const all = storyReadAll();
+  const key = storyCampaign ? storyCampaign.key : "sommet";
+  all[key] = { unlocked: storyProgress.unlocked, completed: storyProgress.completed };
+  try { localStorage.setItem(STORY_KEY, JSON.stringify({ byCampaign: all })); } catch (e) {}
+}
+// Nb de chapitres terminés d'une campagne donnée (pour l'écran de sélection).
+function storyCampaignDone(campaignKey, total) {
+  const all = storyReadAll();
+  const p = all[campaignKey];
+  if (!p || !Array.isArray(p.completed)) return 0;
+  let n = 0; for (let i = 0; i < total; i++) if (p.completed[i]) n++;
+  return n;
 }
 function storyIsUnlocked(i) { return i <= storyProgress.unlocked; }
 function storyIsDone(i) { return !!storyProgress.completed[i]; }
 
 // ---------- Entrée / navigation ----------
+let storySelIdx = 0; // curseur de l'écran de sélection de campagne
+
+// Ouvre le mode Histoire : écran de sélection de campagne (sommet + par perso).
+// S'il n'y a qu'une campagne (story-campaigns.js absent), on va direct au hub.
 function storyOpen() {
+  storyActive = true;
+  storyInMatch = false;
+  storyScene = null;
+  if (STORY_CAMPAIGNS.length <= 1) { storySelectCampaign(0); return; }
+  storySelIdx = Math.max(0, Math.min(STORY_CAMPAIGNS.length - 1, storySelIdx));
+  navIdx = storySelIdx;
+  state = "storySelect";
+}
+
+// Choisit une campagne : `STORY` pointe dessus, on charge sa progression, hub.
+function storySelectCampaign(i) {
+  if (i < 0 || i >= STORY_CAMPAIGNS.length) return;
+  storyCampaign = STORY_CAMPAIGNS[i];
+  STORY = storyCampaign.chapters;
   storyLoadProgress();
   storyActive = true;
   storyInMatch = false;
@@ -403,8 +487,16 @@ function storyOnMatchEnd() {
 // ---------- Clavier / manette ----------
 // Renvoie true si la touche a été consommée par le mode histoire.
 function storyHandleKeys(code) {
-  if (state === "storyMenu") {
+  if (state === "storySelect") {
+    const n = STORY_CAMPAIGNS.length;
     if (code === "Escape") { storyLeave(); return true; }
+    if (code === "ArrowUp" || code === "KeyW") { storySelIdx = (storySelIdx - 1 + n) % n; navIdx = storySelIdx; return true; }
+    if (code === "ArrowDown" || code === "KeyS") { storySelIdx = (storySelIdx + 1) % n; navIdx = storySelIdx; return true; }
+    if (code === "Enter" || code === "Space" || code === "KeyF") { storySelectCampaign(storySelIdx); return true; }
+    return true;
+  }
+  if (state === "storyMenu") {
+    if (code === "Escape") { if (STORY_CAMPAIGNS.length > 1) storyOpen(); else storyLeave(); return true; }
     if (code === "ArrowUp" || code === "KeyW") { storyNavIdx = Math.max(0, storyNavIdx - 1); navIdx = storyNavIdx; return true; }
     if (code === "ArrowDown" || code === "KeyS") { storyNavIdx = Math.min(STORY.length - 1, storyNavIdx + 1); navIdx = storyNavIdx; return true; }
     if (code === "Enter" || code === "Space") { storySelectChapter(storyNavIdx); return true; }
@@ -430,7 +522,10 @@ function storyHandleKeys(code) {
 }
 // clic souris (le hub enregistre des hitboxes "StoryChN")
 function storyHandleClickCode(code) {
-  if (code === "StoryBack") { storyLeave(); return true; }
+  if (code === "StoryBack") { if (STORY_CAMPAIGNS.length > 1) storyOpen(); else storyLeave(); return true; }
+  if (code === "StorySelBack") { storyLeave(); return true; }
+  const sm = /^StorySel(\d+)$/.exec(code || "");
+  if (sm) { const i = sm[1] | 0; storySelIdx = i; navIdx = i; storySelectCampaign(i); return true; }
   const m = /^StoryCh(\d+)$/.exec(code || "");
   if (m) { const i = m[1] | 0; storyNavIdx = i; navIdx = i; storySelectChapter(i); return true; }
   if (state === "storyScene" && code === "StoryNext") { storyAdvanceScene(); return true; }
@@ -614,11 +709,79 @@ function storyDrawGameoverTag() {
   ctx.restore();
 }
 
+// ---------- Écran SÉLECTION DE CAMPAGNE ----------
+function drawStorySelect() {
+  menuScreenBase({
+    title: "MODE HISTOIRE",
+    kicker: "Choisis ta campagne",
+    titleSize: 46,
+    noEscHint: true
+  });
+  const mx = UI.mx;
+  uiLabel("Une campagne par dirigeant : affronte tes 9 rivaux, du volley amical au duel-bombe.",
+          mx, 172, 13, UI.muted, 0.3);
+
+  const listX = mx, listW = W - mx * 2;
+  const n = STORY_CAMPAIGNS.length;
+  const top = 192, bottom = H - 46;
+  const rowH = Math.max(24, Math.min(30, Math.floor((bottom - top) / n) - 2));
+  const gap = 2;
+  for (let i = 0; i < n; i++) {
+    const camp = STORY_CAMPAIGNS[i];
+    const total = camp.chapters.length;
+    const done = storyCampaignDone(camp.key, total);
+    const complete = done >= total;
+    const sel = (navIdx === i);
+    const ry = top + i * (rowH + gap), rx = listX;
+    hit(rx + listW / 2, ry + rowH / 2, listW, rowH + gap, "StorySel" + i);
+    const hover = isHover("StorySel" + i);
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(rx, ry, listW, rowH, 9); else ctx.rect(rx, ry, listW, rowH);
+    ctx.fillStyle = (sel || hover) ? "rgba(255,216,74,0.92)" : "rgba(255,246,232,0.10)";
+    ctx.fill();
+    if (sel || hover) { ctx.strokeStyle = UI.stroke; ctx.lineWidth = 2.5; ctx.stroke(); }
+
+    const ink = (sel || hover) ? UI.stroke : UI.ink;
+    const baseY = ry + rowH * 0.66;
+    // pastille (portrait perso ou trophée pour la campagne curée)
+    const isChar = camp.key.indexOf("char:") === 0;
+    if (isChar) {
+      const key = camp.key.slice(5);
+      storyDrawPortrait(key, rx + rowH * 0.55, ry + rowH / 2, rowH - 4, rowH - 4, {});
+    } else {
+      ctx.font = (rowH * 0.6).toFixed(0) + "px " + UI.sans;
+      ctx.textAlign = "center";
+      ctx.fillText("🏆", rx + rowH * 0.55, baseY);
+    }
+    // nom
+    ctx.textAlign = "left";
+    ctx.fillStyle = ink;
+    ctx.font = "800 14px " + UI.sans;
+    const nameX = rx + rowH + 8;
+    ctx.fillText(camp.name, nameX, baseY);
+    const nameW = ctx.measureText(camp.name).width;
+    // sous-titre
+    ctx.font = "600 11px " + UI.sans;
+    ctx.fillStyle = (sel || hover) ? "rgba(27,23,48,0.72)" : UI.muted;
+    ctx.fillText(camp.sub, nameX + nameW + 16, baseY);
+    // progression à droite
+    ctx.textAlign = "right";
+    ctx.font = "700 12px " + UI.mono;
+    ctx.fillStyle = complete ? (sel || hover ? "#1b7d3a" : UI.gold) : (sel || hover ? "rgba(27,23,48,0.8)" : UI.muted);
+    ctx.fillText((complete ? "✓ " : "") + done + "/" + total, rx + listW - 12, baseY);
+    ctx.textAlign = "left";
+  }
+
+  hit(mx + 45, H - 26, 150, 24, "StorySelBack");
+  uiLabel("Échap ← Menu  ·  " + (padConnected ? "🎮 ↑↓ · A choisir" : "↑↓ · Entrée choisir"),
+          mx, H - 20, 12, UI.muted, 0.3);
+}
+
 // ---------- Écran HUB (roadmap des chapitres) ----------
 function drawStoryHub() {
   menuScreenBase({
     title: "MODE HISTOIRE",
-    kicker: "Les Jeux du Sommet · " + STORY.length + " chapitres",
+    kicker: storyCampaign.name + " · " + STORY.length + " chapitres",
     titleSize: 46,
     noEscHint: true
   });
@@ -635,7 +798,8 @@ function drawStoryHub() {
     const ch = STORY[i];
     if (ch.act !== lastAct) {
       lastAct = ch.act;
-      const label = ["", "Acte I · Petites rivalités", "Acte II · Le froid revient", "Acte III · Jeux impitoyables"][ch.act];
+      const am = ACT_META[ch.act];
+      const label = am ? ("Acte " + am.num + " · " + am.title) : ("Acte " + ch.act);
       uiLabel(label, listX, y + 11, 11, UI.gold, 1.2);
       y += 17;
     }
@@ -684,7 +848,8 @@ function drawStoryHub() {
 
   // pied
   hit(mx + 45, H - 26, 150, 24, "StoryBack");
-  uiLabel("Échap ← Menu  ·  " + (padConnected ? "🎮 Croix ↑↓ · A jouer" : "↑↓ ou 1-9 · Entrée jouer"),
+  const backLbl = STORY_CAMPAIGNS.length > 1 ? "Échap ← Campagnes" : "Échap ← Menu";
+  uiLabel(backLbl + "  ·  " + (padConnected ? "🎮 Croix ↑↓ · A jouer" : "↑↓ ou 1-9 · Entrée jouer"),
           mx, H - 20, 12, UI.muted, 0.3);
 }
 
@@ -844,18 +1009,28 @@ function drawStoryEnding() {
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
 
+  const isChar = storyCampaign && storyCampaign.key.indexOf("char:") === 0;
+  const heroKey = isChar ? storyCampaign.key.slice(5) : null;
+  const heroName = isChar ? storyCharName(heroKey) : null;
+
   ctx.textAlign = "center";
   const bounce = Math.sin(storySceneFrame / 20) * 3;
-  uiLabel("LES JEUX DU SOMMET", W / 2, 96, 14, UI.gold, 4, "center");
+  uiLabel(isChar ? ("CAMPAGNE DE " + heroName).toUpperCase() : "LES JEUX DU SOMMET",
+          W / 2, 96, 14, UI.gold, 4, "center");
   if (typeof uiTitleBoxed === "function") {
-    uiTitleBoxed("Les Jeux sont sauvés", W / 2, 150 + bounce, W - 160, 52,
+    uiTitleBoxed(isChar ? "Sommet remporté" : "Les Jeux sont sauvés", W / 2, 150 + bounce, W - 160, 52,
                  { align: "center", fill: UI.ink, stroke: UI.stroke, maxLines: 1, minSize: 26 });
   }
   // trophée stylisé
   ctx.font = "64px " + UI.sans;
   ctx.fillText("🏆", W / 2, 236);
 
-  const epilogue = [
+  const epilogue = isChar ? [
+    heroName + " a défait ses neuf rivaux,",
+    "du match amical au duel-bombe des grands soirs.",
+    "Le monde applaudit, grince des dents, ou tremble —",
+    "mais le trophée du Sommet est à " + heroName + ".",
+  ] : [
     "La machine dopée est tombée en finale.",
     "Le monde a retenu son souffle, puis applaudi.",
     "Le sport, fragile et imparfait, tient encore debout —",
