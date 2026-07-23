@@ -1,0 +1,9 @@
+{
+  "key": "colline",
+  "name": "Citadelle du Levant",
+  "layers": ["far", "skyline"],
+  "props": ["net_post", "flag", "falcon"],
+  "event": "falcon",
+  "thumb": "thumb.png",
+  "notes": "Le Faucon / Levantie. Skyline Gemini 16:9 (réintégrée 2026-07-22), bgFullHeight, baselineFromBottom=43. Event: falcon. Props net_post/flag/falcon régénérés sommet-decor 2026-07-22 (skyline ref, palette grès/bleu/verre)."
+}

@@ -84,6 +84,12 @@ const EPILOGUE = `
   mapEventsCanStep: typeof mapEventsCanStep === "function" ? mapEventsCanStep : () => false,
   setTerrain: v => { terrain = Math.max(0, Math.min(TERRAINS.length - 1, v | 0)); },
   getTerrain: () => terrain,
+  weatherFlavor: typeof weatherFlavor === "function" ? weatherFlavor : () => "rain",
+  stepWeather: typeof stepWeather === "function" ? stepWeather : () => {},
+  resetWeather: typeof resetWeather === "function" ? resetWeather : () => {},
+  getWeather: () => weather,
+  setWeather: (w, timer) => { weather = w; if (timer !== undefined) weatherTimer = timer | 0; },
+  getWeatherTimer: () => weatherTimer,
   setMapEventsQuiet: v => { mapEventsQuiet = !!v; }, getMapEventsQuiet: () => mapEventsQuiet,
   setPaused: v => { paused = !!v; }, getPaused: () => paused,
   MAP_EVENT_WARN_T: typeof MAP_EVENT_WARN_T !== "undefined" ? MAP_EVENT_WARN_T : 120,
@@ -94,6 +100,7 @@ const EPILOGUE = `
   getGameplayV2: () => GAMEPLAY_V2, setGameplayV2: v => { GAMEPLAY_V2 = !!v; },
   HOLD_MAX, RECEIVE_R, CHARGE_MAX, AIM_CONE,
   CHARACTERS, TERRAINS, superEffects,
+  CHAR_ANIM_DEFAULTS: typeof CHAR_ANIM_DEFAULTS !== "undefined" ? CHAR_ANIM_DEFAULTS : null,
   STORY: typeof STORY !== "undefined" ? STORY : null,
   storyCharIdx: typeof storyCharIdx === "function" ? storyCharIdx : null,
   storyStartMatch: typeof storyStartMatch === "function" ? storyStartMatch : null,
@@ -112,6 +119,8 @@ const EPILOGUE = `
   SPRITES: typeof SPRITES !== "undefined" ? SPRITES : null,
   spriteReady: typeof spriteReady === "function" ? spriteReady : () => false,
   SUPER_DUR: typeof SUPER_DUR !== "undefined" ? SUPER_DUR : {},
+  CHAR_BASE_H: typeof CHAR_BASE_H !== "undefined" ? CHAR_BASE_H : 110,
+  PROP_H: typeof PROP_H !== "undefined" ? PROP_H : null,
   consts: { W, H, NET_X, NET_W, NET_TOP, GROUND_Y, BALL_R, MAX_BALL_SPEED, GUEST_BALL_MARGIN, HOLD_LOB_SPD: typeof HOLD_LOB_SPD !== "undefined" ? HOLD_LOB_SPD : 0 }
 };`;
 

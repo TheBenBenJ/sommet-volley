@@ -180,7 +180,11 @@ function handleMenuKeys(code, key) {
     if (code === "Escape" || code === "Enter" || code === "Space") goMenu();
 
   } else if (state === "selectCharacter") {
-    const slot = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Digit5: 4, Digit6: 5, Digit7: 6, Digit8: 7, Digit9: 8 }[code];
+    // Parse le n° du code (Digit1..DigitN) → slot : marche au-delà de 9 (clic /
+    // Entrée génèrent "Digit10"+ pour les slots ≥ 9 ; le clavier physique s'arrête
+    // à Digit9, les suivants restent atteignables au clic ou aux flèches+Entrée).
+    const _dmC = /^Digit(\d+)$/.exec(code);
+    const slot = _dmC ? (parseInt(_dmC[1], 10) - 1) : undefined;
     const vis = characterIndices();
     const n = slot !== undefined && slot < vis.length ? vis[slot] : undefined;
     if (n !== undefined && !takenCharacterSet().has(n)) {
@@ -209,7 +213,8 @@ function handleMenuKeys(code, key) {
     }
 
   } else if (state === "selectTerrain") {
-    const slotT = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Digit5: 4, Digit6: 5, Digit7: 6, Digit8: 7, Digit9: 8 }[code];
+    const _dmT = /^Digit(\d+)$/.exec(code);
+    const slotT = _dmT ? (parseInt(_dmT[1], 10) - 1) : undefined;
     const visT = terrainIndices();
     const n = slotT !== undefined && slotT < visT.length ? visT[slotT] : undefined;
     if (n !== undefined) { terrain = n; navIdx = 0; commitSetup(); }
@@ -363,7 +368,7 @@ function startTutorial() {
   setMode("1v1");
   blobL.charId = 2; // Micron
   blobR.charId = 1; // Trompette
-  terrain = 2;      // Palais de l'Hexagone
+  terrain = 2;      // Palais du Coq
   ballSkin = 0;
   paused = false;
   newGame(42);
@@ -1442,11 +1447,11 @@ function drawRules() {
   p("Service : F pour lancer, puis F à nouveau pour servir. Double saut en l'air.");
   y += 4;
   h("★ SUPER", "#ffd93d");
-  p("3 points d'affilée chargent la jauge (Houn : 2). E / B lance la technique : un bandeau explique l'effet et le visuel ~4 s.");
+  p("3 points d'affilée chargent la jauge (Bébé : 2). E / B lance la technique : un bandeau explique l'effet et le visuel ~4 s.");
   y += 4;
   h("Météo & événements", "#4db3ff");
-  p("Pluie / tempête : sol glissant, balle plus lourde (sauf Pelouse Oval, toujours au beau fixe).");
-  p("Place Grand-Rouge : canon. Pelouse Oval : voiturette. Palais : cortège. Esplanade : radar. Matin : lanternes. Bosphore : tapis. Ashram : vache. Amazonie : aras.");
+  p("Météo sur toutes les maps : pluie/orage (éclairs), neige/blizzard (Place Écarlate), tempête de sable (Country Club). Sol glissant, balle plus lourde.");
+  p("Place Écarlate : canon. Country Club Doré : voiturette. Palais du Coq : cortège. Esplanade : radar. Cité du Matin : lanternes. Pont des Deux Mondes : tapis. Ashram : vache. Grande Forêt : aras.");
   p("Deux joueurs au filet + balle proche = Smash Battle (le gagnant smash mortel, le perdant est stun).");
   ctx.restore();
 

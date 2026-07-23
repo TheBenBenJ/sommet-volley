@@ -1,0 +1,16 @@
+# Fiche personnage — Le Faucon (Levantie)
+# Alias de session utilisateur : « netanyaou » → clé technique faucon
+# Design COMPOSITE (Steam) : PAS le portrait 1:1 — chauve + moustache + costume ardoise + cravate bordeaux
+key: faucon
+name: "Le Faucon"
+pays_theme: "Levantie — citadelle, Méditerranée, sécurité"
+silhouette: "trapu, crâne chauve avec couronne grise courte, moustache grise soignée, sourcils épais, costume ardoise croisé, cravate bordeaux, épingle argentée simple"
+palette: ["#455a64", "#8b1e3f", "#c9a882"]
+look_lock: "Costume civil ardoise croisé + cravate bordeaux. JAMAIS de tenue religieuse, kippa, étoile, drapeau réel ou symbole confessionnel. Archétype composite générique (pas un portrait 1:1)."
+stats: { vitesse: 3, detente: 3, puissance: 4, controle: 3 }
+trait_passif: "Faucon : SUPER aussi quand il perd un point (ego sécuritaire)."
+super:
+  nom: "Raid Éclair"
+  effet: "interdit de sauter au camp adverse ~5 s (comme Séisme / Batterie AA)"
+sons: "voix rauque courte ; impact = claquement sec"
+map: "Citadelle du Levant"

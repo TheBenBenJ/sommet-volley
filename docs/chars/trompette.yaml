@@ -1,13 +1,13 @@
-# Fiche personnage — Ronald Trompette
+# Fiche personnage — Baron Dorf (Doria) · clé technique trompette
 key: trompette
-name: "Ronald Trompette"
-pays_theme: "USA — resort doré, golf, ego"
-silhouette: "compact/stocky (même format que Vladou), mèche dorée, cravate rouge, bronzage orange, pouce levé"
-palette: ["#f0a060", "#c9a227", "#c62828"]
+name: "Baron Dorf"
+nation: "Doria"
+pays_theme: "Doria — golf, dorure, club privé"
+silhouette: "tycoon fanfaron trapu chibi, cheveux blond platine/crème en vague volumineuse asymétrique (PAS mèche comb-over), hale dorée chaude (PAS orange spray-tan), costume marine oversized col large cartoon + boutons dorés, chemise crème, cravate dorée COURTE ou pochette champagne (JAMAIS cravate rouge longue), chaussures noires, geste deal bras ouverts / index — PAS thumbs-up permanent"
+palette: ["#f5e6c8", "#c9a227", "#1a237e"]
 stats: { vitesse: 3, detente: 2, puissance: 4, controle: 3 }
-trait_passif: "Ego en béton — la jauge SUPER se charge aussi quand il perd un point"
+trait_passif: "Ego en béton — SUPER aussi en perdant un point"
 super:
   nom: "Le Mur"
-  effet: "mur doré au milieu du camp adverse ~5 s"
-sons: "voix nasillarde, fanfare brève"
-map: "Pelouse Oval"
+  effet: "mur doré camp adverse ~5 s"
+map: "Country Club Doré"

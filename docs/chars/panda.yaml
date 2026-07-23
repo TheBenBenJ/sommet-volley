@@ -1,13 +1,13 @@
-# Fiche personnage — Président Panda
+# Fiche personnage — Le Grand Timonier (Panguo) · clé technique panda
 key: panda
-name: "Président Panda"
-pays_theme: "Chine — place du matin, muraille, rouge"
-silhouette: "humain stocky + petites oreilles panda, costume navy, chemise blanche, cravate rouge, pin drapeau Chine, chaussures noires"
-palette: ["#c62828", "#1a1a1a", "#f5d0b0"]
-look_lock: "Toujours humain (jamais panda anthropomorphe). Oreilles panda + cravate rouge + pin Chine sur toutes les poses."
+name: "Le Grand Timonier"
+nation: "Panguo"
+pays_theme: "Panguo — cité du matin, muraille"
+silhouette: "visage rond âgé / bajoues, front haut, cheveux noirs peignés en arrière (PAS coupe au bol), veste Zhongshan anthracite 4 poches, pin rouge"
+palette: ["#c62828", "#8e0000", "#212121"]
 stats: { vitesse: 3, detente: 3, puissance: 3, controle: 5 }
-trait_passif: "Contrôle max"
+trait_passif: "Mur invisible — contrôle max"
 super:
   nom: "Grande Muraille"
-  effet: "mur au milieu du camp adverse ~5 s"
-map: "Place du Matin"
+  effet: "mur camp adverse ~5 s"
+map: "Cité du Matin"

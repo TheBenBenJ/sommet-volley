@@ -89,7 +89,7 @@ function drawCrowdCritter(species, x, hy, col, excited, glow) {
   const shirt = species === "vladou" ? "#b43a2e"
     : species === "trompette" ? "#f0a060"
     : species === "micron" ? "#3d5afe"
-    : species === "houn" ? "#2d3a2e"
+    : species === "bebe" ? "#2d3a2e"
     : col;
   ctx.fillStyle = shirt;
   ctx.beginPath(); ctx.ellipse(x, hy + 5, 4.5, 6.5, 0, 0, Math.PI * 2); ctx.fill();
@@ -99,7 +99,7 @@ function drawCrowdCritter(species, x, hy, col, excited, glow) {
     ctx.beginPath(); ctx.arc(x, hy - 2, 3.2, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = "#f5d76e";
     ctx.beginPath(); ctx.ellipse(x + 0.5, hy - 5, 3.4, 2.2, -0.3, 0, Math.PI * 2); ctx.fill();
-  } else if (species === "houn") {
+  } else if (species === "bebe") {
     ctx.fillStyle = "#f0d5c0";
     ctx.beginPath(); ctx.arc(x, hy - 2, 3.2, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = "#111";
@@ -170,24 +170,39 @@ function celestialPos() {
   return { x, y, p };
 }
 
-// ---------- Météo (plage) ----------
-// État météo déterministe : dérivé du RNG seedé et rangé dans les snapshots,
-// pour que l'hôte et l'invité voient exactement le même ciel en ligne.
-// "clear" → "rain" (sable humide) ; si le soleil perce → arc-en-ciel ;
-// si la pluie s'intensifie → ciel sombre (orage).
+// ---------- Météo (toutes maps) ----------
+// État déterministe (RNG + snapshots) pour le sync en ligne.
+// "clear" → "rain" → "storm" | "clear". Habillage par flavor :
+//   neige → flocons/blizzard · plage → sable · sinon → pluie/orage+éclairs.
 let weather = "clear";        // "clear" | "rain" | "storm"
-let weatherTimer = 0;         // ticks avant le prochain changement (0 = jamais planifié)
-let rainDrops = [];           // gouttes (visuel, régénéré localement)
-let sandGrains = [];          // grains soufflés (plage, visuel, régénéré localement)
-let fogPuffs = [];            // bancs de brume (marais, visuel, régénéré localement)
+let weatherTimer = 0;         // ticks avant le prochain changement
+let rainDrops = [];           // gouttes proches (visuel local)
+let rainDropsFar = [];        // gouttes lointaines
+let rainSplashes = [];        // impacts au sol
+let sandGrains = [];          // grains (Country Club)
+let fogPuffs = [];            // brume (legacy)
+let weatherFlash = 0;         // frames d'éclair restantes (visuel local)
+let weatherFlashCool = 0;     // cooldown entre éclairs
 
 function resetWeather() {
   weather = "clear";
   weatherTimer = 600 + Math.floor(rng() * 1200); // ~10-30 s avant 1er changement
   rainDrops = [];
+  rainDropsFar = [];
+  rainSplashes = [];
   sandGrains = [];
   fogPuffs = [];
+  weatherFlash = 0;
+  weatherFlashCool = 0;
   resetMapEvent();
+}
+
+/** Habillage météo selon le terrain : snow | sand | rain. */
+function weatherFlavor() {
+  const key = TERRAINS[terrain] && TERRAINS[terrain].key;
+  if (key === "neige") return "snow";
+  if (key === "plage" || key === "colline") return "sand";
+  return "rain";
 }
 
 // ---------- Événements de map ----------
@@ -258,6 +273,8 @@ function mapEventKind() {
   if (k === "bosphore") return "carpet";
   if (k === "ashram") return "cow";
   if (k === "amazon") return "macaw";
+  if (k === "colline") return "falcon";
+  if (k === "roseraie") return "peacock";
   return null;
 }
 
@@ -266,7 +283,24 @@ function mapEventIsRain(kind) {
 }
 
 function mapEventIsCrosser(kind) {
-  return kind === "march" || kind === "carpet" || kind === "cow";
+  return kind === "march" || kind === "carpet" || kind === "cow" || kind === "falcon" || kind === "peacock";
+}
+
+/** Bornes horizontales du caddie sur le gazon plage : il ne doit PAS rouler
+ *  plus loin que les buissons (sinon il « rentre dans le mur »/les bâtiments).
+ *  Buissons ≈ [151,757] ; demi-largeur caddie ≈ 53 → centre borné pour garder
+ *  la carrosserie dans les buissons. */
+function cartLaneBounds() {
+  return { lo: 204, hi: 704 };
+}
+
+/** Va-et-vient du caddie entre les buissons (rebond aux bornes). */
+function stepCartBounce(spd) {
+  const b = cartLaneBounds();
+  if (mapEvent.cartDir !== 1 && mapEvent.cartDir !== -1) mapEvent.cartDir = 1;
+  mapEvent.cartX += mapEvent.cartDir * spd;
+  if (mapEvent.cartX >= b.hi) { mapEvent.cartX = b.hi; mapEvent.cartDir = -1; }
+  else if (mapEvent.cartX <= b.lo) { mapEvent.cartX = b.lo; mapEvent.cartDir = 1; }
 }
 
 /** Déplacement continu hors event (caddie / tapis / vache). */
@@ -348,6 +382,24 @@ function mapEventAnnounceCopy(kind, phase) {
       };
     }
     return { title: "Attention vache !", sub: "Laisse-la passer sans la toucher avec la balle." };
+  }
+  if (kind === "falcon") {
+    if (phase === "warn") {
+      return {
+        title: "Le Faucon fond sur le terrain !",
+        sub: "Un rapace traverse en vol — contact = déviation."
+      };
+    }
+    return { title: "Faucon en piqué !", sub: "Évite sa trajectoire, il dévie la balle." };
+  }
+  if (kind === "peacock") {
+    if (phase === "warn") {
+      return {
+        title: "Paon de cour !",
+        sub: "Un paon traverse le terrain — contact = déviation."
+      };
+    }
+    return { title: "Paon en parade !", sub: "Laisse-le passer, il dévie la balle." };
   }
   if (kind === "macaw") {
     if (phase === "warn") {
@@ -482,9 +534,17 @@ function stepMacaws() {
 function collideMapCrosser(kind) {
   if (tick - (mapEvent.lastHitTick || -999) < MAP_CROSSER_HIT_CD) return;
   const cx = mapEvent.cartX;
-  const halfW = kind === "march" ? 120 : kind === "carpet" ? 70 : kind === "cow" ? 58 : 55;
-  const topY = kind === "carpet" ? GROUND_Y - 110
-    : kind === "cow" ? GROUND_Y - 88
+  // Hitboxes calées sur PROP_H (src/core.js) — garder cohérent avec le rendu.
+  const halfW = kind === "march" ? 110
+    : kind === "carpet" ? 58
+    : kind === "cow" ? 48
+    : kind === "falcon" ? 48
+    : kind === "peacock" ? 52
+    : 55;
+  const topY = kind === "carpet" ? GROUND_Y - (PROP_H.carpet + 40)
+    : kind === "cow" ? GROUND_Y - (PROP_H.cow - 4)
+    : kind === "falcon" ? GROUND_Y - 130
+    : kind === "peacock" ? GROUND_Y - (PROP_H.peacock - 2)
     : GROUND_Y - 95;
   if (ball.x < cx - halfW || ball.x > cx + halfW) return;
   if (ball.y < topY || ball.y > GROUND_Y + 8) return;
@@ -498,7 +558,7 @@ function stepMapCrosserEvent(kind) {
   if (mapEvent.phase !== "fire" && mapEvent.phase !== "flying") return;
   mapEvent.t++;
   mapEvent.cartDir = 1;
-  const spd = kind === "march" ? 2.6 : kind === "carpet" ? 3.4 : 2.2;
+  const spd = kind === "march" ? 2.6 : kind === "carpet" ? 3.4 : kind === "falcon" ? 4.2 : 2.2;
   mapEvent.cartX += spd;
   if (mapEvent.phase === "fire" && mapEvent.t === 1) {
     sfxCannonFire();
@@ -537,7 +597,7 @@ function stepMapRadarEvent() {
 function stepMapRainEvent(kind) {
   if (mapEvent.phase !== "fire" && mapEvent.phase !== "flying") return;
   mapEvent.t++;
-  if (kind === "cart") mapEvent.cartX += 3.2;
+  if (kind === "cart") stepCartBounce(3.2);
   if (mapEvent.phase === "fire" && mapEvent.t === 1) {
     sfxCannonFire();
     shake = Math.max(shake, 4);
@@ -550,8 +610,9 @@ function stepMapRainEvent(kind) {
     mapEvent.phase = "flying";
   }
   const alive = stepGolfBalls();
-  const cartGone = kind !== "cart" || mapEvent.cartX > W + 60;
-  if (mapEvent.t > MAP_CART_RAIN_T && alive === 0 && cartGone) {
+  // Le caddie ne sort plus de l'écran (il patrouille entre les buissons) :
+  // fin d'event sur le minuteur dès que les balles sont retombées.
+  if (mapEvent.t > MAP_CART_RAIN_T && alive === 0) {
     scheduleNextMapEvent();
   }
 }
@@ -611,7 +672,7 @@ function stepMapEvent() {
       }
       if (kind === "cart") {
         mapEvent.cartDir = 1;
-        if (mapEvent.cartX < -40) mapEvent.cartX = -40;
+        mapEvent.cartX = cartLaneBounds().lo; // entre par le buisson gauche, pas hors-champ
       }
       if (mapEventIsCrosser(kind)) {
         mapEvent.cartDir = 1;
@@ -626,8 +687,7 @@ function stepMapEvent() {
   if (mapEvent.phase === "warn") {
     mapEvent.t++;
     if (kind === "cart") {
-      mapEvent.cartDir = 1;
-      mapEvent.cartX += 1.35;
+      stepCartBounce(1.35);
     }
     if (mapEventIsCrosser(kind)) {
       mapEvent.cartDir = 1;
@@ -659,7 +719,7 @@ function stepMapEvent() {
     return;
   }
 
-  // --- Place Grand-Rouge : canon ---
+  // --- Place Écarlate : canon ---
   if (mapEvent.phase === "fire") {
     mapEvent.t++;
     if (mapEvent.t === 1) {
@@ -688,23 +748,14 @@ function stepMapEvent() {
 }
 
 // avancé une fois par tick DANS la simulation (déterministe).
-// Même machine à états sur les terrains ; seul l'habillage change :
-//  banquise → chute de neige/blizzard · prairie → averse
-//  Pelouse Oval : toujours clair (pas de tempête de sable)
+// Toutes les maps : même FSM ; l'habillage dépend de weatherFlavor().
 function stepWeather() {
-  const key = TERRAINS[terrain] && TERRAINS[terrain].key;
-  if (key === "plage") {
-    weather = "clear";
-    weatherTimer = 99999;
-    return;
-  }
   if (--weatherTimer > 0) return;
   const r = rng();
   if (weather === "clear") {
     weather = "rain";
     weatherTimer = 480 + Math.floor(rng() * 720);
   } else if (weather === "rain") {
-    // soit ça se dégage, soit l'orage éclate
     weather = r < 0.5 ? "clear" : "storm";
     weatherTimer = 360 + Math.floor(rng() * 720);
   } else { // storm
@@ -738,48 +789,164 @@ function ballLift() {
   return 1;
 }
 
+/** @deprecated utiliser drawWeatherOverlay — conservé pour compat éventuelle. */
 function drawRain(intensity) {
-  // gouttes purement visuelles : densité selon l'intensité
-  const target = Math.floor(intensity * 140);
-  while (rainDrops.length < target) {
-    rainDrops.push({ x: Math.random() * (W + 60) - 30, y: Math.random() * GROUND_Y,
-                     len: 8 + Math.random() * 10, sp: 9 + Math.random() * 6 });
+  drawWeatherRain(intensity);
+}
+
+function drawWeatherRain(intensity) {
+  const storm = weather === "storm";
+  const wind = storm ? 5.5 : 2.8;
+  // Couche lointaine (fine, pâle)
+  const farN = Math.floor(intensity * (storm ? 110 : 70));
+  while (rainDropsFar.length < farN) {
+    rainDropsFar.push({
+      x: Math.random() * (W + 80) - 40, y: Math.random() * H,
+      len: 6 + Math.random() * 8, sp: 6 + Math.random() * 4
+    });
   }
-  if (rainDrops.length > target) rainDrops.length = target;
-  ctx.strokeStyle = weather === "storm" ? "rgba(150,170,200,0.5)" : "rgba(180,200,230,0.45)";
-  ctx.lineWidth = 1.5;
+  if (rainDropsFar.length > farN) rainDropsFar.length = farN;
+  ctx.strokeStyle = storm ? "rgba(160,180,210,0.28)" : "rgba(190,210,235,0.22)";
+  ctx.lineWidth = 1.1;
   ctx.lineCap = "round";
-  const wind = 2.2;
+  for (const d of rainDropsFar) {
+    ctx.beginPath();
+    ctx.moveTo(d.x, d.y);
+    ctx.lineTo(d.x - wind * 0.7, d.y + d.len);
+    ctx.stroke();
+    d.y += d.sp; d.x -= wind * 0.25;
+    if (d.y > H) { d.y = -d.len; d.x = Math.random() * (W + 80) - 40; }
+  }
+  // Couche proche (épaisse, rapide)
+  const nearN = Math.floor(intensity * (storm ? 200 : 130));
+  while (rainDrops.length < nearN) {
+    rainDrops.push({
+      x: Math.random() * (W + 60) - 30, y: Math.random() * H,
+      len: 10 + Math.random() * 14, sp: 11 + Math.random() * 8
+    });
+  }
+  if (rainDrops.length > nearN) rainDrops.length = nearN;
+  ctx.strokeStyle = storm ? "rgba(175,195,225,0.62)" : "rgba(200,220,245,0.5)";
+  ctx.lineWidth = storm ? 2 : 1.6;
   for (const d of rainDrops) {
     ctx.beginPath();
     ctx.moveTo(d.x, d.y);
     ctx.lineTo(d.x - wind, d.y + d.len);
     ctx.stroke();
-    d.y += d.sp; d.x -= wind * 0.4;
-    if (d.y > GROUND_Y) { d.y = -d.len; d.x = Math.random() * (W + 60) - 30; }
+    d.y += d.sp; d.x -= wind * 0.45;
+    if (d.y > H) {
+      // splash en bas de l'écran
+      if (rainSplashes.length < 48) {
+        rainSplashes.push({ x: d.x, y: H, life: 6 + Math.floor(Math.random() * 5), r: 2 + Math.random() * 3 });
+      }
+      d.y = -d.len; d.x = Math.random() * (W + 60) - 30;
+    }
+  }
+  // Impacts
+  ctx.fillStyle = storm ? "rgba(200,220,245,0.45)" : "rgba(210,225,245,0.35)";
+  for (let i = rainSplashes.length - 1; i >= 0; i--) {
+    const s = rainSplashes[i];
+    const a = s.life / 10;
+    ctx.globalAlpha = a;
+    ctx.beginPath();
+    ctx.ellipse(s.x, (s.y || GROUND_Y) - 1, s.r * (1.2 - a * 0.3), s.r * 0.35, 0, 0, Math.PI * 2);
+    ctx.fill();
+    s.life -= 1;
+    if (s.life <= 0) rainSplashes.splice(i, 1);
+  }
+  ctx.globalAlpha = 1;
+}
+
+// tempête de sable (Country Club) : grains horizontaux + voile ocre
+function drawSandstorm(intensity) {
+  const storm = weather === "storm";
+  const target = Math.floor(intensity * (storm ? 220 : 140));
+  while (sandGrains.length < target) {
+    sandGrains.push({
+      x: Math.random() * (W + 100) - 50, y: Math.random() * H,
+      len: 12 + Math.random() * 22, sp: 12 + Math.random() * 10,
+      thick: 1 + Math.random() * 1.4
+    });
+  }
+  if (sandGrains.length > target) sandGrains.length = target;
+  // Voile ocre + bande basse plus dense
+  ctx.fillStyle = "rgba(196,156,84," + (0.12 + intensity * 0.18).toFixed(2) + ")";
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "rgba(170,130,70," + (0.08 + intensity * 0.12).toFixed(2) + ")";
+  ctx.fillRect(0, GROUND_Y - 70, W, H - (GROUND_Y - 70));
+  ctx.strokeStyle = storm ? "rgba(160,118,60,0.6)" : "rgba(190,150,95,0.48)";
+  ctx.lineCap = "round";
+  for (const g of sandGrains) {
+    ctx.lineWidth = g.thick;
+    ctx.beginPath();
+    ctx.moveTo(g.x, g.y);
+    ctx.lineTo(g.x - g.len, g.y + g.len * 0.22);
+    ctx.stroke();
+    g.x -= g.sp; g.y += g.sp * 0.18;
+    if (g.x < -50) { g.x = W + 50; g.y = Math.random() * H; }
   }
 }
 
-// tempête de sable (plage) : grains soufflés quasi à l'horizontale + voile ocre
-function drawSandstorm(intensity) {
-  const target = Math.floor(intensity * 150);
-  while (sandGrains.length < target) {
-    sandGrains.push({ x: Math.random() * (W + 80) - 40, y: Math.random() * GROUND_Y,
-                     len: 10 + Math.random() * 16, sp: 10 + Math.random() * 8 });
+/**
+ * Overlay météo unique (après le décor) — pluie / sable / neige selon flavor.
+ * Éclair = flash local (non syncé, comme les gouttes).
+ */
+function drawWeatherOverlay() {
+  if (weather === "clear") {
+    weatherFlash = 0;
+    return;
   }
-  if (sandGrains.length > target) sandGrains.length = target;
-  ctx.fillStyle = "rgba(196,156,84," + (0.1 + intensity * 0.14).toFixed(2) + ")";
-  ctx.fillRect(0, 0, W, GROUND_Y);
-  ctx.strokeStyle = weather === "storm" ? "rgba(150,112,58,0.55)" : "rgba(180,145,90,0.45)";
-  ctx.lineWidth = 1.4;
-  ctx.lineCap = "round";
-  for (const g of sandGrains) {
-    ctx.beginPath();
-    ctx.moveTo(g.x, g.y);
-    ctx.lineTo(g.x - g.len, g.y + g.len * 0.28);
-    ctx.stroke();
-    g.x -= g.sp; g.y += g.sp * 0.22;
-    if (g.x < -40) { g.x = W + 40; g.y = Math.random() * GROUND_Y; }
+  const flavor = weatherFlavor();
+  const storm = weather === "storm";
+  const t = (typeof performance !== "undefined" ? performance.now() : 0) / 1000;
+
+  if (flavor === "snow") {
+    if (typeof drawNeigeWeatherFX === "function") {
+      drawNeigeWeatherFX(t, true, storm);
+    }
+    return;
+  }
+  if (flavor === "sand") {
+    drawSandstorm(storm ? 1 : 0.58);
+    return;
+  }
+
+  // Grade pluie / orage
+  ctx.fillStyle = storm ? "rgba(28,42,68,0.34)" : "rgba(40,58,88,0.16)";
+  ctx.fillRect(0, 0, W, H);
+  // Légère « désaturation » chaude → cool
+  ctx.fillStyle = storm ? "rgba(20,30,50,0.1)" : "rgba(50,70,100,0.05)";
+  ctx.fillRect(0, 0, W, H);
+
+  drawWeatherRain(storm ? 1 : 0.55);
+
+  // Éclairs (orage seulement)
+  if (storm) {
+    if (weatherFlashCool > 0) weatherFlashCool -= 1;
+    else if (Math.random() < 0.012) {
+      weatherFlash = 2 + (Math.random() < 0.35 ? 1 : 0);
+      weatherFlashCool = 70 + Math.floor(Math.random() * 90);
+    }
+    if (weatherFlash > 0) {
+      const peak = weatherFlash >= 2;
+      ctx.fillStyle = peak ? "rgba(230,240,255,0.55)" : "rgba(180,200,255,0.22)";
+      ctx.fillRect(0, 0, W, H);
+      // trait d'éclair stylisé
+      if (peak) {
+        const lx = 80 + Math.random() * (W - 160);
+        ctx.strokeStyle = "rgba(255,255,255,0.85)";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(lx, 0);
+        ctx.lineTo(lx - 18, GROUND_Y * 0.28);
+        ctx.lineTo(lx + 10, GROUND_Y * 0.28);
+        ctx.lineTo(lx - 8, GROUND_Y * 0.55);
+        ctx.stroke();
+      }
+      weatherFlash -= 1;
+    }
+  } else {
+    weatherFlash = 0;
   }
 }
 
@@ -799,7 +966,7 @@ function drawFog(intensity) {
     if (f.y < GROUND_Y - 130) { f.y = GROUND_Y - 10 + Math.random() * 10; f.x = Math.random() * (W + 200) - 100; }
   }
   ctx.fillStyle = "rgba(200,212,208," + (0.05 + intensity * 0.07).toFixed(2) + ")";
-  ctx.fillRect(0, GROUND_Y - 90, W, 90);
+  ctx.fillRect(0, GROUND_Y - 90, W, H - (GROUND_Y - 90));
 }
 
 function drawRainbow() {
@@ -829,6 +996,10 @@ function drawBackground() {
   else if (key === "prairie" || key === "matin" || key === "bosphore") drawBgPrairie();
   else if (key === "parade" || key === "ashram") drawBgParade();
   else if (key === "amazon") drawBgPlage();
+  else if (key === "colline") drawBgColline();
+  else if (key === "roseraie") drawBgRoseraie();
   else drawBgPlage();
+  // Particules / grade / éclairs — une seule passe pour toutes les maps
+  drawWeatherOverlay();
 }
 

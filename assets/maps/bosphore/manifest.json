@@ -1,8 +1,17 @@
 {
   "key": "bosphore",
-  "name": "Palais du Bosphore",
-  "layers": ["far", "skyline"],
-  "props": ["flag", "warn", "net_post"],
-  "notes": "Palais du Bosphore — quay / mosquée / bannières pourpres. Public (crowd_0) en raw seulement, non affiché.",
-  "thumb": "thumb.png"
+  "name": "Pont des Deux Mondes",
+  "layers": [
+    "far",
+    "skyline"
+  ],
+  "props": [
+    "flag",
+    "warn",
+    "net_post",
+    "carpet"
+  ],
+  "notes": "Style Micron, 16:9 (1920×1080), bgFullHeight + baselineFromBottom=60 (map_fit --full). Event: tapis volant.",
+  "thumb": "thumb.png",
+  "event": "carpet"
 }

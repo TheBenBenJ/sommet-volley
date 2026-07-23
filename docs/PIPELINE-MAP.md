@@ -24,6 +24,8 @@ corrigée ICI (et dans les prompts `raw/maps/`), pas contournée au cas par cas.
 | Tempête / sable sur Pelouse Oval | Météo code sur map « calme » | Forcer `clear` (ou doc explicite) pour les maps qui doivent rester propres |
 | Double bannières (PNG + dessin fond) | Props flag redondantes avec skyline | Décider : **soit** bannières dans le skyline, **soit** props `flag` — pas les deux saturés |
 | Cutout sur skyline/far/thumb | Lance `cutout.py` sur tout le dossier | **Copie manuelle** des fonds plein cadre ; cutout **props only** |
+| Skyline « Saint-Basile » / monument réel | `theme` vague (`onion domes`, `palace`) → Gemini colle le landmark n°1 | Theme = archi **positive** + **anti-landmarks nommés** ; QA Steam avant intégration (cf. skill `sommet-map` §1.5) |
+| Court = patinoire / autre sport + Zamboni | Prompt sans « VOLLEY » explicite ni interdits véhicule | Prompt : court de **volley** VIDE ; interdits véhicule **nommés** (camion, Zamboni…) |
 
 ---
 
@@ -55,7 +57,7 @@ Mapping **terrainKey → dossier pack** actuel :
 | neige | vladou |
 | plage | trompette |
 | prairie | micron |
-| parade | houn |
+| parade | bebe |
 | matin / bosphore / ashram / amazon | même nom |
 
 ---
@@ -151,7 +153,7 @@ traite tout PNG non-prop comme un perso (ancrage pieds, etc.).
 ### Drapeaux
 
 - Préférer champs **sans blanc pur** (crème, or, couleur unie) pour ashram /
-  bosphore / amazon / matin / houn.
+  bosphore / amazon / matin / bebe.
 - Si blanc intentionnel (rayures US parody, etc.) → ajouter le dossier map dans
   `FLAG_KEEP_WHITE_MAPS` dans `cutout.py`.
 - Prompt flag : *solid color field, NO white triangles, NO white gaps between

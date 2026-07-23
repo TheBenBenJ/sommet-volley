@@ -176,16 +176,136 @@ test("service : contact filet = faute (pas de rebond qui sauve)", () => {
   assert.ok(!g.ball.serveFlight, "serveFlight levé après faute");
 });
 
-test("roster : Tsar Vladou est le perso pilote (index 0)", () => {
+test("roster : Tsar Volkoï est le perso pilote (index 0)", () => {
   const g = loadGame();
   assert.ok(g.CHARACTERS && g.CHARACTERS.length >= 3);
   assert.strictEqual(g.CHARACTERS[0].key, "vladou");
-  assert.strictEqual(g.CHARACTERS[0].name, "Tsar Vladou");
+  assert.strictEqual(g.CHARACTERS[0].name, "Tsar Volkoï");
   assert.strictEqual(g.CHARACTERS[1].key, "trompette");
   assert.strictEqual(g.CHARACTERS[2].key, "micron");
   assert.ok(g.CHARACTERS[0].coldProof);
   assert.ok(g.CHARACTERS[1].egoCharge);
   assert.ok(g.CHARACTERS[2].swapStats);
+});
+
+test("roster : Le Faucon (Citadelle du Levant) est jouable", () => {
+  const g = loadGame();
+  const i = g.CHARACTERS.findIndex(c => c.key === "faucon");
+  assert.ok(i >= 0, "faucon dans CHARACTERS");
+  assert.strictEqual(g.CHARACTERS[i].name, "Le Faucon");
+  assert.ok(g.CHARACTERS[i].egoCharge, "egoCharge");
+  const col = g.TERRAINS.find(t => t.key === "colline");
+  assert.ok(col, "terrain colline");
+  assert.strictEqual(col.character, i, "public Citadelle = Faucon");
+});
+
+test("roster : Le Safran est jouable (Voile d’Or)", () => {
+  const g = loadGame();
+  const i = g.CHARACTERS.findIndex(c => c.key === "safran");
+  assert.ok(i >= 0, "safran dans CHARACTERS");
+  assert.strictEqual(g.CHARACTERS[i].name, "Le Safran");
+  assert.strictEqual(g.CHARACTERS[i].superName, "Voile d’Or");
+  assert.ok(g.CHARACTERS[i].control >= 0.91, "contrôle élevé");
+});
+
+test("roster : noms fictionnalisés (casting Steam)", () => {
+  const g = loadGame();
+  const want = {
+    vladou: "Tsar Volkoï", trompette: "Baron Dorf", micron: "Le Cygne",
+    bebe: "Maréchal Bébé", panda: "Le Grand Timonier", sultan: "Le Sultan",
+    yogi: "Le Gourou", jair: "Le Capitaine", faucon: "Le Faucon", safran: "Le Safran"
+  };
+  for (const c of g.CHARACTERS) {
+    if (want[c.key]) assert.strictEqual(c.name, want[c.key], c.key);
+  }
+  assert.strictEqual(g.CHARACTERS.find(c => c.key === "micron").superName, "Passage en Force");
+  const maps = Object.fromEntries(g.TERRAINS.map(t => [t.key, t.name]));
+  assert.strictEqual(maps.plage, "Country Club Doré");
+  assert.strictEqual(maps.prairie, "Palais du Coq");
+  assert.strictEqual(maps.matin, "Cité du Matin");
+  assert.strictEqual(maps.bosphore, "Pont des Deux Mondes");
+  assert.strictEqual(maps.amazon, "Grande Forêt");
+});
+
+test("sprites : défaut walk = 4 frames (packs walk_0..3)", () => {
+  const g = loadGame();
+  assert.strictEqual(g.CHAR_ANIM_DEFAULTS.walk, 4,
+    "walk:8 cassait charAnimReady (PNG 4..7 absents)");
+});
+
+test("sprites : aucun PNG partagé entre deux persos (anti-contamination)", () => {
+  const fs = require("fs");
+  const path = require("path");
+  const crypto = require("crypto");
+  const root = path.join(__dirname, "..", "assets");
+  const keys = fs.readdirSync(root).filter(d => {
+    const man = path.join(root, d, "manifest.json");
+    return fs.existsSync(man) && d !== "maps";
+  });
+  const byHash = new Map();
+  for (const key of keys) {
+    const dir = path.join(root, key);
+    for (const f of fs.readdirSync(dir)) {
+      if (!f.endsWith(".png") || f.startsWith("_")) continue;
+      const buf = fs.readFileSync(path.join(dir, f));
+      const h = crypto.createHash("md5").update(buf).digest("hex");
+      if (!byHash.has(h)) byHash.set(h, []);
+      byHash.get(h).push(key + "/" + f);
+    }
+  }
+  const bad = [...byHash.values()].filter(g => new Set(g.map(x => x.split("/")[0])).size > 1);
+  assert.deepStrictEqual(bad, [], "PNG partagés entre persos : " + JSON.stringify(bad));
+});
+
+test("échelles décor : PROP_H cohérent vs CHAR_BASE_H", () => {
+  const g = loadGame();
+  assert.strictEqual(g.CHAR_BASE_H, 110);
+  assert.ok(g.PROP_H, "PROP_H exposé");
+  // Au sol : plus petits qu'un perso (sauf cortège lisible)
+  assert.ok(g.PROP_H.cow < g.CHAR_BASE_H);
+  assert.ok(g.PROP_H.peacock < g.CHAR_BASE_H);
+  assert.ok(g.PROP_H.flag < g.CHAR_BASE_H);
+  assert.ok(g.PROP_H.cannon < g.CHAR_BASE_H);
+  assert.ok(g.PROP_H.snowman < g.CHAR_BASE_H);
+  assert.ok(g.PROP_H.cart < g.CHAR_BASE_H);
+  assert.ok(g.PROP_H.marchers > g.CHAR_BASE_H, "cortège un cran plus grand");
+  assert.ok(g.PROP_H.cowIdle < g.PROP_H.cow);
+  assert.ok(g.PROP_H.falcon < g.PROP_H.cow, "oiseau vol < animal sol");
+  assert.ok(g.PROP_H.pigeon < g.PROP_H.peacock);
+});
+
+test("events map : chaque terrain a un kind non-null", () => {
+  const g = loadGame();
+  for (let i = 0; i < g.TERRAINS.length; i++) {
+    g.setTerrain(i);
+    const kind = g.mapEventKind();
+    assert.ok(kind, g.TERRAINS[i].key + " sans mapEventKind");
+  }
+});
+
+test("météo : flavor snow/sand/rain selon terrain", () => {
+  const g = loadGame();
+  const byKey = Object.fromEntries(g.TERRAINS.map((t, i) => [t.key, i]));
+  g.setTerrain(byKey.neige);
+  assert.strictEqual(g.weatherFlavor(), "snow");
+  g.setTerrain(byKey.plage);
+  assert.strictEqual(g.weatherFlavor(), "sand");
+  g.setTerrain(byKey.roseraie);
+  assert.strictEqual(g.weatherFlavor(), "rain");
+  g.setTerrain(byKey.prairie);
+  assert.strictEqual(g.weatherFlavor(), "rain");
+});
+
+test("météo : plage et roseraie ne sont plus bloquées au clear", () => {
+  const g = loadGame();
+  const byKey = Object.fromEntries(g.TERRAINS.map((t, i) => [t.key, i]));
+  for (const key of ["plage", "roseraie"]) {
+    g.setTerrain(byKey[key]);
+    g.resetWeather();
+    g.setWeather("clear", 1);
+    g.stepWeather();
+    assert.strictEqual(g.getWeather(), "rain", key + " doit pouvoir passer en rain");
+  }
 });
 
 test("V2 : balle rapide + smash touche malgré la vitesse", () => {
@@ -574,14 +694,31 @@ test("V2 : service — balle dans les mains, lancer vertical (smash/X)", () => {
   assert.ok(g.ball.inHands && g.ball.frozen);
   assert.ok(Math.abs(g.ball.y - (g.blobL.y - 48)) < 3, "balle collée aux bras");
   assert.ok(g.ball.x > g.blobL.x + 16, "balle devant le corps (côté face)");
-  g.stepGame({ ...N0, jump:true }, N0); // saut seul ≠ lancer
-  assert.ok(g.ball.inHands && g.ball.frozen, "saut sans X ne lance pas");
+  g.stepGame({ ...N0, ax:0.6, jump:true }, N0); // saut MANETTE ≠ lancer
+  assert.ok(g.ball.inHands && g.ball.frozen, "saut manette sans X ne lance pas");
   g.stepGame({ ...N0, smash:true }, N0); // lancer = smash (X)
   assert.strictEqual(g.ball.frozen, false);
   assert.strictEqual(g.ball.inHands, false);
   assert.ok(Math.abs(g.ball.vx) < 0.5, "lancer vraiment vertical (vx≈0)");
   assert.ok(g.ball.vy < -8, "fortement vers le haut (vy=" + g.ball.vy + ")");
   assert.ok(g.ball.y < y0, "la balle a quitté les mains vers le haut");
+});
+
+test("V2 : au service, le SAUT seul ne sert pas — il faut F pour lancer", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(51);
+  g.setState("serve"); g.setServeCountdown(0);
+  g.setServingSide(0);
+  g.ball.reset(0);
+  g.stepGame(N0, N0); // pose
+  assert.ok(g.ball.inHands, "balle en mains");
+  // Saut (Espace) seul : la balle reste en mains (on ne sert pas au saut)
+  g.stepGame({ ...N0, jump:true, kbdJump:true }, N0);
+  assert.ok(g.ball.inHands && g.ball.frozen, "le saut seul ne lance pas");
+  // F lance la balle (toss vertical)
+  g.stepGame({ ...N0, smash:true }, N0);
+  assert.strictEqual(g.ball.inHands, false, "F lance la balle");
 });
 
 test("V2 : service — se retourner déplace la balle avec les mains", () => {
@@ -629,27 +766,31 @@ test("V2 : service — pas de cloche auto après lancer (il faut F)", () => {
   assert.ok(g.ball.vy < 0, "cloche");
 });
 
-test("V2 : service — sauter dans le lancer sans F ≠ smash auto", () => {
+test("V2 : service — sauter DANS la balle en l'air = smash auto (clavier), pas la manette", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(1);
   g.newGame(56);
   g.setState("play"); g.setServeCountdown(0);
   g.setServingSide(0);
-  g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y - 60; g.blobL.onGround = false;
-  g.blobL.lastActiveHitTick = -999;
-  g.ball.x = 250; g.ball.y = g.blobL.y - 58; g.ball.vx = 0; g.ball.vy = 3;
-  g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
-  g.ball.serveAimLock = true;
-  g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
+  const setup = () => {
+    g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y - 60; g.blobL.onGround = false;
+    g.blobL.lastActiveHitTick = -999;
+    g.ball.x = 250; g.ball.y = g.blobL.y - 58; g.ball.vx = 0; g.ball.vy = 3;
+    g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+    g.ball.serveAimLock = true;
+    g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
+    if (g.ball.touches) { g.ball.touches[0] = 0; g.ball.touches[1] = 0; }
+  };
+  // CLAVIER : contact en l'air sans F → smash auto (« sauter dans la balle »)
+  setup();
   g.stepGame(N0, N0);
-  assert.strictEqual(g.ball.touches[0], 0, "saut seul ≠ frappe de service");
-  assert.strictEqual(g.ball.serveAimLock, true, "lock intact");
-  g.blobL.lastActiveHitTick = -999;
-  g.ball.y = g.blobL.y - 58; g.ball.vy = 3;
-  g.stepGame({ ...N0, smash:true }, N0);
-  assert.strictEqual(g.ball.touches[0], 1, "F en l'air = service");
+  assert.strictEqual(g.ball.touches[0], 1, "contact clavier en l'air = smash auto");
   assert.strictEqual(g.ball.serveAimLock, false, "lock levé après la frappe");
   assert.ok(g.ball.vx > 0, "service vers l'adversaire");
+  // MANETTE (ax≠0) : contact en l'air sans X → PAS de smash auto (frappe explicite)
+  setup();
+  g.stepGame({ ...N0, ax:0.6 }, N0);
+  assert.strictEqual(g.ball.touches[0], 0, "manette sans X ≠ smash auto");
 });
 
 test("V2 : service — X manette maintenu après lancer ne sert pas tout seul", () => {
@@ -691,24 +832,41 @@ test("V2 : service — F + saut immédiat interdit (anti-triche)", () => {
   g.setState("serve"); g.setServeCountdown(0);
   g.setServingSide(0);
   g.ball.reset(0);
-  // Même frame : lancer + saut
-  g.stepGame({ ...N0, smash:true, jump:true }, N0);
+  // Même frame : lancer + saut (MANETTE : ax≠0 → le saut ne sert pas, F lance)
+  g.stepGame({ ...N0, smash:true, jump:true, ax:0.6 }, N0);
   assert.strictEqual(g.ball.inHands, false, "F lance bien");
   assert.ok(g.blobL.onGround, "pas de saut le frame du lancer");
-  // Tenir le saut pendant toute la montée
+  // Grâce post-lancer : A tenu ne saute pas encore
+  const grace = g.consts.SERVE_TOSS_GRACE || 10;
   let leftGround = false;
-  for (let i = 0; i < 80; i++) {
+  for (let i = 0; i < grace; i++) {
     g.stepGame({ ...N0, jump:true }, N0);
     if (!g.blobL.onGround) leftGround = true;
-    if (!g.ball.serveAimLock) break;
-    if (g.ball.vy >= 0) break; // apex atteint
   }
-  assert.ok(!leftGround, "tenir Espace pendant la montée ne fait pas sauter");
-  assert.ok(g.ball.vy >= 0 || !g.ball.serveAimLock, "balle au pic ou déjà frappée");
-  // Nouvel appui une fois en descente → saut OK
-  g.stepGame(N0, N0); // relâche
+  assert.ok(!leftGround, "pas de saut pendant la grâce post-lancer");
+  // Après la grâce : saut OK même si la balle monte encore (service aérien)
+  g.stepGame(N0, N0); // relâche pour front propre
   g.stepGame({ ...N0, jump:true }, N0);
-  assert.ok(!g.blobL.onGround, "après la descente, un nouvel appui saute");
+  assert.ok(!g.blobL.onGround, "après la grâce, A saute");
+});
+
+test("V2 : service — saut manette pendant la montée du lancer", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(61);
+  g.setState("serve"); g.setServeCountdown(0);
+  g.setServingSide(0);
+  g.ball.reset(0);
+  const pad = { ...N0, smash:true, ax: 0.3, ay: -0.4 };
+  g.stepGame({ ...pad, jump:true }, N0);
+  assert.ok(g.blobL.onGround, "pas de saut au lancer");
+  const grace = g.consts.SERVE_TOSS_GRACE || 10;
+  for (let i = 0; i < grace; i++) g.stepGame({ ...N0, jump:true, ax: 0.3, ay: -0.4 }, N0);
+  assert.ok(g.blobL.onGround, "grâce = encore au sol");
+  assert.ok(g.ball.vy < 0, "balle encore en montée");
+  g.stepGame(N0, N0);
+  g.stepGame({ ...N0, jump:true, ax: 0.3, ay: -0.4 }, N0);
+  assert.ok(!g.blobL.onGround, "manette : saute pendant la montée après grâce");
 });
 
 test("V2 : service — passe le filet depuis près du filet (tous persos)", () => {
@@ -765,6 +923,76 @@ test("V2 : service aérien (smash) — passe aussi le filet", () => {
   }
   assert.ok(cleared, "service aérien Trompette doit passer le filet");
   assert.strictEqual(g.scores[1], 0, "pas de faute filet en smash de service");
+});
+
+test("V2 : service aérien — plus de punch qu'au sol (Yogi)", () => {
+  const g = loadGame();
+  const C = g.consts;
+  const N0 = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  const yogi = g.CHARACTERS.findIndex(c => c.key === "yogi");
+  assert.ok(yogi >= 0, "Yogi présent");
+
+  function hit(aerial) {
+    g.setVsAI(true); g.setAiLevel(1);
+    g.newGame(77);
+    g.setServingSide(0);
+    g.setState("play"); g.setServeCountdown(0);
+    g.blobL.charId = yogi;
+    g.blobL.x = 280;
+    // Assez haut pour le vrai smash de service (balle proche du bandeau)
+    g.blobL.y = aerial ? C.GROUND_Y - 120 : C.GROUND_Y;
+    g.blobL.onGround = !aerial;
+    g.blobL.lastActiveHitTick = -999;
+    g.blobR.x = C.W - 40; g.blobR.y = C.GROUND_Y; g.blobR.onGround = true;
+    g.ball.x = 285;
+    g.ball.y = aerial ? C.NET_TOP - 10 : g.blobL.y - 70;
+    g.ball.vx = 0; g.ball.vy = 1;
+    g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+    g.ball.serveAimLock = true; g.ball.serveFlight = false;
+    g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
+    g.scores[0] = 0; g.scores[1] = 0;
+    g.stepGame({ ...N0, smash:true, ax: 0.6, ay: -0.3 }, N0);
+    return {
+      spd: Math.hypot(g.ball.vx, g.ball.vy),
+      vx: Math.abs(g.ball.vx),
+    };
+  }
+  const ground = hit(false);
+  const air = hit(true);
+  assert.ok(air.spd > ground.spd + 0.4, "smash aérien plus rapide que cloche sol");
+  assert.ok(air.vx > ground.vx + 2, "smash aérien plus de composante avant");
+  assert.ok(g.CHARACTERS[yogi].power >= 1.06, "Yogi n'est plus sous-puissance");
+});
+
+test("V2 : smash sous le bandeau — passe le filet (Yogi milieu de court)", () => {
+  const g = loadGame();
+  const C = g.consts;
+  const N0 = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  const yogi = g.CHARACTERS.findIndex(c => c.key === "yogi");
+  g.setVsAI(true); g.setAiLevel(0);
+  g.newGame(81);
+  g.setServingSide(1);
+  g.setState("play"); g.setServeCountdown(0);
+  g.blobL.charId = yogi;
+  g.blobL.x = 300; g.blobL.y = C.GROUND_Y - 75; g.blobL.onGround = false;
+  g.blobL.lastActiveHitTick = -999;
+  g.blobR.x = C.W - 40;
+  g.ball.x = 308; g.ball.y = g.blobL.y - 50; // sous le bandeau
+  g.ball.vx = 0; g.ball.vy = 1;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+  g.ball.serveAimLock = false;
+  g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
+  g.scores[0] = 0; g.scores[1] = 0;
+  assert.ok(g.ball.y > C.NET_TOP, "balle sous le sommet du filet");
+  g.stepGame({ ...N0, smash:true, ax: 0.75, ay: -0.15 }, N0);
+  let cleared = false;
+  for (let i = 0; i < 160; i++) {
+    g.updateBall();
+    if (g.ball.x > C.NET_X + 20 && g.ball.y < C.NET_TOP) { cleared = true; break; }
+    if (g.getState() === "point") break;
+  }
+  assert.ok(cleared, "smash Yogi sous le bandeau doit passer le filet");
+  assert.strictEqual(g.scores[1], 0, "pas de faute filet");
 });
 
 test("V2 : service — cloche forcée vers l'adversaire", () => {
@@ -830,7 +1058,7 @@ test("V2 : cloche suit l'angle du stick", () => {
   assert.ok(Math.abs(g.ball.vx) < Math.abs(g.ball.vy) * 0.35, "plein haut ≠ tir vers l'avant (vx=" + g.ball.vx + ", vy=" + g.ball.vy + ")");
 });
 
-test("V2 : clavier — réception verticale (pas vers l'avant)", () => {
+test("V2 : clavier — réception légèrement vers l'avant (setup smash)", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(1);
   g.newGame(55);
@@ -846,8 +1074,9 @@ test("V2 : clavier — réception verticale (pas vers l'avant)", () => {
   setup(0);
   g.stepGame({ ...N0, smash:true }, N0);
   assert.ok(g.ball.vy < -6, "clavier → passe haute (vy=" + g.ball.vy + ")");
-  assert.ok(Math.abs(g.ball.vx) < Math.abs(g.ball.vy) * 0.35,
-    "clavier sous la balle → vertical (vx=" + g.ball.vx + ")");
+  assert.ok(g.ball.vx > 1.2, "légère poussée vers le filet (vx=" + g.ball.vx + ")");
+  assert.ok(Math.abs(g.ball.vx) < Math.abs(g.ball.vy) * 0.45,
+    "reste surtout vertical (vx=" + g.ball.vx + " vy=" + g.ball.vy + ")");
   const vxMid = g.ball.vx;
   setup(36);
   g.stepGame({ ...N0, smash:true }, N0);
@@ -855,9 +1084,9 @@ test("V2 : clavier — réception verticale (pas vers l'avant)", () => {
   setup(-28);
   g.stepGame({ ...N0, smash:true }, N0);
   const vxBack = g.ball.vx;
-  // Toutes les réceptions clavier restent quasi verticales (plus de géométrie avant/arrière)
-  assert.ok(Math.abs(vxMid) < 4 && Math.abs(vxFront) < 4 && Math.abs(vxBack) < 4,
-    "réceptions clavier sans poussée avant (mid=" + vxMid + " F=" + vxFront + " B=" + vxBack + ")");
+  // Toutes les réceptions clavier poussent un peu vers l'avant (setup smash)
+  assert.ok(vxMid > 1 && vxFront > 1 && vxBack > 1,
+    "réceptions clavier vers l'avant (mid=" + vxMid + " F=" + vxFront + " B=" + vxBack + ")");
 });
 
 test("V2 : clavier — smash auto au contact en saut", () => {
@@ -883,11 +1112,13 @@ test("V2 : clavier — smash piqué quand la balle est haute", () => {
   g.setVsAI(true); g.setAiLevel(1);
   g.newGame(59);
   g.setState("play"); g.setServeCountdown(0);
-  // Près du filet : balle au-dessus de la tête → piqué
-  g.blobL.x = 360; g.blobL.y = g.consts.GROUND_Y - 90; g.blobL.onGround = false;
+  // Près du filet, sauté haut : balle au-dessus du bandeau → piqué
+  g.blobL.x = 370; g.blobL.y = g.consts.NET_TOP + 40; g.blobL.onGround = false;
   g.blobL.vy = 0; g.blobL.lastActiveHitTick = -999;
   const headY = g.blobL.y - 64;
-  g.ball.x = 375; g.ball.y = headY - 20; g.ball.vx = 0; g.ball.vy = 1;
+  g.ball.x = 378; g.ball.y = headY - 12; // proche de la tête, au-dessus du filet
+  assert.ok(g.ball.y < g.consts.NET_TOP - 8, "balle au-dessus du bandeau");
+  g.ball.vx = 0; g.ball.vy = 1;
   g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
   g.ball.serveAimLock = false;
   g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
@@ -922,7 +1153,7 @@ test("V2 : clavier — smash depuis le fond passe le filet", () => {
   assert.strictEqual(g.scores[1], 0, "pas de faute filet");
 });
 
-test("V2 : cloche depuis le fond = passe haute verticale (clavier)", () => {
+test("V2 : cloche depuis le fond = passe haute légèrement avant (clavier)", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(1);
   g.newGame(53);
@@ -933,8 +1164,9 @@ test("V2 : cloche depuis le fond = passe haute verticale (clavier)", () => {
   g.ball.serveAimLock = false;
   g.stepGame({ ...N0, smash:true }, N0);
   assert.ok(g.ball.vy < -6.5, "assez de cloche verticale");
-  assert.ok(Math.abs(g.ball.vx) < Math.abs(g.ball.vy) * 0.35,
-    "depuis le fond aussi : vertical, pas vers le filet (vx=" + g.ball.vx + ")");
+  assert.ok(g.ball.vx > 1.2, "léger biais vers le filet (vx=" + g.ball.vx + ")");
+  assert.ok(Math.abs(g.ball.vx) < Math.abs(g.ball.vy) * 0.45,
+    "reste une passe haute, pas un lob plat (vx=" + g.ball.vx + ")");
 });
 
 test("V2 : après lancer, smash maintenu frappe vraiment", () => {
@@ -951,7 +1183,7 @@ test("V2 : après lancer, smash maintenu frappe vraiment", () => {
   assert.ok(g.ball.vx > 3, "smash vers l'adversaire (vx=" + g.ball.vx + ")");
 });
 
-test("event canon : annonce puis tir déterministe (Place Grand-Rouge)", () => {
+test("event canon : annonce puis tir déterministe (Place Écarlate)", () => {
   const g = freshRally(42);
   const N = { left:false, right:false, jump:false };
   // balle hors jeu pour ne pas marquer pendant l'annonce
@@ -993,7 +1225,7 @@ test("terrain calme : aucun événement canon", () => {
   assert.strictEqual(g.mapEvent.phase, "idle");
 });
 
-test("event cortège : Palais de l'Hexagone traverse le terrain", () => {
+test("event cortège : Palais du Coq traverse le terrain", () => {
   const g = freshRally(77);
   const N = { left:false, right:false, jump:false };
   g.setTerrain(2); // prairie / Micron
@@ -1083,7 +1315,7 @@ test("events map : pas de trigger en pause / service / point", () => {
   const g = freshRally(12);
   const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
   g.setMapEventsQuiet(false);
-  g.setTerrain(0); // Place Grand-Rouge / canon
+  g.setTerrain(0); // Place Écarlate / canon
   g.mapEvent.phase = "idle";
   g.mapEvent.timer = 1;
 

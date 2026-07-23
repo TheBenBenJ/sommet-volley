@@ -19,7 +19,10 @@ rencontrée doit être corrigée ICI, pas contournée en douce.
 >   **trou** après `cutout.py` → silhouettes en **aplats solides**, pas de
 >   « triangle blanc » dans le corps (surtout `defeat`, `smash`, `super`) ;
 > - map attitrée : suivre aussi [`PIPELINE-MAP.md`](PIPELINE-MAP.md) (court,
->   baseline, event), sinon le perso est beau mais le terrain est à refaire.
+>   baseline, event), sinon le perso est beau mais le terrain est à refaire ;
+> - `walk` = **4** frames distinctes (appui / passage / appui / passage). Un
+>   défaut code à 8 frames faisait échouer `charAnimReady("walk")` (PNG
+>   manquants) ; des walks trop similaires → marche qui saute.
 
 ---
 
@@ -66,7 +69,7 @@ agrandi). Nommage : `raw/<key>/<anim>_<n>.png`.
 |-------------|--------|------------------------------------------|
 | idle_face   | 1      | menus / sélection                         |
 | idle        | 2      | repos en jeu (respiration)                |
-| walk        | 8      | cycle de marche (2 contacts, 2 passages)  |
+| walk        | 4      | cycle distinct : appui / passage / appui / passage |
 | jump        | 3      | impulsion / apex / retombée               |
 | receive     | 2      | réception (bras prêts / balle captée)     |
 | aim         | 2      | contrôle + visée (regard vers la cible)   |
@@ -76,9 +79,10 @@ agrandi). Nommage : `raw/<key>/<anim>_<n>.png`.
 | victory     | 2      | point gagné / match gagné                 |
 | defeat      | 2      | match perdu                               |
 
-Soit **31 images** par personnage. Le cycle `walk` se génère pose par pose en
-décrivant la phase (« jambe droite en contact au sol, bras gauche en avant »…)
-— pas « génère un cycle de marche » en une image.
+Soit **27 images** par personnage. Le cycle `walk` : **4 poses vraiment
+différentes** (pas 4 fois « walking ») — `walk_0` pied avant planté, `walk_1`
+jambes serrées (passage), `walk_2` pied opposé planté, `walk_3` passage
+opposé. Le moteur les joue toutes (`walkPhase % 4`).
 
 ## Étape 3 — Génération (Gemini)
 
@@ -122,7 +126,7 @@ Entrée `raw/<key>/*.png` → sortie `assets/<key>/*.png` :
 
 1. `assets/<key>/manifest.json` :
    ```json
-   { "anims": { "walk": 8, "idle": 2, "jump": 3, "receive": 2, "aim": 2,
+   { "anims": { "walk": 4, "idle": 2, "jump": 3, "receive": 2, "aim": 2,
                 "smash": 3, "super": 4, "panic": 2, "victory": 2,
                 "defeat": 2, "idle_face": 1 },
      "baseH": 110, "footPad": 2 }

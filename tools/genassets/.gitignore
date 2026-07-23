@@ -1,0 +1,6 @@
+# Local / lourd — pas dans git
+config.yaml
+dataset/
+workflows/
+poses/
+*.safetensors

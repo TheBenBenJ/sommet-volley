@@ -1,8 +1,16 @@
 {
   "key": "vladou",
-  "name": "Place Grand-Rouge",
-  "layers": ["far", "skyline", "crowd_0"],
-  "props": ["cannon_0", "cannon_1", "snowman", "shot", "warn", "net_post"],
+  "name": "Place Écarlate",
+  "layers": [
+    "far",
+    "skyline"
+  ],
+  "props": [
+    "net_post",
+    "flag",
+    "cannon"
+  ],
+  "event": "cannon",
   "thumb": "thumb.png",
-  "event": "ceremonial_cannon"
+  "notes": "Bourassie / Tsar Volkoï (clé vladou, terrainKey neige). Skyline Gemini 16:9 bgFullHeight. Props Grok raccordés (net_post, flag, cannon/cannon_fire → cannon_0/1). Event: canon cérémoniel. snowman/shot/warn legacy optionnels."
 }

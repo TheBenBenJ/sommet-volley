@@ -6,10 +6,11 @@
     "skyline"
   ],
   "props": [
+    "net_post",
     "flag",
-    "warn",
-    "net_post"
+    "cow"
   ],
-  "notes": "Stade Ashram — nuit étoilée, arcs terracotta, tente pourpre. Public déjà dans le skyline.",
-  "thumb": "thumb.png"
+  "event": "cow",
+  "thumb": "thumb.png",
+  "notes": "Stade Ashram / Bharatie (Yogi). Skyline grès miel + soucis + turquoise. Props sommet-decor (net_post, flag, cow). Event cow (crosser). Public désactivé (déjà dans skyline)."
 }

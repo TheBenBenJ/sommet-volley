@@ -39,7 +39,7 @@ L’IA a **exécuté** sous consignes (code, intégration, docs techniques).
 | Tsar Vladou | Place Grand-Rouge |
 | Ronald Trompette | Pelouse Oval |
 | Manu Micron | Palais de l’Hexagone |
-| Kim Houn | Esplanade du Défilé |
+| Maréchal Bébé | Esplanade du Défilé |
 | Président Panda | Place du Matin |
 | Recep Sultan | Palais du Bosphore |
 | Narendra Yogi | Stade Ashram |
@@ -95,7 +95,7 @@ L’IA a **exécuté** sous consignes (code, intégration, docs techniques).
 | 19 juil. soir | Playtest pad : service, cloche, IA, sauts |
 | 19 juil. soir | Validation fiches → Vladou + pipeline assets |
 | 19→20 juil. | Génération Gemini persos / maps / filets |
-| 20 juil. journée–soir | Trompette, Micron, Houn + 4 maps « extension » (Panda, Sultan, Yogi, Jair) |
+| 20 juil. journée–soir | Dorf, Cygne, Bébé + 4 maps « extension » (Panda, Sultan, Yogi, Jair) |
 | 20 juil. soir | Events map (aras, vache, tapis, lanternes…), feel smash / clavier, décors |
 | 20 juil. ~minuit | Pipelines map/perso documentés + skyline Bosphore + push prod |
 

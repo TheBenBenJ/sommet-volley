@@ -18,7 +18,7 @@ function drawCharacter(b) {
     if (key === "vladou") drawVladou(b);
     else if (key === "trompette") drawTrompette(b);
     else if (key === "micron") drawMicron(b);
-    else if (key === "houn") drawHoun(b);
+    else if (key === "bebe") drawBebe(b);
     else drawGenericChar(b);
   }
   drawSuperOverlay(b);
@@ -208,7 +208,7 @@ function drawMicron(b) {
   });
 }
 
-function drawHoun(b) {
+function drawBebe(b) {
   drawCharBody(b, (c) => {
     c.fillStyle = "#1a241c";
     c.fillRect(-11, -30, 9, 30); c.fillRect(2, -30, 9, 30);
@@ -282,7 +282,7 @@ function drawCharSuperFX(b) {
     ctx.fillStyle = base;
     ctx.beginPath(); ctx.ellipse(wallX, GROUND_Y + 2, 36, 8, 0, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
-  } else if (key === "houn") {
+  } else if (key === "bebe") {
     ctx.save();
     ctx.globalAlpha = 0.4 * fade;
     const band = ctx.createLinearGradient(x0, GROUND_Y, x0, GROUND_Y - 70);

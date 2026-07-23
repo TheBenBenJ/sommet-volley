@@ -1,8 +1,9 @@
-# Fiche personnage — Tsar Vladou (perso pilote Phase 2)
+# Fiche personnage — Tsar Volkoï (Bourassie) · clé technique vladou
 key: vladou
-name: "Tsar Vladou"
-pays_theme: "Russie — hiver, ours, parade"
-silhouette: "petit, massif, torse bombé, chemise ouverte, regard d'acier"
+name: "Tsar Volkoï"
+nation: "Bourassie"
+pays_theme: "Bourassie — hiver, forteresse écarlate, parades"
+silhouette: "petit autocrate trapu au torse bombé, crâne chauve compact (~1/3 hauteur crown→pieds, PAS ballon), teint pâle, regard d'acier — overshirt laine bordeaux col montant boutonnée sur col roulé noir, pantalon anthracite, chaussures cuir (PAS de jogging/tracksuit, PAS chemise ouverte)"
 palette: ["#b43a2e", "#e8d9b0", "#3a3f4a"]
 stats: { vitesse: 3, detente: 3, puissance: 4, controle: 4 }
 trait_passif: "Sang froid — insensible au gel/ralentissement"
@@ -10,4 +11,4 @@ super:
   nom: "Hiver Général"
   effet: "gèle le camp adverse ~6 s (glisse extrême), flocons côté adverse"
 sons: "voix grave, rire bref ; impact = coup sec"
-map: "Place Grand-Rouge"
+map: "Place Écarlate"

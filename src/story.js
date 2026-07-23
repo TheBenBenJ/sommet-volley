@@ -58,10 +58,10 @@ const STORY = [
     ]
   },
   {
-    act: 1, title: "Le toit du monde", sub: "Inde–Chine · frontière himalayenne",
+    act: 1, title: "Le toit du monde", sub: "Bharatie–Panguo · crête disputée",
     left: "yogi", right: "panda", terrain: 6, mode: "volley", ai: 1, doped: null,
     pre: [
-      { s: "narrator", t: "Deux géants d'Asie, un milliard et demi d'habitants chacun, une ligne de crête contestée en toile de fond." },
+      { s: "narrator", t: "Deux géants du continent, des foules immenses de chaque côté, une ligne de crête contestée en toile de fond." },
       { s: "panda", t: "L'harmonie exige une seule chose : que la ligne passe là où je le décide." },
       { s: "yogi", t: "Namasté. Chez nous, l'endurance est une discipline millénaire. Tu vas courir, ami." },
       { s: "panda", t: "Je contrôle le tempo. Toujours. Ta démographie ne joue pas au volley pour toi." },
@@ -77,12 +77,12 @@ const STORY = [
     ]
   },
   {
-    act: 1, title: "La porte close", sub: "Turquie–UE · Méditerranée orientale",
+    act: 1, title: "La porte close", sub: "Bosforie–Gallardie · détroit disputé",
     left: "sultan", right: "micron", terrain: 5, mode: "volley", ai: 1, doped: null,
     pre: [
-      { s: "narrator", t: "Sur le Bosphore, entre deux continents, une candidature qui dure depuis… on ne compte plus." },
+      { s: "narrator", t: "Sur le détroit, entre deux continents, une candidature qui dure depuis… on ne compte plus." },
       { s: "sultan", t: "Trente ans que je frappe à votre porte. Ce soir, je la défonce au smash." },
-      { s: "micron", t: "L'Europe a des valeurs, des critères, des procédures. Et un excellent contre." },
+      { s: "micron", t: "Gallardie a des valeurs, des critères, des procédures. Et un excellent contre." },
       { s: "sultan", t: "Des procédures ! Pendant que vous délibérez, moi je contrôle le détroit." },
       { s: "micron", t: "En même temps, un détroit, ça se traverse dans les deux sens. Balle au centre." }
     ],
@@ -101,7 +101,7 @@ const STORY = [
     act: 2, title: "Le dégel n'aura pas lieu", sub: "Guerre froide 2.0 · course aux armements",
     left: "vladou", right: "trompette", terrain: 0, mode: "bomb", ai: 1, doped: null,
     pre: [
-      { s: "narrator", t: "Place Grand-Rouge, sous la neige. Le ballon n'est plus un ballon : c'est une bombe. Le camp où elle tombe perd." },
+      { s: "narrator", t: "Place Écarlate, sous la neige. Le ballon n'est plus un ballon : c'est une bombe. Le camp où elle tombe perd." },
       { s: "vladou", t: "Le froid ne me gêne pas. Je SUIS le froid. Toi, tu transpires déjà." },
       { s: "trompette", t: "J'ai le plus gros bouton. Le plus gros ! Un très, très gros bouton bombe." },
       { s: "vladou", t: "Les boutons, c'est pour ceux qui doutent. Moi, je patiente. La mèche fait le travail." },
@@ -117,10 +117,10 @@ const STORY = [
     ]
   },
   {
-    act: 2, title: "La guerre des puces", sub: "USA–Chine · tarifs & silicium",
+    act: 2, title: "La guerre des puces", sub: "Doria–Panguo · tarifs & silicium",
     left: "panda", right: "trompette", terrain: 4, mode: "bomb", ai: 2, doped: null,
     pre: [
-      { s: "narrator", t: "Place du Matin. Enjeu : qui fabrique le monde. La bombe tourne — comme les chaînes d'approvisionnement." },
+      { s: "narrator", t: "Cité du Matin. Enjeu : qui fabrique le monde. La bombe tourne — comme les chaînes d'approvisionnement." },
       { s: "trompette", t: "Des taxes ! Des taxes sur tout ! Sur le ballon, sur le filet, sur l'air que tu respires !" },
       { s: "panda", t: "Taxe ce que tu veux. Tes usines, tes téléphones, tes bombes… c'est encore moi qui les assemble." },
       { s: "trompette", t: "On se découple ! On rapatrie tout ! Enfin… après ce match. J'ai besoin de tes ballons." },
@@ -137,30 +137,30 @@ const STORY = [
   },
   {
     act: 2, title: "Le carburant du régime", sub: "Dossier nucléaire · sommets ratés",
-    left: "trompette", right: "houn", terrain: 3, mode: "bomb", ai: 3, doped: "R",
+    left: "trompette", right: "bebe", terrain: 3, mode: "bomb", ai: 3, doped: "R",
     pre: [
       { s: "narrator", t: "Esplanade du Défilé. On avait annoncé une poignée de main historique. On a eu autre chose." },
-      { s: "houn", t: "Nous nous étions écrit de si belles lettres, toi et moi. Puis tu es parti de la table." },
+      { s: "bebe", t: "Nous nous étions écrit de si belles lettres, toi et moi. Puis tu es parti de la table." },
       { s: "trompette", t: "Grand leader ! Très grand ! On s'aimait beaucoup. Puis un peu moins. Puis plus du tout." },
       { s: "narrator", t: "Regarde ses yeux. Injectés. On murmure qu'un « carburant militaire » coule dans ses veines." },
-      { s: "houn", t: "Ce n'est pas de la triche. C'est de la DISCIPLINE nationale. Concentré. Prépare-toi." }
+      { s: "bebe", t: "Ce n'est pas de la triche. C'est de la DISCIPLINE nationale. Concentré. Prépare-toi." }
     ],
     win: [
       { s: "trompette", t: "Battu ton truc dopé ! Personne n'y croyait ! MOI si. Toujours." },
-      { s: "houn", t: "Une défaite temporaire. Le programme continue. Le défilé aussi." }
+      { s: "bebe", t: "Une défaite temporaire. Le programme continue. Le défilé aussi." }
     ],
     lose: [
-      { s: "houn", t: "La discipline écrase l'improvisation. Écris-moi une lettre. Je répondrai peut-être." },
+      { s: "bebe", t: "La discipline écrase l'improvisation. Écris-moi une lettre. Je répondrai peut-être." },
       { s: "narrator", t: "Le dopage a payé. Mais quelque chose s'est cassé dans l'esprit des Jeux." }
     ]
   },
 
   // ===================== ACTE III — Jeux impitoyables (Bombe + dopage) =========
   {
-    act: 3, title: "La forêt qui brûle", sub: "Amazonie · climat · BRICS",
+    act: 3, title: "La forêt qui brûle", sub: "Grande Forêt · climat · alliances",
     left: "jair", right: "yogi", terrain: 7, mode: "bomb", ai: 2, doped: "R",
     pre: [
-      { s: "narrator", t: "Amazonie Dorée. La chaleur monte — sur le terrain et sur la planète. Yogi arrive… changé." },
+      { s: "narrator", t: "Grande Forêt. La chaleur monte — sur le terrain et sur la planète. Le Gourou arrive… changé." },
       { s: "jair", t: "Ma tronçonneuse a soif. Un smash de moi, et ta défense tombe comme un arbre." },
       { s: "yogi", t: "J'ai laissé la méditation au vestiaire. Ce soir, je carbure. Les Jeux l'exigent." },
       { s: "narrator", t: "Lui aussi. L'œil vitreux, les gestes trop vifs. La contagion du dopage gagne le peloton." },
@@ -235,11 +235,13 @@ const STORY_BARKS = {
   vladou:    ["Prévu.", "Le froid gagne.", "Patience.", "Faiblesse."],
   trompette: ["Énorme !", "Le plus grand !", "Truqué !", "On gagne !"],
   micron:    ["En même temps…", "Décisif.", "La méthode.", "Et voilà."],
-  houn:      ["Discipline !", "Défilé !", "Concentré.", "Écris-moi."],
+  bebe:      ["Discipline !", "Défilé !", "Concentré.", "Écris-moi."],
   panda:     ["Harmonie.", "Le tempo.", "Patience.", "Prévu."],
   sultan:    ["Séisme !", "Le détroit !", "Debout.", "J'entre."],
   yogi:      ["Namasté.", "Souffle.", "Le calme.", "Retour."],
-  jair:      ["Tronçonneuse !", "Ça coupe !", "Brute !", "Ça pousse."]
+  jair:      ["Tronçonneuse !", "Ça coupe !", "Brute !", "Ça pousse."],
+  faucon:    ["Raid !", "Sécurisé.", "Debout.", "Faucon."],
+  safran:    ["Safran.", "Mesuré.", "La cour.", "Or."]
 };
 
 // ---------- État du mode histoire ----------

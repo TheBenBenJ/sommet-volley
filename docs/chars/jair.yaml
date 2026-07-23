@@ -1,11 +1,13 @@
+# Fiche personnage — Le Capitaine (Tropicalia) · clé technique jair
 key: jair
-name: "Jair Tronço"
-pays_theme: "Brésil — amazonie, vert-jaune, tronçonneuse satirique"
-silhouette: "stocky, large sourire, costume présidentiel sombre, chemise blanche, cravate jaune-vert, pin Brésil, chaussures noires — JAMAIS de tenue de sport ni casquette"
-palette: ["#1b5e20", "#fbc02d", "#f5d0b0"]
-look_lock: "Toujours en costume présidentiel (veste + pantalon sombre, cravate jaune/vert, pin Brésil). Interdit : maillot, short, baskets, casquette, chaussettes sport."
+name: "Le Capitaine"
+nation: "Tropicalia"
+pays_theme: "Tropicalia — forêt, chaleur"
+silhouette: "trapu, cheveux courts sombres, veste militaire olive, sourire dentu"
+palette: ["#2e7d32", "#1b5e20", "#ffd54f"]
 stats: { vitesse: 3, detente: 2, puissance: 5, controle: 2 }
+trait_passif: "Tronçonneuse — puissance max, SUPER aussi en perdant"
 super:
   nom: "Déforestation"
-  effet: "mur de troncs au camp adverse ~5 s"
-map: "Amazonie Dorée"
+  effet: "mur de troncs camp adverse ~5 s"
+map: "Grande Forêt"

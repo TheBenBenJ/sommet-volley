@@ -261,7 +261,7 @@ function charHitSound(a, heavy) {
     case "micron":
       beep(520, 0.07, "sine", 0.1); beep(660, 0.09, "sine", 0.08, 0.05);
       break;
-    case "houn":
+    case "bebe":
       beep(180, 0.08, "square", 0.12); beep(240, 0.1, "triangle", 0.1, 0.05);
       break;
     case "panda":
@@ -275,6 +275,12 @@ function charHitSound(a, heavy) {
       break;
     case "jair":
       beep(150, 0.08, "sawtooth", 0.1); beep(90, 0.12, "square", 0.08, 0.05);
+      break;
+    case "faucon":
+      beep(260, 0.07, "square", 0.11); beep(380, 0.09, "triangle", 0.09, 0.05);
+      break;
+    case "safran":
+      beep(300, 0.08, "sine", 0.1); beep(420, 0.1, "triangle", 0.08, 0.05);
       break;
     default:
       beep(240, 0.1, "triangle", 0.12);

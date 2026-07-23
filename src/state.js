@@ -5,14 +5,16 @@
 // chaque terrain appartient à un perso (voir CHARACTERS) : son public des
 // tribunes est composé de ce perso, et le nom du terrain lui rend hommage.
 const TERRAINS = [
-  { key: "neige",    name: "Place Grand-Rouge",       character: 0 }, // Vladou
-  { key: "plage",    name: "Pelouse Oval",            character: 1 }, // Trompette
-  { key: "prairie",  name: "Palais de l'Hexagone",    character: 2 }, // Micron
-  { key: "parade",   name: "Esplanade du Défilé",     character: 3 }, // Houn
-  { key: "matin",    name: "Place du Matin",          character: 4 }, // Panda
-  { key: "bosphore", name: "Palais du Bosphore",      character: 5 }, // Sultan
-  { key: "ashram",   name: "Stade Ashram",            character: 6 }, // Yogi
-  { key: "amazon",   name: "Amazonie Dorée",          character: 7 }  // Jair
+  { key: "neige",    name: "Place Écarlate",          character: 0 }, // Volkoï / Bourassie
+  { key: "plage",    name: "Country Club Doré",       character: 1 }, // Baron Dorf / Doria
+  { key: "prairie",  name: "Palais du Coq",           character: 2 }, // Le Cygne / Gallardie
+  { key: "parade",   name: "Esplanade du Défilé",     character: 3 }, // Maréchal Bébé / Ryonganie
+  { key: "matin",    name: "Cité du Matin",           character: 4 }, // Grand Timonier / Panguo
+  { key: "bosphore", name: "Pont des Deux Mondes",    character: 5 }, // Le Sultan / Bosforie
+  { key: "ashram",   name: "Stade Ashram",            character: 6 }, // Le Gourou / Bharatie
+  { key: "amazon",   name: "Grande Forêt",            character: 7 }, // Le Capitaine / Tropicalia
+  { key: "colline",  name: "Citadelle du Levant",     character: 8 }, // Le Faucon / Levantie
+  { key: "roseraie", name: "Jardin des Roses",         character: 9 }  // Le Safran / Ramenie
 ];
 let terrain = 0;
 
@@ -26,7 +28,7 @@ const CHARACTERS = [
   // Casting satirique Sommet Volley — fiches docs/chars/*.yaml
   // stats /5 + multiplicateurs moteur (speed, jump, power, control)
   {
-    key: "vladou", name: "Tsar Vladou",
+    key: "vladou", name: "Tsar Volkoï",
     color: "#b43a2e", darkColor: "#7a281e",
     stats: { vitesse: 3, detente: 3, puissance: 4, controle: 4 },
     speed: 1.06, jump: 1.06, power: 1.18, control: 0.91,
@@ -36,7 +38,7 @@ const CHARACTERS = [
     superDesc: "Gèle le camp adverse ~6 s : ils glissent comme sur de la glace. Visuel : voile bleu glacial + flocons qui tombent sur leur moitié."
   },
   {
-    key: "trompette", name: "Ronald Trompette",
+    key: "trompette", name: "Baron Dorf",
     color: "#f0a060", darkColor: "#c97838",
     stats: { vitesse: 3, detente: 2, puissance: 4, controle: 3 },
     speed: 1.06, jump: 0.94, power: 1.18, control: 0.82,
@@ -46,17 +48,17 @@ const CHARACTERS = [
     superDesc: "Mur doré au milieu du camp adverse ~5 s : bloque les courses au sol (sauter par-dessus pour passer). Visuel : colonne d’or lumineuse + halo au pied du mur."
   },
   {
-    key: "micron", name: "Manu Micron",
+    key: "micron", name: "Le Cygne",
     color: "#3d5afe", darkColor: "#1a237e",
     stats: { vitesse: 4, detente: 3, puissance: 3, controle: 4 },
     speed: 1.18, jump: 1.06, power: 1.06, control: 0.91,
     swapStats: true,
-    trait: "En même temps : après chaque point, échange vitesse ↔ puissance.",
-    superName: "49.3",
+    trait: "Double jeu : après chaque point, échange vitesse ↔ puissance.",
+    superName: "Passage en Force",
     superDesc: "~4 s : tes frappes ne peuvent plus être smashées en retour. Visuel : aura bleue autour de toi pendant l’effet."
   },
   {
-    key: "houn", name: "Kim Jong Houn",
+    key: "bebe", name: "Maréchal Bébé",
     color: "#2d3a2e", darkColor: "#1a241c",
     stats: { vitesse: 3, detente: 2, puissance: 4, controle: 3 },
     speed: 1.06, jump: 0.94, power: 1.18, control: 0.82,
@@ -66,7 +68,7 @@ const CHARACTERS = [
     superDesc: "Interdit de sauter au camp adverse ~5 s — collés au sol. Visuel : bande rouge au sol + pulses d’alerte sur leur camp."
   },
   {
-    key: "panda", name: "Président Panda",
+    key: "panda", name: "Le Grand Timonier",
     color: "#c62828", darkColor: "#8e0000",
     stats: { vitesse: 3, detente: 3, puissance: 3, controle: 5 },
     speed: 1.06, jump: 1.06, power: 1.06, control: 1.0,
@@ -75,7 +77,7 @@ const CHARACTERS = [
     superDesc: "Mur au milieu du camp adverse ~5 s : coupe le terrain en deux. Visuel : même muraille dorée lumineuse que Le Mur."
   },
   {
-    key: "sultan", name: "Recep Sultan",
+    key: "sultan", name: "Le Sultan",
     color: "#6a1b9a", darkColor: "#4a148c",
     stats: { vitesse: 3, detente: 4, puissance: 3, controle: 3 },
     speed: 1.06, jump: 1.18, power: 1.06, control: 0.82,
@@ -84,16 +86,16 @@ const CHARACTERS = [
     superDesc: "Interdit de sauter au camp adverse ~5 s. Visuel : tremblement d’écran + bande rouge d’alerte au sol (comme Batterie AA)."
   },
   {
-    key: "yogi", name: "Narendra Yogi",
+    key: "yogi", name: "Le Gourou",
     color: "#ef6c00", darkColor: "#e65100",
-    stats: { vitesse: 4, detente: 3, puissance: 2, controle: 4 },
-    speed: 1.18, jump: 1.06, power: 0.94, control: 0.91,
-    trait: "Ashram : rapide et technique, peu de puissance brute.",
+    stats: { vitesse: 4, detente: 3, puissance: 3, controle: 4 },
+    speed: 1.18, jump: 1.06, power: 1.06, control: 0.91,
+    trait: "Ashram : rapide et technique, smashs dans la moyenne.",
     superName: "Méditation",
     superDesc: "Gèle le camp adverse ~5 s (glisse extrême). Visuel : voile clair + particules, façon Hiver Général zen."
   },
   {
-    key: "jair", name: "Jair Tronço",
+    key: "jair", name: "Le Capitaine",
     color: "#2e7d32", darkColor: "#1b5e20",
     stats: { vitesse: 3, detente: 2, puissance: 5, controle: 2 },
     speed: 1.06, jump: 0.94, power: 1.28, control: 0.75,
@@ -101,6 +103,25 @@ const CHARACTERS = [
     trait: "Tronçonneuse : puissance max, SUPER aussi en perdant un point.",
     superName: "Déforestation",
     superDesc: "Mur de troncs au camp adverse ~5 s : bloque les courses. Visuel : mur épais façon forêt + lueur verte."
+  },
+  {
+    key: "faucon", name: "Le Faucon",
+    color: "#556270", darkColor: "#333b45",
+    stats: { vitesse: 3, detente: 3, puissance: 4, controle: 3 },
+    speed: 1.06, jump: 1.06, power: 1.18, control: 0.82,
+    egoCharge: true,
+    trait: "Faucon : SUPER aussi quand il perd un point.",
+    superName: "Raid Éclair",
+    superDesc: "Interdit de sauter au camp adverse ~5 s — collés au sol. Visuel : bande d’alerte au sol (comme Séisme)."
+  },
+  {
+    key: "safran", name: "Le Safran",
+    color: "#c45c26", darkColor: "#8a3d14",
+    stats: { vitesse: 3, detente: 3, puissance: 3, controle: 4 },
+    speed: 1.06, jump: 1.06, power: 1.06, control: 0.91,
+    trait: "Safran : contrôle élevé, jeu posé.",
+    superName: "Voile d’Or",
+    superDesc: "Ralentit le camp adverse ~5 s (glisse extrême). Visuel : voile clair + particules, façon Hiver Général doré."
   },
 ];
 function charOf(b) { return CHARACTERS[b.charId]; }
@@ -244,7 +265,7 @@ const battle = {
 
 // ---------- Combos & techniques signature ----------
 // Chaque camp charge un SUPER en gagnant SUPER_NEED points d'affilée.
-//   Vladou → Hiver Général · Trompette → Le Mur · Micron → 49.3 · Houn → Batterie AA
+//   Volkoï → Hiver Général · Dorf → Le Mur · Cygne → Passage en Force · Bébé → Batterie AA
 //   Panda → Grande Muraille · Sultan → Séisme · Yogi → Méditation · Jair → Déforestation
 const SUPER_NEED = 3;
 const SUPER_FLASH_T = 240;      // ~4 s pour lire nom + description
@@ -254,12 +275,14 @@ const superCharge = [0, 0];   // 0 = vide, 1 = super prête
 const SUPER_DUR = {
   vladou: 360,      // Hiver Général ~6 s
   trompette: 300,   // Le Mur ~5 s
-  micron: 240,      // 49.3 ~4 s
-  houn: 300,        // Batterie AA ~5 s
+  micron: 240,      // Passage en Force ~4 s
+  bebe: 300,        // Batterie AA ~5 s
   panda: 300,       // Grande Muraille ~5 s
   sultan: 300,      // Séisme ~5 s
   yogi: 300,        // Méditation ~5 s
-  jair: 300         // Déforestation ~5 s
+  jair: 300,        // Déforestation ~5 s
+  faucon: 300,      // Raid Éclair ~5 s
+  safran: 300       // Voile d’Or ~5 s
 };
 
 // Effets de zone SUPER (Phase 4 — stubs jouables pour le pilote)
@@ -393,24 +416,29 @@ class Blob {
       this.scramble = 0;
       this._walkTick = 0;
     }
-    // Service : pas de saut avec la balle en mains, ni pendant la montée du
-    // lancer (anti F+saut immédiat). Saut autorisé seulement une fois la
-    // balle en descente — et il faut un nouvel appui (pas tenir Espace).
-    const servePostToss = typeof GAMEPLAY_V2 !== "undefined" && GAMEPLAY_V2 &&
+    // Service : pas de saut avec la balle en mains, ni pendant la grâce post-lancer
+    // (anti X/F + saut la même frame). Ensuite saut normal — y compris en montée
+    // pour un service aérien à la manette.
+    const serveHands = typeof GAMEPLAY_V2 !== "undefined" && GAMEPLAY_V2 &&
       typeof ball !== "undefined" && this.side === servingSide &&
-      ball.serveAimLock && !ball.inHands;
-    const serveNoJump = typeof GAMEPLAY_V2 !== "undefined" && GAMEPLAY_V2 &&
+      ball.inHands && ball.frozen;
+    const serveTossLock = typeof GAMEPLAY_V2 !== "undefined" && GAMEPLAY_V2 &&
       typeof ball !== "undefined" && this.side === servingSide &&
-      ((ball.inHands && ball.frozen) || (servePostToss && ball.vy < 0));
+      !ball.inHands && ball.serveAimLock && (ball.tossGrace | 0) > 0;
+    const serveNoJump = serveHands || serveTossLock;
     const holdingJump = !!(input && input.jump);
+    // Front de saut CLAVIER (touche réelle, non bloqué par serveNoJump ni par le
+    // drift d'une manette au repos) : sert au service clavier (keyboardJumpServe).
+    const kbdJumpNow = !!(input && input.kbdJump);
+    this._kbdJumpEdge = kbdJumpNow && !this._kbdPrevJump;
+    this._kbdPrevJump = kbdJumpNow;
     const jumpIn = holdingJump && !serveNoJump;
     const jumpPressed = jumpIn && !this.prevJump; // front montant
     this._jumpEdge = jumpPressed;
     this.prevJump = jumpIn || (serveNoJump && holdingJump);
-    // Batterie AA (Houn) : camp ciblé ne peut plus sauter
+    // Batterie AA (Bébé) : camp ciblé ne peut plus sauter
     const noJump = typeof hasSuperEffect === "function" && hasSuperEffect("noground", this.side);
-    if (!noJump && !serveNoJump && this.onGround &&
-        (servePostToss ? jumpPressed : jumpIn)) {
+    if (!noJump && !serveNoJump && this.onGround && jumpIn) {
       this.vy = BLOB_JUMP * a.jump * (0.85 + grip * 0.15);
       this.onGround = false;
       this.jumpsUsed = 1;

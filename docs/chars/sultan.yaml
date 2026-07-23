@@ -1,11 +1,13 @@
+# Fiche personnage — Le Sultan (Bosforie) · clé technique sultan
 key: sultan
-name: "Recep Sultan"
-pays_theme: "Turquie — palais, Bosphore, moustache"
-silhouette: "stocky, costume navy, cravate + pochette violettes, moustache épaisse, pin Turquie, chaussures noires — PAS de cape ni turban"
-palette: ["#6a1b9a", "#c9a227", "#f5d0b0"]
-look_lock: "Costume moderne violet, jamais costume fantasy/turban rouge."
+name: "Le Sultan"
+nation: "Bosforie"
+pays_theme: "Bosforie — détroit, deux continents"
+silhouette: "imposant, moustache sombre épaisse, costume sombre cintré"
+palette: ["#6a1b9a", "#4a148c", "#c9a227"]
 stats: { vitesse: 3, detente: 4, puissance: 3, controle: 3 }
+trait_passif: "Séisme — détente élevée"
 super:
   nom: "Séisme"
-  effet: "interdit de sauter au camp adverse ~5 s"
-map: "Palais du Bosphore"
+  effet: "interdit de sauter camp adverse ~5 s"
+map: "Pont des Deux Mondes"

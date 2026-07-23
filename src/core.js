@@ -13,6 +13,29 @@ const NET_X = W / 2;
 const NET_W = 10;
 const NET_TOP = GROUND_Y - 185;
 
+// ---------- Échelles décor (réf. = perso debout) ----------
+// Les sprites perso utilisent manifest.baseH ≈ 110. Tout prop/event doit se
+// calibrer ICI — ne plus hardcoder des hauteurs disparates dans drawBg*.
+const CHAR_BASE_H = 110;
+const PROP_H = {
+  flag: 80,          // bannières de touche (~¾ perso)
+  cow: 92,           // vache event (~⅔ perso)
+  cowIdle: 54,       // vache broute en bord de court
+  peacock: 72,       // paon au sol (queue déployée, < perso)
+  falcon: 52,        // faucon en vol
+  carpet: 64,        // tapis volant
+  marchers: 118,     // cortège : un cran > perso (lisibilité)
+  cannon: 72,        // canon d'apparat
+  snowman: 76,       // bonhomme de neige
+  cart: 62,          // voiturette country club
+  radar: 68,         // antenne radar
+  flower: 40,        // fleurs décor Esplanade
+  pigeon: 28,        // pigeons prairie
+  macawShot: 40,     // ara en vol (projectile)
+  lanternShot: 42,   // lanterne tombante
+  warnIcon: 42       // triangle d'annonce event
+};
+
 const GRAV_BALL = 0.25;
 const GRAV_BLOB = 0.65;
 const BLOB_SPEED = 5.2;
@@ -20,7 +43,7 @@ const BLOB_JUMP = -16;
 const DOUBLE_JUMP_MUL = 0.72; // 2e saut : encore utile pour finir un smash
 const BALL_R = 11;
 const HIT_SPEED = 9.2;
-const MAX_BALL_SPEED = 15.5;   // tête de smash ; les cloches restent ~HOLD_LOB_SPD
+const MAX_BALL_SPEED = 14;     // tête de smash ; les cloches restent ~HOLD_LOB_SPD
 const WIN_SCORE = 15;
 const TUTORIAL_WIN_SCORE = 3; // premier à 3 en tutoriel (sans écart obligatoire)
 const MAX_TOUCHES = 3;
@@ -40,7 +63,7 @@ const SHOT_SPEED_SHORT = 9.5;
 const SHOT_SPEED_LONG = 12.5;
 const CHARGE_MAX = 24;         // ≤ 0,4 s de charge
 const CHARGE_SHOW_OPP = 12;    // au-delà, l'arc est visible pour l'adversaire
-const SMASH_MUL = 1.68;        // smash piquant, sans missile
+const SMASH_MUL = 1.48;        // smash net, sans missile
 const PASSIVE_SOFT_SPD = 7;
 const HOLD_LOB_SPD = 12.7;     // réception un cran plus franche (smashs restent au-dessus)
 const SERVE_TOSS_SPD = 9.5;
@@ -66,7 +89,7 @@ const BATTLE_NET_DIST = 95;  // distance max des joueurs au filet pour déclench
 const BATTLE_BALL_DIST = 90; // distance max de la balle au filet
 const BATTLE_STUN_T = 52;    // perdant du duel : stun ~0,85 s (ne digue pas)
 // Smash destructeur post-duel : rapide et plongeant vers le fond de cour
-const SMASH_VX = 15.5, SMASH_VY = 10.5;
+const SMASH_VX = 14.5, SMASH_VY = 9.5;
 
 // --- Mode Bombe ---
 const BOMB_TIME = 600;      // 10 s à 60 Hz : durée de la mèche avant explosion

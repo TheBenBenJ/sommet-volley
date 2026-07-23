@@ -1,10 +1,12 @@
+# Fiche personnage — Le Gourou (Bharatie) · clé technique yogi
 key: yogi
-name: "Narendra Yogi"
-pays_theme: "Inde — ashram, orange, yoga"
-silhouette: "stocky, gilet safran boutons or, kurta blanc, pantalon blanc, mocassins bruns, barbe blanche, lunettes"
-palette: ["#ef6c00", "#ffffff", "#f5d0b0"]
-look_lock: "Toujours mocassins bruns (jamais baskets). Gilet safran + kurta blanc."
-stats: { vitesse: 4, detente: 3, puissance: 2, controle: 4 }
+name: "Le Gourou"
+nation: "Bharatie"
+pays_theme: "Bharatie — ashram, chaleur"
+silhouette: "mince, barbe blanche courte, lunettes rondes, gilet safran sur tunique blanche"
+palette: ["#ef6c00", "#e65100", "#fff8e1"]
+stats: { vitesse: 4, detente: 3, puissance: 3, controle: 4 }
+trait_passif: "Ashram — rapide et technique"
 super:
   nom: "Méditation"
   effet: "gèle le camp adverse ~5 s"

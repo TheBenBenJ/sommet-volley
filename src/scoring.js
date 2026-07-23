@@ -48,7 +48,7 @@ function awardPoint(side, reason) {
 
   // combo : points d'affilée → charge le SUPER
   streak[side]++; streak[1 - side] = 0;
-  // Applaudissements (Houn) : SUPER en 2 points d'affilée
+  // Applaudissements (Bébé) : SUPER en 2 points d'affilée
   let need = SUPER_NEED;
   for (const b of activeBlobs) {
     if (b.side === side && charOf(b).clapDouble) { need = 2; break; }

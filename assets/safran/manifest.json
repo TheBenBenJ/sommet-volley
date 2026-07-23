@@ -1,0 +1,23 @@
+{
+  "anims": {
+    "idle_face": 1,
+    "idle": 1,
+    "walk": 4,
+    "jump": 3,
+    "receive": 2,
+    "aim": 2,
+    "smash": 3,
+    "super": 4,
+    "panic": 2,
+    "victory": 2,
+    "defeat": 2
+  },
+  "baseH": 110,
+  "footPad": 2,
+  "lockAspect": 0.52,
+  "serveHands": {
+    "dx": 19.8,
+    "dy": -32.9
+  },
+  "notes": "Full 27-frame regen casting look (2026-07-22), walk\u00d74 distinct, Voile d'Or super."
+}

@@ -8,7 +8,7 @@ Template à copier : **[`_TEMPLATE/`](_TEMPLATE/)**
 | vladou | Vladou | (à compléter si regen) | canon |
 | trompette | Trompette | `prompts.md` | cart (golf) |
 | micron | Micron | `prompts.md` | marchers |
-| houn | Houn | `prompts.md` | radar |
+| bebe | Bébé | `prompts.md` | radar |
 | matin | Panda | (skyline via template) | `prompts-event.md` lantern |
 | bosphore | Sultan | `prompts.md` | `prompts-event.md` carpet |
 | ashram | Yogi | `prompts.md` | `prompts-event.md` cow |

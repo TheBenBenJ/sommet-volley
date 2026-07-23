@@ -19,7 +19,7 @@ comme référence, puis demander l'édition. Garder EXACTEMENT le même personna
 mêmes habits, même cadrage, fond blanc pur #FFFFFF.
 
 Chemin de sortie attendu par le jeu : `assets/story/<key>_doped.png`
-(`houn_doped.png`, `yogi_doped.png`, `vladou_doped.png`).
+(`bebe_doped.png`, `yogi_doped.png`, `vladou_doped.png`).
 
 Prompt (coller après avoir uploadé l'idle_face de référence) :
 
@@ -43,7 +43,7 @@ Post-traitement (détourage, comme le roster) :
 est déjà blanc net — ces portraits ne sont pas des sprites de jeu, pas d'ancrage
 pieds nécessaire).*
 
-Personnages dopés dans la campagne : **houn** (ch. 6), **yogi** (ch. 7),
+Personnages dopés dans la campagne : **bebe** (ch. 6), **yogi** (ch. 7),
 **vladou** (ch. 8 & finale).
 
 ## B. Splashs d'acte (optionnel, ambiance)

@@ -1,10 +1,16 @@
-# Prompts Micron — génération sprites (référence idle_face)
+# sommet-character — Le Cygne (`micron`)
 
-## BLOC A — Style
-Single solo character, ONE only, political editorial cartoon, thick black ink outlines, flat cel-shading, NO photo. Oversized head ~1/3 height, SHORT STOCKY compact body (same cast proportions). Pure white #FFFFFF background, no shadow, no floor.
+27 frames générées (Grok) → cutout → `assets/micron/`.
+Backup pré-regen : `assets/micron/_bak_pre_regen/`.
 
-## BLOC B — Personnage
-"Manu Micron" — fictional satirical cartoon volleyball mascot (NOT a real person). Short stocky, pale skin, slick dark-brown lacquered hair swoop, tiny intense eyes, thin smile. Navy blue suit (#1a237e), white shirt, thin dark tie, small blue-white-red scarf accent on lapel or pocket (tricolor abstract, no emblems), black shoes. Same visual weight as Vladou/Trompette/Houn.
+Archétype (répété à l’identique) :
 
-## BLOC C — Négatif
-Avoid: tall lanky, skinny, photorealism, real celebrity likeness, multiple characters, character sheet, grey/checkerboard BG, ground shadow, text, logos, flags filling background.
+```
+a slim young technocrat leader mascot, slicked-back dark hair, sharp navy
+tailored suit, small tricolor lapel pin, assured debating gesture
+(composite mascot archetype — must NOT resemble any real politician;
+abstract lapel pin only, NOT a real French flag)
+```
+
+OUTFIT LOCK : costume navy cintré, chemise blanche, fine cravate sombre,
+pin tricolore abstrait (pas un vrai drapeau), pantalon navy, chaussures noires.

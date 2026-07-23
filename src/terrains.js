@@ -38,17 +38,17 @@ function drawBgPlage() {
   drawBgPlageCanvas(raining, storm);
 }
 
-/** Amazonie Dorée PNG (Jair) — jungle, terre battue, bannières vert-jaune. */
+/** Grande Forêt PNG (Jair) — jungle, terre battue, bannières vert-jaune. */
 function drawBgAmazonPng(t, raining, storm) {
   const p = SPRITES.mapAmazon;
   drawMapBackdrop(p, "#4a6a38");
 
   if (storm) {
     ctx.fillStyle = "rgba(40,60,30,0.35)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   } else if (raining) {
     ctx.fillStyle = "rgba(50,70,40,0.18)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   }
 
   // Public désactivé pour l’instant (crowd en raw seulement)
@@ -60,15 +60,14 @@ function drawBgAmazonPng(t, raining, storm) {
   // Bannières vert-jaune
   if (spriteReady(p.flag)) {
     const bob = Math.sin(t * 2.05) * 2;
-    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, 96);
+    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, PROP_H.flag);
     ctx.save();
     ctx.translate(W - 70, 0);
     ctx.scale(-1, 1);
-    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, 96);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, PROP_H.flag);
     ctx.restore();
   }
 
-  if (raining) drawRain(storm ? 1 : 0.55);
   drawMapEventOverlay();
 }
 
@@ -77,17 +76,16 @@ function drawBgSkylinePack(p, t, raining, storm, cols) {
   drawMapBackdrop(p, cols.sky || "#6a8498");
   if (storm) {
     ctx.fillStyle = "rgba(60,70,80,0.3)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   } else if (raining) {
     ctx.fillStyle = "rgba(90,100,110,0.14)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   }
   drawCourtApron(cols.ground0, cols.ground1);
   drawCourtSeam();
-  if (raining) drawRain(storm ? 1 : 0.55);
 }
 
-/** Place du Matin PNG (Panda) — portail rouge, muraille, bannières. */
+/** Cité du Matin PNG (Panda) — portail rouge, muraille, bannières. */
 function drawBgMatinPng(t, raining, storm) {
   const p = SPRITES.mapMatin;
 
@@ -95,10 +93,10 @@ function drawBgMatinPng(t, raining, storm) {
 
   if (storm) {
     ctx.fillStyle = "rgba(60,50,45,0.32)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   } else if (raining) {
     ctx.fillStyle = "rgba(90,80,70,0.16)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   }
 
   // Public désactivé pour l’instant (crowd_0 raté)
@@ -109,15 +107,14 @@ function drawBgMatinPng(t, raining, storm) {
   // Bannières cérémonielles
   if (spriteReady(p.flag)) {
     const bob = Math.sin(t * 2.1) * 2;
-    drawMapProp(p.flag, 72, GROUND_Y + 2 + bob, 96);
+    drawMapProp(p.flag, 72, GROUND_Y + 2 + bob, PROP_H.flag);
     ctx.save();
     ctx.translate(W - 72, 0);
     ctx.scale(-1, 1);
-    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, 96);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, PROP_H.flag);
     ctx.restore();
   }
 
-  if (raining) drawRain(storm ? 1 : 0.55);
   drawMapEventOverlay();
 }
 
@@ -129,10 +126,10 @@ function drawBgBosphorePng(t, raining, storm) {
 
   if (storm) {
     ctx.fillStyle = "rgba(50,60,80,0.32)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   } else if (raining) {
     ctx.fillStyle = "rgba(70,80,100,0.16)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   }
 
   // Public désactivé pour l’instant (crowd en raw seulement)
@@ -143,30 +140,117 @@ function drawBgBosphorePng(t, raining, storm) {
   // Bannières pourpres
   if (spriteReady(p.flag)) {
     const bob = Math.sin(t * 2.0) * 2;
-    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, 100);
+    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, PROP_H.flag);
     ctx.save();
     ctx.translate(W - 70, 0);
     ctx.scale(-1, 1);
-    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, 100);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, PROP_H.flag);
     ctx.restore();
   }
 
-  if (raining) drawRain(storm ? 1 : 0.55);
   drawMapEventOverlay();
 }
 
-/** Stade Ashram PNG (Yogi) — nuit étoilée, arcs terracotta, tente pourpre. */
+/** Citadelle du Levant (Le Faucon) — dispatcher : PNG si prêt, sinon fallback. */
+function drawBgColline() {
+  const t = performance.now() / 1000;
+  const storm = weather === "storm";
+  const raining = weather === "rain" || storm;
+  if (typeof mapCollineReady === "function" && mapCollineReady()) {
+    drawBgCollinePng(t, raining, storm);
+    return;
+  }
+  ctx.fillStyle = "#bfe0f2";
+  ctx.fillRect(0, 0, W, GROUND_Y);
+  drawCourtApron("#e6d3a8", "#c9b482");
+}
+
+/** Citadelle du Levant PNG — capitale fortifiée en bord de Méditerranée, plein midi. */
+function drawBgCollinePng(t, raining, storm) {
+  const p = SPRITES.mapColline;
+
+  drawMapBackdrop(p, "#bfe0f2");
+
+  if (storm) {
+    ctx.fillStyle = "rgba(50,60,80,0.30)";
+    ctx.fillRect(0, 0, W, H);
+  } else if (raining) {
+    ctx.fillStyle = "rgba(70,80,100,0.14)";
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  drawCourtApron(raining ? "#b8a678" : "#e6d3a8", raining ? "#8a7a50" : "#c9b482");
+
+  // Bannières (prop optionnel — généré via sommet-decor)
+  if (spriteReady(p.flag)) {
+    const bob = Math.sin(t * 2.0) * 2;
+    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, PROP_H.flag);
+    ctx.save();
+    ctx.translate(W - 70, 0);
+    ctx.scale(-1, 1);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, PROP_H.flag);
+    ctx.restore();
+  }
+
+  drawMapEventOverlay();
+}
+
+/** Jardin des Roses (Le Safran) — dispatcher : PNG si prêt, sinon fallback. */
+function drawBgRoseraie() {
+  const t = performance.now() / 1000;
+  const storm = weather === "storm";
+  const raining = weather === "rain" || storm;
+  if (typeof mapRoseraieReady === "function" && mapRoseraieReady()) {
+    drawBgRoseraiePng(t, raining, storm);
+    return;
+  }
+  ctx.fillStyle = "#f0c878";
+  ctx.fillRect(0, 0, W, GROUND_Y);
+  drawCourtApron("#e8d4a8", "#c9b482");
+}
+
+/** Jardin des Roses PNG — cour à roses, cyprès, tuiles turquoise, lumière dorée. */
+function drawBgRoseraiePng(t, raining, storm) {
+  const p = SPRITES.mapRoseraie;
+
+  drawMapBackdrop(p, "#f0c878");
+
+  if (storm) {
+    ctx.fillStyle = "rgba(60,40,30,0.28)";
+    ctx.fillRect(0, 0, W, H);
+  } else if (raining) {
+    ctx.fillStyle = "rgba(80,55,40,0.12)";
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  drawCourtApron(raining ? "#b8a070" : "#e8d4a8", raining ? "#8a7050" : "#c9b482");
+
+  if (spriteReady(p.flag)) {
+    const bob = Math.sin(t * 2.0) * 2;
+    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, PROP_H.flag);
+    ctx.save();
+    ctx.translate(W - 70, 0);
+    ctx.scale(-1, 1);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, PROP_H.flag);
+    ctx.restore();
+  }
+
+  drawMapEventOverlay();
+}
+
+/** Stade Ashram PNG (Yogi) — palais grès miel, soucis, turquoise. */
 function drawBgAshramPng(t, raining, storm) {
   const p = SPRITES.mapAshram;
 
-  drawMapBackdrop(p, "#1a1430");
+  drawMapBackdrop(p, "#f0d9a8");
+
 
   if (storm) {
     ctx.fillStyle = "rgba(30,20,45,0.40)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   } else if (raining) {
     ctx.fillStyle = "rgba(45,30,60,0.20)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   }
 
   // Public désactivé pour l’instant (crowd en raw seulement)
@@ -177,36 +261,48 @@ function drawBgAshramPng(t, raining, storm) {
   // Bannières orange
   if (spriteReady(p.flag)) {
     const bob = Math.sin(t * 2.0) * 2;
-    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, 100);
+    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, PROP_H.flag);
     ctx.save();
     ctx.translate(W - 70, 0);
     ctx.scale(-1, 1);
-    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, 100);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, PROP_H.flag);
     ctx.restore();
   }
 
-  if (raining) drawRain(storm ? 1 : 0.55);
   drawMapEventOverlay();
 }
 
-/** Pelouse Oval PNG (Trompette) — pelouse (pas de tempête / vent). */
+/** Country Club Doré PNG (Baron Dorf) — voile ocre local ; sable via overlay. */
 function drawBgPlagePng(t, raining, storm) {
   const p = SPRITES.mapTrompette;
 
   drawMapBackdrop(p, "#87b0d0");
 
-  drawCourtApron("#8fbc6a", "#6a9a48");
+  if (storm) {
+    ctx.fillStyle = "rgba(160,120,55,0.28)";
+    ctx.fillRect(0, 0, W, H);
+  } else if (raining) {
+    ctx.fillStyle = "rgba(180,145,80,0.14)";
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  drawCourtApron(raining ? "#7a9a58" : "#8fbc6a", raining ? "#5a7a38" : "#6a9a48");
   // Pas de trait or code : la barrière est déjà dans le skyline PNG
   drawCourtSeam("#e8e4d8", "rgba(0,0,0,0.18)");
 
   // Pas de palmier « prop » : le fond a déjà ses éléments géants —
   // le doublon miniature au premier plan cassait la perspective.
-  if (!spriteReady(p.far) && !spriteReady(p.skyline)) drawPalm(52, false);
+  if (!spriteReady(p.far) && !spriteReady(p.skyline)) drawPalm(52, storm);
 
-  // Drapeau cérémoniel (droite)
+  // Bannières de club, symétriques (gauche + droite miroir)
   if (spriteReady(p.flag)) {
-    const bob = Math.sin(t * 2.2) * 2;
-    drawMapProp(p.flag, 845, GROUND_Y + 2 + bob, 88);
+    const bob = Math.sin(t * (storm ? 3.2 : 2.2)) * (storm ? 3.5 : 2);
+    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, PROP_H.flag);
+    ctx.save();
+    ctx.translate(W - 70, 0);
+    ctx.scale(-1, 1);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, PROP_H.flag);
+    ctx.restore();
   }
 
   // Voiturette / mini-cortège (event ou idle décoratif)
@@ -219,14 +315,17 @@ function drawResortCart(t) {
   const p = SPRITES.mapTrompette;
   if (!p || (!spriteReady(p.cart) && !spriteReady(p.cartHorn))) return;
   if (typeof mapEvent === "undefined") return;
+  // UNIQUEMENT pendant l'événement (plus de voiturette garée en plein court en idle).
+  if (mapEvent.phase === "idle") return;
   // Une seule position continue (mapEvent.cartX) — plus de teleport idle ↔ event
   const cx = mapEvent.cartX;
   if (cx < -70 || cx > W + 70) return;
   const horn = !mapEventsQuiet &&
     (mapEvent.phase === "fire" || (mapEvent.phase === "flying" && mapEvent.t < 18));
   const img = horn && spriteReady(p.cartHorn) ? p.cartHorn : p.cart;
-  // Midground : entre le gazon du premier plan et la barrière
-  const footY = GROUND_Y - 148;
+  // Roule SUR LE GAZON, un peu plus bas que la fontaine (au fond, derrière le
+  // court), à une échelle réduite pour la profondeur.
+  const footY = GROUND_Y - 115;
   const drawH = 78;
   let a = 1;
   if (cx < 50) a = Math.max(0, (cx + 70) / 120);
@@ -247,31 +346,38 @@ function drawResortCart(t) {
 function drawBgPlageCanvas(raining, storm) {
   const sun = celestialPos();
 
-  // ciel bleu clair (Pelouse Oval : pas de tempête)
+  // ciel : plombé / ocre quand tempête de sable
   const sky = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
-  sky.addColorStop(0, "#4da6e8");
-  sky.addColorStop(1, "#bfe6ff");
+  if (storm) {
+    sky.addColorStop(0, "#8a7048"); sky.addColorStop(1, "#c4a060");
+  } else if (raining) {
+    sky.addColorStop(0, "#6a90b0"); sky.addColorStop(1, "#d2c090");
+  } else {
+    sky.addColorStop(0, "#4da6e8"); sky.addColorStop(1, "#bfe6ff");
+  }
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, W, GROUND_Y);
 
-  drawHillLayer(GROUND_Y - 100, "#a9d4ec", 0.12,
+  drawHillLayer(GROUND_Y - 100, storm ? "#8a9aaa" : "#a9d4ec", 0.12,
     [[110, GROUND_Y - 150], [300, GROUND_Y - 118], [470, GROUND_Y - 162], [660, GROUND_Y - 122], [820, GROUND_Y - 152]]);
-  drawHillLayer(GROUND_Y - 92, "#7fbfe0", 0.3,
+  drawHillLayer(GROUND_Y - 92, storm ? "#6a8090" : "#7fbfe0", 0.3,
     [[180, GROUND_Y - 128], [380, GROUND_Y - 104], [560, GROUND_Y - 134], [760, GROUND_Y - 108]]);
 
-  ctx.fillStyle = "rgba(255,230,128,0.35)";
-  ctx.beginPath(); ctx.arc(sun.x, sun.y, 52, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = "#ffe680";
-  ctx.beginPath(); ctx.arc(sun.x, sun.y, 38, 0, Math.PI * 2); ctx.fill();
+  if (!storm) {
+    ctx.fillStyle = raining ? "rgba(255,230,128,0.18)" : "rgba(255,230,128,0.35)";
+    ctx.beginPath(); ctx.arc(sun.x, sun.y, 52, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = raining ? "rgba(255,230,128,0.7)" : "#ffe680";
+    ctx.beginPath(); ctx.arc(sun.x, sun.y, 38, 0, Math.PI * 2); ctx.fill();
+  }
 
-  drawClouds("rgba(255,255,255,0.85)");
+  drawClouds(storm ? "rgba(160,140,100,0.85)" : raining ? "rgba(220,210,180,0.8)" : "rgba(255,255,255,0.85)");
 
   ctx.fillStyle = "#2e86c1";
   ctx.fillRect(0, GROUND_Y - 55, W, 18);
   ctx.fillStyle = "rgba(255,255,255,0.25)";
   ctx.fillRect(0, GROUND_Y - 55, W, 3);
 
-  drawCourtApron("#f4d58d", "#d9b25f");
+  drawCourtApron(raining ? "#d4b87a" : "#f4d58d", raining ? "#b89450" : "#d9b25f");
 
   ctx.fillStyle = "rgba(120,90,30,0.18)";
   for (let i = 0; i < 42; i++) {
@@ -352,22 +458,32 @@ function drawPalm(px, storm) {
  * codeSeam : dessiner une ligne de fond code (maps sans traits PNG fiables).
  */
 const MAP_LAYOUT = {
-  amazon:   { baselineFromBottom: 135, netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false },
-  plage:    { baselineFromBottom: 132, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false },
-  neige:    { baselineFromBottom: 0,   netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: true },
-  prairie:  { baselineFromBottom: 43,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false },
-  parade:   { baselineFromBottom: 368, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
-  matin:    { baselineFromBottom: 0,   netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: true, bgFullHeight: true },
-  bosphore: { baselineFromBottom: 0,   netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: true },
-  ashram:   { baselineFromBottom: 48,  netPost: { footPad: 4, xOff: 0, scale: 1 }, codeSeam: false }
+  // baselineFromBottom inclut le pad sol sous la ligne de court (skylines
+  // étendues pour couvrir la bande score H-GROUND_Y sans bande vide).
+  amazon:   { baselineFromBottom: 70,  netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  plage:    { baselineFromBottom: 69,  netPost: { footPad: 2, xOff: 4, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  neige:    { baselineFromBottom: 60,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  prairie:  { baselineFromBottom: 68,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  parade:   { baselineFromBottom: 123, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  matin:    { baselineFromBottom: 48,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  bosphore: { baselineFromBottom: 59,  netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  ashram:   { baselineFromBottom: 133,  netPost: { footPad: 4, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  colline:  { baselineFromBottom: 45,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  roseraie: { baselineFromBottom: 41, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true }
 };
 
 function currentMapLayout() {
   const key = (typeof TERRAINS !== "undefined" && TERRAINS[terrain]) ? TERRAINS[terrain].key : "";
-  return MAP_LAYOUT[key] || { baselineFromBottom: 0, netPost: { footPad: 0, xOff: 0, scale: 1 }, codeSeam: true };
+  // Défaut pour TOUTE nouvelle map (sans entrée explicite) : plein hauteur +
+  // remplissage bas sable (via drawImgCoverBaseline) → cadrage 16:9 correct dès
+  // le dépôt, sans bande grise ni zoom. La baseline précise (pieds sur la ligne)
+  // se règle ensuite par map avec map_fit, mais 60 est un bon point de départ
+  // pour une skyline Gemini 16:9 (court proche du bas). Les maps déjà listées
+  // dans MAP_LAYOUT gardent leur réglage — aucune régression.
+  return MAP_LAYOUT[key] || { baselineFromBottom: 60, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true };
 }
 
-/** Hauteur de dessin du décor : H si bgFullHeight (ex. Place du Matin, Esplanade). */
+/** Hauteur de dessin du décor : H si bgFullHeight (ex. Cité du Matin, Esplanade). */
 function mapBgDrawH() {
   return currentMapLayout().bgFullHeight ? H : BG_DRAW_H;
 }
@@ -392,7 +508,7 @@ function drawImgCoverBottom(img, dx, dy, dw, dh, parallaxX, baselineFromBottom) 
  * Fond plein cadre : aligne la ligne de court source sur groundY, centre sur NET_X,
  * et laisse le pavé sous la ligne descendre jusqu'en bas du canvas.
  */
-function drawImgCoverBaseline(img, dx, dw, groundY, canvasH, parallaxX, baselineFromBottom) {
+function drawImgCoverBaseline(img, dx, dw, groundY, canvasH, parallaxX, baselineFromBottom, fillImg) {
   const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height;
   if (!sw || !sh) return;
   const bl = Math.max(0, Math.min(sh - 8, baselineFromBottom | 0));
@@ -402,15 +518,89 @@ function drawImgCoverBaseline(img, dx, dw, groundY, canvasH, parallaxX, baseline
   const tw = sw * scale, th = sh * scale;
   const ox = dx + (dw - tw) / 2 + (parallaxX || 0);
   const oy = groundY - baselineSrcY * scale;
+  // Comble le bas AVANT de dessiner : les skylines 16:9 s'arrêtent souvent
+  // ~40–70 px avant le bas du canvas. On étire la bande sol du PNG (mieux
+  // qu'un aplati uni) puis on dessine l'image par-dessus.
+  const drawnBottom = oy + th;
+  if (drawnBottom < canvasH - 0.5) {
+    const gapTop = Math.floor(drawnBottom) - 1;
+    const gapH = Math.ceil(canvasH - gapTop);
+    if (fillImg && spriteReady(fillImg)) {
+      // Combler l'espace vide avec la BANDE de sol dédiée (juste ce qu'il faut).
+      // On NE touche PAS au skyline : il est redessiné par-dessus jusqu'à drawnBottom.
+      // Anti-étirement : on ne prend que la TRANCHE BASSE de la bande (pavés les
+      // plus proches), à l'échelle qui préserve les proportions (scaleX == scaleY).
+      const fsw = fillImg.naturalWidth || fillImg.width, fsh = fillImg.naturalHeight || fillImg.height;
+      const srcH = Math.min(fsh, Math.max(1, Math.round(gapH * fsw / dw)));
+      ctx.drawImage(fillImg, 0, fsh - srcH, fsw, srcH, dx, gapTop, dw, gapH);
+      mapBandSeamY = gapTop + 1; // raccord skyline↔bande → moulure de masquage
+    } else {
+      // Pas de bande dédiée : on COMBLE le vide en copiant une lamelle de SOL
+      // prise dans le bas du skyline, au-dessus de la ligne blanche du court.
+      ctx.fillStyle = bottomColorOf(img);
+      ctx.fillRect(dx, gapTop, dw, gapH);
+      try {
+        const srcY = groundStripSrcY(img);                 // rangée « sable », pas la ligne blanche
+        const srcStrip = Math.max(6, Math.min(40, Math.floor(sh * 0.03)));
+        const srcTop = Math.max(0, srcY - srcStrip);
+        ctx.drawImage(img, 0, srcTop, sw, srcStrip, ox, gapTop, tw, gapH);
+      } catch (e) { /* canvas tainted → aplat déjà en place */ }
+      mapBandSeamY = gapTop + 1; // même ligne blanche de délimitation que les maps à bande
+    }
+  }
   ctx.drawImage(img, 0, 0, sw, sh, ox, oy, tw, th);
 }
 
+/** Couleur dominante du bas d'une image (mise en cache) — pour combler proprement. */
+/** Trouve, dans le bas de l'image, une rangée de SOL (sable/pierre) en SAUTANT
+ *  la ligne blanche du court : on scanne la colonne centrale du bas vers le haut
+ *  et on retient la 1re rangée « matière » (ni blanche, ni sombre). Mise en cache.
+ *  Sert à combler le vide du bas avec du vrai sol copié, sans la bande blanche. */
+function groundStripSrcY(img) {
+  if (img._groundY != null) return img._groundY;
+  const sh = img.naturalHeight || img.height, sw = img.naturalWidth || img.width;
+  let y = sh - 3;
+  try {
+    const c = document.createElement("canvas");
+    c.width = 1; c.height = sh;
+    const cx = c.getContext("2d");
+    cx.drawImage(img, (sw / 2) | 0, 0, 1, sh, 0, 0, 1, sh);
+    const d = cx.getImageData(0, 0, 1, sh).data;
+    const lo = Math.floor(sh * 0.80);
+    for (let yy = sh - 3; yy > lo; yy--) {
+      const i = yy * 4, r = d[i], g = d[i + 1], b = d[i + 2], lum = (r + g + b) / 3;
+      const white = r > 236 && g > 236 && b > 236;      // ligne blanche du court
+      const material = lum > 110 && lum < 232 && r >= b - 6; // sable/pierre
+      if (material && !white) { y = yy; break; }
+    }
+  } catch (e) { y = sh - 3; }
+  img._groundY = y;
+  return y;
+}
+
+function bottomColorOf(img) {
+  if (img._botColor) return img._botColor;
+  try {
+    const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height;
+    const c = document.createElement("canvas");
+    c.width = 1; c.height = 1;
+    const cx = c.getContext("2d");
+    const stripH = Math.max(2, Math.floor(sh * 0.03));
+    cx.drawImage(img, 0, sh - stripH, sw, stripH, 0, 0, 1, 1);
+    const d = cx.getImageData(0, 0, 1, 1).data;
+    img._botColor = `rgb(${d[0]},${d[1]},${d[2]})`;
+  } catch (e) {
+    img._botColor = "#b89a6a"; // sable de secours
+  }
+  return img._botColor;
+}
+
 /** Far / skyline de la map courante, baseline alignée sur GROUND_Y. */
-function drawMapBgLayer(img, parallaxX) {
+function drawMapBgLayer(img, parallaxX, bandImg) {
   const layout = currentMapLayout();
   const px = (parallaxX || 0) + (layout.bgXOff || 0);
   if (layout.bgFullHeight && (layout.baselineFromBottom | 0) > 0) {
-    drawImgCoverBaseline(img, 0, W, GROUND_Y, H, px, layout.baselineFromBottom);
+    drawImgCoverBaseline(img, 0, W, GROUND_Y, H, px, layout.baselineFromBottom, bandImg);
     return;
   }
   drawImgCoverBottom(img, 0, 0, W, mapBgDrawH(), px, layout.baselineFromBottom);
@@ -424,8 +614,53 @@ function drawMapBackdrop(pack, fillColor) {
   const dh = mapBgDrawH();
   ctx.fillStyle = fillColor || "#6a8498";
   ctx.fillRect(0, 0, W, dh);
-  if (spriteReady(pack.skyline)) drawMapBgLayer(pack.skyline, 0);
+  mapBandActive = false;
+  mapBandSeamY = 0;
+  if (spriteReady(pack.skyline)) drawMapBgLayer(pack.skyline, 0, pack.band);
   else if (spriteReady(pack.far)) drawMapBgLayer(pack.far, 0);
+  drawMapBandSeam();
+}
+
+/** Moulure décorative (thème UI : navy + liseré crème) posée sur le raccord
+ *  skyline↔bande pour masquer la couture. Ne s'affiche que si une bande a
+ *  rempli un vide (mapBandSeamY > 0). */
+let mapBandSeamY = 0;
+function drawMapBandSeam() {
+  if (mapBandSeamY <= 0 || mapBandSeamY >= H) return;
+  const y = mapBandSeamY;
+  const LINE_H = 5;   // épaisseur de la ligne blanche
+  const STROKE = 1;   // contour noir cartoon (fin)
+  // 1) contour noir (encrage cartoon) : au-dessus + en dessous de la ligne
+  ctx.fillStyle = "rgba(20,17,26,0.95)";
+  ctx.fillRect(0, y - 1 - STROKE, W, LINE_H + STROKE * 2);
+  // 2) LIGNE BLANCHE de délimitation de terrain (comme les lignes du court)
+  ctx.fillStyle = "rgba(248,246,240,0.97)";
+  ctx.fillRect(0, y - 1, W, LINE_H);
+}
+
+let mapBandActive = false;
+/** Compositing 2 zones : la BANDE (sol de premier plan) remplit le bas à SA
+ *  taille (largeur pleine, ratio conservé) ; la SKYLINE remplit le HAUT, calée
+ *  pour que sa ligne de court tombe sur le raccord (seam) — son haut débordant
+ *  est COUPÉ. Résultat : bâtiments en haut, sol-bande en bas, joint net. */
+function drawMapTwoZone(pack) {
+  const band = pack.band, sky = pack.skyline;
+  const bsw = band.naturalWidth || band.width, bsh = band.naturalHeight || band.height;
+  const bandH = Math.round(W * bsh / bsw);   // bande à sa taille (remplit la largeur)
+  const seam = Math.max(0, H - bandH);       // raccord : la bande commence ici
+  // --- SKYLINE : échelle = remplir la LARGEUR (JAMAIS déformée/compressée),
+  //     BAS calé sur le raccord, HAUT qui dépasse = COUPÉ (clip). ---
+  const ssw = sky.naturalWidth || sky.width, ssh = sky.naturalHeight || sky.height;
+  const scale = W / ssw;
+  const th = ssh * scale;
+  const oy = seam - th;                       // bas du skyline exactement au seam
+  ctx.save();
+  ctx.beginPath(); ctx.rect(0, 0, W, seam); ctx.clip();
+  ctx.drawImage(sky, 0, 0, ssw, ssh, 0, oy, W, th);
+  ctx.restore();
+  // --- BANDE : posée EN DESSOUS (seam..H), pas par-dessus le skyline ---
+  ctx.drawImage(band, 0, 0, bsw, bsh, 0, seam, W, bandH);
+  mapBandActive = true;
 }
 
 /** Ligne de fond code (quand le PNG n'en a pas de fiable). */
@@ -451,7 +686,9 @@ function drawCourtSeam(stroke, accent) {
  * (qui s'arrêtent à GROUND_Y via BG_DRAW_H).
  */
 function drawCourtApron(topColor, botColor) {
-  // Décor plein cadre (Place du Matin) : voile léger pour laisser voir le PNG sous le HUD
+  // Une bande de sol dédiée est dessinée → pas de voile (elle ferait office d'apron laid).
+  if (mapBandActive) return;
+  // Décor plein cadre (Cité du Matin) : voile léger pour laisser voir le PNG sous le HUD
   if (currentMapLayout().bgFullHeight) {
     ctx.save();
     ctx.globalAlpha = 0.28;
@@ -474,7 +711,7 @@ function drawCourtApron(topColor, botColor) {
   ctx.fillRect(0, GROUND_Y, W, 2);
 }
 
-/** Prop ancré aux pieds (x centre, y = ligne de sol). */
+/** Prop ancré pieds (x centre) ; `drawH` depuis PROP_H — réf. CHAR_BASE_H. */
 function drawMapProp(img, x, footY, drawH) {
   if (!spriteReady(img)) return;
   const aspect = img.naturalWidth / img.naturalHeight;
@@ -491,10 +728,10 @@ function drawBgNeigePng(t, heavy, blizzard) {
   // Voile météo sur le décor (ciel plus plombé sans changer d'image)
   if (blizzard) {
     ctx.fillStyle = "rgba(90,110,130,0.28)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   } else if (heavy) {
     ctx.fillStyle = "rgba(120,140,165,0.14)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   }
 
   // Tribune fixe (un seul PNG — pas de swap crowd_0/1) et plus en retrait
@@ -515,26 +752,30 @@ function drawBgNeigePng(t, heavy, blizzard) {
   drawCourtApron("#fbfdff", "#d7e4ee");
   drawCourtSeam("rgba(180,200,220,0.95)", "rgba(100,130,160,0.55)");
 
+  // Bannières Place Écarlate (côtés — décalées du canon à gauche)
+  if (spriteReady(p.flag)) {
+    const bob = Math.sin(t * 2.05) * 2;
+    drawMapProp(p.flag, 168, GROUND_Y + 2 + bob, PROP_H.flag); // un seul drapeau, à gauche
+  }
+
   // Canon d'apparat (gauche) — idle / tir piloté par l'événement de map
   const firing = typeof mapEvent !== "undefined" &&
     (mapEvent.phase === "fire" || (mapEvent.phase === "flying" && mapEvent.t < 8));
-  drawMapProp(firing && spriteReady(p.cannonFire) ? p.cannonFire : p.cannon, 78, GROUND_Y + 2, 78);
+  drawMapProp(firing && spriteReady(p.cannonFire) ? p.cannonFire : p.cannon, 72, GROUND_Y + 2, PROP_H.cannon);
 
   // Bonhomme de neige (droite) — se baisse quand la balle approche
   if (spriteReady(p.snowman)) {
     const sx = 838;
     const sbd = Math.hypot(sx - ball.x, (GROUND_Y - 40) - ball.y);
     const duck = sbd < 90 ? (1 - sbd / 90) * 10 : 0;
-    drawMapProp(p.snowman, sx, GROUND_Y + 2 + duck, 86 - duck * 0.3);
+    drawMapProp(p.snowman, sx, GROUND_Y + 2 + duck, PROP_H.snowman - duck * 0.3);
   }
 
-  // Neige / blizzard animés en code (un seul décor)
-  drawNeigeWeatherFX(t, heavy, blizzard);
 
   drawMapEventOverlay();
 }
 
-/** Flocons, rafales et voile — météo Place Grand-Rouge sans 2e fond PNG. */
+/** Flocons, rafales et voile — météo Place Écarlate sans 2e fond PNG. */
 function drawNeigeWeatherFX(t, heavy, blizzard) {
   const flakes = blizzard ? 220 : heavy ? 120 : 48;
   const wind = blizzard ? 95 : heavy ? 28 : 4;
@@ -547,7 +788,7 @@ function drawNeigeWeatherFX(t, heavy, blizzard) {
     ctx.lineWidth = blizzard ? 1.6 : 1;
     ctx.lineCap = "round";
     for (let i = 0; i < n; i++) {
-      const fy = ((i * 67.1 + t * (40 + (i % 5) * 10)) % (GROUND_Y + 10));
+      const fy = ((i * 67.1 + t * (40 + (i % 5) * 10)) % (H + 10));
       const fx = ((i * 131.7 + t * (80 + wind) + Math.sin(t * 2 + i) * 30) % (W + 120)) - 60;
       const len = blizzard ? 28 + (i % 5) * 8 : 14 + (i % 3) * 5;
       ctx.globalAlpha = 0.25 + (i % 4) * 0.08;
@@ -563,7 +804,7 @@ function drawNeigeWeatherFX(t, heavy, blizzard) {
   ctx.fillStyle = "#fff";
   for (let i = 0; i < flakes; i++) {
     const fx = ((i * 97.3 + t * (18 + (i % 5) * 6) * spd + wind * t + Math.sin(t + i) * 12) % (W + 40)) - 20;
-    const fy = (i * 53.7 + t * (30 + (i % 7) * 8) * spd) % (GROUND_Y + 20);
+    const fy = (i * 53.7 + t * (30 + (i % 7) * 8) * spd) % (H + 20);
     ctx.globalAlpha = 0.4 + (i % 4) * 0.14;
     const r = blizzard ? 1.4 + (i % 4) * 0.7 : 1.2 + (i % 3);
     ctx.beginPath();
@@ -575,16 +816,17 @@ function drawNeigeWeatherFX(t, heavy, blizzard) {
   // Brume blanche / voile de blizzard
   if (blizzard) {
     ctx.fillStyle = "rgba(255,255,255,0.16)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
     // bande basse un peu plus dense (rafales au sol)
-    const mist = ctx.createLinearGradient(0, GROUND_Y - 90, 0, GROUND_Y);
+    const mist = ctx.createLinearGradient(0, GROUND_Y - 90, 0, H);
     mist.addColorStop(0, "rgba(255,255,255,0)");
+    mist.addColorStop(0.55, "rgba(255,255,255,0.22)");
     mist.addColorStop(1, "rgba(255,255,255,0.22)");
     ctx.fillStyle = mist;
-    ctx.fillRect(0, GROUND_Y - 90, W, 90);
+    ctx.fillRect(0, GROUND_Y - 90, W, H - (GROUND_Y - 90));
   } else if (heavy) {
     ctx.fillStyle = "rgba(255,255,255,0.07)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   }
 }
 
@@ -593,11 +835,13 @@ function mapEventWarnPack(kind) {
   if (kind === "cannon") return SPRITES.mapVladou;
   if (kind === "cart") return SPRITES.mapTrompette;
   if (kind === "march") return SPRITES.mapMicron;
-  if (kind === "radar") return SPRITES.mapHoun;
+  if (kind === "radar") return SPRITES.mapBebe;
   if (kind === "lantern") return SPRITES.mapMatin;
   if (kind === "carpet") return SPRITES.mapBosphore;
   if (kind === "cow") return SPRITES.mapAshram;
   if (kind === "macaw") return SPRITES.mapAmazon;
+  if (kind === "falcon") return SPRITES.mapColline;
+  if (kind === "peacock") return SPRITES.mapRoseraie;
   return null;
 }
 
@@ -611,8 +855,8 @@ function drawMapEventRainProp(kind, x, y, vx) {
   if (kind === "cart") { drawGolfBall(x, y); return; }
   const pack = mapEventWarnPack(kind);
   let img = null, h = 36;
-  if (kind === "lantern" && pack && spriteReady(pack.lantern)) { img = pack.lantern; h = 42; }
-  if (kind === "macaw" && pack && spriteReady(pack.macaw)) { img = pack.macaw; h = 40; }
+  if (kind === "lantern" && pack && spriteReady(pack.lantern)) { img = pack.lantern; h = PROP_H.lanternShot; }
+  if (kind === "macaw" && pack && spriteReady(pack.macaw)) { img = pack.macaw; h = PROP_H.macawShot; }
   if (img) {
     const sc = h / img.height;
     const dw = img.width * sc;
@@ -636,17 +880,50 @@ function drawMapEventCrosser(kind) {
   ctx.translate(cx, 0);
   if (face < 0) ctx.scale(-1, 1);
   if (kind === "march" && pack && spriteReady(pack.marchers0)) {
-    // Strip détouré : un cran plus grand que les joueurs (lisibilité du cortège)
-    drawMapProp(pack.marchers0, 0, GROUND_Y + 4, 128);
+    // Strip détouré : un cran > CHAR_BASE_H (lisibilité du cortège)
+    drawMapProp(pack.marchers0, 0, GROUND_Y + 4, PROP_H.marchers);
   } else if (kind === "carpet" && pack && spriteReady(pack.carpet)) {
-    drawMapProp(pack.carpet, 0, GROUND_Y - 40, 70);
+    drawMapProp(pack.carpet, 0, GROUND_Y - 36, PROP_H.carpet);
   } else if (kind === "cow" && pack && spriteReady(pack.cow)) {
-    // Idle : petite, devant le public. Event : plus grande sur le terrain (perspective).
+    // Idle bord de court / event sur le terrain — hauteurs dans PROP_H
     const onCourt = mapEvent.phase !== "idle";
-    drawMapProp(pack.cow, 0, onCourt ? GROUND_Y + 12 : GROUND_Y - 110, onCourt ? 92 : 40);
+    drawMapProp(pack.cow, 0, onCourt ? GROUND_Y + 8 : GROUND_Y - 4,
+      onCourt ? PROP_H.cow : PROP_H.cowIdle);
+  } else if (kind === "falcon") {
+    // Faucon en vol horizontal au-dessus du terrain.
+    if (pack && spriteReady(pack.falcon)) {
+      drawMapProp(pack.falcon, 0, GROUND_Y - 70, PROP_H.falcon);
+    } else {
+      // Fallback canvas tant que falcon.png n'existe pas (sommet-decor) : silhouette d'oiseau.
+      const y = GROUND_Y - 100, wf = Math.sin(t2() * 10) * 6;
+      ctx.strokeStyle = "#2b2b33"; ctx.lineWidth = 5; ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(-26, y + wf); ctx.quadraticCurveTo(-8, y - 12, 0, y);
+      ctx.quadraticCurveTo(8, y - 12, 26, y + wf);
+      ctx.stroke();
+      ctx.fillStyle = "#2b2b33";
+      ctx.beginPath(); ctx.ellipse(0, y + 1, 5, 3, 0, 0, Math.PI * 2); ctx.fill();
+    }
+  } else if (kind === "peacock") {
+    // Paon qui traverse la cour.
+    if (pack && spriteReady(pack.peacock)) {
+      drawMapProp(pack.peacock, 0, GROUND_Y + 8, PROP_H.peacock);
+    } else {
+      // Fallback canvas tant que peacock.png n'existe pas (sommet-decor).
+      const y = GROUND_Y - 8;
+      ctx.fillStyle = "#1a6b5a";
+      ctx.beginPath(); ctx.ellipse(0, y - 18, 14, 22, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#2a9b7a";
+      ctx.beginPath(); ctx.ellipse(10, y - 40, 18, 28, 0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#c9a227";
+      ctx.beginPath(); ctx.arc(0, y - 42, 5, 0, Math.PI * 2); ctx.fill();
+    }
   }
   ctx.restore();
 }
+
+/** Horloge locale (s) — pour l'animation de secours du faucon. */
+function t2() { return performance.now() / 1000; }
 
 function drawMapEventOverlay() {
   if (typeof mapEvent === "undefined" || mapEventsQuiet || !mapEventActiveTerrain()) return;
@@ -671,7 +948,7 @@ function drawMapEventOverlay() {
     ctx.scale(scale, scale);
     const warnImg = mapEventWarnIcon();
     if (warnImg) {
-      const wh = 42;
+      const wh = PROP_H.warnIcon;
       ctx.drawImage(warnImg, -wh / 2, -wh, wh, wh);
     } else {
       ctx.fillStyle = showZone ? "#ff9800" : "#e53935";
@@ -862,7 +1139,7 @@ function drawBgNeige() {
   const heavy = weather === "rain";    // chute de neige soutenue
   const blizzard = weather === "storm"; // blizzard
 
-  // Place Grand-Rouge PNG (Vladou) — fallback canvas si pas encore chargé
+  // Place Écarlate PNG (Volkoï) — fallback canvas si pas encore chargé
   if (typeof mapVladouReady === "function" && mapVladouReady()) {
     drawBgNeigePng(t, heavy, blizzard);
     return; // overlay event déjà dessiné dans drawBgNeigePng
@@ -950,8 +1227,6 @@ function drawBgNeige() {
   ctx.beginPath(); ctx.moveTo(sx + 12, sy - 14); ctx.lineTo(sx + 22, sy - 22); ctx.stroke();
 
   // flocons (positions dérivées du temps : aucun état à synchroniser).
-  // Densité et vent selon la météo : léger / chute soutenue / blizzard.
-  drawNeigeWeatherFX(t, heavy, blizzard);
 
   // Canon + event (fallback canvas — pas de PNG)
   if (typeof mapEvent !== "undefined") {
@@ -1063,10 +1338,9 @@ function drawBgPrairie() {
   drawCarrotPatch(60, storm);
   drawHayBale(W - 60);
   drawButterflies();
-  if (raining) drawRain(storm ? 1 : 0.55);
 }
 
-/** Esplanade du Défilé — fond PNG Houn. */
+/** Esplanade du Défilé — fond PNG Bébé. */
 function drawBgParade() {
   const t = performance.now() / 1000;
   const storm = weather === "storm";
@@ -1076,7 +1350,7 @@ function drawBgParade() {
     drawBgAshramPng(t, raining, storm);
     return;
   }
-  if (typeof mapHounReady === "function" && mapHounReady() && tk !== "ashram") {
+  if (typeof mapBebeReady === "function" && mapBebeReady() && tk !== "ashram") {
     drawBgParadePng(t, raining, storm);
     return;
   }
@@ -1085,20 +1359,19 @@ function drawBgParade() {
   ctx.fillRect(0, 0, W, GROUND_Y);
   drawCrowd();
   drawCourtApron("#7a8088", "#5a6068");
-  if (raining) drawRain(storm ? 1 : 0.55);
 }
 
 function drawBgParadePng(t, raining, storm) {
-  const p = SPRITES.mapHoun;
+  const p = SPRITES.mapBebe;
 
   drawMapBackdrop(p, "#9aa2aa");
 
   if (storm) {
     ctx.fillStyle = "rgba(60,70,80,0.35)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   } else if (raining) {
     ctx.fillStyle = "rgba(90,100,110,0.16)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   }
 
   // Public calque désactivé (déjà dans le skyline)
@@ -1109,18 +1382,18 @@ function drawBgParadePng(t, raining, storm) {
   // Bannière
   if (spriteReady(p.flag)) {
     const bob = Math.sin(t * 2.1) * 2;
-    drawMapProp(p.flag, 78, GROUND_Y + 2 + bob, 100);
+    drawMapProp(p.flag, 78, GROUND_Y + 2 + bob, PROP_H.flag);
     ctx.save();
     ctx.translate(W - 78, 0);
     ctx.scale(-1, 1);
-    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, 100);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, PROP_H.flag);
     ctx.restore();
   }
 
   // Bouquets
   if (spriteReady(p.flower)) {
-    drawMapProp(p.flower, 200, GROUND_Y + 2, 42);
-    drawMapProp(p.flower, W - 200, GROUND_Y + 2, 40);
+    drawMapProp(p.flower, 200, GROUND_Y + 2, PROP_H.flower);
+    drawMapProp(p.flower, W - 200, GROUND_Y + 2, PROP_H.flower);
   }
 
   // Radar — idle décoratif ; actif pendant l'event Batterie AA
@@ -1129,14 +1402,13 @@ function drawBgParadePng(t, raining, storm) {
       typeof mapEventKind === "function" && mapEventKind() === "radar" &&
       mapEvent.phase !== "idle";
     const ping = (eventOn || Math.sin(t * 4) > 0.65) && spriteReady(p.radarActive);
-    drawMapProp(ping ? p.radarActive : p.radar, 130, GROUND_Y + 2, 70);
+    drawMapProp(ping ? p.radarActive : p.radar, 130, GROUND_Y + 2, PROP_H.radar);
   }
 
-  if (raining) drawRain(storm ? 1 : 0.55);
   drawMapEventOverlay();
 }
 
-/** Palais de l'Hexagone — fond PNG Micron. */
+/** Palais du Coq — fond PNG Micron. */
 function drawBgPrairiePng(t, raining, storm) {
   const p = SPRITES.mapMicron;
 
@@ -1145,10 +1417,10 @@ function drawBgPrairiePng(t, raining, storm) {
 
   if (storm) {
     ctx.fillStyle = "rgba(70,80,90,0.32)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   } else if (raining) {
     ctx.fillStyle = "rgba(100,120,130,0.16)";
-    ctx.fillRect(0, 0, W, GROUND_Y);
+    ctx.fillRect(0, 0, W, H);
   }
 
   // Public PNG désactivé pour l’instant (même raison que Resort)
@@ -1159,11 +1431,11 @@ function drawBgPrairiePng(t, raining, storm) {
   // Drapeaux (gauche / droite)
   if (spriteReady(p.flag)) {
     const bob = Math.sin(t * 2.4) * 2;
-    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, 96);
+    drawMapProp(p.flag, 70, GROUND_Y + 2 + bob, PROP_H.flag);
     ctx.save();
     ctx.translate(W - 70, 0);
     ctx.scale(-1, 1);
-    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, 96);
+    drawMapProp(p.flag, 0, GROUND_Y + 2 - bob, PROP_H.flag);
     ctx.restore();
   }
 
@@ -1171,11 +1443,10 @@ function drawBgPrairiePng(t, raining, storm) {
   if (spriteReady(p.pigeon)) {
     const bob1 = Math.sin(t * 3.1) * 1.5;
     const bob2 = Math.sin(t * 2.7 + 1.2) * 1.5;
-    drawMapProp(p.pigeon, 160, GROUND_Y - 2 + bob1, 28);
-    drawMapProp(p.pigeon, W - 180, GROUND_Y - 4 + bob2, 26);
+    drawMapProp(p.pigeon, 160, GROUND_Y - 2 + bob1, PROP_H.pigeon);
+    drawMapProp(p.pigeon, W - 180, GROUND_Y - 4 + bob2, PROP_H.pigeon);
   }
 
-  if (raining) drawRain(storm ? 1 : 0.55);
   drawMapEventOverlay();
 }
 
@@ -1235,8 +1506,8 @@ function terrainNetPostImg() {
   if (key === "prairie" && SPRITES.mapMicron && spriteReady(SPRITES.mapMicron.netPost)) {
     return SPRITES.mapMicron.netPost;
   }
-  if (key === "parade" && SPRITES.mapHoun && spriteReady(SPRITES.mapHoun.netPost)) {
-    return SPRITES.mapHoun.netPost;
+  if (key === "parade" && SPRITES.mapBebe && spriteReady(SPRITES.mapBebe.netPost)) {
+    return SPRITES.mapBebe.netPost;
   }
   if (key === "matin" && SPRITES.mapMatin && spriteReady(SPRITES.mapMatin.netPost)) {
     return SPRITES.mapMatin.netPost;
@@ -1249,6 +1520,12 @@ function terrainNetPostImg() {
   }
   if (key === "amazon" && SPRITES.mapAmazon && spriteReady(SPRITES.mapAmazon.netPost)) {
     return SPRITES.mapAmazon.netPost;
+  }
+  if (key === "colline" && SPRITES.mapColline && spriteReady(SPRITES.mapColline.netPost)) {
+    return SPRITES.mapColline.netPost;
+  }
+  if (key === "roseraie" && SPRITES.mapRoseraie && spriteReady(SPRITES.mapRoseraie.netPost)) {
+    return SPRITES.mapRoseraie.netPost;
   }
   return null;
 }

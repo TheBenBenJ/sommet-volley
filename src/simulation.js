@@ -107,17 +107,17 @@ function maybeActivateSuper(blob, input) {
   crowdHype = Math.max(crowdHype, 45);
   spawnSuperBurst(blob);
   superSound(a.key);
-  if (a.key === "vladou" || a.key === "yogi") {
-    // Hiver Général / Méditation : gèle le camp adverse
+  if (a.key === "vladou" || a.key === "yogi" || a.key === "safran") {
+    // Hiver Général / Méditation / Voile d’Or : gèle le camp adverse
     superEffects.push({ kind: "ice", side: 1 - blob.side, t: blob.superT });
   } else if (a.key === "trompette" || a.key === "panda" || a.key === "jair") {
     // Le Mur / Grande Muraille / Déforestation
     superEffects.push({ kind: "wall", side: 1 - blob.side, t: blob.superT });
   } else if (a.key === "micron") {
-    // 49.3 : frappes immunisées au smash adverse (voir trySmashBall)
+    // Passage en Force : frappes immunisées au smash adverse (voir trySmashBall)
     blob.superSmash = false;
-  } else if (a.key === "houn" || a.key === "sultan") {
-    // Batterie AA / Séisme : interdit de sauter au camp adverse
+  } else if (a.key === "bebe" || a.key === "sultan" || a.key === "faucon") {
+    // Batterie AA / Séisme / Raid Éclair : interdit de sauter au camp adverse
     superEffects.push({ kind: "noground", side: 1 - blob.side, t: blob.superT });
   }
 }
@@ -132,7 +132,7 @@ function superSound(key) {
   beep(800, 0.1, "square", 0.13, 0.08, 1150);
   if (key === "trompette") { beep(400, 0.1, "square", 0.14); beep(600, 0.14, "square", 0.12, 0.08); }
   if (key === "micron") beep(880, 0.18, "sine", 0.14, 0.05, 440);
-  if (key === "houn") {
+  if (key === "bebe") {
     beep(200, 0.06, "square", 0.14); beep(280, 0.08, "square", 0.12, 0.05);
     beep(160, 0.12, "triangle", 0.16, 0.1);
   }
@@ -235,6 +235,7 @@ function localInputs(side) {
     left:  !!keys["KeyA"] || pad.left,
     right: !!keys["KeyD"] || pad.right,
     jump:  !!(keys["KeyW"] || keys["Space"] || (!twoHumans && keys["ArrowUp"])) || pad.jump,
+    kbdJump: !!(keys["KeyW"] || keys["Space"] || (!twoHumans && keys["ArrowUp"])),
     smash: !!keys["KeyF"] || !!pad.smash,
     super: !!keys["KeyE"] || pad.super,
     up:    !!pad.up,
@@ -245,6 +246,7 @@ function localInputs(side) {
     left:  !!keys["ArrowLeft"] || pad.left,
     right: !!keys["ArrowRight"] || pad.right,
     jump:  !!keys["ArrowUp"] || pad.jump,
+    kbdJump: !!keys["ArrowUp"],
     smash: !!(keys["ArrowDown"] || keys["Slash"]) || !!pad.smash,
     super: !!keys["ShiftRight"] || pad.super,
     up:    !!pad.up,

@@ -5,7 +5,8 @@
 if (!SPRITES.chars) SPRITES.chars = {};
 
 const CHAR_ANIM_DEFAULTS = {
-  idle_face: 1, idle: 2, walk: 8, jump: 3, receive: 2, aim: 2,
+  // walk: 4 — cycle appui / passage / appui / passage (packs walk_0..3).
+  idle_face: 1, idle: 2, walk: 4, jump: 3, receive: 2, aim: 2,
   smash: 3, super: 4, panic: 2, victory: 2, defeat: 2
 };
 
@@ -19,7 +20,7 @@ function charFramePath(key, anim, n) {
 
 function loadCharSprites(key, manifest) {
   const anims = (manifest && manifest.anims) || CHAR_ANIM_DEFAULTS;
-  const pack = { manifest: manifest || { baseH: 110, footPad: 2 }, frames: {} };
+  const pack = { manifest: manifest || { baseH: CHAR_BASE_H, footPad: 2 }, frames: {} };
   for (const anim of Object.keys(anims)) {
     const n = anims[anim] | 0;
     pack.frames[anim] = [];
@@ -215,7 +216,7 @@ function drawSpriteChar(b) {
   if (!spriteReady(img)) return false;
 
   const pack = charPack(key);
-  const baseH = (pack.manifest && pack.manifest.baseH) || 110;
+  const baseH = (pack.manifest && pack.manifest.baseH) || CHAR_BASE_H;
   const footPad = (pack.manifest && pack.manifest.footPad) || 2;
   const scaleX = (pack.manifest && pack.manifest.scaleX) || 1;
   // Menus : groundY forcé. En jeu : ancrer aux pieds via b.y (sinon collé au sol).
@@ -244,7 +245,7 @@ function drawSpriteCharMenu(b) {
     const img = charPack(key).frames.idle_face[0];
     if (spriteReady(img)) {
       const pack = charPack(key);
-      const baseH = (pack.manifest && pack.manifest.baseH) || 110;
+      const baseH = (pack.manifest && pack.manifest.baseH) || CHAR_BASE_H;
       const scaleX = (pack.manifest && pack.manifest.scaleX) || 1;
       const footY = b.groundY != null ? b.groundY : b.y;
       const h = baseH * 0.95;

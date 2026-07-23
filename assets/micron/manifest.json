@@ -1,7 +1,7 @@
 {
   "anims": {
     "idle_face": 1,
-    "idle": 2,
+    "idle": 1,
     "walk": 4,
     "jump": 3,
     "receive": 2,

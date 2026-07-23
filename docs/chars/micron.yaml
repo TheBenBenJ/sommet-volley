@@ -1,13 +1,13 @@
-# Fiche personnage — Manu Micron
+# Fiche personnage — Le Cygne (Gallardie) · clé technique micron
 key: micron
-name: "Manu Micron"
-pays_theme: "France — palais, meeting, tricolore"
-silhouette: "costume cintré impeccable, mèche laquée, gestuelle de meeting, écharpe tricolore"
-palette: ["#1a237e", "#f5f5f5", "#c62828"]
+name: "Le Cygne"
+nation: "Gallardie"
+pays_theme: "Gallardie — palais, technocrate"
+silhouette: "mince, cheveux gominés, costume navy cintré, petit pin tricolore abstrait"
+palette: ["#3d5afe", "#1a237e", "#ffffff"]
 stats: { vitesse: 4, detente: 3, puissance: 3, controle: 4 }
-trait_passif: "En même temps — après chaque point, échange seedé vitesse ↔ puissance"
+trait_passif: "Double jeu — après chaque point, échange vitesse ↔ puissance"
 super:
-  nom: "49.3"
-  effet: "4 s : ses frappes ne peuvent pas être smashées en retour"
-sons: "voix posée, cloche institutionnelle"
-map: "Palais de l'Hexagone"
+  nom: "Passage en Force"
+  effet: "~4 s frappes immunisées au smash adverse"
+map: "Palais du Coq"
