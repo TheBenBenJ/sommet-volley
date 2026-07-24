@@ -51,7 +51,7 @@ const STORY_SOMMET = [
       { s: "dorf", t: "Tu vois ce gazon ? Le plus beau gazon du monde. On dit que c'est le mien. C'est vrai." },
       { s: "cygne", t: "Cher ami, nous sommes alliés. En même temps, un allié, ça se bat aussi. Sur le terrain, s'entend." },
       { s: "dorf", t: "L'Alliance, l'Alliance… Vous payez jamais votre part. Sers, et on verra qui protège qui." },
-      { s: "cygne", t: "Je vais vous montrer ce qu'est une passe décisive. À la française." }
+      { s: "cygne", t: "Je vais vous montrer ce qu'est une passe décisive. À la gallarde." }
     ],
     win: [
       { s: "cygne", t: "Voilà. Une rivalité entre amis, ça se règle en trois sets et un sourire." },
@@ -151,12 +151,12 @@ const STORY_SOMMET = [
       { s: "bebe", t: "Ce n'est pas de la triche. C'est de la DISCIPLINE nationale. Concentré. Prépare-toi." }
     ],
     win: [
-      { s: "dorf", t: "Battu ton truc dopé ! Personne n'y croyait ! MOI si. Toujours." },
+      { s: "dorf", t: "Battu ton truc rouge ! Personne n'y croyait ! MOI si. Toujours." },
       { s: "bebe", t: "Une défaite temporaire. Le programme continue. Le défilé aussi." }
     ],
     lose: [
       { s: "bebe", t: "La discipline écrase l'improvisation. Écris-moi une lettre. Je répondrai peut-être." },
-      { s: "narrator", t: "Le dopage a payé. Mais quelque chose s'est cassé dans l'esprit des Jeux." }
+      { s: "narrator", t: "L'aura a payé. Mais quelque chose s'est cassé dans l'esprit des Jeux." }
     ]
   },
 
@@ -168,7 +168,7 @@ const STORY_SOMMET = [
       { s: "narrator", t: "Grande Forêt. La chaleur monte — sur le terrain et sur la planète. Le Gourou arrive… changé." },
       { s: "capitaine", t: "Ma tronçonneuse a soif. Un smash de moi, et ta défense tombe comme un arbre." },
       { s: "gourou", t: "J'ai laissé la méditation au vestiaire. Ce soir, je carbure. Les Jeux l'exigent." },
-      { s: "narrator", t: "Lui aussi. L'œil vitreux, les gestes trop vifs. La contagion du dopage gagne le peloton." },
+      { s: "narrator", t: "Lui aussi. L'œil vitreux, les gestes trop vifs. La contagion rouge gagne le peloton." },
       { s: "capitaine", t: "Deux fauves, une bombe, une forêt. Que le plus brutal reste debout." }
     ],
     win: [
@@ -181,13 +181,13 @@ const STORY_SOMMET = [
     ]
   },
   {
-    act: 3, title: "Le scandale d'État", sub: "Dopage aux Jeux · bannière neutre",
+    act: 3, title: "Le scandale d'État", sub: "Aura rouge aux Jeux · bannière neutre",
     left: "cygne", right: "volkoi", terrain: 0, mode: "bomb", ai: 3, doped: "R",
     pre: [
       { s: "narrator", t: "Le laboratoire a parlé : échantillons échangés, éprouvettes truquées, tout un État sur ordonnance." },
       { s: "cygne", t: "On vous a démasqués. Vous jouez sous bannière neutre, sans hymne, sans drapeau." },
       { s: "volkoi", t: "Neutre ? Regarde mieux. Pas de drapeau, pas de règles. Juste la force. La mienne." },
-      { s: "narrator", t: "Ses veines pulsent. C'est le dopage d'État, à ciel ouvert, assumé, glaçant." },
+      { s: "narrator", t: "Ses veines pulsent. Machine d'État à plein régime, à ciel ouvert, assumée, glaçante." },
       { s: "cygne", t: "En même temps… quelqu'un doit défendre l'esprit du sport. Ce sera moi. Ce soir." }
     ],
     win: [
@@ -196,26 +196,26 @@ const STORY_SOMMET = [
     ],
     lose: [
       { s: "volkoi", t: "La morale ne renvoie pas les bombes. La force, si. Rendez-vous en finale, l'idéaliste." },
-      { s: "narrator", t: "Le dopage règne. Le public gronde. Il ne reste qu'un match pour sauver les Jeux." }
+      { s: "narrator", t: "L'aura rouge règne. Le public gronde. Il ne reste qu'un match pour sauver les Jeux." }
     ]
   },
   {
     act: 3, title: "La finale des Jeux du Sommet", sub: "Le sport contre la machine",
     left: "dorf", right: "volkoi", terrain: 1, mode: "bomb", ai: 3, doped: "R",
     pre: [
-      { s: "narrator", t: "Finale. Stade comble. D'un côté l'ego le plus bruyant du monde ; de l'autre, la machine dopée d'État." },
+      { s: "narrator", t: "Finale. Stade comble. D'un côté l'ego le plus bruyant du monde ; de l'autre, la machine d'État survoltée." },
       { s: "volkoi", t: "Toi, le bavard, contre moi, le glacier chimique. Le monde entier retient son souffle." },
       { s: "dorf", t: "Le plus grand match de tous les temps. Et je vais gagner. Sans carburant. Juste avec MOI." },
-      { s: "narrator", t: "Personne n'a le beau rôle. Mais si un dopé soulève le trophée, l'esprit des Jeux meurt." },
+      { s: "narrator", t: "Personne n'a le beau rôle. Mais si l'aura rouge soulève le trophée, l'esprit des Jeux meurt." },
       { s: "dorf", t: "Pour une fois, gamins, je joue pour tout le monde. Étrange sensation. J'aime pas. Servons." }
     ],
     win: [
-      { s: "dorf", t: "CHAMPION ! Sans dopage ! Le plus grand ! On a sauvé les Jeux — enfin, MOI je les ai sauvés." },
-      { s: "narrator", t: "La machine dopée tombe en finale. Les Jeux du Sommet survivront. Cette fois. Générique." }
+      { s: "dorf", t: "CHAMPION ! À mains nues ! Le plus grand ! On a sauvé les Jeux — enfin, MOI je les ai sauvés." },
+      { s: "narrator", t: "La machine rouge tombe en finale. Les Jeux du Sommet survivront. Cette fois. Générique." }
     ],
     lose: [
       { s: "volkoi", t: "La machine soulève le trophée. Sans hymne, sans drapeau, sans scrupule. Parfait." },
-      { s: "narrator", t: "Le dopé est champion. Rideau amer sur les Jeux du Sommet. À toi de réécrire la fin." }
+      { s: "narrator", t: "L'aura rouge est championne. Rideau amer sur les Jeux du Sommet. À toi de réécrire la fin." }
     ]
   }
 ];
@@ -885,7 +885,7 @@ function drawStoryScene() {
   uiLabel(ch.sub, mx, 108, 12, UI.muted, 0.4);
   if (ch.mode === "bomb") uiLabel("💣  Conflit — mode Bombe", W - mx, 84, 13, UI.accent, 0.4, "right");
   else uiLabel("🏐  Rivalité — mode Volley", W - mx, 84, 13, UI.sky, 0.4, "right");
-  if (ch.doped) uiLabel("☠️  Adversaire dopé — impitoyable", W - mx, 108, 12, "#ff6b6b", 0.4, "right");
+  if (ch.doped) uiLabel("☠️  Aura rouge — adversaire impitoyable", W - mx, 108, 12, "#ff6b6b", 0.4, "right");
 
   // boîte de dialogue (dimensions calculées avant les portraits pour placer les noms)
   const bx = mx, bw = W - mx * 2, bh = 108, by = H - bh - 30;
@@ -1031,7 +1031,7 @@ function drawStoryEnding() {
     "Le monde applaudit, grince des dents, ou tremble —",
     "mais le trophée du Sommet est à " + heroName + ".",
   ] : [
-    "La machine dopée est tombée en finale.",
+    "La machine rouge est tombée en finale.",
     "Le monde a retenu son souffle, puis applaudi.",
     "Le sport, fragile et imparfait, tient encore debout —",
     "jusqu'au prochain Sommet.",

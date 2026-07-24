@@ -885,9 +885,9 @@ function drawMapEventCrosser(kind) {
   } else if (kind === "carpet" && pack && spriteReady(pack.carpet)) {
     drawMapProp(pack.carpet, 0, GROUND_Y - 36, PROP_H.carpet);
   } else if (kind === "cow" && pack && spriteReady(pack.cow)) {
-    // Idle bord de court / event sur le terrain — hauteurs dans PROP_H
+    // Idle : fond central sous la fontaine ; event : traverse le court
     const onCourt = mapEvent.phase !== "idle";
-    drawMapProp(pack.cow, 0, onCourt ? GROUND_Y + 8 : GROUND_Y - 4,
+    drawMapProp(pack.cow, 0, onCourt ? GROUND_Y + 8 : GROUND_Y - 98,
       onCourt ? PROP_H.cow : PROP_H.cowIdle);
   } else if (kind === "falcon") {
     // Faucon en vol horizontal au-dessus du terrain.

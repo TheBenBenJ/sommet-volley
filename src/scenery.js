@@ -309,10 +309,10 @@ function stepCartIdleMotion() {
   if (kind !== "cart" && kind !== "carpet" && kind !== "cow") return;
   if (mapEvent.phase !== "idle") return;
   if (mapEvent.cartDir !== 1 && mapEvent.cartDir !== -1) mapEvent.cartDir = 1;
-  // Vache : promenade large devant le public ; caddie/tapis : petit va-et-vient central
-  const lo = kind === "cow" ? 70 : W * 0.5 - 100;
-  const hi = kind === "cow" ? W - 70 : W * 0.5 + 100;
-  const spd = kind === "cart" ? 0.28 : kind === "cow" ? 0.22 : 0.18;
+  // Vache idle : petit va-et-vient central (sous la fontaine) ; caddie/tapis : idem
+  const lo = W * 0.5 - (kind === "cow" ? 55 : 100);
+  const hi = W * 0.5 + (kind === "cow" ? 55 : 100);
+  const spd = kind === "cart" ? 0.28 : kind === "cow" ? 0.14 : 0.18;
   mapEvent.cartX += mapEvent.cartDir * spd;
   if (mapEvent.cartX >= hi) { mapEvent.cartX = hi; mapEvent.cartDir = -1; }
   else if (mapEvent.cartX <= lo) { mapEvent.cartX = lo; mapEvent.cartDir = 1; }
