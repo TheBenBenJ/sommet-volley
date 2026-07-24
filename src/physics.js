@@ -509,7 +509,7 @@ function trySmashBall(blob) {
   // Passage en Force (Cygne / micron) : frappes immunisées au smash adverse
   if (ball.lastTouchSide !== blob.side && ball.lastTouchSide >= 0) {
     for (const o of activeBlobs) {
-      if (o.side === ball.lastTouchSide && o.superKind === "micron" && o.superT > 0) return false;
+      if (o.side === ball.lastTouchSide && o.superKind === "cygne" && o.superT > 0) return false;
     }
   }
   // Balle au-dessus de la taille (plus tolérant que « au-dessus des épaules »)

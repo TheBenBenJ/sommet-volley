@@ -25,13 +25,13 @@ function drawCrowd() {
   const species = CHARACTERS[TERRAINS[terrain].character].key;
   const top = GROUND_Y - 118, bot = GROUND_Y - 78;
   let stand, rail, pal, glow = false;
-  if (key === "neige") {
+  if (key === "place-ecarlate") {
     stand = "#aabecd"; rail = "#8299ab";
     pal = ["#e57373", "#64b5f6", "#ffffff", "#ffb74d", "#ba68c8", "#4db6ac"];
-  } else if (key === "prairie") {
+  } else if (key === "palais-du-coq") {
     stand = "#8fae52"; rail = "#6b8a3a";
     pal = ["#ff6f61", "#ffd93d", "#7ed957", "#4db3ff", "#c07bff", "#ffffff"];
-  } else if (key === "parade") {
+  } else if (key === "esplanade-du-defile") {
     stand = "#6a7278"; rail = "#c62828";
     pal = ["#2d3a2e", "#c62828", "#c9a227", "#90a4ae", "#ffffff", "#546e7a"];
   } else {
@@ -86,15 +86,15 @@ function drawCrowdCritter(species, x, hy, col, excited, glow) {
   // Silhouettes humanoïdes mini (casting satirique)
   ctx.fillStyle = glow ? "rgba(255,255,255,0.08)" : "transparent";
   if (glow) { ctx.beginPath(); ctx.arc(x, hy, 8, 0, Math.PI * 2); ctx.fill(); }
-  const shirt = species === "vladou" ? "#b43a2e"
-    : species === "trompette" ? "#f0a060"
-    : species === "micron" ? "#3d5afe"
+  const shirt = species === "volkoi" ? "#b43a2e"
+    : species === "dorf" ? "#f0a060"
+    : species === "cygne" ? "#3d5afe"
     : species === "bebe" ? "#2d3a2e"
     : col;
   ctx.fillStyle = shirt;
   ctx.beginPath(); ctx.ellipse(x, hy + 5, 4.5, 6.5, 0, 0, Math.PI * 2); ctx.fill();
   // tête + mèche / coupe selon le perso du terrain
-  if (species === "trompette") {
+  if (species === "dorf") {
     ctx.fillStyle = "#f0a060";
     ctx.beginPath(); ctx.arc(x, hy - 2, 3.2, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = "#f5d76e";
@@ -200,8 +200,8 @@ function resetWeather() {
 /** Habillage météo selon le terrain : snow | sand | rain. */
 function weatherFlavor() {
   const key = TERRAINS[terrain] && TERRAINS[terrain].key;
-  if (key === "neige") return "snow";
-  if (key === "plage" || key === "colline") return "sand";
+  if (key === "place-ecarlate") return "snow";
+  if (key === "country-club-dore" || key === "citadelle-du-levant") return "sand";
   return "rain";
 }
 
@@ -265,16 +265,16 @@ function scheduleNextMapEvent() {
 
 function mapEventKind() {
   const k = TERRAINS[terrain] && TERRAINS[terrain].key;
-  if (k === "neige") return "cannon";
-  if (k === "plage") return "cart";
-  if (k === "prairie") return "march";
-  if (k === "parade") return "radar";
-  if (k === "matin") return "lantern";
-  if (k === "bosphore") return "carpet";
-  if (k === "ashram") return "cow";
-  if (k === "amazon") return "macaw";
-  if (k === "colline") return "falcon";
-  if (k === "roseraie") return "peacock";
+  if (k === "place-ecarlate") return "cannon";
+  if (k === "country-club-dore") return "cart";
+  if (k === "palais-du-coq") return "march";
+  if (k === "esplanade-du-defile") return "radar";
+  if (k === "cite-du-matin") return "lantern";
+  if (k === "pont-des-deux-mondes") return "carpet";
+  if (k === "stade-ashram") return "cow";
+  if (k === "grande-foret") return "macaw";
+  if (k === "citadelle-du-levant") return "falcon";
+  if (k === "jardin-des-roses") return "peacock";
   return null;
 }
 
@@ -771,7 +771,7 @@ function sunVisible() { return weather === "clear" || weather === "rain"; }
 // adhérence du sol : 1 (sec) → 0.8 (intempérie) → 0.6 (déchaînée). Tous terrains.
 // Sur la banquise, la neige rend déjà le sol un peu glissant même au "sec".
 function groundGrip(blob) {
-  const icy = TERRAINS[terrain].key === "neige" ? 0.92 : 1;
+  const icy = TERRAINS[terrain].key === "place-ecarlate" ? 0.92 : 1;
   let g = 1;
   if (weather === "storm") g = 0.6 * (icy < 1 ? 0.9 : 1);
   else if (weather === "rain") g = 0.8 * icy;
@@ -991,13 +991,13 @@ function drawBackground() {
   ctx.fillStyle = "#2a3340";
   ctx.fillRect(0, 0, W, H);
   const key = TERRAINS[terrain].key;
-  if (key === "plage") drawBgPlage();
-  else if (key === "neige") drawBgNeige();
-  else if (key === "prairie" || key === "matin" || key === "bosphore") drawBgPrairie();
-  else if (key === "parade" || key === "ashram") drawBgParade();
-  else if (key === "amazon") drawBgPlage();
-  else if (key === "colline") drawBgColline();
-  else if (key === "roseraie") drawBgRoseraie();
+  if (key === "country-club-dore") drawBgPlage();
+  else if (key === "place-ecarlate") drawBgNeige();
+  else if (key === "palais-du-coq" || key === "cite-du-matin" || key === "pont-des-deux-mondes") drawBgPrairie();
+  else if (key === "esplanade-du-defile" || key === "stade-ashram") drawBgParade();
+  else if (key === "grande-foret") drawBgPlage();
+  else if (key === "citadelle-du-levant") drawBgColline();
+  else if (key === "jardin-des-roses") drawBgRoseraie();
   else drawBgPlage();
   // Particules / grade / éclairs — une seule passe pour toutes les maps
   drawWeatherOverlay();

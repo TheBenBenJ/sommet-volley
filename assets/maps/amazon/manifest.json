@@ -1,9 +1,0 @@
-{
-  "key": "amazon",
-  "name": "Grande Forêt",
-  "layers": ["far", "skyline"],
-  "props": ["net_post", "flag", "macaw"],
-  "event": "macaw",
-  "thumb": "thumb.png",
-  "notes": "Grande Forêt / Tropicalia (Jair). Palette terre battue rouille, verts jungle, bois, or chaud. Props régénérés sommet-decor 2026-07-22 (skyline ref). Event: macaw."
-}

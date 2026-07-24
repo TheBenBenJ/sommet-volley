@@ -86,7 +86,7 @@ par terrain, transitions via `rng()` + `weatherTimer`. Consommée par les
 `drawBg<Nom>` (voiles `rain`/`storm` + `drawRain()`), pas par la simulation.
 
 - **Terrain qui doit rester au beau fixe** (jardin ensoleillé, désert…) : ajouter sa
-  clé à la liste en tête de `stepWeather()` : `if (key === "plage" || key === "<key>")
+  clé à la liste en tête de `stepWeather()` : `if (key === "country-club-dore" || key === "<key>")
   { weather = "clear"; weatherTimer = 99999; return; }`.
 - **Terrain avec météo** : rien à faire (FSM par défaut) ; juste gérer les voiles
   `raining`/`storm` dans son `drawBg<Nom>Png` (copier un voisin).

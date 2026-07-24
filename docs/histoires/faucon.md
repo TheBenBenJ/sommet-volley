@@ -39,61 +39,61 @@ const STORY_FAUCON = [
   // ===================== ACTE I — Le carnet d'alliances (Volley) =====================
   {
     act: 1, title: "L'ami de l'est lointain", sub: "Levantie–Bharatie · axe technologique",
-    left: "faucon", right: "yogi", terrain: 6, mode: "volley", ai: 0, doped: null,
+    left: "faucon", right: "gourou", terrain: 6, mode: "volley", ai: 0, doped: null,
     pre: [
       { s: "narrator", t: "Stade Ashram, guirlandes de soucis et grès couleur miel. Le premier tour oppose deux alliés qui s'aiment autant qu'ils se surveillent." },
-      { s: "yogi", t: "Namasté, mon ami du Levant. On m'a vendu tes drones, tes capteurs, tes belles caméras. Excellent service après-vente." },
+      { s: "gourou", t: "Namasté, mon ami du Levant. On m'a vendu tes drones, tes capteurs, tes belles caméras. Excellent service après-vente." },
       { s: "faucon", t: "La sécurité s'exporte, Gourou. Ce que je te vends, je l'ai d'abord testé sur mes propres remparts." },
-      { s: "yogi", t: "Testé, éprouvé, facturé. Chez toi, même l'amitié a un bon de garantie." },
+      { s: "gourou", t: "Testé, éprouvé, facturé. Chez toi, même l'amitié a un bon de garantie." },
       { s: "faucon", t: "Un allié sans garantie est un ennemi en sursis. Sers. Je note tes points de faiblesse, comme un ami le doit." },
-      { s: "yogi", t: "Alors médite entre deux échanges. Ici, c'est moi qui donne le tempo de la respiration." }
+      { s: "gourou", t: "Alors médite entre deux échanges. Ici, c'est moi qui donne le tempo de la respiration." }
     ],
     win: [
       { s: "faucon", t: "Bon partenaire. Réflexes lents, mais loyal. Je te garde une place dans le carnet." },
-      { s: "yogi", t: "Le faucon fond, la vache traverse, la vie continue. On se revend des radars la semaine prochaine ?" }
+      { s: "gourou", t: "Le faucon fond, la vache traverse, la vie continue. On se revend des radars la semaine prochaine ?" }
     ],
     lose: [
-      { s: "yogi", t: "La patience du grès use la serre du faucon. Respire, ami. Tu reviendras me vendre quelque chose." },
+      { s: "gourou", t: "La patience du grès use la serre du faucon. Respire, ami. Tu reviendras me vendre quelque chose." },
       { s: "faucon", t: "Une défaite chez un allié n'est pas une défaite. C'est une démonstration commerciale ratée. Ça se rembourse." }
     ]
   },
   {
     act: 1, title: "Le capitaine et le rempart", sub: "Levantie–Tropicalia · fraternité des durs",
-    left: "faucon", right: "jair", terrain: 7, mode: "volley", ai: 1, doped: null,
+    left: "faucon", right: "capitaine", terrain: 7, mode: "volley", ai: 1, doped: null,
     pre: [
       { s: "narrator", t: "Clairière de jungle dorée, court en terre rouge, un ara braille dans la canopée. Deux hommes à poigne se reconnaissent de loin." },
-      { s: "jair", t: "Le Faucon ! Enfin un type qui ne me fait pas la leçon sur les droits du filet. Tope là, mon frère de rempart." },
+      { s: "capitaine", t: "Le Faucon ! Enfin un type qui ne me fait pas la leçon sur les droits du filet. Tope là, mon frère de rempart." },
       { s: "faucon", t: "On me fait la leçon depuis quarante ans, Capitaine. J'ai arrêté d'écouter avant toi." },
-      { s: "jair", t: "Moi je défriche, toi tu murailles. Deux façons de dire : chez moi, on ne rentre pas." },
+      { s: "capitaine", t: "Moi je défriche, toi tu murailles. Deux façons de dire : chez moi, on ne rentre pas." },
       { s: "faucon", t: "Sauf que ta forêt repousse. Mes remparts, non : je les rebâtis moi-même, plus haut, chaque nuit." },
-      { s: "jair", t: "Alors montre-moi ce fameux piqué. Ici on aime les prédateurs, ça fait bon effet à la télé." }
+      { s: "capitaine", t: "Alors montre-moi ce fameux piqué. Ici on aime les prédateurs, ça fait bon effet à la télé." }
     ],
     win: [
       { s: "faucon", t: "Sympathique, brutal, imprévisible. Un bon voisin de tranchée. Mais un rempart ne s'appuie sur personne." },
-      { s: "jair", t: "Battu par un oiseau ! Bon. Au moins c'est un dur. Reviens quand tu veux, on rôtira quelque chose." }
+      { s: "capitaine", t: "Battu par un oiseau ! Bon. Au moins c'est un dur. Reviens quand tu veux, on rôtira quelque chose." }
     ],
     lose: [
-      { s: "jair", t: "Ah ! La terre rouge tient bon face au grès. Le Capitaine reste debout, mon frère." },
+      { s: "capitaine", t: "Ah ! La terre rouge tient bon face au grès. Le Capitaine reste debout, mon frère." },
       { s: "faucon", t: "Tu gagnes le set, pas la doctrine. Continue de défricher ; moi je continue de veiller." }
     ]
   },
   {
     act: 1, title: "Le contrat silencieux", sub: "Levantie–Panguo · affaires sans amitié",
-    left: "faucon", right: "panda", terrain: 4, mode: "volley", ai: 1, doped: null,
+    left: "faucon", right: "timonier", terrain: 4, mode: "volley", ai: 1, doped: null,
     pre: [
       { s: "narrator", t: "Cité du Matin, murs cramoisis et toits d'or, lions de pierre à l'entrée. Ici on ne se serre pas la main : on signe." },
-      { s: "panda", t: "Faucon. Tu vends tes armes à mes rivaux, tu m'achètes mon silicium. L'harmonie tolère la contradiction rentable." },
+      { s: "timonier", t: "Faucon. Tu vends tes armes à mes rivaux, tu m'achètes mon silicium. L'harmonie tolère la contradiction rentable." },
       { s: "faucon", t: "Je fais des affaires avec tout le monde et je ne fais confiance à personne. Nous nous comprenons, Timonier." },
-      { s: "panda", t: "Je contrôle le tempo, tu contrôles la panique. Chacun sa spécialité. Ne saute pas trop haut chez moi." },
+      { s: "timonier", t: "Je contrôle le tempo, tu contrôles la panique. Chacun sa spécialité. Ne saute pas trop haut chez moi." },
       { s: "faucon", t: "Justement. Reste dans ton camp, je resterai poli. Mon Raid Éclair déteste les surprises." },
-      { s: "panda", t: "Menace un mur de patience avec ta vitesse. On verra ce qui s'érode le premier." }
+      { s: "timonier", t: "Menace un mur de patience avec ta vitesse. On verra ce qui s'érode le premier." }
     ],
     win: [
       { s: "faucon", t: "Un partenaire glacial vaut mieux qu'un ami tiède. Le contrat tient. On ne se reverra qu'aux chiffres." },
-      { s: "panda", t: "Un revers logistique. Sans conséquence. L'harmonie recalcule et la Cité rouvre demain." }
+      { s: "timonier", t: "Un revers logistique. Sans conséquence. L'harmonie recalcule et la Cité rouvre demain." }
     ],
     lose: [
-      { s: "panda", t: "Le tempo l'emporte sur le piqué. La patience, jeune faucon, est aussi une arme longue portée." },
+      { s: "timonier", t: "Le tempo l'emporte sur le piqué. La patience, jeune faucon, est aussi une arme longue portée." },
       { s: "faucon", t: "Tu gagnes une manche, je garde le fournisseur. En affaires, ça s'appelle un match nul rentable." }
     ]
   },
@@ -101,61 +101,61 @@ const STORY_FAUCON = [
   // ===================== ACTE II — Les alliés encombrants (montée des tensions) =====================
   {
     act: 2, title: "Le protecteur transactionnel", sub: "Levantie–Doria · le prix du parapluie",
-    left: "faucon", right: "trompette", terrain: 1, mode: "volley", ai: 1, doped: null,
+    left: "faucon", right: "dorf", terrain: 1, mode: "volley", ai: 1, doped: null,
     pre: [
       { s: "narrator", t: "Country Club Doré. Fontaine, palmiers, gazon parfait. Le grand parrain de l'ouest reçoit son protégé le plus intense." },
-      { s: "trompette", t: "Le Faucon ! Mon meilleur ami. Le meilleur. On te protège tellement, tellement, tu ne peux même pas imaginer." },
+      { s: "dorf", t: "Le Faucon ! Mon meilleur ami. Le meilleur. On te protège tellement, tellement, tu ne peux même pas imaginer." },
       { s: "faucon", t: "Je n'imagine pas, Baron : je facture le risque. Ta protection est excellente les jours où elle t'arrange." },
-      { s: "trompette", t: "Ingrat ! Sans mon Mur d'or, tu jouerais tout seul contre dix. Dis merci, et sers." },
+      { s: "dorf", t: "Ingrat ! Sans mon Mur d'or, tu jouerais tout seul contre dix. Dis merci, et sers." },
       { s: "faucon", t: "Je dis merci et je garde mon Raid Éclair armé. Un parapluie, ça se referme sans prévenir." },
-      { s: "trompette", t: "Personne ne referme mes parapluies ! Les plus beaux parapluies du monde. Terriblement solides." }
+      { s: "dorf", t: "Personne ne referme mes parapluies ! Les plus beaux parapluies du monde. Terriblement solides." }
     ],
     win: [
       { s: "faucon", t: "Voilà pourquoi je ne dépends de personne : même mon meilleur protecteur perd au filet. Note-le, Baron." },
-      { s: "trompette", t: "Match truqué ! Enfin… beau piqué. On refera un deal. Le plus grand deal de volley de l'histoire." }
+      { s: "dorf", t: "Match truqué ! Enfin… beau piqué. On refera un deal. Le plus grand deal de volley de l'histoire." }
     ],
     lose: [
-      { s: "trompette", t: "GAGNÉ ! Le Mur d'or ! Imprenable ! Même le faucon rebondit dessus, incroyable, les gens pleuraient." },
+      { s: "dorf", t: "GAGNÉ ! Le Mur d'or ! Imprenable ! Même le faucon rebondit dessus, incroyable, les gens pleuraient." },
       { s: "faucon", t: "Profite. Mais souviens-toi : un protégé qui perd apprend à ne plus avoir besoin de protecteur." }
     ]
   },
   {
     act: 2, title: "La leçon de morale", sub: "Levantie–Gallardie · l'allié qui sermonne",
-    left: "faucon", right: "micron", terrain: 8, mode: "volley", ai: 2, doped: null,
+    left: "faucon", right: "cygne", terrain: 8, mode: "volley", ai: 2, doped: null,
     pre: [
       { s: "narrator", t: "Citadelle du Levant. Grès chaud, dômes anciens, tours de verre, remparts. Au-dessus des créneaux, le faucon tourne et pique." },
-      { s: "micron", t: "Cher Faucon, en même temps que je vous soutiens, je dois vous dire, avec amitié, que la mesure serait plus sage." },
+      { s: "cygne", t: "Cher Faucon, en même temps que je vous soutiens, je dois vous dire, avec amitié, que la mesure serait plus sage." },
       { s: "faucon", t: "La mesure. On me la conseille depuis mon berceau, sur cette colline, face à cette mer. J'ai survécu à tous ceux qui la prêchaient." },
-      { s: "micron", t: "Soutien indéfectible ET fermeté sur le droit. Les deux. C'est ma doctrine : et-en-même-temps." },
+      { s: "cygne", t: "Soutien indéfectible ET fermeté sur le droit. Les deux. C'est ma doctrine : et-en-même-temps." },
       { s: "faucon", t: "Chez moi, Cygne, on ne dit pas 'en même temps'. On dit 'd'abord'. La sécurité d'abord, ton sermon après." },
-      { s: "micron", t: "Alors gardez votre 'd'abord'. Mon contre, lui, arrive toujours au bon moment." }
+      { s: "cygne", t: "Alors gardez votre 'd'abord'. Mon contre, lui, arrive toujours au bon moment." }
     ],
     win: [
       { s: "faucon", t: "Beau discours, revers lent. Retiens la leçon, Cygne : on ne sermonne pas un rempart, on le contourne — ou on perd." },
-      { s: "micron", t: "En même temps, une défaite est une forme de dialogue. Nous reprendrons cette conversation. Poliment." }
+      { s: "cygne", t: "En même temps, une défaite est une forme de dialogue. Nous reprendrons cette conversation. Poliment." }
     ],
     lose: [
-      { s: "micron", t: "Vous voyez ? La mesure marque des points. Élégamment. Sans un mot plus haut que l'autre." },
+      { s: "cygne", t: "Vous voyez ? La mesure marque des points. Élégamment. Sans un mot plus haut que l'autre." },
       { s: "faucon", t: "Tu gagnes un set sous mes remparts. Souviens-toi qui les a bâtis, et qui rentre chez lui avec la leçon." }
     ]
   },
   {
     act: 2, title: "La ligne rouge du nord", sub: "Levantie–Bourassie · déconfliction sous tension",
-    left: "faucon", right: "vladou", terrain: 0, mode: "bomb", ai: 2, doped: null,
+    left: "faucon", right: "volkoi", terrain: 0, mode: "bomb", ai: 2, doped: null,
     pre: [
       { s: "narrator", t: "Place Écarlate, sous la neige. Le ballon est une bombe à mèche : le camp où elle tombe saute. Le Tsar joue à domicile, glacial." },
-      { s: "vladou", t: "Faucon. Tu voles au-dessus d'un ciel que je surveille aussi. Nous nous croisons souvent. Trop souvent." },
+      { s: "volkoi", t: "Faucon. Tu voles au-dessus d'un ciel que je surveille aussi. Nous nous croisons souvent. Trop souvent." },
       { s: "faucon", t: "On se croise poliment, Tsar, parce qu'aucun de nous ne veut du chaos de l'autre. Appelons ça une méfiance professionnelle." },
-      { s: "vladou", t: "La méfiance, oui. Tu frappes tes cibles, j'observe. Un jour, ta bombe tombera trop près de mes intérêts." },
+      { s: "volkoi", t: "La méfiance, oui. Tu frappes tes cibles, j'observe. Un jour, ta bombe tombera trop près de mes intérêts." },
       { s: "faucon", t: "Alors ne te tiens pas sur ma ligne de tir. Mon Raid Éclair ne demande pas la permission ; il informe après." },
       { s: "narrator", t: "Renvoyez la bombe. Toujours. Sur cette place, l'hiver ne pardonne pas l'hésitation." }
     ],
     win: [
       { s: "faucon", t: "La déconfliction tient tant que je gagne. Bien. Reste au chaud, Tsar. Je surveille le ciel pour deux." },
-      { s: "vladou", t: "Une manche. L'hiver est patient. Tu voles vite, mais tu dois te poser un jour. Je serai là." }
+      { s: "volkoi", t: "Une manche. L'hiver est patient. Tu voles vite, mais tu dois te poser un jour. Je serai là." }
     ],
     lose: [
-      { s: "vladou", t: "Boum. De ton côté. Le sang-froid bat toujours la précipitation, petit faucon pressé." },
+      { s: "volkoi", t: "Boum. De ton côté. Le sang-froid bat toujours la précipitation, petit faucon pressé." },
       { s: "faucon", t: "Une bombe mal renvoyée n'efface pas la doctrine. La prochaine fois, je pique avant que tu observes." }
     ]
   },

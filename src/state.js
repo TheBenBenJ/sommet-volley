@@ -5,16 +5,16 @@
 // chaque terrain appartient à un perso (voir CHARACTERS) : son public des
 // tribunes est composé de ce perso, et le nom du terrain lui rend hommage.
 const TERRAINS = [
-  { key: "neige",    name: "Place Écarlate",          character: 0 }, // Volkoï / Bourassie
-  { key: "plage",    name: "Country Club Doré",       character: 1 }, // Baron Dorf / Doria
-  { key: "prairie",  name: "Palais du Coq",           character: 2 }, // Le Cygne / Gallardie
-  { key: "parade",   name: "Esplanade du Défilé",     character: 3 }, // Maréchal Bébé / Ryonganie
-  { key: "matin",    name: "Cité du Matin",           character: 4 }, // Grand Timonier / Panguo
-  { key: "bosphore", name: "Pont des Deux Mondes",    character: 5 }, // Le Sultan / Bosforie
-  { key: "ashram",   name: "Stade Ashram",            character: 6 }, // Le Gourou / Bharatie
-  { key: "amazon",   name: "Grande Forêt",            character: 7 }, // Le Capitaine / Tropicalia
-  { key: "colline",  name: "Citadelle du Levant",     character: 8 }, // Le Faucon / Levantie
-  { key: "roseraie", name: "Jardin des Roses",         character: 9 }  // Le Safran / Ramenie
+  { key: "place-ecarlate",    name: "Place Écarlate",          character: 0 }, // Volkoï / Bourassie
+  { key: "country-club-dore",    name: "Country Club Doré",       character: 1 }, // Baron Dorf / Doria
+  { key: "palais-du-coq",  name: "Palais du Coq",           character: 2 }, // Le Cygne / Gallardie
+  { key: "esplanade-du-defile",   name: "Esplanade du Défilé",     character: 3 }, // Maréchal Bébé / Ryonganie
+  { key: "cite-du-matin",    name: "Cité du Matin",           character: 4 }, // Grand Timonier / Panguo
+  { key: "pont-des-deux-mondes", name: "Pont des Deux Mondes",    character: 5 }, // Le Sultan / Bosforie
+  { key: "stade-ashram",   name: "Stade Ashram",            character: 6 }, // Le Gourou / Bharatie
+  { key: "grande-foret",   name: "Grande Forêt",            character: 7 }, // Le Capitaine / Tropicalia
+  { key: "citadelle-du-levant",  name: "Citadelle du Levant",     character: 8 }, // Le Faucon / Levantie
+  { key: "jardin-des-roses", name: "Jardin des Roses",         character: 9 }  // Le Safran / Ramenie
 ];
 let terrain = 0;
 
@@ -28,7 +28,7 @@ const CHARACTERS = [
   // Casting satirique Sommet Volley — fiches docs/chars/*.yaml
   // stats /5 + multiplicateurs moteur (speed, jump, power, control)
   {
-    key: "vladou", name: "Tsar Volkoï",
+    key: "volkoi", name: "Tsar Volkoï",
     color: "#b43a2e", darkColor: "#7a281e",
     stats: { vitesse: 3, detente: 3, puissance: 4, controle: 4 },
     speed: 1.06, jump: 1.06, power: 1.18, control: 0.91,
@@ -38,7 +38,7 @@ const CHARACTERS = [
     superDesc: "Gèle le camp adverse ~6 s : ils glissent comme sur de la glace. Visuel : voile bleu glacial + flocons qui tombent sur leur moitié."
   },
   {
-    key: "trompette", name: "Baron Dorf",
+    key: "dorf", name: "Baron Dorf",
     color: "#f0a060", darkColor: "#c97838",
     stats: { vitesse: 3, detente: 2, puissance: 4, controle: 3 },
     speed: 1.06, jump: 0.94, power: 1.18, control: 0.82,
@@ -48,7 +48,7 @@ const CHARACTERS = [
     superDesc: "Mur doré au milieu du camp adverse ~5 s : bloque les courses au sol (sauter par-dessus pour passer). Visuel : colonne d’or lumineuse + halo au pied du mur."
   },
   {
-    key: "micron", name: "Le Cygne",
+    key: "cygne", name: "Le Cygne",
     color: "#3d5afe", darkColor: "#1a237e",
     stats: { vitesse: 4, detente: 3, puissance: 3, controle: 4 },
     speed: 1.18, jump: 1.06, power: 1.06, control: 0.91,
@@ -68,7 +68,7 @@ const CHARACTERS = [
     superDesc: "Interdit de sauter au camp adverse ~5 s — collés au sol. Visuel : bande rouge au sol + pulses d’alerte sur leur camp."
   },
   {
-    key: "panda", name: "Le Grand Timonier",
+    key: "timonier", name: "Le Grand Timonier",
     color: "#c62828", darkColor: "#8e0000",
     stats: { vitesse: 3, detente: 3, puissance: 3, controle: 5 },
     speed: 1.06, jump: 1.06, power: 1.06, control: 1.0,
@@ -86,7 +86,7 @@ const CHARACTERS = [
     superDesc: "Interdit de sauter au camp adverse ~5 s. Visuel : tremblement d’écran + bande rouge d’alerte au sol (comme Batterie AA)."
   },
   {
-    key: "yogi", name: "Le Gourou",
+    key: "gourou", name: "Le Gourou",
     color: "#ef6c00", darkColor: "#e65100",
     stats: { vitesse: 4, detente: 3, puissance: 3, controle: 4 },
     speed: 1.18, jump: 1.06, power: 1.06, control: 0.91,
@@ -95,7 +95,7 @@ const CHARACTERS = [
     superDesc: "Gèle le camp adverse ~5 s (glisse extrême). Visuel : voile clair + particules, façon Hiver Général zen."
   },
   {
-    key: "jair", name: "Le Capitaine",
+    key: "capitaine", name: "Le Capitaine",
     color: "#2e7d32", darkColor: "#1b5e20",
     stats: { vitesse: 3, detente: 2, puissance: 5, controle: 2 },
     speed: 1.06, jump: 0.94, power: 1.28, control: 0.75,
@@ -273,14 +273,14 @@ const SUPER_READY_FLASH_T = 180; // ~3 s quand la jauge est prête
 const streak = [0, 0];        // points d'affilée par camp
 const superCharge = [0, 0];   // 0 = vide, 1 = super prête
 const SUPER_DUR = {
-  vladou: 360,      // Hiver Général ~6 s
-  trompette: 300,   // Le Mur ~5 s
-  micron: 240,      // Passage en Force ~4 s
+  volkoi: 360,      // Hiver Général ~6 s
+  dorf: 300,   // Le Mur ~5 s
+  cygne: 240,      // Passage en Force ~4 s
   bebe: 300,        // Batterie AA ~5 s
-  panda: 300,       // Grande Muraille ~5 s
+  timonier: 300,       // Grande Muraille ~5 s
   sultan: 300,      // Séisme ~5 s
-  yogi: 300,        // Méditation ~5 s
-  jair: 300,        // Déforestation ~5 s
+  gourou: 300,        // Méditation ~5 s
+  capitaine: 300,        // Déforestation ~5 s
   faucon: 300,      // Raid Éclair ~5 s
   safran: 300       // Voile d’Or ~5 s
 };

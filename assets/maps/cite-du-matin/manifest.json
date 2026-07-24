@@ -1,0 +1,16 @@
+{
+  "key": "cite-du-matin",
+  "name": "Cité du Matin",
+  "layers": [
+    "far",
+    "skyline"
+  ],
+  "props": [
+    "net_post",
+    "flag",
+    "lantern"
+  ],
+  "event": "lantern",
+  "notes": "Place du Matin — portail rouge / muraille. Public (crowd_0) désactivé pour l’instant.",
+  "thumb": "thumb.png"
+}

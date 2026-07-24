@@ -50,7 +50,7 @@ Mêmes noms de fichier partout. La colonne « Source » dit qui le fabrique.
 
 **Pas besoin de générer** :
 - `warn.png` : l'alerte d'événement utilise **toujours** celle de Micron
-  (`mapEventWarnIcon` → `SPRITES.mapMicron.warn`) avec un fallback triangle « ! »
+  (`mapEventWarnIcon` → `SPRITES.mapPalaisDuCoq.warn`) avec un fallback triangle « ! »
   dans le code. Inutile par map — **ne pas le demander à Grok**.
 - `far.png` : couche de parallaxe lointaine **optionnelle**. `drawMapBackdrop`
   se contente de `skyline` seule. Ne l'ajouter que si on veut vraiment un plan

@@ -2,7 +2,7 @@
 """Détourage anti-aliasé + ancrage pieds — pipeline Sommet Volley (Phase 2).
 
 Usage:
-  python3 tools/cutout.py raw/vladou assets/vladou
+  python3 tools/cutout.py raw/volkoi assets/vladou
 
 Entrée : PNG fond blanc (raw/<key>/*.png)
 Sortie : PNG détourés + _contact.png (planche de contrôle)
@@ -687,7 +687,7 @@ def main():
     }
     # Drapeaux avec bandes blanches (FR / US / RU…) : ne pas percer les îlots.
     # Les autres (matin, bebe, ashram…) : percer le blanc entre mât et toile.
-    FLAG_KEEP_WHITE_MAPS = {"trompette", "plage", "micron", "prairie", "vladou", "neige", "bosphore"}
+    FLAG_KEEP_WHITE_MAPS = {"dorf", "country-club-dore", "cygne", "palais-du-coq", "volkoi", "place-ecarlate", "pont-des-deux-mondes"}
     outs = []
     for src in sorted(raw_dir.glob("*.png")):
         if src.name.startswith("_"):

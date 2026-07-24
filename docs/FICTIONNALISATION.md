@@ -30,7 +30,7 @@ tout est *data-driven*, donc c'est surtout de l'édition de texte.
 
 ## Proposition concrète (Option A — à amender)
 
-Clés techniques internes **inchangées** (`vladou`, `trompette`… = dossiers
+Clés techniques internes **inchangées** (`volkoi`, `dorf`… = dossiers
 assets/, packs sprites) — on ne touche qu'au **nom affiché** + textes.
 
 | Clé | Archétype | Nation fictive | Nom proposé | Kit / Super (inchangé) |
@@ -67,7 +67,7 @@ Renommer les **noms affichés** propage automatiquement partout où `storyCharNa
 3. **Sprites** : idéalement une retouche « composite » des visages (voir plus
    bas). À défaut, les sprites actuels + noms/nations fictifs réduisent déjà
    beaucoup l'identifiabilité.
-4. **Tests** : `tests/game.test.js` référence des clés (`bebe`, `trompette`…),
+4. **Tests** : `tests/game.test.js` référence des clés (`bebe`, `dorf`…),
    PAS les noms affichés → **rien à changer** si on garde les clés internes.
 5. **Titres/README/store** : « caricatures de dirigeants fictifs ».
 

@@ -3,16 +3,16 @@
 
 const SPRITES = {
   ballPurple: null,      // ballon volley violet / crème
-  mapVladou: null,       // Place Écarlate (Volkoï)
-  mapTrompette: null,    // Country Club Doré (Dorf)
-  mapMicron: null,       // Palais du Coq (Cygne)
-  mapBebe: null,         // Esplanade du Défilé (Bébé)
-  mapMatin: null,        // Cité du Matin (Timonier)
-  mapBosphore: null,     // Pont des Deux Mondes (Sultan)
-  mapAshram: null,       // Stade Ashram (Gourou)
-  mapAmazon: null,       // Grande Forêt (Capitaine)
-  mapColline: null,      // Citadelle du Levant (Faucon)
-  mapRoseraie: null      // Jardin des Roses (Safran)
+  mapPlaceEcarlate: null,       // Place Écarlate (Volkoï)
+  mapCountryClubDore: null,    // Country Club Doré (Dorf)
+  mapPalaisDuCoq: null,       // Palais du Coq (Cygne)
+  mapEsplanadeDuDefile: null,         // Esplanade du Défilé (Bébé)
+  mapCiteDuMatin: null,        // Cité du Matin (Timonier)
+  mapPontDesDeuxMondes: null,     // Pont des Deux Mondes (Sultan)
+  mapStadeAshram: null,       // Stade Ashram (Gourou)
+  mapGrandeForet: null,       // Grande Forêt (Capitaine)
+  mapCitadelleDuLevant: null,      // Citadelle du Levant (Faucon)
+  mapJardinDesRoses: null      // Jardin des Roses (Safran)
 };
 
 function loadSprite(path) {
@@ -38,104 +38,104 @@ function loadMapPack(key, files) {
 
 function initSprites() {
   SPRITES.ballPurple = loadSprite("assets/ball/volley_purple.png");
-  initMapVladou();
-  initMapTrompette();
-  initMapMicron();
-  initMapBebe();
-  initMapMatin();
-  initMapAshram();
-  initMapBosphore();
-  initMapAmazon();
-  initMapColline();
-  initMapRoseraie();
+  initMapPlaceEcarlate();
+  initMapCountryClubDore();
+  initMapPalaisDuCoq();
+  initMapEsplanadeDuDefile();
+  initMapCiteDuMatin();
+  initMapStadeAshram();
+  initMapPontDesDeuxMondes();
+  initMapGrandeForet();
+  initMapCitadelleDuLevant();
+  initMapJardinDesRoses();
 }
 
 /** Pack fond / props Citadelle du Levant (terrain Le Faucon). */
-function initMapColline() {
-  SPRITES.mapColline = loadMapPack("colline", {
+function initMapCitadelleDuLevant() {
+  SPRITES.mapCitadelleDuLevant = loadMapPack("citadelle-du-levant", {
     skyline: "skyline.png", band: "band.png", thumb: "thumb.png",
     flag: "flag.png", netPost: "net_post.png", falcon: "falcon.png"
   });
 }
 
-function mapCollineReady() {
-  const p = SPRITES.mapColline;
+function mapCitadelleDuLevantReady() {
+  const p = SPRITES.mapCitadelleDuLevant;
   return !!(p && spriteReady(p.skyline));
 }
 
 /** Pack fond / props Jardin des Roses (terrain Le Safran).
  *  Skyline/props à générer via sommet-map + sommet-decor. */
-function initMapRoseraie() {
-  SPRITES.mapRoseraie = loadMapPack("roseraie", {
+function initMapJardinDesRoses() {
+  SPRITES.mapJardinDesRoses = loadMapPack("jardin-des-roses", {
     skyline: "skyline.png", band: "band.png", thumb: "thumb.png",
     flag: "flag.png", netPost: "net_post.png", peacock: "peacock.png"
   });
 }
 
-function mapRoseraieReady() {
-  const p = SPRITES.mapRoseraie;
+function mapJardinDesRosesReady() {
+  const p = SPRITES.mapJardinDesRoses;
   return !!(p && spriteReady(p.skyline));
 }
 
 /** Pack fond / props Grande Forêt (terrain Jair). */
-function initMapAmazon() {
-  SPRITES.mapAmazon = loadMapPack("amazon", {
+function initMapGrandeForet() {
+  SPRITES.mapGrandeForet = loadMapPack("grande-foret", {
     skyline: "skyline.png", band: "band.png", far: "far.png",
     flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png",
     macaw: "macaw.png"
   });
 }
 
-function mapAmazonReady() {
-  const p = SPRITES.mapAmazon;
+function mapGrandeForetReady() {
+  const p = SPRITES.mapGrandeForet;
   return !!(p && spriteReady(p.skyline));
 }
 
 /** Pack fond / props Palais du Bosphore (terrain Sultan). */
-function initMapBosphore() {
-  SPRITES.mapBosphore = loadMapPack("bosphore", {
+function initMapPontDesDeuxMondes() {
+  SPRITES.mapPontDesDeuxMondes = loadMapPack("pont-des-deux-mondes", {
     skyline: "skyline.png", band: "band.png", far: "far.png",
     flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png",
     carpet: "carpet.png"
   });
 }
 
-function mapBosphoreReady() {
-  const p = SPRITES.mapBosphore;
+function mapPontDesDeuxMondesReady() {
+  const p = SPRITES.mapPontDesDeuxMondes;
   return !!(p && spriteReady(p.skyline));
 }
 
 /** Pack fond / props Cité du Matin (terrain Panda). */
-function initMapMatin() {
-  SPRITES.mapMatin = loadMapPack("matin", {
+function initMapCiteDuMatin() {
+  SPRITES.mapCiteDuMatin = loadMapPack("cite-du-matin", {
     skyline: "skyline.png", band: "band.png", far: "far.png",
     flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png",
     lantern: "lantern.png"
   });
 }
 
-function mapMatinReady() {
-  const p = SPRITES.mapMatin;
+function mapCiteDuMatinReady() {
+  const p = SPRITES.mapCiteDuMatin;
   return !!(p && spriteReady(p.skyline));
 }
 
 /** Pack fond / props Stade Ashram (terrain Yogi). */
-function initMapAshram() {
-  SPRITES.mapAshram = loadMapPack("ashram", {
+function initMapStadeAshram() {
+  SPRITES.mapStadeAshram = loadMapPack("stade-ashram", {
     skyline: "skyline.png", band: "band.png", far: "far.png",
     flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png",
     cow: "cow.png"
   });
 }
 
-function mapAshramReady() {
-  const p = SPRITES.mapAshram;
+function mapStadeAshramReady() {
+  const p = SPRITES.mapStadeAshram;
   return !!(p && spriteReady(p.skyline));
 }
 
 /** Pack fond / props Place Écarlate (terrain Volkoï / clé vladou). */
-function initMapVladou() {
-  SPRITES.mapVladou = loadMapPack("vladou", {
+function initMapPlaceEcarlate() {
+  SPRITES.mapPlaceEcarlate = loadMapPack("place-ecarlate", {
     skyline: "skyline.png", band: "band.png", far: "far.png",
     flag: "flag.png",
     snowman: "snowman.png", cannon: "cannon_0.png", cannonFire: "cannon_1.png",
@@ -143,28 +143,28 @@ function initMapVladou() {
   });
 }
 
-function mapVladouReady() {
-  const p = SPRITES.mapVladou;
+function mapPlaceEcarlateReady() {
+  const p = SPRITES.mapPlaceEcarlate;
   return !!(p && spriteReady(p.skyline));
 }
 
 /** Pack fond / props Country Club Doré (terrain Trompette). */
-function initMapTrompette() {
-  SPRITES.mapTrompette = loadMapPack("trompette", {
+function initMapCountryClubDore() {
+  SPRITES.mapCountryClubDore = loadMapPack("country-club-dore", {
     skyline: "skyline.png", far: "far.png", crowd0: "crowd_0.png",
     cart: "cart_0.png", cartHorn: "cart_1.png", palm: "palm.png",
     flag: "flag.png", warn: "warn.png", thumb: "thumb.png", netPost: "net_post.png"
   });
 }
 
-function mapTrompetteReady() {
-  const p = SPRITES.mapTrompette;
+function mapCountryClubDoreReady() {
+  const p = SPRITES.mapCountryClubDore;
   return !!(p && spriteReady(p.skyline));
 }
 
 /** Pack fond / props Palais du Coq (terrain Micron). */
-function initMapMicron() {
-  SPRITES.mapMicron = loadMapPack("micron", {
+function initMapPalaisDuCoq() {
+  SPRITES.mapPalaisDuCoq = loadMapPack("palais-du-coq", {
     skyline: "skyline.png", band: "band.png", far: "far.png", crowd0: "crowd_0.png",
     flag: "flag.png", pigeon: "pigeon.png", warn: "warn.png",
     whistle: "whistle.png", marchers0: "marchers_0.png",
@@ -172,14 +172,14 @@ function initMapMicron() {
   });
 }
 
-function mapMicronReady() {
-  const p = SPRITES.mapMicron;
+function mapPalaisDuCoqReady() {
+  const p = SPRITES.mapPalaisDuCoq;
   return !!(p && spriteReady(p.skyline));
 }
 
 /** Pack fond / props Esplanade du Défilé (terrain Bébé). */
-function initMapBebe() {
-  SPRITES.mapBebe = loadMapPack("bebe", {
+function initMapEsplanadeDuDefile() {
+  SPRITES.mapEsplanadeDuDefile = loadMapPack("esplanade-du-defile", {
     skyline: "skyline.png", band: "band.png", far: "far.png", crowd0: "crowd_0.png",
     flag: "flag.png", flower: "flower.png", warn: "warn.png",
     radar: "radar_0.png", radarActive: "radar_1.png",
@@ -187,8 +187,8 @@ function initMapBebe() {
   });
 }
 
-function mapBebeReady() {
-  const p = SPRITES.mapBebe;
+function mapEsplanadeDuDefileReady() {
+  const p = SPRITES.mapEsplanadeDuDefile;
   return !!(p && spriteReady(p.skyline));
 }
 
@@ -197,35 +197,35 @@ function drawTerrainMenuThumb(terrainIdx, dx, dy, dw, dh) {
   const t = TERRAINS[terrainIdx];
   if (!t) return false;
   let img = null;
-  if (t.key === "neige" && SPRITES.mapVladou && spriteReady(SPRITES.mapVladou.thumb)) {
-    img = SPRITES.mapVladou.thumb;
+  if (t.key === "place-ecarlate" && SPRITES.mapPlaceEcarlate && spriteReady(SPRITES.mapPlaceEcarlate.thumb)) {
+    img = SPRITES.mapPlaceEcarlate.thumb;
   }
-  if (t.key === "plage" && SPRITES.mapTrompette && spriteReady(SPRITES.mapTrompette.thumb)) {
-    img = SPRITES.mapTrompette.thumb;
+  if (t.key === "country-club-dore" && SPRITES.mapCountryClubDore && spriteReady(SPRITES.mapCountryClubDore.thumb)) {
+    img = SPRITES.mapCountryClubDore.thumb;
   }
-  if (t.key === "prairie" && SPRITES.mapMicron && spriteReady(SPRITES.mapMicron.thumb)) {
-    img = SPRITES.mapMicron.thumb;
+  if (t.key === "palais-du-coq" && SPRITES.mapPalaisDuCoq && spriteReady(SPRITES.mapPalaisDuCoq.thumb)) {
+    img = SPRITES.mapPalaisDuCoq.thumb;
   }
-  if (t.key === "parade" && SPRITES.mapBebe && spriteReady(SPRITES.mapBebe.thumb)) {
-    img = SPRITES.mapBebe.thumb;
+  if (t.key === "esplanade-du-defile" && SPRITES.mapEsplanadeDuDefile && spriteReady(SPRITES.mapEsplanadeDuDefile.thumb)) {
+    img = SPRITES.mapEsplanadeDuDefile.thumb;
   }
-  if (t.key === "matin" && SPRITES.mapMatin && spriteReady(SPRITES.mapMatin.thumb)) {
-    img = SPRITES.mapMatin.thumb;
+  if (t.key === "cite-du-matin" && SPRITES.mapCiteDuMatin && spriteReady(SPRITES.mapCiteDuMatin.thumb)) {
+    img = SPRITES.mapCiteDuMatin.thumb;
   }
-  if (t.key === "bosphore" && SPRITES.mapBosphore && spriteReady(SPRITES.mapBosphore.thumb)) {
-    img = SPRITES.mapBosphore.thumb;
+  if (t.key === "pont-des-deux-mondes" && SPRITES.mapPontDesDeuxMondes && spriteReady(SPRITES.mapPontDesDeuxMondes.thumb)) {
+    img = SPRITES.mapPontDesDeuxMondes.thumb;
   }
-  if (t.key === "ashram" && SPRITES.mapAshram && spriteReady(SPRITES.mapAshram.thumb)) {
-    img = SPRITES.mapAshram.thumb;
+  if (t.key === "stade-ashram" && SPRITES.mapStadeAshram && spriteReady(SPRITES.mapStadeAshram.thumb)) {
+    img = SPRITES.mapStadeAshram.thumb;
   }
-  if (t.key === "amazon" && SPRITES.mapAmazon && spriteReady(SPRITES.mapAmazon.thumb)) {
-    img = SPRITES.mapAmazon.thumb;
+  if (t.key === "grande-foret" && SPRITES.mapGrandeForet && spriteReady(SPRITES.mapGrandeForet.thumb)) {
+    img = SPRITES.mapGrandeForet.thumb;
   }
-  if (t.key === "colline" && SPRITES.mapColline && spriteReady(SPRITES.mapColline.thumb)) {
-    img = SPRITES.mapColline.thumb;
+  if (t.key === "citadelle-du-levant" && SPRITES.mapCitadelleDuLevant && spriteReady(SPRITES.mapCitadelleDuLevant.thumb)) {
+    img = SPRITES.mapCitadelleDuLevant.thumb;
   }
-  if (t.key === "roseraie" && SPRITES.mapRoseraie && spriteReady(SPRITES.mapRoseraie.thumb)) {
-    img = SPRITES.mapRoseraie.thumb;
+  if (t.key === "jardin-des-roses" && SPRITES.mapJardinDesRoses && spriteReady(SPRITES.mapJardinDesRoses.thumb)) {
+    img = SPRITES.mapJardinDesRoses.thumb;
   }
   if (!img) return false;
   const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height;

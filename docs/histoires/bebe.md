@@ -34,61 +34,61 @@ Physiquement, le Maréchal est un **chibi à très grosse tête**, sanglé dans 
 // ===================== ACTE I — Les frères d'armes (Volley) =====================
 {
   act: 1, title: "Le grand frère", sub: "Ryonganie–Panguo · le parrain du continent",
-  left: "bebe", right: "panda", terrain: 4, mode: "volley", ai: 0, doped: null,
+  left: "bebe", right: "timonier", terrain: 4, mode: "volley", ai: 0, doped: null,
   pre: [
     { s: "narrator", t: "Cité du Matin. Sous les toits d'or et les lanternes rouges, le petit voisin bruyant vient rendre visite au très patient géant." },
     { s: "bebe", t: "Grand frère ! J'ai fait un nouveau défilé hier. Douze mille cuivres. Tu m'as regardé à la télé, dis ?" },
-    { s: "panda", t: "J'ai regardé. J'ai surtout regardé la facture de charbon que tu me laisses payer. Sers, petit." },
+    { s: "timonier", t: "J'ai regardé. J'ai surtout regardé la facture de charbon que tu me laisses payer. Sers, petit." },
     { s: "bebe", t: "Le charbon, le charbon… Entre frères, on ne compte pas. Toi tu construis des murs, moi je construis des fusées : on se complète." },
-    { s: "panda", t: "Je construis des murs pour ne pas entendre les fusées. Nuance. Balle au centre." },
+    { s: "timonier", t: "Je construis des murs pour ne pas entendre les fusées. Nuance. Balle au centre." },
     { s: "bebe", t: "Un jour tu seras fier de moi, grand frère. Aujourd'hui, contente-toi d'avoir peur comme les autres." }
   ],
   win: [
     { s: "bebe", t: "J'ai battu le géant ! Notez ça dans les archives : cent pour cent de victoires, toujours." },
-    { s: "panda", t: "Je t'ai laissé gagner. C'est ce que fait un grand frère. Ne le crie pas trop fort." }
+    { s: "timonier", t: "Je t'ai laissé gagner. C'est ce que fait un grand frère. Ne le crie pas trop fort." }
   ],
   lose: [
-    { s: "panda", t: "Le tempo, petit. Toujours le tempo. Tu tires trop vite et tu vises trop haut." },
+    { s: "timonier", t: "Le tempo, petit. Toujours le tempo. Tu tires trop vite et tu vises trop haut." },
     { s: "bebe", t: "Match d'entraînement ! Ça ne compte pas ! Je gardais mes vraies fusées pour plus tard." }
   ]
 },
 {
   act: 1, title: "Les camarades du froid", sub: "Ryonganie–Bourassie · échange de bons procédés",
-  left: "bebe", right: "vladou", terrain: 3, mode: "volley", ai: 0, doped: null,
+  left: "bebe", right: "volkoi", terrain: 3, mode: "volley", ai: 0, doped: null,
   pre: [
     { s: "narrator", t: "Esplanade du Défilé. Le radar tourne, les bannières unies claquent. Deux amateurs de très longues parades se serrent la main au filet." },
-    { s: "vladou", t: "Beau béton. Froid, gris, sans fioritures. J'aime ton goût, petit Maréchal." },
+    { s: "volkoi", t: "Beau béton. Froid, gris, sans fioritures. J'aime ton goût, petit Maréchal." },
     { s: "bebe", t: "Tsar ! J'ai des fusées toutes neuves. Tu m'envoies du carburant, je t'envoie des obus, et on ne dit rien à personne, hein ?" },
-    { s: "vladou", t: "Je ne dis jamais rien. C'est même ma spécialité. Ton radar est allumé ? On n'est jamais trop prudent." },
+    { s: "volkoi", t: "Je ne dis jamais rien. C'est même ma spécialité. Ton radar est allumé ? On n'est jamais trop prudent." },
     { s: "bebe", t: "Toujours allumé ! Chez moi, personne ne saute par-dessus le filet. Batterie AA. Souveraineté." },
-    { s: "vladou", t: "L'hiver et la flak. Nous parlons la même langue. Servons, camarade, avant que le monde nous surveille." }
+    { s: "volkoi", t: "L'hiver et la flak. Nous parlons la même langue. Servons, camarade, avant que le monde nous surveille." }
   ],
   win: [
     { s: "bebe", t: "Battu le Tsar ! Le plus jeune Maréchal humilie le plus vieux glaçon. Quelle journée !" },
-    { s: "vladou", t: "Savoure. Entre camarades, une défaite se rembourse en carburant. Tu me dois un plein." }
+    { s: "volkoi", t: "Savoure. Entre camarades, une défaite se rembourse en carburant. Tu me dois un plein." }
   ],
   lose: [
-    { s: "vladou", t: "Le sang-froid bat l'enthousiasme. Range tes cuivres, petit. Et rallume ton radar." },
+    { s: "volkoi", t: "Le sang-froid bat l'enthousiasme. Range tes cuivres, petit. Et rallume ton radar." },
     { s: "bebe", t: "Tu as gagné parce qu'on est amis ! Contre un ennemi, j'aurais sorti la bombe. Tu as de la chance." }
   ]
 },
 {
   act: 1, title: "Cher ennemi bien-aimé", sub: "Ryonganie–Doria · les lettres magnifiques",
-  left: "bebe", right: "trompette", terrain: 3, mode: "volley", ai: 1, doped: null,
+  left: "bebe", right: "dorf", terrain: 3, mode: "volley", ai: 1, doped: null,
   pre: [
     { s: "narrator", t: "Sommet historique sur l'Esplanade. Deux hommes qui se sont menacés d'anéantissement se sourient devant les caméras. Personne ne comprend rien. C'est parfait." },
-    { s: "trompette", t: "On s'est écrit des lettres. Les plus belles lettres. On est tombés amoureux, tout le monde le dit. Enfin, moi je le dis." },
+    { s: "dorf", t: "On s'est écrit des lettres. Les plus belles lettres. On est tombés amoureux, tout le monde le dit. Enfin, moi je le dis." },
     { s: "bebe", t: "Cher Baron ! Ta lettre était magnifique. La mienne était plus magnifique. J'ai le plus gros bouton, tu te souviens ?" },
-    { s: "trompette", t: "Le plus gros bouton c'est le mien, et il marche. Mais on est potes. Un match entre potes qui pourraient finir le monde." },
+    { s: "dorf", t: "Le plus gros bouton c'est le mien, et il marche. Mais on est potes. Un match entre potes qui pourraient finir le monde." },
     { s: "bebe", t: "Chez moi, on ne saute pas le filet, sinon flak. Mais pour toi, mon ami, je laisse le radar tourner tout doucement." },
-    { s: "trompette", t: "Adorable. Vraiment. Sers, gamin, et souris à la caméra : ce sommet va faire un audimat historique." }
+    { s: "dorf", t: "Adorable. Vraiment. Sers, gamin, et souris à la caméra : ce sommet va faire un audimat historique." }
   ],
   win: [
     { s: "bebe", t: "J'ai battu mon meilleur ennemi ! Écris-moi une lettre de félicitations. Une belle. Très belle." },
-    { s: "trompette", t: "Match truqué, mais quel show ! On remet ça au prochain sommet, mon petit Maréchal terrible." }
+    { s: "dorf", t: "Match truqué, mais quel show ! On remet ça au prochain sommet, mon petit Maréchal terrible." }
   ],
   lose: [
-    { s: "trompette", t: "Gagné ! Le plus beau sommet de l'histoire ! Les gens pleuraient, il paraît. Moi aussi presque." },
+    { s: "dorf", t: "Gagné ! Le plus beau sommet de l'histoire ! Les gens pleuraient, il paraît. Moi aussi presque." },
     { s: "bebe", t: "Tu gagnes le match, pas mon cœur. Enfin si, un peu mon cœur. Mais je garde mes fusées, hein." }
   ]
 },
@@ -96,21 +96,21 @@ Physiquement, le Maréchal est un **chibi à très grosse tête**, sanglé dans 
 // ===================== ACTE II — Le tour du monde bruyant (Volley) =====================
 {
   act: 2, title: "Le sage et le pétard", sub: "Ryonganie–Bharatie · le calme contre le vacarme",
-  left: "bebe", right: "yogi", terrain: 6, mode: "volley", ai: 1, doped: null,
+  left: "bebe", right: "gourou", terrain: 6, mode: "volley", ai: 1, doped: null,
   pre: [
     { s: "narrator", t: "Stade Ashram. Une vache traverse tranquillement le court. Le Maréchal la regarde comme s'il envisageait un défilé militaire de bétail." },
-    { s: "yogi", t: "Namasté, jeune Maréchal. Tu cries beaucoup. Le vacarme est souvent le déguisement de la peur." },
+    { s: "gourou", t: "Namasté, jeune Maréchal. Tu cries beaucoup. Le vacarme est souvent le déguisement de la peur." },
     { s: "bebe", t: "Je n'ai peur de rien ! J'ai des fusées, un radar, et le plus gros bouton. Toi tu as… une vache." },
-    { s: "yogi", t: "J'ai un milliard de spectateurs et une respiration lente. Tu vas te fatiguer avant moi, petit tonnerre." },
+    { s: "gourou", t: "J'ai un milliard de spectateurs et une respiration lente. Tu vas te fatiguer avant moi, petit tonnerre." },
     { s: "bebe", t: "Me fatiguer ? Je suis né sur un arc-en-ciel ! Mais bon… tu médites, tu ne me menaces pas, alors on joue gentiment." },
-    { s: "yogi", t: "Gentiment. Et chaque fois que tu voudras sauter chez moi pour smasher, je serai déjà là, assis, à t'attendre." }
+    { s: "gourou", t: "Gentiment. Et chaque fois que tu voudras sauter chez moi pour smasher, je serai déjà là, assis, à t'attendre." }
   ],
   win: [
     { s: "bebe", t: "Battu le sage ! Le tonnerre est plus fort que le silence. Notez-le en lettres d'or." },
-    { s: "yogi", t: "Tu gagnes le point, pas la paix intérieure. Reviens quand le bruit t'aura lassé." }
+    { s: "gourou", t: "Tu gagnes le point, pas la paix intérieure. Reviens quand le bruit t'aura lassé." }
   ],
   lose: [
-    { s: "yogi", t: "Vois-tu ? L'endurance a raison de la poudre. Respire, jeune homme. Ça t'évitera des explosions." },
+    { s: "gourou", t: "Vois-tu ? L'endurance a raison de la poudre. Respire, jeune homme. Ça t'évitera des explosions." },
     { s: "bebe", t: "Ta vache m'a déconcentré ! Je réclame une revanche sans bétail sur le terrain !" }
   ]
 },
@@ -136,21 +136,21 @@ Physiquement, le Maréchal est un **chibi à très grosse tête**, sanglé dans 
 },
 {
   act: 2, title: "Le capitaine et le caporal", sub: "Ryonganie–Tropicalia · deux grandes gueules en treillis",
-  left: "bebe", right: "jair", terrain: 7, mode: "volley", ai: 2, doped: null,
+  left: "bebe", right: "capitaine", terrain: 7, mode: "volley", ai: 2, doped: null,
   pre: [
     { s: "narrator", t: "Grande Forêt. Un ara hurle dans la canopée. Deux amateurs d'uniforme et de gros mots se retrouvent sur la terre rouge." },
-    { s: "jair", t: "Alors comme ça t'es le plus jeune Maréchal ? Moi j'étais capitaine. Un vrai. Avec de la boue aux bottes." },
+    { s: "capitaine", t: "Alors comme ça t'es le plus jeune Maréchal ? Moi j'étais capitaine. Un vrai. Avec de la boue aux bottes." },
     { s: "bebe", t: "De la boue ? J'ai du GRANIT ! Des gradins entiers en granit ! Et une Batterie AA qui interdit à ta jungle de sauter chez moi." },
-    { s: "jair", t: "Ta batterie, je la brûle et je plante un parking dessus. Moi je déboise, tu vois ? C'est mon smash à moi." },
+    { s: "capitaine", t: "Ta batterie, je la brûle et je plante un parking dessus. Moi je déboise, tu vois ? C'est mon smash à moi." },
     { s: "bebe", t: "Déboiser, détruire… on est faits pour s'entendre, caporal ! Mais je reste le plus jeune, et le plus jeune sert en premier." },
-    { s: "jair", t: "Sers, bébé Maréchal. Et gare à l'ara : lui non plus il respecte pas ton espace aérien." }
+    { s: "capitaine", t: "Sers, bébé Maréchal. Et gare à l'ara : lui non plus il respecte pas ton espace aérien." }
   ],
   win: [
     { s: "bebe", t: "Battu le capitaine dans sa propre jungle ! Le béton est plus fort que la boue. Toujours." },
-    { s: "jair", t: "Pas mal, le morveux. T'as du coffre. Reviens quand j'aurai fini de couper les arbres du court." }
+    { s: "capitaine", t: "Pas mal, le morveux. T'as du coffre. Reviens quand j'aurai fini de couper les arbres du court." }
   ],
   lose: [
-    { s: "jair", t: "Le vieux capitaine t'a appris le respect. Retourne jouer avec tes fanfares, petit." },
+    { s: "capitaine", t: "Le vieux capitaine t'a appris le respect. Retourne jouer avec tes fanfares, petit." },
     { s: "bebe", t: "C'est la faute de l'ara ! Il a survolé mon camp ! Ma Batterie AA aurait dû l'abattre !" }
   ]
 },
@@ -178,21 +178,21 @@ Physiquement, le Maréchal est un **chibi à très grosse tête**, sanglé dans 
 },
 {
   act: 3, title: "Le donneur de leçons", sub: "Ryonganie–Gallardie · l'Ouest contre la souveraineté",
-  left: "bebe", right: "micron", terrain: 3, mode: "bomb", ai: 3, doped: null,
+  left: "bebe", right: "cygne", terrain: 3, mode: "bomb", ai: 3, doped: null,
   pre: [
     { s: "narrator", t: "Esplanade du Défilé. Le radar s'allume, s'éteint, se rallume. La balle est une bombe. Le premier des donneurs de leçons vient sermonner le Maréchal chez lui." },
-    { s: "micron", t: "Vos essais, vos provocations, vos parades… En même temps, il faut dialoguer. Je viens dialoguer. Fermement." },
+    { s: "cygne", t: "Vos essais, vos provocations, vos parades… En même temps, il faut dialoguer. Je viens dialoguer. Fermement." },
     { s: "bebe", t: "Dialoguer ! L'Ouest ne dialogue que pour gagner du temps. Ici c'est chez moi : personne ne saute mon filet. Batterie AA !" },
-    { s: "micron", t: "Vos frappes ne peuvent pas être smashées, dites-vous ? Les miennes non plus. Passage en force. On est bien avancés." },
+    { s: "cygne", t: "Vos frappes ne peuvent pas être smashées, dites-vous ? Les miennes non plus. Passage en force. On est bien avancés." },
     { s: "bebe", t: "Tes belles phrases contre ma bombe à mèche. Vas-y, fais-moi la morale pendant que la mèche brûle." },
-    { s: "micron", t: "Je ne cède pas au chantage. En même temps… je n'aime pas trop où est posée cette bombe. Renvoyez-la." }
+    { s: "cygne", t: "Je ne cède pas au chantage. En même temps… je n'aime pas trop où est posée cette bombe. Renvoyez-la." }
   ],
   win: [
     { s: "bebe", t: "Boum ! Chez le donneur de leçons ! La souveraineté a parlé, et elle parle fort. Rentre écrire un communiqué." },
-    { s: "micron", t: "Ce n'est qu'un match. La communauté internationale, elle, ne renvoie jamais la bombe. Rendez-vous au conseil." }
+    { s: "cygne", t: "Ce n'est qu'un match. La communauté internationale, elle, ne renvoie jamais la bombe. Rendez-vous au conseil." }
   ],
   lose: [
-    { s: "micron", t: "En même temps, voyez-vous, le droit international finit toujours par gagner le point. Fermement." },
+    { s: "cygne", t: "En même temps, voyez-vous, le droit international finit toujours par gagner le point. Fermement." },
     { s: "bebe", t: "Complot ! Vous étiez tous ligués ! Mon radar était éteint une seconde et vous en avez profité, tricheurs !" }
   ]
 },

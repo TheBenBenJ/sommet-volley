@@ -107,13 +107,13 @@ function maybeActivateSuper(blob, input) {
   crowdHype = Math.max(crowdHype, 45);
   spawnSuperBurst(blob);
   superSound(a.key);
-  if (a.key === "vladou" || a.key === "yogi" || a.key === "safran") {
+  if (a.key === "volkoi" || a.key === "gourou" || a.key === "safran") {
     // Hiver Général / Méditation / Voile d’Or : gèle le camp adverse
     superEffects.push({ kind: "ice", side: 1 - blob.side, t: blob.superT });
-  } else if (a.key === "trompette" || a.key === "panda" || a.key === "jair") {
+  } else if (a.key === "dorf" || a.key === "timonier" || a.key === "capitaine") {
     // Le Mur / Grande Muraille / Déforestation
     superEffects.push({ kind: "wall", side: 1 - blob.side, t: blob.superT });
-  } else if (a.key === "micron") {
+  } else if (a.key === "cygne") {
     // Passage en Force : frappes immunisées au smash adverse (voir trySmashBall)
     blob.superSmash = false;
   } else if (a.key === "bebe" || a.key === "sultan" || a.key === "faucon") {
@@ -127,11 +127,11 @@ function tickSuper(blob) {
 }
 
 function superSound(key) {
-  if (key === "vladou") { sfxVladouSuper(); return; }
+  if (key === "volkoi") { sfxVladouSuper(); return; }
   beep(520, 0.08, "square", 0.14, 0, 800);
   beep(800, 0.1, "square", 0.13, 0.08, 1150);
-  if (key === "trompette") { beep(400, 0.1, "square", 0.14); beep(600, 0.14, "square", 0.12, 0.08); }
-  if (key === "micron") beep(880, 0.18, "sine", 0.14, 0.05, 440);
+  if (key === "dorf") { beep(400, 0.1, "square", 0.14); beep(600, 0.14, "square", 0.12, 0.08); }
+  if (key === "cygne") beep(880, 0.18, "sine", 0.14, 0.05, 440);
   if (key === "bebe") {
     beep(200, 0.06, "square", 0.14); beep(280, 0.08, "square", 0.12, 0.05);
     beep(160, 0.12, "triangle", 0.16, 0.1);

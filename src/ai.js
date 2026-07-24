@@ -258,7 +258,7 @@ function aiInput(side, lvlOverride, god) {
     const onMySide = side === 0 ? ball.x < NET_X : ball.x > NET_X;
     const hitReach = god ? 100 : 72;
     const nearHit = Math.abs(ball.x - me.x) < hitReach && ball.y > me.y - 210 && ball.vy > -1;
-    if (key === "vladou" || key === "trompette" || key === "micron") {
+    if (key === "volkoi" || key === "dorf" || key === "cygne") {
       if (onMySide && nearHit) input.super = true;
     } else if (onMySide && (side === 0 ? ball.vx < 0 : ball.vx > 0)) {
       input.super = true;
@@ -438,7 +438,7 @@ function aiInput2v2(me, lvlOverride) {
       iChase && superCharge[side] === 1 && me.superT <= 0 && !ball.frozen && state === "play") {
     const key = charOf(me).key;
     const nearHit = Math.abs(ball.x - me.x) < 72 && ball.y > me.y - 210 && ball.vy > -1;
-    if (key === "vladou" || key === "trompette" || key === "micron") {
+    if (key === "volkoi" || key === "dorf" || key === "cygne") {
       if (onMySide && nearHit) input.super = true;
     } else if (onMySide && (side === 0 ? ball.vx < 0 : ball.vx > 0)) {
       input.super = true;

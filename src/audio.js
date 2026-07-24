@@ -252,28 +252,28 @@ function crowdCheer(intensity) {
 function charHitSound(a, heavy) {
   if (!a) return;
   switch (a.key) {
-    case "vladou":
+    case "volkoi":
       sfxVladouHit(!!heavy);
       break;
-    case "trompette":
+    case "dorf":
       beep(280, 0.08, "square", 0.12); beep(420, 0.1, "square", 0.1, 0.05);
       break;
-    case "micron":
+    case "cygne":
       beep(520, 0.07, "sine", 0.1); beep(660, 0.09, "sine", 0.08, 0.05);
       break;
     case "bebe":
       beep(180, 0.08, "square", 0.12); beep(240, 0.1, "triangle", 0.1, 0.05);
       break;
-    case "panda":
+    case "timonier":
       beep(200, 0.09, "triangle", 0.12); beep(160, 0.1, "sine", 0.1, 0.06);
       break;
     case "sultan":
       beep(310, 0.08, "square", 0.11); beep(470, 0.09, "triangle", 0.09, 0.05);
       break;
-    case "yogi":
+    case "gourou":
       beep(440, 0.1, "sine", 0.1); beep(550, 0.12, "sine", 0.08, 0.06);
       break;
-    case "jair":
+    case "capitaine":
       beep(150, 0.08, "sawtooth", 0.1); beep(90, 0.12, "square", 0.08, 0.05);
       break;
     case "faucon":

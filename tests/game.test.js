@@ -179,10 +179,10 @@ test("service : contact filet = faute (pas de rebond qui sauve)", () => {
 test("roster : Tsar Volkoï est le perso pilote (index 0)", () => {
   const g = loadGame();
   assert.ok(g.CHARACTERS && g.CHARACTERS.length >= 3);
-  assert.strictEqual(g.CHARACTERS[0].key, "vladou");
+  assert.strictEqual(g.CHARACTERS[0].key, "volkoi");
   assert.strictEqual(g.CHARACTERS[0].name, "Tsar Volkoï");
-  assert.strictEqual(g.CHARACTERS[1].key, "trompette");
-  assert.strictEqual(g.CHARACTERS[2].key, "micron");
+  assert.strictEqual(g.CHARACTERS[1].key, "dorf");
+  assert.strictEqual(g.CHARACTERS[2].key, "cygne");
   assert.ok(g.CHARACTERS[0].coldProof);
   assert.ok(g.CHARACTERS[1].egoCharge);
   assert.ok(g.CHARACTERS[2].swapStats);
@@ -194,7 +194,7 @@ test("roster : Le Faucon (Citadelle du Levant) est jouable", () => {
   assert.ok(i >= 0, "faucon dans CHARACTERS");
   assert.strictEqual(g.CHARACTERS[i].name, "Le Faucon");
   assert.ok(g.CHARACTERS[i].egoCharge, "egoCharge");
-  const col = g.TERRAINS.find(t => t.key === "colline");
+  const col = g.TERRAINS.find(t => t.key === "citadelle-du-levant");
   assert.ok(col, "terrain colline");
   assert.strictEqual(col.character, i, "public Citadelle = Faucon");
 });
@@ -211,20 +211,20 @@ test("roster : Le Safran est jouable (Voile d’Or)", () => {
 test("roster : noms fictionnalisés (casting Steam)", () => {
   const g = loadGame();
   const want = {
-    vladou: "Tsar Volkoï", trompette: "Baron Dorf", micron: "Le Cygne",
-    bebe: "Maréchal Bébé", panda: "Le Grand Timonier", sultan: "Le Sultan",
-    yogi: "Le Gourou", jair: "Le Capitaine", faucon: "Le Faucon", safran: "Le Safran"
+    volkoi: "Tsar Volkoï", dorf: "Baron Dorf", cygne: "Le Cygne",
+    bebe: "Maréchal Bébé", timonier: "Le Grand Timonier", sultan: "Le Sultan",
+    gourou: "Le Gourou", capitaine: "Le Capitaine", faucon: "Le Faucon", safran: "Le Safran"
   };
   for (const c of g.CHARACTERS) {
     if (want[c.key]) assert.strictEqual(c.name, want[c.key], c.key);
   }
-  assert.strictEqual(g.CHARACTERS.find(c => c.key === "micron").superName, "Passage en Force");
+  assert.strictEqual(g.CHARACTERS.find(c => c.key === "cygne").superName, "Passage en Force");
   const maps = Object.fromEntries(g.TERRAINS.map(t => [t.key, t.name]));
-  assert.strictEqual(maps.plage, "Country Club Doré");
-  assert.strictEqual(maps.prairie, "Palais du Coq");
-  assert.strictEqual(maps.matin, "Cité du Matin");
-  assert.strictEqual(maps.bosphore, "Pont des Deux Mondes");
-  assert.strictEqual(maps.amazon, "Grande Forêt");
+  assert.strictEqual(maps["country-club-dore"], "Country Club Doré");
+  assert.strictEqual(maps["palais-du-coq"], "Palais du Coq");
+  assert.strictEqual(maps["cite-du-matin"], "Cité du Matin");
+  assert.strictEqual(maps["pont-des-deux-mondes"], "Pont des Deux Mondes");
+  assert.strictEqual(maps["grande-foret"], "Grande Forêt");
 });
 
 test("sprites : défaut walk = 4 frames (packs walk_0..3)", () => {
@@ -286,20 +286,20 @@ test("events map : chaque terrain a un kind non-null", () => {
 test("météo : flavor snow/sand/rain selon terrain", () => {
   const g = loadGame();
   const byKey = Object.fromEntries(g.TERRAINS.map((t, i) => [t.key, i]));
-  g.setTerrain(byKey.neige);
+  g.setTerrain(byKey["place-ecarlate"]);
   assert.strictEqual(g.weatherFlavor(), "snow");
-  g.setTerrain(byKey.plage);
+  g.setTerrain(byKey["country-club-dore"]);
   assert.strictEqual(g.weatherFlavor(), "sand");
-  g.setTerrain(byKey.roseraie);
+  g.setTerrain(byKey["jardin-des-roses"]);
   assert.strictEqual(g.weatherFlavor(), "rain");
-  g.setTerrain(byKey.prairie);
+  g.setTerrain(byKey["palais-du-coq"]);
   assert.strictEqual(g.weatherFlavor(), "rain");
 });
 
 test("météo : plage et roseraie ne sont plus bloquées au clear", () => {
   const g = loadGame();
   const byKey = Object.fromEntries(g.TERRAINS.map((t, i) => [t.key, i]));
-  for (const key of ["plage", "roseraie"]) {
+  for (const key of ["country-club-dore", "jardin-des-roses"]) {
     g.setTerrain(byKey[key]);
     g.resetWeather();
     g.setWeather("clear", 1);
@@ -929,7 +929,7 @@ test("V2 : service aérien — plus de punch qu'au sol (Yogi)", () => {
   const g = loadGame();
   const C = g.consts;
   const N0 = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
-  const yogi = g.CHARACTERS.findIndex(c => c.key === "yogi");
+  const yogi = g.CHARACTERS.findIndex(c => c.key === "gourou");
   assert.ok(yogi >= 0, "Yogi présent");
 
   function hit(aerial) {
@@ -968,7 +968,7 @@ test("V2 : smash sous le bandeau — passe le filet (Yogi milieu de court)", () 
   const g = loadGame();
   const C = g.consts;
   const N0 = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
-  const yogi = g.CHARACTERS.findIndex(c => c.key === "yogi");
+  const yogi = g.CHARACTERS.findIndex(c => c.key === "gourou");
   g.setVsAI(true); g.setAiLevel(0);
   g.newGame(81);
   g.setServingSide(1);

@@ -1,0 +1,9 @@
+{
+  "key": "jardin-des-roses",
+  "name": "Jardin des Roses",
+  "layers": ["far", "skyline"],
+  "props": ["net_post", "flag", "peacock"],
+  "event": "peacock",
+  "thumb": "thumb.png",
+  "notes": "Le Safran / Ramenie. Props via sommet-decor (net_post, flag, peacock). bgFullHeight, baselineFromBottom=44. Event peacock (crosser, gate mapEventsCanStep)."
+}

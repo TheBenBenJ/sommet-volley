@@ -27,11 +27,11 @@ function drawBgPlage() {
   const storm = weather === "storm";
   const raining = weather === "rain" || storm;
   const tk = TERRAINS[terrain] && TERRAINS[terrain].key;
-  if (tk === "amazon" && typeof mapAmazonReady === "function" && mapAmazonReady()) {
+  if (tk === "grande-foret" && typeof mapGrandeForetReady === "function" && mapGrandeForetReady()) {
     drawBgAmazonPng(performance.now() / 1000, raining, storm);
     return;
   }
-  if (typeof mapTrompetteReady === "function" && mapTrompetteReady() && tk !== "amazon") {
+  if (typeof mapCountryClubDoreReady === "function" && mapCountryClubDoreReady() && tk !== "grande-foret") {
     drawBgPlagePng(performance.now() / 1000, raining, storm);
     return;
   }
@@ -40,7 +40,7 @@ function drawBgPlage() {
 
 /** Grande Forêt PNG (Jair) — jungle, terre battue, bannières vert-jaune. */
 function drawBgAmazonPng(t, raining, storm) {
-  const p = SPRITES.mapAmazon;
+  const p = SPRITES.mapGrandeForet;
   drawMapBackdrop(p, "#4a6a38");
 
   if (storm) {
@@ -87,7 +87,7 @@ function drawBgSkylinePack(p, t, raining, storm, cols) {
 
 /** Cité du Matin PNG (Panda) — portail rouge, muraille, bannières. */
 function drawBgMatinPng(t, raining, storm) {
-  const p = SPRITES.mapMatin;
+  const p = SPRITES.mapCiteDuMatin;
 
   drawMapBackdrop(p, "#c8beb0");
 
@@ -120,7 +120,7 @@ function drawBgMatinPng(t, raining, storm) {
 
 /** Palais du Bosphore PNG (Sultan) — quay, mosquée, bannières pourpres. */
 function drawBgBosphorePng(t, raining, storm) {
-  const p = SPRITES.mapBosphore;
+  const p = SPRITES.mapPontDesDeuxMondes;
 
   drawMapBackdrop(p, "#8aa0b8");
 
@@ -156,7 +156,7 @@ function drawBgColline() {
   const t = performance.now() / 1000;
   const storm = weather === "storm";
   const raining = weather === "rain" || storm;
-  if (typeof mapCollineReady === "function" && mapCollineReady()) {
+  if (typeof mapCitadelleDuLevantReady === "function" && mapCitadelleDuLevantReady()) {
     drawBgCollinePng(t, raining, storm);
     return;
   }
@@ -167,7 +167,7 @@ function drawBgColline() {
 
 /** Citadelle du Levant PNG — capitale fortifiée en bord de Méditerranée, plein midi. */
 function drawBgCollinePng(t, raining, storm) {
-  const p = SPRITES.mapColline;
+  const p = SPRITES.mapCitadelleDuLevant;
 
   drawMapBackdrop(p, "#bfe0f2");
 
@@ -200,7 +200,7 @@ function drawBgRoseraie() {
   const t = performance.now() / 1000;
   const storm = weather === "storm";
   const raining = weather === "rain" || storm;
-  if (typeof mapRoseraieReady === "function" && mapRoseraieReady()) {
+  if (typeof mapJardinDesRosesReady === "function" && mapJardinDesRosesReady()) {
     drawBgRoseraiePng(t, raining, storm);
     return;
   }
@@ -211,7 +211,7 @@ function drawBgRoseraie() {
 
 /** Jardin des Roses PNG — cour à roses, cyprès, tuiles turquoise, lumière dorée. */
 function drawBgRoseraiePng(t, raining, storm) {
-  const p = SPRITES.mapRoseraie;
+  const p = SPRITES.mapJardinDesRoses;
 
   drawMapBackdrop(p, "#f0c878");
 
@@ -240,7 +240,7 @@ function drawBgRoseraiePng(t, raining, storm) {
 
 /** Stade Ashram PNG (Yogi) — palais grès miel, soucis, turquoise. */
 function drawBgAshramPng(t, raining, storm) {
-  const p = SPRITES.mapAshram;
+  const p = SPRITES.mapStadeAshram;
 
   drawMapBackdrop(p, "#f0d9a8");
 
@@ -274,7 +274,7 @@ function drawBgAshramPng(t, raining, storm) {
 
 /** Country Club Doré PNG (Baron Dorf) — voile ocre local ; sable via overlay. */
 function drawBgPlagePng(t, raining, storm) {
-  const p = SPRITES.mapTrompette;
+  const p = SPRITES.mapCountryClubDore;
 
   drawMapBackdrop(p, "#87b0d0");
 
@@ -312,7 +312,7 @@ function drawBgPlagePng(t, raining, storm) {
 }
 
 function drawResortCart(t) {
-  const p = SPRITES.mapTrompette;
+  const p = SPRITES.mapCountryClubDore;
   if (!p || (!spriteReady(p.cart) && !spriteReady(p.cartHorn))) return;
   if (typeof mapEvent === "undefined") return;
   // UNIQUEMENT pendant l'événement (plus de voiturette garée en plein court en idle).
@@ -460,16 +460,16 @@ function drawPalm(px, storm) {
 const MAP_LAYOUT = {
   // baselineFromBottom inclut le pad sol sous la ligne de court (skylines
   // étendues pour couvrir la bande score H-GROUND_Y sans bande vide).
-  amazon:   { baselineFromBottom: 70,  netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
-  plage:    { baselineFromBottom: 69,  netPost: { footPad: 2, xOff: 4, scale: 1 }, codeSeam: false, bgFullHeight: true },
-  neige:    { baselineFromBottom: 60,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
-  prairie:  { baselineFromBottom: 68,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
-  parade:   { baselineFromBottom: 123, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
-  matin:    { baselineFromBottom: 48,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
-  bosphore: { baselineFromBottom: 59,  netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
-  ashram:   { baselineFromBottom: 133,  netPost: { footPad: 4, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
-  colline:  { baselineFromBottom: 45,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
-  roseraie: { baselineFromBottom: 41, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true }
+  "grande-foret":   { baselineFromBottom: 70,  netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  "country-club-dore":    { baselineFromBottom: 69,  netPost: { footPad: 2, xOff: 4, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  "place-ecarlate":    { baselineFromBottom: 60,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  "palais-du-coq":  { baselineFromBottom: 68,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  "esplanade-du-defile":   { baselineFromBottom: 123, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  "cite-du-matin":    { baselineFromBottom: 48,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  "pont-des-deux-mondes": { baselineFromBottom: 59,  netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  "stade-ashram":   { baselineFromBottom: 133,  netPost: { footPad: 4, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  "citadelle-du-levant":  { baselineFromBottom: 45,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  "jardin-des-roses": { baselineFromBottom: 41, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true }
 };
 
 function currentMapLayout() {
@@ -720,7 +720,7 @@ function drawMapProp(img, x, footY, drawH) {
 }
 
 function drawBgNeigePng(t, heavy, blizzard) {
-  const p = SPRITES.mapVladou;
+  const p = SPRITES.mapPlaceEcarlate;
 
   // Un seul fond (skyline) — la météo se joue en overlays code, pas en 2e PNG
   drawMapBackdrop(p, "#d7e4ee");
@@ -832,22 +832,22 @@ function drawNeigeWeatherFX(t, heavy, blizzard) {
 
 /** Warn + projectiles / traverseurs selon le terrain. */
 function mapEventWarnPack(kind) {
-  if (kind === "cannon") return SPRITES.mapVladou;
-  if (kind === "cart") return SPRITES.mapTrompette;
-  if (kind === "march") return SPRITES.mapMicron;
-  if (kind === "radar") return SPRITES.mapBebe;
-  if (kind === "lantern") return SPRITES.mapMatin;
-  if (kind === "carpet") return SPRITES.mapBosphore;
-  if (kind === "cow") return SPRITES.mapAshram;
-  if (kind === "macaw") return SPRITES.mapAmazon;
-  if (kind === "falcon") return SPRITES.mapColline;
-  if (kind === "peacock") return SPRITES.mapRoseraie;
+  if (kind === "cannon") return SPRITES.mapPlaceEcarlate;
+  if (kind === "cart") return SPRITES.mapCountryClubDore;
+  if (kind === "march") return SPRITES.mapPalaisDuCoq;
+  if (kind === "radar") return SPRITES.mapEsplanadeDuDefile;
+  if (kind === "lantern") return SPRITES.mapCiteDuMatin;
+  if (kind === "carpet") return SPRITES.mapPontDesDeuxMondes;
+  if (kind === "cow") return SPRITES.mapStadeAshram;
+  if (kind === "macaw") return SPRITES.mapGrandeForet;
+  if (kind === "falcon") return SPRITES.mapCitadelleDuLevant;
+  if (kind === "peacock") return SPRITES.mapJardinDesRoses;
   return null;
 }
 
 /** Icône d'annonce unique : celle de la map française (Micron), lisible partout. */
 function mapEventWarnIcon() {
-  const fr = SPRITES.mapMicron;
+  const fr = SPRITES.mapPalaisDuCoq;
   return (fr && spriteReady(fr.warn)) ? fr.warn : null;
 }
 
@@ -941,14 +941,16 @@ function drawMapEventOverlay() {
     const bob = Math.sin(mapEvent.t * 0.32) * 4;
     const scale = 1 + 0.08 * Math.sin(mapEvent.t * 0.5);
     const wx = NET_X;
-    const wy = NET_TOP - 8 + bob;
+    // Au-dessus du finial du poteau (sommet PNG ≈ NET_TOP - 28) — sinon
+    // drawNet (après le fond) masque l'icône.
+    const wh = PROP_H.warnIcon;
+    const wy = NET_TOP - 28 - wh - 18 + bob;
     ctx.save();
     ctx.globalAlpha = pulse;
     ctx.translate(wx, wy);
     ctx.scale(scale, scale);
     const warnImg = mapEventWarnIcon();
     if (warnImg) {
-      const wh = PROP_H.warnIcon;
       ctx.drawImage(warnImg, -wh / 2, -wh, wh, wh);
     } else {
       ctx.fillStyle = showZone ? "#ff9800" : "#e53935";
@@ -1140,7 +1142,7 @@ function drawBgNeige() {
   const blizzard = weather === "storm"; // blizzard
 
   // Place Écarlate PNG (Volkoï) — fallback canvas si pas encore chargé
-  if (typeof mapVladouReady === "function" && mapVladouReady()) {
+  if (typeof mapPlaceEcarlateReady === "function" && mapPlaceEcarlateReady()) {
     drawBgNeigePng(t, heavy, blizzard);
     return; // overlay event déjà dessiné dans drawBgNeigePng
   }
@@ -1247,15 +1249,15 @@ function drawBgPrairie() {
   const storm = weather === "storm";
   const raining = weather === "rain" || storm;
   const tk = TERRAINS[terrain] && TERRAINS[terrain].key;
-  if (tk === "matin" && typeof mapMatinReady === "function" && mapMatinReady()) {
+  if (tk === "cite-du-matin" && typeof mapCiteDuMatinReady === "function" && mapCiteDuMatinReady()) {
     drawBgMatinPng(t, raining, storm);
     return;
   }
-  if (tk === "bosphore" && typeof mapBosphoreReady === "function" && mapBosphoreReady()) {
+  if (tk === "pont-des-deux-mondes" && typeof mapPontDesDeuxMondesReady === "function" && mapPontDesDeuxMondesReady()) {
     drawBgBosphorePng(t, raining, storm);
     return;
   }
-  if (typeof mapMicronReady === "function" && mapMicronReady() && tk === "prairie") {
+  if (typeof mapPalaisDuCoqReady === "function" && mapPalaisDuCoqReady() && tk === "palais-du-coq") {
     drawBgPrairiePng(t, raining, storm);
     return;
   }
@@ -1346,11 +1348,11 @@ function drawBgParade() {
   const storm = weather === "storm";
   const raining = weather === "rain" || storm;
   const tk = TERRAINS[terrain] && TERRAINS[terrain].key;
-  if (tk === "ashram" && typeof mapAshramReady === "function" && mapAshramReady()) {
+  if (tk === "stade-ashram" && typeof mapStadeAshramReady === "function" && mapStadeAshramReady()) {
     drawBgAshramPng(t, raining, storm);
     return;
   }
-  if (typeof mapBebeReady === "function" && mapBebeReady() && tk !== "ashram") {
+  if (typeof mapEsplanadeDuDefileReady === "function" && mapEsplanadeDuDefileReady() && tk !== "stade-ashram") {
     drawBgParadePng(t, raining, storm);
     return;
   }
@@ -1362,7 +1364,7 @@ function drawBgParade() {
 }
 
 function drawBgParadePng(t, raining, storm) {
-  const p = SPRITES.mapBebe;
+  const p = SPRITES.mapEsplanadeDuDefile;
 
   drawMapBackdrop(p, "#9aa2aa");
 
@@ -1410,7 +1412,7 @@ function drawBgParadePng(t, raining, storm) {
 
 /** Palais du Coq — fond PNG Micron. */
 function drawBgPrairiePng(t, raining, storm) {
-  const p = SPRITES.mapMicron;
+  const p = SPRITES.mapPalaisDuCoq;
 
   // far optionnel (scène différente) : léger voile seulement
   drawMapBackdrop(p, "#b5c4d2");
@@ -1497,35 +1499,35 @@ function drawHayBale(px) {
 /** Poteau PNG du terrain courant, ou null → fallback canvas. */
 function terrainNetPostImg() {
   const key = TERRAINS[terrain].key;
-  if (key === "neige" && SPRITES.mapVladou && spriteReady(SPRITES.mapVladou.netPost)) {
-    return SPRITES.mapVladou.netPost;
+  if (key === "place-ecarlate" && SPRITES.mapPlaceEcarlate && spriteReady(SPRITES.mapPlaceEcarlate.netPost)) {
+    return SPRITES.mapPlaceEcarlate.netPost;
   }
-  if (key === "plage" && SPRITES.mapTrompette && spriteReady(SPRITES.mapTrompette.netPost)) {
-    return SPRITES.mapTrompette.netPost;
+  if (key === "country-club-dore" && SPRITES.mapCountryClubDore && spriteReady(SPRITES.mapCountryClubDore.netPost)) {
+    return SPRITES.mapCountryClubDore.netPost;
   }
-  if (key === "prairie" && SPRITES.mapMicron && spriteReady(SPRITES.mapMicron.netPost)) {
-    return SPRITES.mapMicron.netPost;
+  if (key === "palais-du-coq" && SPRITES.mapPalaisDuCoq && spriteReady(SPRITES.mapPalaisDuCoq.netPost)) {
+    return SPRITES.mapPalaisDuCoq.netPost;
   }
-  if (key === "parade" && SPRITES.mapBebe && spriteReady(SPRITES.mapBebe.netPost)) {
-    return SPRITES.mapBebe.netPost;
+  if (key === "esplanade-du-defile" && SPRITES.mapEsplanadeDuDefile && spriteReady(SPRITES.mapEsplanadeDuDefile.netPost)) {
+    return SPRITES.mapEsplanadeDuDefile.netPost;
   }
-  if (key === "matin" && SPRITES.mapMatin && spriteReady(SPRITES.mapMatin.netPost)) {
-    return SPRITES.mapMatin.netPost;
+  if (key === "cite-du-matin" && SPRITES.mapCiteDuMatin && spriteReady(SPRITES.mapCiteDuMatin.netPost)) {
+    return SPRITES.mapCiteDuMatin.netPost;
   }
-  if (key === "ashram" && SPRITES.mapAshram && spriteReady(SPRITES.mapAshram.netPost)) {
-    return SPRITES.mapAshram.netPost;
+  if (key === "stade-ashram" && SPRITES.mapStadeAshram && spriteReady(SPRITES.mapStadeAshram.netPost)) {
+    return SPRITES.mapStadeAshram.netPost;
   }
-  if (key === "bosphore" && SPRITES.mapBosphore && spriteReady(SPRITES.mapBosphore.netPost)) {
-    return SPRITES.mapBosphore.netPost;
+  if (key === "pont-des-deux-mondes" && SPRITES.mapPontDesDeuxMondes && spriteReady(SPRITES.mapPontDesDeuxMondes.netPost)) {
+    return SPRITES.mapPontDesDeuxMondes.netPost;
   }
-  if (key === "amazon" && SPRITES.mapAmazon && spriteReady(SPRITES.mapAmazon.netPost)) {
-    return SPRITES.mapAmazon.netPost;
+  if (key === "grande-foret" && SPRITES.mapGrandeForet && spriteReady(SPRITES.mapGrandeForet.netPost)) {
+    return SPRITES.mapGrandeForet.netPost;
   }
-  if (key === "colline" && SPRITES.mapColline && spriteReady(SPRITES.mapColline.netPost)) {
-    return SPRITES.mapColline.netPost;
+  if (key === "citadelle-du-levant" && SPRITES.mapCitadelleDuLevant && spriteReady(SPRITES.mapCitadelleDuLevant.netPost)) {
+    return SPRITES.mapCitadelleDuLevant.netPost;
   }
-  if (key === "roseraie" && SPRITES.mapRoseraie && spriteReady(SPRITES.mapRoseraie.netPost)) {
-    return SPRITES.mapRoseraie.netPost;
+  if (key === "jardin-des-roses" && SPRITES.mapJardinDesRoses && spriteReady(SPRITES.mapJardinDesRoses.netPost)) {
+    return SPRITES.mapJardinDesRoses.netPost;
   }
   return null;
 }

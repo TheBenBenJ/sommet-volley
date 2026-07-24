@@ -31,21 +31,21 @@ Pour **chaque** image : joins le fichier de référence indiqué, colle les *Rè
 ci-dessus, puis ajoute la ligne « Prompt » spécifique. Destination finale entre parenthèses.
 
 ### 1. Tsar Volkoï — dopé
-- **Référence à joindre** : `assets/vladou/idle_face_0.png`
+- **Référence à joindre** : `assets/volkoi/idle_face_0.png`
 - **Prompt** : « Version *dopée* de ce dirigeant slave glacial : même visage, même manteau
   sombre. Yeux bleu pâle devenus rouge luisant, veines saillantes sur le crâne, buée froide,
   rictus mauvais. Aura rouge glacée. Fond magenta `#FF00FF`. »
 - **Destination** : `assets/story/vladou_doped.png`
 
 ### 2. Baron Dorf — dopé
-- **Référence à joindre** : `assets/trompette/idle_face_0.png`
+- **Référence à joindre** : `assets/dorf/idle_face_0.png`
 - **Prompt** : « Version *dopée* de ce magnat blond bronzé, costume bleu et longue cravate rouge :
   visage cramoisi, yeux injectés rouge vif, veines gonflées au front, sueur, air survolté et furieux.
   Aura rouge. Fond magenta `#FF00FF`. »
 - **Destination** : `assets/story/trompette_doped.png`
 
 ### 3. Le Cygne — dopé
-- **Référence à joindre** : `assets/micron/idle_face_0.png`
+- **Référence à joindre** : `assets/cygne/idle_face_0.png`
 - **Prompt** : « Version *dopée* de ce jeune technocrate en costume bleu, chemise blanche :
   le sourire diplomate remplacé par un regard fixe et rouge luisant, veines aux tempes, sueur,
   mâchoire crispée. Aura rouge. Fond magenta `#FF00FF`. »
@@ -59,7 +59,7 @@ ci-dessus, puis ajoute la ligne « Prompt » spécifique. Destination finale ent
 - **Destination** : `assets/story/bebe_doped.png`
 
 ### 5. Le Grand Timonier — dopé
-- **Référence à joindre** : `assets/panda/idle_face_0.png`
+- **Référence à joindre** : `assets/timonier/idle_face_0.png`
 - **Prompt** : « Version *dopée* de ce dirigeant impassible aux cheveux noirs peignés, costume sombre :
   le calme impérial vire à la fureur froide, yeux rouge luisant, veines au cou, mâchoire serrée.
   Aura rouge. Fond magenta `#FF00FF`. »
@@ -73,14 +73,14 @@ ci-dessus, puis ajoute la ligne « Prompt » spécifique. Destination finale ent
 - **Destination** : `assets/story/sultan_doped.png`
 
 ### 7. Le Gourou — dopé
-- **Référence à joindre** : `assets/yogi/idle_face_0.png`
+- **Référence à joindre** : `assets/gourou/idle_face_0.png`
 - **Prompt** : « Version *dopée* de ce gourou à barbe blanche en tenue safran/orange :
   la sérénité zen remplacée par des yeux rouge luisant grand ouverts, veines au front, sueur,
   rictus. Aura rouge. Fond magenta `#FF00FF`. »
 - **Destination** : `assets/story/yogi_doped.png`
 
 ### 8. Le Capitaine — dopé
-- **Référence à joindre** : `assets/jair/idle_face_0.png`
+- **Référence à joindre** : `assets/capitaine/idle_face_0.png`
 - **Prompt** : « Version *dopée* de cet ex-militaire populiste au visage rude :
   yeux injectés rouge luisant, veines gonflées aux tempes et au cou, sueur, air brutal et hargneux.
   Aura rouge. Fond magenta `#FF00FF`. »

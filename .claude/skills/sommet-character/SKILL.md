@@ -21,7 +21,7 @@ le roster actuel a été généré avec Grok — un nouveau perso se génère PA
 Un perso = **un jeu de poses complet, IDENTIQUE pour tous** (`src/char-sprites.js`
 lit ces anims, `charPickAnim` choisit selon l'état). Fichiers
 `assets/<key>/<anim>_<n>.png` (n commence à 0). Structure canonique (celle de
-TOUS les persos, ex. `assets/micron/`) :
+TOUS les persos, ex. `assets/cygne/`) :
 
 | anim | frames | fichiers | action (vue de CÔTÉ, face à droite) |
 |------|:--:|---|---|
@@ -98,7 +98,7 @@ Invoqué avec un nom (`/sommet-character volkoi`, `safran`, …), l'agent :
 
 1. **Résout la clé** : cherche dans `tools/genassets/casting.py` → `CHARACTERS`
    par `key`, `name` (insensible à la casse / accents) ou alias évident
-   (`volkoi` / `Volkoï` → `vladou`). La **clé technique** (`vladou`, `safran`…)
+   (`volkoi` / `Volkoï` → `volkoi`). La **clé technique** (`volkoi`, `safran`…)
    = dossier `raw/<key>/` + `assets/<key>/`. Ne pas inventer une 2ᵉ clé.
 2. **Lit le `look` VERBATIM** (champ `look` de l'entrée) + `name` / `nation`.
    Ce texte EST `<ARCHÉTYPE>`. Il inclut déjà silhouette + **tenue complète**.
@@ -196,7 +196,7 @@ détourage échoue).
    1, idle 2, walk 4, jump 3, receive 2, aim 2, smash 3, super 4, panic 2,
    victory 2, defeat 2) + `baseH: 110` (= `CHAR_BASE_H` dans `src/core.js` —
    référence d'échelle pour tous les props `PROP_H`), `footPad: 2`, `lockAspect`,
-   `serveHands` (calquer sur `assets/micron/manifest.json`).
+   `serveHands` (calquer sur `assets/cygne/manifest.json`).
 4. **Roster** : entrée dans `CHARACTERS` (`src/state.js`) — `key`, `name`
    (fictif, aligné casting), `color`/`darkColor`, `stats`, multiplicateurs
    (`speed/jump/power/control`), `trait`, `superName`, `superDesc`.

@@ -16,7 +16,7 @@ la **ligne de court** dans le PNG doit être assez haute pour caler `GROUND_Y`
 5. Après `skyline`, uploade-le en **référence** pour far / crowd / thumb.
 6. Props : fond **blanc pur #FFFFFF**, pas d’ombre au sol.
 7. Ne pas citer de vrai nom de dirigeant, de pays, ni de drapeau réel. Pas d’armes réalistes, pas de missiles.
-8. Nomme : `raw/maps/bebe/<nom>.png`  
+8. Nomme : `raw/maps/esplanade-du-defile/<nom>.png`  
    Puis détoure les **props** (pas skyline / far / thumb) — voir `PIPELINE-MAP.md`.
 
 ---

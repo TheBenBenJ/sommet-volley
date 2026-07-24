@@ -117,7 +117,7 @@ L’IA a **exécuté** sous consignes (code, intégration, docs techniques).
 - Ce document : `docs/CONTRIBUTION-BENJAMIN.md`
 - Vision / design : `docs/VISION.md`, `docs/GAMEPLAY-V2.md`, `docs/chars/*.yaml`
 - Pipelines : `docs/PIPELINE-PERSONNAGE.md`, `docs/PIPELINE-MAP.md`
-- Prompts : `raw/maps/`, `raw/vladou/prompts.md`, `raw/_SHARED/`
+- Prompts : `raw/maps/`, `raw/volkoi/prompts.md`, `raw/_SHARED/`
 - Licence : `LICENSE`
 - Prod : https://ns3104412.ip-37-187-139.eu/sommet-volley/
 

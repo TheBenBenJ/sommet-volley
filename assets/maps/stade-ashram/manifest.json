@@ -1,0 +1,16 @@
+{
+  "key": "stade-ashram",
+  "name": "Stade Ashram",
+  "layers": [
+    "far",
+    "skyline"
+  ],
+  "props": [
+    "net_post",
+    "flag",
+    "cow"
+  ],
+  "event": "cow",
+  "thumb": "thumb.png",
+  "notes": "Stade Ashram / Bharatie (Yogi). Skyline grès miel + soucis + turquoise. Props sommet-decor (net_post, flag, cow). Event cow (crosser). Public désactivé (déjà dans skyline)."
+}

@@ -4,7 +4,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const KEYS = ["vladou","trompette","micron","bebe","panda","sultan","yogi","jair","faucon","safran"];
+const KEYS = ["volkoi","dorf","cygne","bebe","timonier","sultan","gourou","capitaine","faucon","safran"];
 const VALID = new Set([...KEYS, "narrator"]);
 const HIST = path.join(__dirname, "..", "docs", "histoires");
 

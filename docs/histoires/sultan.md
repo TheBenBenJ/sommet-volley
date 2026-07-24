@@ -31,21 +31,21 @@ const STORY_SULTAN = [
   // ================= ACTE I — Bravades de bazar (Volley) =================
   {
     act: 1, title: "Le marchand de missiles", sub: "Bosforie–Doria · systèmes de défense & sanctions",
-    left: "sultan", right: "trompette", terrain: 1, mode: "volley", ai: 0, doped: null,
+    left: "sultan", right: "dorf", terrain: 1, mode: "volley", ai: 0, doped: null,
     pre: [
       { s: "narrator", t: "Country Club Doré. Sous les palmiers en plastique, deux hommes qui se croient chacun le plus grand se serrent la main un peu trop fort." },
-      { s: "trompette", t: "Le Sultan ! J'adore le Sultan. Grand type. Mais tu m'as acheté tes défenses au Tsar. Pas bien. Très pas bien. Sanctions !" },
+      { s: "dorf", t: "Le Sultan ! J'adore le Sultan. Grand type. Mais tu m'as acheté tes défenses au Tsar. Pas bien. Très pas bien. Sanctions !" },
       { s: "sultan", t: "J'achète où je veux, à qui je veux. Je suis un empire, pas un client fidèle de ta boutique." },
-      { s: "trompette", t: "Un empire ! Il dit un empire. Moi j'ai le plus beau resort du monde. Toi t'as un pont. Un pont !" },
+      { s: "dorf", t: "Un empire ! Il dit un empire. Moi j'ai le plus beau resort du monde. Toi t'as un pont. Un pont !" },
       { s: "sultan", t: "Un pont entre deux mondes, Baron. Toi tu as un mur qui n'arrête que le regard. Sers, et écoute trembler ton gazon." },
-      { s: "trompette", t: "Ça tremble pas, c'est le meilleur gazon du monde. Balle au centre, mon ami-ennemi." }
+      { s: "dorf", t: "Ça tremble pas, c'est le meilleur gazon du monde. Balle au centre, mon ami-ennemi." }
     ],
     win: [
       { s: "sultan", t: "Le talon frappe, la terre tremble, ton golf s'effondre. On se refait un sommet quand tu veux, marchand." },
-      { s: "trompette", t: "Match truqué ! Le tapis volant m'a distrait ! Enquête ! … mais beau smash, je l'avoue. Rare que je l'avoue." }
+      { s: "dorf", t: "Match truqué ! Le tapis volant m'a distrait ! Enquête ! … mais beau smash, je l'avoue. Rare que je l'avoue." }
     ],
     lose: [
-      { s: "trompette", t: "Gagné ! Le plus grand match du monde ! Les gens dansaient sur le green, ils pleuraient de joie !" },
+      { s: "dorf", t: "Gagné ! Le plus grand match du monde ! Les gens dansaient sur le green, ils pleuraient de joie !" },
       { s: "sultan", t: "Tu gagnes un set, pas le détroit. Reviens, apporte tes sanctions, j'apporte mon Séisme." }
     ]
   },
@@ -71,21 +71,21 @@ const STORY_SULTAN = [
   },
   {
     act: 1, title: "Deux voix qui portent", sub: "Bosforie–Tropicalia · populistes de la jungle et du détroit",
-    left: "sultan", right: "jair", terrain: 7, mode: "volley", ai: 1, doped: null,
+    left: "sultan", right: "capitaine", terrain: 7, mode: "volley", ai: 1, doped: null,
     pre: [
       { s: "narrator", t: "Grande Forêt. Un ara traverse la canopée dorée. Deux tribuns habitués à crier plus fort que la raison se retrouvent sur la terre rouge." },
-      { s: "jair", t: "Alors comme ça t'es le grand chef de l'Orient ? Ici c'est ma clairière, mon micro, ma tronçonneuse. Bienvenue, cousin." },
+      { s: "capitaine", t: "Alors comme ça t'es le grand chef de l'Orient ? Ici c'est ma clairière, mon micro, ma tronçonneuse. Bienvenue, cousin." },
       { s: "sultan", t: "Capitaine, nous nous ressemblons : deux voix que le monde voudrait baisser et qui montent le volume à la place." },
-      { s: "jair", t: "Ha ! Sauf que moi j'abats des arbres, toi t'abats des taux d'intérêt. On est fous tous les deux, mais moi j'assume mieux." },
+      { s: "capitaine", t: "Ha ! Sauf que moi j'abats des arbres, toi t'abats des taux d'intérêt. On est fous tous les deux, mais moi j'assume mieux." },
       { s: "sultan", t: "Baisser les taux fait baisser les prix. C'est de la science. MA science. Comme mon talon fait trembler ta terre rouge." },
-      { s: "jair", t: "T'es aussi économiste que je suis forestier. Servons, grand théoricien !" }
+      { s: "capitaine", t: "T'es aussi économiste que je suis forestier. Servons, grand théoricien !" }
     ],
     win: [
       { s: "sultan", t: "Ta forêt a tremblé, ton ara s'est envolé, et toi tu es resté cloué. La gravité impériale, Capitaine." },
-      { s: "jair", t: "Bon, bon. T'as gagné. Mais je te préviens : la prochaine fois j'amène la tronçonneuse au filet." }
+      { s: "capitaine", t: "Bon, bon. T'as gagné. Mais je te préviens : la prochaine fois j'amène la tronçonneuse au filet." }
     ],
     lose: [
-      { s: "jair", t: "Déforestation totale ! Mur de troncs, plus de sol pour ton Séisme ! Rentre chez tes dômes, cousin !" },
+      { s: "capitaine", t: "Déforestation totale ! Mur de troncs, plus de sol pour ton Séisme ! Rentre chez tes dômes, cousin !" },
       { s: "sultan", t: "Profite de ta clairière. Le vrai carrefour du monde est chez moi, pas sous tes arbres." }
     ]
   },
@@ -93,61 +93,61 @@ const STORY_SULTAN = [
   // ============ ACTE II — Le grand écart (Volley tendu) ============
   {
     act: 2, title: "Le toit et le tapis", sub: "Bosforie–Bharatie · deux civilisations, une seule scène",
-    left: "sultan", right: "yogi", terrain: 6, mode: "volley", ai: 1, doped: null,
+    left: "sultan", right: "gourou", terrain: 6, mode: "volley", ai: 1, doped: null,
     pre: [
       { s: "narrator", t: "Stade Ashram. Guirlandes de soucis orange, une vache traverse tranquillement le terrain. Deux hommes qui parlent au nom de civilisations millénaires." },
-      { s: "yogi", t: "Namasté, Sultan. Tu prends parti pour mon rival du nord sur la question de la crête. Le karma note tout, tu sais." },
+      { s: "gourou", t: "Namasté, Sultan. Tu prends parti pour mon rival du nord sur la question de la crête. Le karma note tout, tu sais." },
       { s: "sultan", t: "Je prends parti pour l'équilibre, Gourou. Et l'équilibre, ces temps-ci, penche du côté de ceux qui m'achètent des faucons de fer." },
-      { s: "yogi", t: "Toujours le marchand. Ici on médite avant de frapper. Toi tu factures avant de servir." },
+      { s: "gourou", t: "Toujours le marchand. Ici on médite avant de frapper. Toi tu factures avant de servir." },
       { s: "sultan", t: "Médite tant que tu veux : quand je frappe le sol, même ta vache sacrée s'arrête de mâcher." },
-      { s: "yogi", t: "Elle s'arrête par politesse, pas par peur. Servons, et respirons." }
+      { s: "gourou", t: "Elle s'arrête par politesse, pas par peur. Servons, et respirons." }
     ],
     win: [
       { s: "sultan", t: "Ton calme est une belle chose, Gourou. Mon Séisme est une chose plus lourde. Nul rancune : namasté à mon tour." },
-      { s: "yogi", t: "Une secousse passe, la montagne reste. Tu as gagné le point, pas le sommet." }
+      { s: "gourou", t: "Une secousse passe, la montagne reste. Tu as gagné le point, pas le sommet." }
     ],
     lose: [
-      { s: "yogi", t: "La sérénité use le tonnerre. Ton talon a fatigué avant mon souffle, ami du détroit." },
+      { s: "gourou", t: "La sérénité use le tonnerre. Ton talon a fatigué avant mon souffle, ami du détroit." },
       { s: "sultan", t: "Tu médites bien, mais tu ne possèdes pas de pont entre deux mondes. Moi si. On se retrouvera." }
     ]
   },
   {
     act: 2, title: "Les amis du détroit gelé", sub: "Bosforie–Bourassie · S-400, corridor & manœuvres croisées",
-    left: "sultan", right: "vladou", terrain: 0, mode: "volley", ai: 2, doped: null,
+    left: "sultan", right: "volkoi", terrain: 0, mode: "volley", ai: 2, doped: null,
     pre: [
       { s: "narrator", t: "Place Écarlate sous la neige. Le canon d'apparat tonne au loin. Deux hommes qui se vendent des armes le matin et se marchent dessus l'après-midi." },
-      { s: "vladou", t: "Sultan. Tu m'achètes mes défenses, puis tu envoies tes faucons de fer contre mes amis. Curieuse amitié." },
+      { s: "volkoi", t: "Sultan. Tu m'achètes mes défenses, puis tu envoies tes faucons de fer contre mes amis. Curieuse amitié." },
       { s: "sultan", t: "La meilleure sorte, Tsar : celle où chacun sait exactement combien l'autre lui coûte. Tu gèles le camp, je fais trembler le sol. À forces égales." },
-      { s: "vladou", t: "L'hiver travaille pour moi. Ici, ton talon frappe la glace : il glisse. Il ne tremble pas." },
+      { s: "volkoi", t: "L'hiver travaille pour moi. Ici, ton talon frappe la glace : il glisse. Il ne tremble pas." },
       { s: "sultan", t: "La glace se fissure aussi, Tsar. Demande à ton corridor. Je contrôle le détroit par où passe ton blé." },
-      { s: "vladou", t: "Le grain, le gaz, les mercenaires… on se doit trop de choses pour se détester. Sers, marchand de ponts." }
+      { s: "volkoi", t: "Le grain, le gaz, les mercenaires… on se doit trop de choses pour se détester. Sers, marchand de ponts." }
     ],
     win: [
       { s: "sultan", t: "Même sur ta glace, la terre m'obéit. Bon partenariat, Tsar : je garde tes défenses, tu gardes ta rancune." },
-      { s: "vladou", t: "Un revers sans conséquence. Nous rejouerons. Nous rejouons toujours, toi et moi. C'est notre malédiction." }
+      { s: "volkoi", t: "Un revers sans conséquence. Nous rejouerons. Nous rejouons toujours, toi et moi. C'est notre malédiction." }
     ],
     lose: [
-      { s: "vladou", t: "La glace a eu ton talon. Le froid gagne à la patience, l'agitation perd au bruit." },
+      { s: "volkoi", t: "La glace a eu ton talon. Le froid gagne à la patience, l'agitation perd au bruit." },
       { s: "sultan", t: "Une manche pour l'hiver. Mais c'est mon détroit qui décide quand ton blé sort. Souviens-t'en." }
     ]
   },
   {
     act: 2, title: "La route de la soie et du silence", sub: "Bosforie–Panguo · peuples cousins, gros contrats",
-    left: "sultan", right: "panda", terrain: 4, mode: "volley", ai: 2, doped: null,
+    left: "sultan", right: "timonier", terrain: 4, mode: "volley", ai: 2, doped: null,
     pre: [
       { s: "narrator", t: "Cité du Matin. Lanternes rouges, lions de pierre, toits d'or. Deux empereurs se jaugent au-dessus d'un carnet de commandes très épais." },
-      { s: "panda", t: "Sultan. Tu te dis protecteur des peuples cousins de mes provinces de l'ouest. Puis tu signes mes contrats de la Route. Le tempo te contredit." },
+      { s: "timonier", t: "Sultan. Tu te dis protecteur des peuples cousins de mes provinces de l'ouest. Puis tu signes mes contrats de la Route. Le tempo te contredit." },
       { s: "sultan", t: "Un empire sait quand parler fort et quand compter bas, Timonier. Sur le terrain, au moins, je frappe franc." },
-      { s: "panda", t: "Franc et bruyant. Ma Grande Muraille montera au milieu de ton camp. Elle n'a pas besoin de trembler pour tenir." },
+      { s: "timonier", t: "Franc et bruyant. Ma Grande Muraille montera au milieu de ton camp. Elle n'a pas besoin de trembler pour tenir." },
       { s: "sultan", t: "Ma bannière pourpre a régné quand ta muraille n'arrêtait déjà plus rien. Le talon d'abord, le tempo ensuite." },
-      { s: "panda", t: "L'orgueil est un bruit. L'harmonie est un silence. Servons, et écoutons lequel dure." }
+      { s: "timonier", t: "L'orgueil est un bruit. L'harmonie est un silence. Servons, et écoutons lequel dure." }
     ],
     win: [
       { s: "sultan", t: "Ta muraille a tremblé, Timonier. Belle pierre, mauvaises fondations. Le carrefour du monde reste chez moi." },
-      { s: "panda", t: "Le tempo se rétablira. Il se rétablit toujours. Va compter tes péages, marchand de ponts." }
+      { s: "timonier", t: "Le tempo se rétablira. Il se rétablit toujours. Va compter tes péages, marchand de ponts." }
     ],
     lose: [
-      { s: "panda", t: "La muraille contient le tonnerre comme elle contient les steppes. Patiemment. Définitivement." },
+      { s: "timonier", t: "La muraille contient le tonnerre comme elle contient les steppes. Patiemment. Définitivement." },
       { s: "sultan", t: "Une muraille finit toujours par avoir deux côtés, Timonier. Je reviendrai par l'autre." }
     ]
   },
@@ -155,21 +155,21 @@ const STORY_SULTAN = [
   // ============ ACTE III — Conflits ouverts (Bombe) ============
   {
     act: 3, title: "La porte de l'Union", sub: "Bosforie–Gallardie · adhésion, détroit & Méditerranée",
-    left: "sultan", right: "micron", terrain: 5, mode: "bomb", ai: 2, doped: null,
+    left: "sultan", right: "cygne", terrain: 5, mode: "bomb", ai: 2, doped: null,
     pre: [
       { s: "narrator", t: "Pont des Deux Mondes. La balle est une bombe à mèche. Sous le pont glissent les barques ; au-dessus, le tapis volant traverse le ciel du soir." },
       { s: "sultan", t: "Bienvenue chez moi, Cygne. Entre deux continents, sur MON pont. Trente ans que je frappe à votre porte. Ce soir je la défonce au smash." },
-      { s: "micron", t: "En même temps, cher Sultan, une porte, ça respecte des critères. On ne défonce pas l'état de droit à coups de talon." },
+      { s: "cygne", t: "En même temps, cher Sultan, une porte, ça respecte des critères. On ne défonce pas l'état de droit à coups de talon." },
       { s: "sultan", t: "L'état de droit ! Pendant que vous délibérez en Méditerranée, moi je fais des forages, des drones, des faits accomplis." },
-      { s: "micron", t: "En même temps il faut du dialogue, et en même temps il faut des limites. Cette bombe, par exemple : ne la gardez pas de votre côté." },
+      { s: "cygne", t: "En même temps il faut du dialogue, et en même temps il faut des limites. Cette bombe, par exemple : ne la gardez pas de votre côté." },
       { s: "sultan", t: "Je ne garde rien, technocrate. Je renvoie. Toujours. Et je fais trembler le pont sous tes pieds bien élevés." }
     ],
     win: [
       { s: "sultan", t: "Boum, de ton côté, sur mon détroit. Un jour, Cygne, c'est ton Union qui demandera à entrer chez MOI." },
-      { s: "micron", t: "Reconnaissons-le : de la puissance, et une vraie détente au talon. On reparlera des critères. En même temps." }
+      { s: "cygne", t: "Reconnaissons-le : de la puissance, et une vraie détente au talon. On reparlera des critères. En même temps." }
     ],
     lose: [
-      { s: "micron", t: "Critères respectés, bombe renvoyée, victoire accordée. La procédure a du bon, voyez-vous." },
+      { s: "cygne", t: "Critères respectés, bombe renvoyée, victoire accordée. La procédure a du bon, voyez-vous." },
       { s: "sultan", t: "Tu gagnes le match, pas le détroit. Je reste sur le pas de ta porte. Debout. Et j'ouvre ou je ferme le robinet quand je veux." }
     ]
   },

@@ -87,7 +87,7 @@ opposé. Le moteur les joue toutes (`walkPhase % 4`).
 ## Étape 3 — Génération (Gemini)
 
 Template de prompt = **A (style) + B (perso) + POSE + C (négatif)** — voir
-`raw/vladou/prompts.md` comme référence complète ; pour un nouveau perso,
+`raw/volkoi/prompts.md` comme référence complète ; pour un nouveau perso,
 copier cette structure dans `raw/<key>/prompts.md`.
 
 Une image à la fois ; après une bonne `idle_face_0`, la mettre en **référence**

@@ -5,7 +5,7 @@
 function spawnSand(x, y, n) {
   if (noFx) return;
   const tkey = TERRAINS[terrain].key;
-  const col = tkey === "neige" ? "#eef4fa" : tkey === "prairie" ? "#8fbf4a"
+  const col = tkey === "place-ecarlate" ? "#eef4fa" : tkey === "palais-du-coq" ? "#8fbf4a"
             : "#c9a24f";
   for (let i = 0; i < n; i++) particles.push({
     type: "sand",

@@ -25,8 +25,10 @@ Canvas logique 900×500 · sol GROUND_Y=418 · filet NET_X=450, sommet NET_TOP=2
 Perso debout ≈ 110 px · court attendu dans le TIERS BAS de l'image
 ```
 
-Mapping `TERRAINS.key` → dossier `assets/maps/` : neige→vladou, plage→trompette,
-prairie→micron, parade→bebe ; matin/bosphore/ashram/amazon/colline = même nom.
+`TERRAINS.key` = dossier `assets/maps/<key>/` (noms officiels) :
+`place-ecarlate`, `country-club-dore`, `palais-du-coq`, `esplanade-du-defile`,
+`cite-du-matin`, `pont-des-deux-mondes`, `stade-ashram`, `grande-foret`,
+`citadelle-du-levant`, `jardin-des-roses`.
 
 ## Règle d'or Steam (lire AVANT de rédiger un theme / prompt)
 
@@ -92,7 +94,7 @@ code** avant l'image — c'est ce qui alimente le prompt et l'intégration :
    `"props": ["net_post","flag","<event>"]` + `"event": "<event>"` (relais vers
    `sommet-decor`).
 4. **Copier la map de référence** hors repo pour la joindre dans Gemini :
-   `cp assets/maps/micron/skyline.png ~/Downloads/JOINDRE_ref_style_map.png`.
+   `cp assets/maps/palais-du-coq/skyline.png ~/Downloads/JOINDRE_ref_style_map.png`.
 
 (Le reste du câblage — `TERRAINS`, `MAP_LAYOUT`, loader — se fait à l'étape 2,
 une fois l'image en main.)
@@ -157,7 +159,7 @@ aucun texte, aucun logo, aucun symbole religieux.
 > **composite** + une blacklist **nommée**. Leçon Place Écarlate (2026-07) :
 > 2 gens refusées pour Saint-Basile + Zamboni + « patinoire ».
 
-Map de référence par défaut : `assets/maps/micron/skyline.png` (≈16:9, bon
+Map de référence par défaut : `assets/maps/palais-du-coq/skyline.png` (≈16:9, bon
 cadrage). Thèmes des nations : `tools/genassets/casting.py` (doivent déjà être
 sécures — sinon les corriger à l'étape 0).
 

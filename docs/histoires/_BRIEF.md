@@ -87,7 +87,7 @@ Pour CHAQUE rencontre, un bloc au format `src/story.js` (données JS, prêtes à
 - `left` = TOUJOURS ce perso (le protagoniste). `right` = le rival.
 - `terrain` = souvent la map du rival OU une map neutre thématique (idx dans le tableau ci-dessus).
 - `ai` monte au fil des actes (0→3). `doped: "R"` sur 1-2 gros adversaires d'Acte III.
-- `s` = clé perso (`vladou`, `micron`, …) ou `"narrator"`.
+- `s` = clé perso (`volkoi`, `cygne`, …) ou `"narrator"`.
 - **Dialogues riches** : 4-6 répliques en `pre`, 2-3 en `win`/`lose`. Drôles, mordants,
   référencés (géopolitique transposée + éléments de jeu : le super, l'event, le décor,
   le drapeau). Chaque voix doit être caractérisée (le Baron se vante, le Cygne fait du

@@ -15,9 +15,9 @@ function drawCharacter(b) {
     ? (typeof drawSpriteCharMenu === "function" && drawSpriteCharMenu(b))
     : (typeof drawSpriteChar === "function" && drawSpriteChar(b));
   if (!sprited) {
-    if (key === "vladou") drawVladou(b);
-    else if (key === "trompette") drawTrompette(b);
-    else if (key === "micron") drawMicron(b);
+    if (key === "volkoi") drawVladou(b);
+    else if (key === "dorf") drawTrompette(b);
+    else if (key === "cygne") drawMicron(b);
     else if (key === "bebe") drawBebe(b);
     else drawGenericChar(b);
   }
@@ -237,7 +237,7 @@ function drawCharSuperFX(b) {
   const x1 = b.side === 0 ? W : NET_X;
   const span = Math.max(1, x1 - x0);
 
-  if (key === "vladou") {
+  if (key === "volkoi") {
     ctx.save();
     ctx.globalAlpha = 0.22 * fade;
     const wash = ctx.createLinearGradient(x0, GROUND_Y, x0, GROUND_Y - 140);
@@ -257,7 +257,7 @@ function drawCharSuperFX(b) {
       ctx.beginPath(); ctx.arc(fx, fy, 3.5, 0, Math.PI * 2); ctx.fill();
     }
     ctx.restore();
-  } else if (key === "trompette") {
+  } else if (key === "dorf") {
     const wallX = b.side === 0 ? NET_X + (W - NET_X) * 0.52 : NET_X * 0.48;
     const top = GROUND_Y - 108;
     ctx.save();
