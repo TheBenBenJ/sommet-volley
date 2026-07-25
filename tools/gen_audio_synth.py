@@ -128,7 +128,7 @@ MAP_THEMES: dict[str, dict] = {
         "bpm": 112, "root": 57, "scale": [0, 2, 4, 5, 7, 9, 11],
         "inst": "square", "motif": [0, 4, 7, 4, 9, 7, 4, 0], "vol": 0.14,
     },
-    "palais-du-coq": {
+    "palais-gallard": {
         "bpm": 118, "root": 62, "scale": [0, 2, 4, 5, 7, 9, 11],
         "inst": "triangle", "motif": [0, 2, 4, 5, 7, 5, 4, 2], "vol": 0.15,
     },

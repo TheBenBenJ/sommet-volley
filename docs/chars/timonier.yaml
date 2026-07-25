@@ -2,12 +2,12 @@
 key: timonier
 name: "Le Grand Timonier"
 nation: "Panguo"
-pays_theme: "Panguo — cité du matin, muraille"
+pays_theme: "Panguo — cité du matin, remparts"
 silhouette: "visage rond âgé / bajoues, front haut, cheveux noirs peignés en arrière (PAS coupe au bol), veste Zhongshan anthracite 4 poches, pin rouge"
 palette: ["#c62828", "#8e0000", "#212121"]
 stats: { vitesse: 3, detente: 3, puissance: 3, controle: 5 }
 trait_passif: "Mur invisible — contrôle max"
 super:
-  nom: "Grande Muraille"
+  nom: "Le Rempart"
   effet: "mur camp adverse ~5 s"
 map: "Cité du Matin"

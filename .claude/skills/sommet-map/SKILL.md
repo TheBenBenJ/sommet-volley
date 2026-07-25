@@ -26,7 +26,7 @@ Perso debout ≈ 110 px · court attendu dans le TIERS BAS de l'image
 ```
 
 `TERRAINS.key` = dossier `assets/maps/<key>/` (noms officiels) :
-`place-ecarlate`, `country-club-dore`, `palais-du-coq`, `esplanade-du-defile`,
+`place-ecarlate`, `country-club-dore`, `palais-gallard`, `esplanade-du-defile`,
 `cite-du-matin`, `pont-des-deux-mondes`, `stade-ashram`, `grande-foret`,
 `citadelle-du-levant`, `jardin-des-roses`.
 
@@ -51,7 +51,7 @@ Anti-landmarks à injecter selon l'archétype (exemples, pas exhaustif) :
 | Archétype / nation | Interdits NOMBRÉS (à écrire dans prompt + theme) |
 |--------------------|--------------------------------------------------|
 | Bourassie / place-ecarlate | Saint-Basile, Kremlin, Place Rouge, coupoles rayées/spiralées multicolores |
-| Gallardie / palais-du-coq | Tour Eiffel, Arc de Triomphe, Notre-Dame |
+| Gallardie / palais-gallard | Tour Eiffel, Arc de Triomphe, Notre-Dame |
 | Doria / country-club-dore | Maison Blanche, Capitol, Statue de la Liberté |
 | Ryonganie / esplanade-du-defile | portraits géants de dirigeants, sceaux d'État |
 | Panguo / cite-du-matin | Cité Interdite réelle, Muraille identifiable |
@@ -94,7 +94,7 @@ code** avant l'image — c'est ce qui alimente le prompt et l'intégration :
    `"props": ["net_post","flag","<event>"]` + `"event": "<event>"` (relais vers
    `sommet-decor`).
 4. **Copier la map de référence** hors repo pour la joindre dans Gemini :
-   `cp assets/maps/palais-du-coq/skyline.png ~/Downloads/JOINDRE_ref_style_map.png`.
+   `cp assets/maps/palais-gallard/skyline.png ~/Downloads/JOINDRE_ref_style_map.png`.
 
 (Le reste du câblage — `TERRAINS`, `MAP_LAYOUT`, loader — se fait à l'étape 2,
 une fois l'image en main.)
@@ -159,7 +159,7 @@ aucun texte, aucun logo, aucun symbole religieux.
 > **composite** + une blacklist **nommée**. Leçon Place Écarlate (2026-07) :
 > 2 gens refusées pour Saint-Basile + Zamboni + « patinoire ».
 
-Map de référence par défaut : `assets/maps/palais-du-coq/skyline.png` (≈16:9, bon
+Map de référence par défaut : `assets/maps/palais-gallard/skyline.png` (≈16:9, bon
 cadrage). Thèmes des nations : `tools/genassets/casting.py` (doivent déjà être
 sécures — sinon les corriger à l'étape 0).
 

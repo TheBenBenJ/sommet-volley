@@ -11,7 +11,7 @@ Process : [`docs/PIPELINE-MAP.md`](../../../docs/PIPELINE-MAP.md) · template
 5. Après `skyline`, uploade-le en **référence** pour far / crowd / thumb.
 6. Props : fond **blanc pur #FFFFFF**, pas d’ombre au sol.
 7. Ne pas citer de vrai nom de dirigeant ni de monument sous son vrai nom commercial.
-8. Nomme : `raw/maps/palais-du-coq/<nom>.png` — cutout props only (pas skyline/far/thumb).
+8. Nomme : `raw/maps/palais-gallard/<nom>.png` — cutout props only (pas skyline/far/thumb).
 
 ---
 

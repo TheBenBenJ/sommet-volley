@@ -10,7 +10,7 @@ Son surnom lui vient du **safran**, cet or végétal que ses hautes terres produ
 
 De ce culte de la lenteur est né son fameux super, le **Voile d'Or**. Là où le Tsar Volkoï gèle brutalement et où le Gourou endort par le zen, Le Safran, lui, se contente de **ralentir** le camp adverse : il déploie sur la moitié ennemie un voile de poussière dorée, une lumière de fin d'après-midi, et soudain l'air s'épaissit comme du miel de printemps. « Je ne vous immobilise pas, murmure-t-il alors. Je vous rends à votre vraie vitesse. Vous découvrirez que ce n'est pas la mienne. » Ses adversaires patinent au ralenti dans la lumière ambrée pendant qu'il place, tranquillement, la balle là où ils ne seront jamais à temps. C'est un super profondément sardonique : il ne punit pas, il souligne.
 
-Politiquement, Le Safran est le grand isolé du roster — et il l'a choisi, jure-t-il, longtemps avant qu'on le lui impose. Depuis des années, le **Baron Dorf** l'étouffe sous une muraille de sanctions et d'embargos qu'il appelle, avec la subtilité qui le caractérise, sa « pression maximale ». Le Safran encaisse chaque tour de vis avec le même haussement d'épaule poli : « Le Baron construit des murs d'or ; moi, je cultive des roses. Devinez lequel des deux nourrit ses gens en hiver. » Sous la roseraie, dit la rumeur, s'étend un labyrinthe d'ateliers et d'alambics où l'on distille, goutte à goutte, une essence dont personne ne connaît tout à fait la nature — assez, en tout cas, pour que le monde entier passe ses nuits à en calculer la concentration.
+Politiquement, Le Safran est le grand isolé du roster — et il l'a choisi, jure-t-il, longtemps avant qu'on le lui impose. Depuis des années, le **Baron Dorf** l'étouffe sous un rempart de sanctions et d'embargos qu'il appelle, avec la subtilité qui le caractérise, sa « pression maximale ». Le Safran encaisse chaque tour de vis avec le même haussement d'épaule poli : « Le Baron construit des murs d'or ; moi, je cultive des roses. Devinez lequel des deux nourrit ses gens en hiver. » Sous la roseraie, dit la rumeur, s'étend un labyrinthe d'ateliers et d'alambics où l'on distille, goutte à goutte, une essence dont personne ne connaît tout à fait la nature — assez, en tout cas, pour que le monde entier passe ses nuits à en calculer la concentration.
 
 Il y eut bien, jadis, **l'Accord** : ce grand traité arraché à l'usure, où Le Cygne, en négociateur épuisé, crut avoir enfin refermé les alambics contre la levée des sanctions. Le Safran en garde un souvenir attendri et un peu cruel. « On a passé des nuits, Le Cygne et moi, à peser des grammes et des virgules. En même temps, comme il dit. Puis le Baron a déchiré la feuille, et il ne restait plus que le thé froid. » Depuis, chaque fois qu'un émissaire lui parle de « revenir à la table », Le Safran désigne poliment le jardin : la table est toujours là, dit-il, ce sont les convives qui manquent de suite dans les idées.
 
@@ -122,12 +122,12 @@ Car c'est là, au fond, tout Le Safran : un joueur qui a compris que dans un mon
     { s: "safran", t: "Elles devraient s'admirer. Mais admirons-nous en jouant : voyons quelle patience place la balle en premier. Voile d'Or." }
   ],
   win:  [
-    { s: "safran", t: "Deux muraille de patience, et c'est la mienne qui a tenu. Continuez d'acheter, Timonier. Le safran monte encore." },
+    { s: "safran", t: "Deux remparts de patience, et c'est la mienne qui a tenu. Continuez d'acheter, Timonier. Le safran monte encore." },
     { s: "timonier", t: "Un revers mineur dans un très long calendrier. J'ai le temps. Toi aussi. On se revend ça demain." },
     { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ],
   lose:  [
-    { s: "timonier", t: "Le tempo, toujours le tempo. Ma muraille était plus lente que ton voile, et plus haute." },
+    { s: "timonier", t: "Le tempo, toujours le tempo. Mon rempart était plus lent que ton voile, et plus haut." },
     { s: "safran", t: "Belle patience, client fidèle. Vous gagnez le set ; moi je garde le contrat. Chacun son or." },
     { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ]

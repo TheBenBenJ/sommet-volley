@@ -114,7 +114,7 @@ function maybeActivateSuper(blob, input) {
     // Voile d’Or : ralentit les courses (pas de glisse)
     superEffects.push({ kind: "slow", side: 1 - blob.side, t: blob.superT });
   } else if (a.key === "dorf" || a.key === "timonier" || a.key === "capitaine") {
-    // Le Mur / Grande Muraille / Déforestation
+    // Le Mur / Le Rempart / Déforestation
     superEffects.push({ kind: "wall", side: 1 - blob.side, t: blob.superT });
   } else if (a.key === "cygne") {
     // Passage en Force : frappes immunisées + punch (voir trySmashBall / applyDirectedHit)

@@ -14,7 +14,7 @@ Ce mot est aussi le nom de son super. Sur le court, quand la pression monte, Le 
 
 Sa carrière politique, il l'a bâtie comme il bâtit ses murs : à la hache, sans plan. Longtemps député de dernier rang qui n'existait que pour ses phrases-chocs, il a surfé sur la colère, la nostalgie des bottes cirées et une saine détestation de tout ce qui ressemble à un intellectuel. Il a promis de « nettoyer », de « déboiser la corruption » (l'ironie ne l'a jamais effleuré), d'ouvrir la Grande Forêt aux affaires, aux tronçonneuses, aux éleveurs, aux orpailleurs, à « ceux qui travaillent ». Élu par surprise et par saturation, il a gouverné comme il joue au volley : en fonçant, en insultant l'arbitre, et en construisant des murs quand le score le contrarie.
 
-Ses obsessions sont connues jusqu'au dernier village de pilotis. Il déteste **Le Cygne** de Gallardie plus que tout au monde — ce **technocrate lisse** venu d'Europe qui ose lui expliquer, depuis son palais à obélisque, comment gérer *sa* forêt. Quand le ciel de la Grande Forêt rougeoie (des feux, dit Le Cygne ; « du barbecue », répond Le Capitaine), les deux hommes s'écharpent par communiqués, par piques, par memes. Le Cygne parle biodiversité, poumon de la planète, sommets climatiques ; Le Capitaine répond « souveraineté », « colonialisme vert » et « occupez-vous de votre coq ». Leur rivalité est devenue le grand feuilleton des Jeux du Sommet — et sur le court, elle ne se règle plus au volley : elle se règle à la **bombe**.
+Ses obsessions sont connues jusqu'au dernier village de pilotis. Il déteste **Le Cygne** de Gallardie plus que tout au monde — ce **technocrate lisse** venu de Gallardie qui ose lui expliquer, depuis son palais à obélisque, comment gérer *sa* forêt. Quand le ciel de la Grande Forêt rougeoie (des feux, dit Le Cygne ; « du barbecue », répond Le Capitaine), les deux hommes s'écharpent par communiqués, par piques, par memes. Le Cygne parle biodiversité, poumon de la planète, sommets climatiques ; Le Capitaine répond « souveraineté », « colonialisme vert » et « occupez-vous de votre palais ». Leur rivalité est devenue le grand feuilleton des Jeux du Sommet — et sur le court, elle ne se règle plus au volley : elle se règle à la **bombe**.
 
 Pour le reste, Le Capitaine a des amis étranges et des ennemis logiques. Il adore **Baron Dorf**, le magnat doré du Nord, dont il copie les casquettes, les majuscules et la haine des journalistes ; il respecte les hommes forts — le **Sultan**, le **Faucon**, le **Gourou** — cette fraternité mondiale des menton-levés qui se retrouvent dans les couloirs pour se plaindre ensemble de la presse. Il fait des affaires avec **le Timonier** de Panguo, lui vend son soja et son minerai, tout en jurant en privé que « le communiste va nous manger tout crus ». Il n'aime pas les leçons, les traités, les ONG, ni les gens qui prononcent le mot « durable ».
 
@@ -170,7 +170,7 @@ Sous la vanne, il y a un joueur redoutable. Rustre, oui. Imprévisible, oui. Mai
     { s: "timonier", t: "Une explosion de bruit, rien de plus. L'histoire retiendra le tempo, pas les cris. Je patiente encore." }
   ],
   lose:  [
-    { s: "timonier", t: "Tu accuses, tu t'agites, tu perds. La muraille au milieu de ton camp t'a coûté la mèche. Silence, maintenant." },
+    { s: "timonier", t: "Tu accuses, tu t'agites, tu perds. Le rempart au milieu de ton camp t'a coûté la mèche. Silence, maintenant." },
     { s: "capitaine", t: "Explosé par le type que j'ai insulté toute la semaine ET à qui je dois du fric ! Vie compliquée, mon frère." }
   ]
 },
@@ -196,12 +196,12 @@ Sous la vanne, il y a un joueur redoutable. Rustre, oui. Imprévisible, oui. Mai
   ]
 },
 {
-  act: 3, title: "La forêt en feu", sub: "Grande Forêt · Amazonie contre le Cygne · le grand duel",
+  act: 3, title: "La forêt en feu", sub: "Grande Forêt · Tropicalia contre le Cygne · le grand duel",
   left: "capitaine", right: "cygne", terrain: 7, mode: "bomb", ai: 3, doped: "R",
   pre:  [
     { s: "narrator", t: "Grande Forêt. Terre rouge, huttes sur pilotis, canopée dorée — et à l'horizon, une lueur : des feux, ou « du barbecue », selon qui parle. La bombe est là. Le grand feuilleton des Jeux se joue ce soir." },
     { s: "cygne", t: "Votre forêt brûle, Capitaine, et c'est le poumon de la planète entière. Je viens défendre ce que vous laissez partir en fumée. En même temps." },
-    { s: "capitaine", t: "MA forêt, Cygne. La MIENNE. Occupe-toi de ton coq héraldique et de ton obélisque. Ici on plante, on coupe, on vit. C'est pas ton jardin." },
+    { s: "capitaine", t: "MA forêt, Cygne. La MIENNE. Occupe-toi de ton emblème doré et de ton obélisque. Ici on plante, on coupe, on vit. C'est pas ton jardin." },
     { s: "cygne", t: "Le colonialisme vert, dites-vous ? Non. La responsabilité. En même temps, on peut protéger ET dialoguer. Ce soir, ce sera surtout se battre." },
     { s: "narrator", t: "Regardez ses yeux. Le premier de la classe s'est dopé pour ce match. L'aura rouge du Cygne éclaire la canopée. Ce n'est plus de la diplomatie — c'est une guerre de troncs." },
     { s: "capitaine", t: "Tu t'es shooté pour venir dans MA jungle me faire la leçon ? Parfait. TRONÇONNEUSE ! Un mur de troncs entre toi et le sol, et on cause plus. On smashe." }

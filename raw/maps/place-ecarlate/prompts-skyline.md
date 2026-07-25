@@ -1,6 +1,6 @@
 # Place Écarlate (`neige` → pack `volkoi`) — prompt skyline Gemini
 
-Joindre : `~/Downloads/JOINDRE_ref_style_map.png` (= `assets/maps/palais-du-coq/skyline.png`).
+Joindre : `~/Downloads/JOINDRE_ref_style_map.png` (= `assets/maps/palais-gallard/skyline.png`).
 Ratio **16:9 strict** (ex. 1920×1080). Template skill `sommet-map` (sécure Steam).
 
 ---

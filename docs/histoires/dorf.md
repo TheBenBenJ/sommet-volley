@@ -38,7 +38,7 @@ Au fond — mais il ne l'avouera jamais, et si vous le citez il dira que c'est *
 
 ```js
 {
-  act: 1, title: "L'Alliance qui coûte cher", sub: "OTAN élargie · double contre le Cygne",
+  act: 1, title: "L'Alliance qui coûte cher", sub: "Alliance élargie · double contre le Cygne",
   left: "dorf", right: "cygne", ally: "faucon", right2: "volkoi", terrain: 1, mode: "2v2", ai: 0, doped: null,
   pre:  [
     { s: "narrator", t: "Resort doré. Aujourd'hui l'Alliance joue en double : le Baron et le Faucon d'un côté, le Cygne et le Tsar de l'autre. Personne n'avait prévu ce tableau." },
@@ -84,7 +84,7 @@ Au fond — mais il ne l'avouera jamais, et si vous le citez il dira que c'est *
   act: 1, title: "Le grand show", sub: "Doria–Bharatie · deux vendeurs, une vache",
   left: "dorf", right: "gourou", terrain: 6, mode: "volley", ai: 1, doped: null,
   pre:  [
-    { s: "narrator", t: "Stade Ashram, grès couleur miel, guirlandes de soucis. Une vache sacrée traverse le court avec la sérénité d'un arbitre neutre." },
+    { s: "narrator", t: "Stade Ashram, grès couleur miel, guirlandes de soucis. Une vache qui traverse traverse le court avec la sérénité d'un arbitre neutre." },
     { s: "dorf", t: "Regarde cette foule ! Immense ! On dit que tu remplis les stades. Moi aussi je remplis les stades. On devrait faire un stade ensemble. Le plus grand." },
     { s: "gourou", t: "Namasté, Baron. Toi tu vends des tours ; moi je vends du souffle. Devine lequel des deux ne tombe jamais en faillite." },
     { s: "dorf", t: "La faillite ! Six fois ! Sept ! Et je suis toujours là, plus doré que jamais. C'est ça, un vrai champion." },

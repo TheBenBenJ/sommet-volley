@@ -12,7 +12,7 @@ NET_TOP=233 (poteau ~185 px) · perso debout ~110 px.
 
 Usage :
   python3 tools/genassets/map_fit.py <skyline.png> [baselineFromBottom] [--full]
-  python3 tools/genassets/map_fit.py assets/maps/palais-du-coq/skyline.png 43
+  python3 tools/genassets/map_fit.py assets/maps/palais-gallard/skyline.png 43
   python3 tools/genassets/map_fit.py raw/maps/bosforie/skyline.png --auto
 Sortie : <skyline>_fit.png (aperçu 900x500).
 """

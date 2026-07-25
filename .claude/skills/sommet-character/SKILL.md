@@ -41,30 +41,39 @@ TOUS les persos, ex. `assets/cygne/`) :
 FIGE le perso sur cette image en jeu — pire que rien (sans sprites, le moteur
 tombe sur le blob canvas animé). Générer les 27, ou aucun.
 
-### Cycle `walk` — 4 frames distinctes (LE point qui rate le plus souvent)
+### Cycle `walk` — 4 frames DISTINCTES (LE point qui rate le plus souvent)
 
 Le moteur charge `walk_0..3` (`manifest.anims.walk: 4`, défaut code aussi **4**)
 et avance `walkPhase` d'1 toutes les 6 ticks → les 4 images sont jouées en boucle.
+Si les 4 se ressemblent → marche « gelée » / tremblote : **rejeter**.
 
-**Générer le lot `walk` ensemble** (4 frames), chaque frame avec sa propre
-description de jambes (ne JAMAIS écrire « walking » 4 fois) :
+**Générer le lot `walk` ensemble** (4 frames). Chaque frame a sa propre
+description de jambes — **ne JAMAIS** écrire « walking pose » / « mid-stride »
+identique 4 fois. Exagérer le cartoon (jambes bien écartées vs collées).
 
-| frame | `<POSE JAMBES>` (vue de côté, face à DROITE) — obligatoire |
-|-------|-----------------------------------------------------------|
-| `walk_0` | `LEFT foot planted flat forward, right leg stretched back behind, clear stride, right arm swung forward` |
-| `walk_1` | `both legs close together passing under the body mid-step, feet nearly together, arms near neutral` |
-| `walk_2` | `RIGHT foot planted flat forward, left leg stretched back (mirror of walk_0), left arm swung forward` |
-| `walk_3` | `both legs close together passing under the body, arms opposite to walk_1` |
+| frame | rôle | `<POSE JAMBES>` (vue de côté, face à DROITE) — obligatoire VERBATIM |
+|-------|------|---------------------------------------------------------------------|
+| `walk_0` | **APPUI A** | `WIDE stride: LEFT foot planted FLAT far FORWARD, RIGHT leg stretched far BACK (toe down), clear gap between feet, RIGHT arm swung FORWARD, left arm back` |
+| `walk_1` | **PASSAGE** | `PASSING pose ONLY: BOTH legs CLOSE together under the body, feet nearly SIDE-BY-SIDE / overlapping silhouette, knees soft, NOT a wide stride, arms near torso (neutral)` |
+| `walk_2` | **APPUI B** | `WIDE stride MIRROR of walk_0: RIGHT foot planted FLAT far FORWARD, LEFT leg stretched far BACK, clear gap between feet, LEFT arm swung FORWARD, right arm back` |
+| `walk_3` | **PASSAGE** | `PASSING pose again: legs CLOSE together under body (like walk_1), but arms OPPOSITE to walk_1; still NOT a wide stride` |
 
-🚫 **INTERDIT dans les 4 frames walk** : pose debout/immobile, pieds côte à côte au
-repos, geste de bras signature (pouce levé, salut, bras croisés), saut.
+🚫 **INTERDIT** :
+- 4× le même demi-pas (le défaut n°1) — si `walk_0`≈`walk_1`≈`walk_2`≈`walk_3` → **rejeter le lot**
+- `walk_1` / `walk_3` en stride large (pieds écartés) — ce n'est PAS un passage
+- `walk_0` et `walk_2` avec le **même** pied devant
+- pose idle / debout / geste signature / saut
 
-✅ **QA walk OBLIGATOIRE avant d'intégrer** :
-1. `walk_0` et `walk_2` = pieds **OPPOSÉS** (gauche devant vs droite devant).
-2. `walk_1` et `walk_3` = jambes **rapprochées** (passage), PAS une pose debout.
-3. Aucune des 4 n'est une pose statique/geste.
-→ Si un critère échoue, **regénérer le lot walk** (ou la frame fautive) via Codex
-avec la même référence `idle_1`. Contrôle : gauche→passage→droite→passage.
+✅ **QA walk OBLIGATOIRE** (ouvrir les 4 PNG côte à côte, ou `_contact.png`) :
+1. Silhouette `walk_0` ≠ `walk_2` : pied **gauche** devant vs pied **droit** devant (miroir).
+2. Silhouette `walk_1` et `walk_3` : jambes **collées** (écart pieds << stride) — si on voit un grand écart = échec.
+3. En lecture rapide 0→1→2→3→0 : on doit lire clairement **appui → passage → appui opposé → passage**.
+4. **Heuristique post-cutout** : largeur canvas `walk_1`/`walk_3` ≪ `walk_0`/`walk_2`
+   (ex. ~200 px vs ~380–400 px). Si les 4 largeurs sont proches → lot trop homogène, **rejeter**.
+→ Échec → **regénérer le lot walk** (ou frames fautives) via Codex, même `-i` ancre
+(`idle_1` de préférence). Prompt type : `raw/cygne/_regen_walk_fix.md` /
+`raw/<key>/_regen_walk_only.md` — forcer les mots `WIDE stride` / `PASSING` /
+`feet nearly SIDE-BY-SIDE` / `MIRROR`.
 
 Contraintes communes à TOUTES les frames : même personnage (même visage, coupe,
 **tenue exacte du casting / de l’ancre**), couleurs ; **vue de côté face à DROITE**

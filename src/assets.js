@@ -9,7 +9,7 @@ const SPRITES = {
   fxFlameHead: [null, null],           // overlays feu tête 0..1
   mapPlaceEcarlate: null,       // Place Écarlate (Volkoï)
   mapCountryClubDore: null,    // Country Club Doré (Dorf)
-  mapPalaisDuCoq: null,       // Palais du Coq (Cygne)
+  mapPalaisGallard: null,       // Palais Gallard (Cygne)
   mapEsplanadeDuDefile: null,         // Esplanade du Défilé (Bébé)
   mapCiteDuMatin: null,        // Cité du Matin (Timonier)
   mapPontDesDeuxMondes: null,     // Pont des Deux Mondes (Sultan)
@@ -57,7 +57,7 @@ function initSprites() {
   }
   initMapPlaceEcarlate();
   initMapCountryClubDore();
-  initMapPalaisDuCoq();
+  initMapPalaisGallard();
   initMapEsplanadeDuDefile();
   initMapCiteDuMatin();
   initMapStadeAshram();
@@ -108,7 +108,7 @@ function mapGrandeForetReady() {
   return !!(p && spriteReady(p.skyline));
 }
 
-/** Pack fond / props Palais du Bosphore (terrain Sultan). */
+/** Pack fond / props Pont des Deux Mondes (terrain Sultan). */
 function initMapPontDesDeuxMondes() {
   SPRITES.mapPontDesDeuxMondes = loadMapPack("pont-des-deux-mondes", {
     skyline: "skyline.png", band: "band.png", far: "far.png",
@@ -179,9 +179,9 @@ function mapCountryClubDoreReady() {
   return !!(p && spriteReady(p.skyline));
 }
 
-/** Pack fond / props Palais du Coq (terrain Micron). */
-function initMapPalaisDuCoq() {
-  SPRITES.mapPalaisDuCoq = loadMapPack("palais-du-coq", {
+/** Pack fond / props Palais Gallard (terrain Cygne). */
+function initMapPalaisGallard() {
+  SPRITES.mapPalaisGallard = loadMapPack("palais-gallard", {
     skyline: "skyline.png", band: "band.png", far: "far.png", crowd0: "crowd_0.png",
     flag: "flag.png", pigeon: "pigeon.png", warn: "warn.png",
     whistle: "whistle.png", marchers0: "marchers_0.png",
@@ -189,8 +189,8 @@ function initMapPalaisDuCoq() {
   });
 }
 
-function mapPalaisDuCoqReady() {
-  const p = SPRITES.mapPalaisDuCoq;
+function mapPalaisGallardReady() {
+  const p = SPRITES.mapPalaisGallard;
   return !!(p && spriteReady(p.skyline));
 }
 
@@ -220,8 +220,8 @@ function drawTerrainMenuThumb(terrainIdx, dx, dy, dw, dh) {
   if (t.key === "country-club-dore" && SPRITES.mapCountryClubDore && spriteReady(SPRITES.mapCountryClubDore.thumb)) {
     img = SPRITES.mapCountryClubDore.thumb;
   }
-  if (t.key === "palais-du-coq" && SPRITES.mapPalaisDuCoq && spriteReady(SPRITES.mapPalaisDuCoq.thumb)) {
-    img = SPRITES.mapPalaisDuCoq.thumb;
+  if (t.key === "palais-gallard" && SPRITES.mapPalaisGallard && spriteReady(SPRITES.mapPalaisGallard.thumb)) {
+    img = SPRITES.mapPalaisGallard.thumb;
   }
   if (t.key === "esplanade-du-defile" && SPRITES.mapEsplanadeDuDefile && spriteReady(SPRITES.mapEsplanadeDuDefile.thumb)) {
     img = SPRITES.mapEsplanadeDuDefile.thumb;

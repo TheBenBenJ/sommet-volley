@@ -287,7 +287,7 @@ function handlePadMenu() {
     if (padEdge("up")) handleMenuKeys("ArrowUp", "");
     if (padEdge("confirm")) handleMenuKeys("Enter", "");
     if (padEdge("back")) handleMenuKeys("Escape", "");
-  } else if (state === "storyScene" || state === "storyActIntro" || state === "storyEnding") {
+  } else if (state === "storyScene" || state === "storyCharIntro" || state === "storyActIntro" || state === "storyEnding") {
     if (padEdge("confirm")) handleMenuKeys("Enter", "");
     if (padEdge("back")) handleMenuKeys("Escape", "");
   } else if (state === "rules" || state === "tutorialHelp" || state === "netError" || state === "credits") {

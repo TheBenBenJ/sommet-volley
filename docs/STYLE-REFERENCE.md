@@ -40,7 +40,7 @@ c'est ça, « le même style que la map Micron ».
    perspective** dans [PIPELINE-MAP.md](PIPELINE-MAP.md).
 
 Pour prompter Grok, **montre-lui les assets Micron en référence visuelle**
-(`assets/cygne/idle_face_0.png` pour un perso, `assets/maps/palais-du-coq/skyline.png`
+(`assets/cygne/idle_face_0.png` pour un perso, `assets/maps/palais-gallard/skyline.png`
 pour une map) et exige le même trait/aplats. Le prompt canon exact est dans les
 skills `sommet-map` / `sommet-character`.
 
@@ -62,7 +62,7 @@ cf. PIPELINE-MAP.md étape 5). Générer généreusement, intégrer avec discipl
 ## Images-témoins (à égaler dans tes prompts Grok)
 
 - Perso : `assets/cygne/idle_face_0.png`.
-- Map : `assets/maps/palais-du-coq/skyline.png`.
+- Map : `assets/maps/palais-gallard/skyline.png`.
 
 Tout nouvel asset doit pouvoir **cohabiter avec Micron sans jurer** (même trait,
 mêmes aplats). C'est le test de validation.

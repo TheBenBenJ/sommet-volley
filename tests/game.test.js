@@ -249,7 +249,7 @@ test("roster : noms fictionnalisés (casting Steam)", () => {
   assert.strictEqual(g.CHARACTERS.find(c => c.key === "cygne").superName, "Passage en Force");
   const maps = Object.fromEntries(g.TERRAINS.map(t => [t.key, t.name]));
   assert.strictEqual(maps["country-club-dore"], "Country Club Doré");
-  assert.strictEqual(maps["palais-du-coq"], "Palais du Coq");
+  assert.strictEqual(maps["palais-gallard"], "Palais Gallard");
   assert.strictEqual(maps["cite-du-matin"], "Cité du Matin");
   assert.strictEqual(maps["pont-des-deux-mondes"], "Pont des Deux Mondes");
   assert.strictEqual(maps["grande-foret"], "Grande Forêt");
@@ -355,7 +355,7 @@ test("météo : flavor snow/sand/rain selon terrain", () => {
   assert.strictEqual(g.weatherFlavor(), "sand");
   g.setTerrain(byKey["jardin-des-roses"]);
   assert.strictEqual(g.weatherFlavor(), "rain");
-  g.setTerrain(byKey["palais-du-coq"]);
+  g.setTerrain(byKey["palais-gallard"]);
   assert.strictEqual(g.weatherFlavor(), "rain");
 });
 
@@ -387,7 +387,7 @@ test("météo : climats secs = long clear ; intempéries possibles sans ping-pon
   }
 
   // Après un orage, retour clear fréquent (pas rain↔storm brutal)
-  g.setTerrain(byKey["palais-du-coq"]);
+  g.setTerrain(byKey["palais-gallard"]);
   g.newGame(12);
   let toClear = 0;
   for (let i = 0; i < 40; i++) {
@@ -1383,7 +1383,7 @@ test("terrain calme : aucun événement canon", () => {
   assert.strictEqual(g.mapEvent.phase, "idle");
 });
 
-test("event cortège : Palais du Coq traverse le terrain", () => {
+test("event cortège : Palais Gallard traverse le terrain", () => {
   const g = freshRally(77);
   const N = { left:false, right:false, jump:false };
   g.setTerrain(2); // prairie / Micron
@@ -1586,8 +1586,9 @@ test("Super Smash : freeze dosage puis frappe lourde + ralenti", () => {
   g.stepGame({ ...N, smash:true, ax:0.8, ay:0.2 }, N);
   assert.ok(g.getPowerWindup(), "entre en dosage Super Smash");
   assert.strictEqual(g.getPowerWindup().side, 0);
-  // Maintien puis relâche
-  for (let i = 0; i < 10; i++) g.stepGame({ ...N, smash:true, ax:0.8, ay:0.3 }, N);
+  // Maintien long (≥ POWER_WINDUP_MIN) puis relâche
+  const hold = Math.max(10, (g.POWER_WINDUP_MIN | 0) + 4);
+  for (let i = 0; i < hold; i++) g.stepGame({ ...N, smash:true, ax:0.8, ay:0.3 }, N);
   assert.ok(g.getPowerWindup(), "toujours en dosage pendant maintien");
   g.stepGame({ ...N, smash:false, ax:0.8, ay:0.3 }, N);
   assert.ok(!g.getPowerWindup(), "relâche → tir");
@@ -1853,7 +1854,12 @@ test("storySelectCampaign : bascule STORY sur la campagne du perso + progression
   const story = g.getSTORY();
   const heroKey = g.CHARACTERS[0].key; // roster[0] = 1re campagne perso
   assert.ok(story.every(ch => ch.left === heroKey), "tous les chapitres pilotés par le héros");
-  assert.strictEqual(g.getState(), "storyMenu", "sélection → hub");
+  assert.strictEqual(g.getState(), "storyCharIntro", "sélection → fiche perso");
+  const fiche = g.storyCharFiche && g.storyCharFiche(heroKey);
+  assert.ok(fiche && fiche.blurb && fiche.blurb.length > 40, "bio présente");
+  assert.ok(fiche.nation, "nation présente");
+  if (g.storyConfirmIntro) g.storyConfirmIntro();
+  assert.strictEqual(g.getState(), "storyMenu", "fiche → hub");
   // lancer le 1er match utilise bien la campagne active
   g.setStoryChapter(0);
   g.storyStartMatch();

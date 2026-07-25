@@ -10,4 +10,4 @@ trait_passif: "Double jeu — après chaque point, échange vitesse ↔ puissanc
 super:
   nom: "Passage en Force"
   effet: "~4 s frappes immunisées au smash adverse"
-map: "Palais du Coq"
+map: "Palais Gallard"

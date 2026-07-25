@@ -207,7 +207,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Stade Ashram. Grès miel, guirlandes de soucis orange, palmiers. Une vache sacrée traverse le court avec l'autorité d'un arbitre."
+          "t": "Stade Ashram. Grès miel, guirlandes de soucis orange, palmiers. Une vache qui traverse traverse le court avec l'autorité d'un arbitre."
         },
         {
           "s": "gourou",
@@ -558,7 +558,7 @@ const STORY_BY_CHAR = {
       "win": [
         {
           "s": "volkoi",
-          "t": "Le canon a parlé, l'hiver a répondu. Rentre au Palais du Coq, Cygne. Dis-leur que la neige, elle, ne négocie pas."
+          "t": "Le canon a parlé, l'hiver a répondu. Rentre au Palais Gallard, Cygne. Dis-leur que la neige, elle, ne négocie pas."
         },
         {
           "s": "volkoi",
@@ -593,7 +593,7 @@ const STORY_BY_CHAR = {
     {
       "act": 1,
       "title": "L'Alliance qui coûte cher",
-      "sub": "OTAN élargie · double contre le Cygne",
+      "sub": "Alliance élargie · double contre le Cygne",
       "left": "dorf",
       "right": "cygne",
       "ally": "faucon",
@@ -731,7 +731,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Stade Ashram, grès couleur miel, guirlandes de soucis. Une vache sacrée traverse le court avec la sérénité d'un arbitre neutre."
+          "t": "Stade Ashram, grès couleur miel, guirlandes de soucis. Une vache qui traverse traverse le court avec la sérénité d'un arbitre neutre."
         },
         {
           "s": "dorf",
@@ -1207,7 +1207,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "timonier",
-          "t": "Sers donc. La muraille attend. Elle a le temps. Elle a toujours le temps."
+          "t": "Sers donc. Le rempart attend. Elle a le temps. Elle a toujours le temps."
         }
       ],
       "win": [
@@ -1244,7 +1244,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Stade Ashram, grès couleur miel, guirlandes de soucis orange, une vache sacrée qui décide de traverser le court quand ça lui chante."
+          "t": "Stade Ashram, grès couleur miel, guirlandes de soucis orange, une vache qui traverse qui décide de traverser le court quand ça lui chante."
         },
         {
           "s": "gourou",
@@ -1539,7 +1539,7 @@ const STORY_BY_CHAR = {
     {
       "act": 3,
       "title": "Le poumon du monde",
-      "sub": "Gallardie–Tropicalia · la querelle de l'Amazonie",
+      "sub": "Gallardie–Tropicalia · la querelle de la forêt",
       "left": "cygne",
       "right": "capitaine",
       "terrain": 7,
@@ -1603,7 +1603,7 @@ const STORY_BY_CHAR = {
     },
     {
       "act": 3,
-      "title": "L'hiver au Palais du Coq",
+      "title": "L'hiver au Palais Gallard",
       "sub": "Gallardie–Bourassie · la finale, chez le Cygne",
       "left": "cygne",
       "right": "volkoi",
@@ -1614,7 +1614,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Finale. Palais du Coq. Colonnes néoclassiques, obélisque abstrait, coq doré sur azur. Les pigeons ont fui : ils sentent l'hiver arriver. La bombe est là, et le Tsar rougeoie."
+          "t": "Finale. Palais Gallard. Colonnes néoclassiques, obélisque abstrait, cygne doré sur azur. Les pigeons ont fui : ils sentent l'hiver arriver. La bombe est là, et le Tsar rougeoie."
         },
         {
           "s": "volkoi",
@@ -1638,13 +1638,13 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Le Tsar se dope. L'hiver tombe sur le Palais du Coq. La mèche crépite. Passe en force, Cygne — ou l'hiver gagne le Sommet."
+          "t": "Le Tsar se dope. L'hiver tombe sur le Palais Gallard. La mèche crépite. Passe en force, Cygne — ou l'hiver gagne le Sommet."
         }
       ],
       "win": [
         {
           "s": "cygne",
-          "t": "Sur mon terrain, sous mon coq, l'hiver n'a pas passé. Fermeté ET dialogue, en même temps, jusqu'au bout. Voilà la Gallardie. Voilà le Sommet remporté."
+          "t": "Sur mon terrain, sous mon emblème, l'hiver n'a pas passé. Fermeté ET dialogue, en même temps, jusqu'au bout. Voilà la Gallardie. Voilà le Sommet remporté."
         },
         {
           "s": "volkoi",
@@ -1652,13 +1652,13 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Le Cygne lève les bras. Les pigeons reviennent se poser sur l'obélisque. Le coq doré, enfin, semble chanter. Jeux du Sommet : Le Cygne triomphe. En même temps. Le ballon est une bombe : le camp où elle tombe perd."
+          "t": "Le Cygne lève les bras. Les pigeons reviennent se poser sur l'obélisque. Le cygne doré, enfin, semble briller. Jeux du Sommet : Le Cygne triomphe. En même temps. Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
         {
           "s": "volkoi",
-          "t": "Boum. Sous ton propre palais. Ton coq a gelé le bec ouvert. Ton « en même temps » a fini en glaçon. Comme prévu."
+          "t": "Boum. Sous ton propre palais. Ton emblème a gelé les ailes ouvertes. Ton « en même temps » a fini en glaçon. Comme prévu."
         },
         {
           "s": "cygne",
@@ -2361,7 +2361,7 @@ const STORY_BY_CHAR = {
       "lose": [
         {
           "s": "volkoi",
-          "t": "Le gel a eu raison de ta muraille. Même les empires patients grelottent, parfois."
+          "t": "Le gel a eu raison de ton rempart. Même les empires patients grelottent, parfois."
         },
         {
           "s": "timonier",
@@ -2371,7 +2371,7 @@ const STORY_BY_CHAR = {
     },
     {
       "act": 1,
-      "title": "La route de la soie",
+      "title": "La grande route",
       "sub": "Panguo–Bosforie · ports, ponts & dettes",
       "left": "timonier",
       "right": "sultan",
@@ -2394,7 +2394,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "sultan",
-          "t": "Tu déroules ta route de la soie jusque sous mes dômes ! Grandiose… mais coûteux, non ?"
+          "t": "Tu déroules ta grande route jusque sous mes dômes ! Grandiose… mais coûteux, non ?"
         },
         {
           "s": "timonier",
@@ -2439,7 +2439,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Palais du Coq. Un coq héraldique doré fanfaronne sur sa bannière bleue. En face, un mur cramoisi patiente. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
+          "t": "Palais Gallard. Un cygne stylisé doré fanfaronne sur sa bannière bleue. En face, un mur cramoisi patiente. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "cygne",
@@ -2451,15 +2451,15 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "cygne",
-          "t": "L'Europe cherche son autonomie stratégique. En même temps, elle aime beaucoup ton marché. C'est subtil."
+          "t": "Gallardie cherche son autonomie stratégique. En même temps, elle aime beaucoup ton marché. C'est subtil."
         },
         {
           "s": "timonier",
-          "t": "C'est surtout contradictoire. Le coq chante fort et court peu. Moi je marche lentement et j'arrive partout."
+          "t": "C'est surtout contradictoire. Le discours chante fort et court peu. Moi je marche lentement et j'arrive partout."
         },
         {
           "s": "cygne",
-          "t": "En même temps… un coq, ça réveille. Servons, empereur. On verra qui tient la distance."
+          "t": "En même temps… une verticale, ça réveille. Servons, empereur. On verra qui tient la distance."
         }
       ],
       "win": [
@@ -2479,7 +2479,7 @@ const STORY_BY_CHAR = {
       "lose": [
         {
           "s": "cygne",
-          "t": "Le coq a chanté juste ! Partenaires, rivaux, systémiques — tout à la fois. C'est ça, la Gallardie."
+          "t": "La nuance a chanté juste ! Partenaires, rivaux, systémiques — tout à la fois. C'est ça, la Gallardie."
         },
         {
           "s": "timonier",
@@ -2544,7 +2544,7 @@ const STORY_BY_CHAR = {
       "lose": [
         {
           "s": "capitaine",
-          "t": "Gagné contre le Timonier ! La tronçonneuse a smashé la muraille ! Grande soirée, patron !"
+          "t": "Gagné contre le Timonier ! La tronçonneuse a smashé le rempart ! Grande soirée, patron !"
         },
         {
           "s": "timonier",
@@ -2609,7 +2609,7 @@ const STORY_BY_CHAR = {
       "lose": [
         {
           "s": "safran",
-          "t": "Le voile d'or a ralenti ta muraille, empereur. Même les patients trébuchent sur une roseraie."
+          "t": "Le voile d'or a ralenti ton rempart, empereur. Même les patients trébuchent sur une roseraie."
         },
         {
           "s": "timonier",
@@ -2642,7 +2642,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "timonier",
-          "t": "« Vol », « copie »… Je préfère « transfert de technologie ». Tout ce qui traverse ma muraille devient mien. C'est la géographie."
+          "t": "« Vol », « copie »… Je préfère « transfert de technologie ». Tout ce qui traverse mon rempart devient mien. C'est la géographie."
         },
         {
           "s": "faucon",
@@ -2654,7 +2654,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "timonier",
-          "t": "Frappe vite. Moi je bâtis lent. Ma muraille coupe ton camp en deux avant que ton aigle n'ait battu de l'aile. Sers."
+          "t": "Frappe vite. Moi je bâtis lent. Mon rempart coupe ton camp en deux avant que ton aigle n'ait battu de l'aile. Sers."
         }
       ],
       "win": [
@@ -2674,7 +2674,7 @@ const STORY_BY_CHAR = {
       "lose": [
         {
           "s": "faucon",
-          "t": "Raid réussi, muraille percée. La vitesse mange la patience quand la patience s'endort."
+          "t": "Raid réussi, rempart percé. La vitesse mange la patience quand la patience s'endort."
         },
         {
           "s": "timonier",
@@ -2689,7 +2689,7 @@ const STORY_BY_CHAR = {
     {
       "act": 3,
       "title": "La guerre froide des tarifs",
-      "sub": "Panguo–Doria · muraille d'or contre muraille rouge",
+      "sub": "Panguo–Doria · rempart d'or contre rempart rouge",
       "left": "timonier",
       "right": "dorf",
       "terrain": 4,
@@ -2703,7 +2703,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "dorf",
-          "t": "Des tarifs ! Des tarifs colossaux ! Cent pour cent sur tes ballons, deux cents sur ton filet, mille pour cent sur ta muraille !"
+          "t": "Des tarifs ! Des tarifs colossaux ! Cent pour cent sur tes ballons, deux cents sur ton filet, mille pour cent sur ton rempart !"
         },
         {
           "s": "timonier",
@@ -2743,7 +2743,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "timonier",
-          "t": "Une manche pour l'or. Le temps, lui, joue en rouge. J'attends. J'ai deux mille ans d'entraînement."
+          "t": "Une manche pour l'or. Le temps, lui, joue en rouge. J'attends. J'ai des siècles d'entraînement."
         }
       ]
     },
@@ -2772,7 +2772,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "gourou",
-          "t": "Non. Mais elle carbure. Regarde mes veines : ce soir je ne médite plus, je brûle. Ta muraille va rencontrer ma colère."
+          "t": "Non. Mais elle carbure. Regarde mes veines : ce soir je ne médite plus, je brûle. Ton rempart va rencontrer ma colère."
         },
         {
           "s": "narrator",
@@ -2780,13 +2780,13 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "timonier",
-          "t": "Brûle donc. Le feu s'épuise ; la muraille reste. Je bâtis un mur au cœur de ton camp et je contrôle le tempo. Sers, voisin."
+          "t": "Brûle donc. Le feu s'épuise ; le rempart reste. Je bâtis un mur au cœur de ton camp et je contrôle le tempo. Sers, voisin."
         }
       ],
       "win": [
         {
           "s": "timonier",
-          "t": "Le calme a tenu la crête. Deux mille ans de patience contre une nuit de carburant : le siècle a choisi la muraille."
+          "t": "Le calme a tenu la crête. Des siècles de patience contre une nuit de carburant : le siècle a choisi le rempart."
         },
         {
           "s": "gourou",
@@ -2800,7 +2800,7 @@ const STORY_BY_CHAR = {
       "lose": [
         {
           "s": "gourou",
-          "t": "Le feu a fendu ta muraille, empereur. Même la patience du panda a un versant qui s'effondre."
+          "t": "Le feu a fendu ton rempart, empereur. Même la patience du panda a un versant qui s'effondre."
         },
         {
           "s": "timonier",
@@ -3032,7 +3032,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "sultan",
-          "t": "Médite tant que tu veux : quand je frappe le sol, même ta vache sacrée s'arrête de mâcher."
+          "t": "Médite tant que tu veux : quand je frappe le sol, même ta vache qui traverse s'arrête de mâcher."
         },
         {
           "s": "gourou",
@@ -3135,7 +3135,7 @@ const STORY_BY_CHAR = {
     },
     {
       "act": 2,
-      "title": "La route de la soie et du silence",
+      "title": "La route commerciale et du silence",
       "sub": "Bosforie–Panguo · peuples cousins, gros contrats",
       "left": "sultan",
       "right": "timonier",
@@ -3158,11 +3158,11 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "timonier",
-          "t": "Franc et bruyant. Ma Grande Muraille montera au milieu de ton camp. Elle n'a pas besoin de trembler pour tenir."
+          "t": "Franc et bruyant. Mon Rempart montera au milieu de ton camp. Il n'a pas besoin de trembler pour tenir."
         },
         {
           "s": "sultan",
-          "t": "Ma bannière pourpre a régné quand ta muraille n'arrêtait déjà plus rien. Le talon d'abord, le tempo ensuite."
+          "t": "Ma bannière pourpre a régné quand ton rempart n'arrêtait déjà plus rien. Le talon d'abord, le tempo ensuite."
         },
         {
           "s": "timonier",
@@ -3172,7 +3172,7 @@ const STORY_BY_CHAR = {
       "win": [
         {
           "s": "sultan",
-          "t": "Ta muraille a tremblé, Timonier. Belle pierre, mauvaises fondations. Le carrefour du monde reste chez moi."
+          "t": "Ton rempart a tremblé, Timonier. Belle pierre, mauvaises fondations. Le carrefour du monde reste chez moi."
         },
         {
           "s": "timonier",
@@ -3186,11 +3186,11 @@ const STORY_BY_CHAR = {
       "lose": [
         {
           "s": "timonier",
-          "t": "La muraille contient le tonnerre comme elle contient les steppes. Patiemment. Définitivement."
+          "t": "Le rempart contient le tonnerre comme il contient les steppes. Patiemment. Définitivement."
         },
         {
           "s": "sultan",
-          "t": "Une muraille finit toujours par avoir deux côtés, Timonier. Je reviendrai par l'autre."
+          "t": "Un rempart finit toujours par avoir deux côtés, Timonier. Je reviendrai par l'autre."
         },
         {
           "s": "narrator",
@@ -3201,7 +3201,7 @@ const STORY_BY_CHAR = {
     {
       "act": 3,
       "title": "La porte de l'Union",
-      "sub": "Bosforie–Gallardie · adhésion, détroit & Méditerranée",
+      "sub": "Bosforie–Gallardie · adhésion, détroit & mer intérieure",
       "left": "sultan",
       "right": "cygne",
       "terrain": 5,
@@ -3223,7 +3223,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "sultan",
-          "t": "L'état de droit ! Pendant que vous délibérez en Méditerranée, moi je fais des forages, des drones, des faits accomplis."
+          "t": "L'état de droit ! Pendant que vous délibérez sur la mer intérieure, moi je fais des forages, des drones, des faits accomplis."
         },
         {
           "s": "cygne",
@@ -3585,7 +3585,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Palais du Coq. Un partenaire d'armement en visite, entre ventes d'avions et petites leçons de morale. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
+          "t": "Palais Gallard. Un partenaire d'armement en visite, entre ventes d'avions et petites leçons de morale. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "cygne",
@@ -3593,7 +3593,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "gourou",
-          "t": "Namasté, Cygne. J'achète tes avions, tu achètes mon marché. En même temps, garde tes leçons pour ton coq."
+          "t": "Namasté, Cygne. J'achète tes avions, tu achètes mon marché. En même temps, garde tes leçons pour ton palais."
         },
         {
           "s": "cygne",
@@ -3625,7 +3625,7 @@ const STORY_BY_CHAR = {
       "lose": [
         {
           "s": "cygne",
-          "t": "L'équilibre l'emporte. En même temps, félicitez-vous d'avoir tenu si longtemps face au Coq."
+          "t": "L'équilibre l'emporte. En même temps, félicitez-vous d'avoir tenu si longtemps face au Cygne."
         },
         {
           "s": "gourou",
@@ -3676,7 +3676,7 @@ const STORY_BY_CHAR = {
       "win": [
         {
           "s": "gourou",
-          "t": "Le lac immobile gèle plus profond que la Volga. Bel échange froid, Tsar. Restons en affaires. Namasté."
+          "t": "Le lac immobile gèle plus profond que le fleuve de Bourassie. Bel échange froid, Tsar. Restons en affaires. Namasté."
         },
         {
           "s": "volkoi",
@@ -3900,7 +3900,7 @@ const STORY_BY_CHAR = {
     {
       "act": 3,
       "title": "Le toit du monde",
-      "sub": "Bharatie–Panguo · la crête, la muraille et la méditation",
+      "sub": "Bharatie–Panguo · la crête, le rempart et la méditation",
       "left": "gourou",
       "right": "timonier",
       "terrain": 6,
@@ -3910,15 +3910,15 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Stade Ashram, chez le Gourou. Guirlandes de soucis, vache sacrée en lisière, et une bombe pour ballon. La rivalité fondatrice, deux géants pour un sommet."
+          "t": "Stade Ashram, chez le Gourou. Guirlandes de soucis, vache qui traverse en lisière, et une bombe pour ballon. La rivalité fondatrice, deux géants pour un sommet."
         },
         {
           "s": "timonier",
-          "t": "Je suis venu sur ton grès miel, Gourou, poser ma Grande Muraille au milieu de ton ashram. L'harmonie passe où je le décide."
+          "t": "Je suis venu sur ton grès miel, Gourou, poser mon Rempart au milieu de ton ashram. L'harmonie passe où je le décide."
         },
         {
           "s": "gourou",
-          "t": "Namasté, Timonier. Bienvenue sous mes guirlandes. Mais la crête, au sommet du monde, est à moi. Ta muraille s'arrêtera au filet."
+          "t": "Namasté, Timonier. Bienvenue sous mes guirlandes. Mais la crête, au sommet du monde, est à moi. Ton rempart s'arrêtera au filet."
         },
         {
           "s": "timonier",
@@ -3926,7 +3926,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "gourou",
-          "t": "Respirer, c'est MON métier. Un milliard et demi de témoins m'accompagnent. Ta muraille est un mur ; mon lac gèle les murs."
+          "t": "Respirer, c'est MON métier. Un milliard et demi de témoins m'accompagnent. Ton rempart est un mur ; mon lac gèle les murs."
         },
         {
           "s": "timonier",
@@ -3944,7 +3944,7 @@ const STORY_BY_CHAR = {
       "win": [
         {
           "s": "gourou",
-          "t": "La muraille s'énerve, le lac reste lisse. Le calme bat le mur quand le mur veut tout. La crête est méditée : elle est mienne. Namasté, voisin."
+          "t": "Le rempart s'énerve, le lac reste lisse. Le calme bat le mur quand le mur veut tout. La crête est méditée : elle est mienne. Namasté, voisin."
         },
         {
           "s": "timonier",
@@ -3958,7 +3958,7 @@ const STORY_BY_CHAR = {
       "lose": [
         {
           "s": "timonier",
-          "t": "Le tempo, toujours le tempo. Même chez toi, sous tes soucis, la muraille tient. La patience impériale absorbe la ferveur."
+          "t": "Le tempo, toujours le tempo. Même chez toi, sous tes soucis, le rempart tient. La patience impériale absorbe la ferveur."
         },
         {
           "s": "gourou",
@@ -4381,7 +4381,7 @@ const STORY_BY_CHAR = {
       "lose": [
         {
           "s": "timonier",
-          "t": "Tu accuses, tu t'agites, tu perds. La muraille au milieu de ton camp t'a coûté la mèche. Silence, maintenant."
+          "t": "Tu accuses, tu t'agites, tu perds. Le rempart au milieu de ton camp t'a coûté la mèche. Silence, maintenant."
         },
         {
           "s": "capitaine",
@@ -4453,7 +4453,7 @@ const STORY_BY_CHAR = {
     {
       "act": 3,
       "title": "La forêt en feu",
-      "sub": "Grande Forêt · Amazonie contre le Cygne · le grand duel",
+      "sub": "Grande Forêt · Tropicalia contre le Cygne · le grand duel",
       "left": "capitaine",
       "right": "cygne",
       "terrain": 7,
@@ -4471,7 +4471,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "capitaine",
-          "t": "MA forêt, Cygne. La MIENNE. Occupe-toi de ton coq héraldique et de ton obélisque. Ici on plante, on coupe, on vit. C'est pas ton jardin."
+          "t": "MA forêt, Cygne. La MIENNE. Occupe-toi de ton emblème doré et de ton obélisque. Ici on plante, on coupe, on vit. C'est pas ton jardin."
         },
         {
           "s": "cygne",
@@ -4617,7 +4617,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "capitaine",
-          "t": "Moi je défriche, toi tu murailles. Deux façons de dire : chez moi, on ne rentre pas."
+          "t": "Moi je défriche, toi tu bâtirais un rempart. Deux façons de dire : chez moi, on ne rentre pas."
         },
         {
           "s": "faucon",
@@ -5363,7 +5363,7 @@ const STORY_BY_CHAR = {
       "win": [
         {
           "s": "safran",
-          "t": "Deux muraille de patience, et c'est la mienne qui a tenu. Continuez d'acheter, Timonier. Le safran monte encore."
+          "t": "Deux remparts de patience, et c'est la mienne qui a tenu. Continuez d'acheter, Timonier. Le safran monte encore."
         },
         {
           "s": "timonier",
@@ -5377,7 +5377,7 @@ const STORY_BY_CHAR = {
       "lose": [
         {
           "s": "timonier",
-          "t": "Le tempo, toujours le tempo. Ma muraille était plus lente que ton voile, et plus haute."
+          "t": "Le tempo, toujours le tempo. Mon rempart était plus lent que ton voile, et plus haut."
         },
         {
           "s": "safran",

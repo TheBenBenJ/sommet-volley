@@ -118,8 +118,8 @@ function drawBgMatinPng(t, raining, storm) {
   drawMapEventOverlay();
 }
 
-/** Palais du Bosphore PNG (Sultan) — quay, mosquée, bannières pourpres. */
-function drawBgBosphorePng(t, raining, storm) {
+/** Pont des Deux Mondes PNG (Sultan) — quai, dômes, bannières pourpres. */
+function drawBgPontDesDeuxMondesPng(t, raining, storm) {
   const p = SPRITES.mapPontDesDeuxMondes;
 
   drawMapBackdrop(p, "#8aa0b8");
@@ -463,7 +463,7 @@ const MAP_LAYOUT = {
   "grande-foret":   { baselineFromBottom: 70,  netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
   "country-club-dore":    { baselineFromBottom: 69,  netPost: { footPad: 2, xOff: 4, scale: 1 }, codeSeam: false, bgFullHeight: true },
   "place-ecarlate":    { baselineFromBottom: 60,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
-  "palais-du-coq":  { baselineFromBottom: 68,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  "palais-gallard":  { baselineFromBottom: 68,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
   "esplanade-du-defile":   { baselineFromBottom: 123, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
   "cite-du-matin":    { baselineFromBottom: 48,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
   "pont-des-deux-mondes": { baselineFromBottom: 57,  netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
@@ -834,7 +834,7 @@ function drawNeigeWeatherFX(t, heavy, blizzard) {
 function mapEventWarnPack(kind) {
   if (kind === "cannon") return SPRITES.mapPlaceEcarlate;
   if (kind === "cart") return SPRITES.mapCountryClubDore;
-  if (kind === "march") return SPRITES.mapPalaisDuCoq;
+  if (kind === "march") return SPRITES.mapPalaisGallard;
   if (kind === "radar") return SPRITES.mapEsplanadeDuDefile;
   if (kind === "lantern") return SPRITES.mapCiteDuMatin;
   if (kind === "carpet") return SPRITES.mapPontDesDeuxMondes;
@@ -847,7 +847,7 @@ function mapEventWarnPack(kind) {
 
 /** Icône d'annonce unique : celle de la map française (Micron), lisible partout. */
 function mapEventWarnIcon() {
-  const fr = SPRITES.mapPalaisDuCoq;
+  const fr = SPRITES.mapPalaisGallard;
   return (fr && spriteReady(fr.warn)) ? fr.warn : null;
 }
 
@@ -1255,10 +1255,10 @@ function drawBgPrairie() {
     return;
   }
   if (tk === "pont-des-deux-mondes" && typeof mapPontDesDeuxMondesReady === "function" && mapPontDesDeuxMondesReady()) {
-    drawBgBosphorePng(t, raining, storm);
+    drawBgPontDesDeuxMondesPng(t, raining, storm);
     return;
   }
-  if (typeof mapPalaisDuCoqReady === "function" && mapPalaisDuCoqReady() && tk === "palais-du-coq") {
+  if (typeof mapPalaisGallardReady === "function" && mapPalaisGallardReady() && tk === "palais-gallard") {
     drawBgPrairiePng(t, raining, storm);
     return;
   }
@@ -1411,9 +1411,9 @@ function drawBgParadePng(t, raining, storm) {
   drawMapEventOverlay();
 }
 
-/** Palais du Coq — fond PNG Micron. */
+/** Palais Gallard — fond PNG Micron. */
 function drawBgPrairiePng(t, raining, storm) {
-  const p = SPRITES.mapPalaisDuCoq;
+  const p = SPRITES.mapPalaisGallard;
 
   // far optionnel (scène différente) : léger voile seulement
   drawMapBackdrop(p, "#b5c4d2");
@@ -1506,8 +1506,8 @@ function terrainNetPostImg() {
   if (key === "country-club-dore" && SPRITES.mapCountryClubDore && spriteReady(SPRITES.mapCountryClubDore.netPost)) {
     return SPRITES.mapCountryClubDore.netPost;
   }
-  if (key === "palais-du-coq" && SPRITES.mapPalaisDuCoq && spriteReady(SPRITES.mapPalaisDuCoq.netPost)) {
-    return SPRITES.mapPalaisDuCoq.netPost;
+  if (key === "palais-gallard" && SPRITES.mapPalaisGallard && spriteReady(SPRITES.mapPalaisGallard.netPost)) {
+    return SPRITES.mapPalaisGallard.netPost;
   }
   if (key === "esplanade-du-defile" && SPRITES.mapEsplanadeDuDefile && spriteReady(SPRITES.mapEsplanadeDuDefile.netPost)) {
     return SPRITES.mapEsplanadeDuDefile.netPost;

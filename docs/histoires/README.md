@@ -15,9 +15,9 @@ Même procédé que `src/story.js` : rivalité/allié → **Volley**, conflit ou
 |---|---|---|---|---|---|
 | volkoi | Tsar Volkoï | Bourassie | Place Écarlate | Hiver Général | [volkoi.md](volkoi.md) |
 | dorf | Baron Dorf | Doria | Country Club Doré | Le Mur | [dorf.md](dorf.md) |
-| cygne | Le Cygne | Gallardie | Palais du Coq | Passage en Force | [cygne.md](cygne.md) |
+| cygne | Le Cygne | Gallardie | Palais Gallard | Passage en Force | [cygne.md](cygne.md) |
 | bebe | Maréchal Bébé | Ryonganie | Esplanade du Défilé | Batterie AA | [bebe.md](bebe.md) |
-| timonier | Le Grand Timonier | Panguo | Cité du Matin | Grande Muraille | [timonier.md](timonier.md) |
+| timonier | Le Grand Timonier | Panguo | Cité du Matin | Le Rempart | [timonier.md](timonier.md) |
 | sultan | Le Sultan | Bosforie | Pont des Deux Mondes | Séisme | [sultan.md](sultan.md) |
 | gourou | Le Gourou | Bharatie | Stade Ashram | Méditation | [gourou.md](gourou.md) |
 | capitaine | Le Capitaine | Tropicalia | Grande Forêt | Déforestation | [capitaine.md](capitaine.md) |

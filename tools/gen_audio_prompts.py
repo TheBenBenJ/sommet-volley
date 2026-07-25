@@ -16,7 +16,7 @@ from gen_audio_synth import EVENT_SFX, MAP_THEMES, SFX_CORE, STORY_STINGS  # noq
 MAP_MOOD = {
     "place-ecarlate": "cold fortress winter parade, crimson bricks, distant cannon pomp",
     "country-club-dore": "sunny gold resort golf club swagger, brass and kitsch",
-    "palais-du-coq": "neoclassical palace witty technocrat bounce, bright fanfare",
+    "palais-gallard": "neoclassical palace witty technocrat bounce, bright fanfare",
     "esplanade-du-defile": "brutalist military parade square, radar beep motif, stern march",
     "cite-du-matin": "imperial red-gold palace dawn, calm patient drone with chimes",
     "pont-des-deux-mondes": "strait between continents, dramatic bridges, modal brass",

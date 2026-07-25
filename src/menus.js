@@ -11,11 +11,14 @@ function handleMenuKeys(code, key) {
   // (c'était le « je remplis le code et rien ne se passe » des claviers à pavé)
 
   // Mode Histoire : hub, dialogues, cartes d'acte et écran de fin absorbent les touches en amont.
-  if ((state === "storySelect" || state === "storyMenu" || state === "storyScene" || state === "storyActIntro" || state === "storyEnding") &&
+  if ((state === "storySelect" || state === "storyCharIntro" || state === "storyMenu" || state === "storyScene" || state === "storyActIntro" || state === "storyEnding") &&
       typeof storyHandleKeys === "function") {
     if (storyHandleKeys(code)) return;
   }
-  if (typeof storyHandleClickCode === "function" && storyHandleClickCode(code)) return;
+  // Clics Histoire uniquement (évite qu'une hitbox Story* périmée vole Escape / Retour ailleurs).
+  if (typeof storyHandleClickCode === "function" &&
+      typeof code === "string" && code.indexOf("Story") === 0 &&
+      storyHandleClickCode(code)) return;
 
   // Navigation grille (persos / terrains) : flèches / WASD
   if (state === "selectCharacter" || state === "selectTerrain") {
@@ -89,7 +92,10 @@ function handleMenuKeys(code, key) {
     if (code === "Escape" || code === "Enter" || code === "Space") goMenu();
 
   } else if (state === "tutorialHelp") {
-    if (code === "Escape" || code === "Enter" || code === "Space" || code === "KeyH") goMenu();
+    if (code === "Escape" || code === "Enter" || code === "Space" || code === "KeyH" || code === "TutBack") {
+      goMenu();
+      return;
+    }
     if (code === "TutKey") tutorialTab = "keyboard";
     if (code === "TutPad") tutorialTab = "pad";
     if (code === "TutTouch") tutorialTab = "touch";
@@ -404,7 +410,7 @@ function startTutorial() {
   setMode("1v1");
   blobL.charId = 2; // Micron
   blobR.charId = 1; // Trompette
-  terrain = 2;      // Palais du Coq
+  terrain = 2;      // Palais Gallard
   ballSkin = 0;
   paused = false;
   newGame(42);
@@ -1144,7 +1150,7 @@ function drawTutorialControls(dev, x, y, maxW) {
       ["Smash (en l'air)", "Saute au contact : smash automatique selon ta position"],
       ["Service / action", "F pour lancer, puis F pour servir (pas d'auto)"],
       ["SUPER (jauge or)", "3 points d'affilée → E  (technique du perso)"],
-      ["Super Smash (jauge orange)", "Plein → MAINTIENS F en l'air : dose, relâche (sinon smash normal)"],
+      ["Super Smash (jauge orange)", "Plein → MAINTIENS F longtemps en l'air, puis relâche (sinon smash normal)"],
       ["Smash Battle", "Les deux au filet en l'air + balle proche → duel de sauts"],
       ["Camp droite (local 1v1)", "← →  ·  ↑ saut  ·  ↓ ou / frappe  ·  Shift dr. SUPER"],
       ["Pause / son", "P pause · M son · N musique · Échap menu"]
@@ -1155,7 +1161,7 @@ function drawTutorialControls(dev, x, y, maxW) {
       ["Cloche / smash", "X/Y  —  sol = cloche · air = smash"],
       ["Dig d'un smash", "Stick vers la balle (ou haut) au sol : tu peux encore rattraper"],
       ["SUPER (jauge or)", "Bouton B — technique du perso"],
-      ["Super Smash (jauge orange)", "Maintiens X/Y en l'air jauge pleine : dose puis relâche"],
+      ["Super Smash (jauge orange)", "Maintiens X/Y longtemps en l'air jauge pleine, puis relâche"],
       ["Visée", "Oriente le stick : flèche + trajectoire suivent l'angle"],
       ["Menus", "Stick/croix choisir · A valider · B retour"]
     ],
@@ -1164,7 +1170,7 @@ function drawTutorialControls(dev, x, y, maxW) {
       ["Saut", "Bouton ⤒  (double saut en l'air)"],
       ["Cloche / smash", "Bouton ⚡  —  sol = cloche · air = smash"],
       ["SUPER (jauge or)", "Bouton ★ — technique du perso"],
-      ["Super Smash (jauge orange)", "Maintiens ⚡ en l'air jauge pleine : dose puis relâche"],
+      ["Super Smash (jauge orange)", "Maintiens ⚡ longtemps en l'air jauge pleine, puis relâche"],
       ["Visée", "Assistée comme au clavier ; manette = stick plus précis"],
       ["Note", "Pavé visible en partie (solo / en ligne)"]
     ],
@@ -1408,8 +1414,8 @@ function drawTutorial() {
     W * 0.50, H - 78, 10, UI.muted, 0.15
   );
 
-  hit(UI.mx + 45, H - 32, 130, 24, "Escape");
-  uiLabel("Échap / Entrée ← Retour", UI.mx, H - 28, 12, UI.muted, 0.3);
+  // Bouton Retour bien visible (clic / tactile) + Échap / Entrée / B manette.
+  drawTutorialTab("← Retour", "TutBack", UI.mx + 72, H - 28, hasTouch ? 168 : 148, false);
   drawTutorialTab("Jouer le tutoriel", "TutPlay", W - UI.mx - 90, H - 28, 160, true);
 }
 

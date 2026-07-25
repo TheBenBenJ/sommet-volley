@@ -94,8 +94,8 @@ const SMASH_VX = 14.5, SMASH_VY = 9.5;
 // --- Super Smash (tous persos) — jauge d'échange, freeze + dosage, frappe lourde ---
 const POWER_GAUGE_MAX = 840;     // ~14 s d'échange à +1/tick (moins fréquent)
 const POWER_GAUGE_TOUCH = 36;    // petit bonus par contact (ne remplit pas tout seul)
-const POWER_WINDUP_MAX = 48;     // ~0,8 s pour viser / doser (hors-ligne)
-const POWER_WINDUP_MIN = 6;      // ticks mini avant relâche possible
+const POWER_WINDUP_MAX = 84;     // ~1,4 s pour viser / doser à fond (hors-ligne)
+const POWER_WINDUP_MIN = 40;     // ~0,67 s de maintien mini — sinon smash normal, jauge gardée
 const POWER_SMASH_MUL = 1.28;    // multiplicateur vs smash normal (après SMASH_MUL)
 const POWER_MAX_BALL_SPEED = 16.2;
 const POWER_SMASH_TICKS = 78;    // traînée feu + message SMASH au sol

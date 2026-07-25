@@ -68,7 +68,7 @@ const STORY_FAUCON = [
       { s: "narrator", t: "Clairière de jungle dorée, court en terre rouge, un ara braille dans la canopée. Deux hommes à poigne se reconnaissent de loin." },
       { s: "capitaine", t: "Le Faucon ! Enfin un type qui ne me fait pas la leçon sur les droits du filet. Tope là, mon frère de rempart." },
       { s: "faucon", t: "On me fait la leçon depuis quarante ans, Capitaine. J'ai arrêté d'écouter avant toi." },
-      { s: "capitaine", t: "Moi je défriche, toi tu murailles. Deux façons de dire : chez moi, on ne rentre pas." },
+      { s: "capitaine", t: "Moi je défriche, toi tu bâtirais un rempart. Deux façons de dire : chez moi, on ne rentre pas." },
       { s: "faucon", t: "Sauf que ta forêt repousse. Mes remparts, non : je les rebâtis moi-même, plus haut, chaque nuit." },
       { s: "capitaine", t: "Alors montre-moi ce fameux piqué. Ici on aime les prédateurs, ça fait bon effet à la télé." }
     ],

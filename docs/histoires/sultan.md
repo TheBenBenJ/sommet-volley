@@ -14,7 +14,7 @@ Sa signature sur le terrain, c'est le **Séisme**. Là où les autres sautent, p
 
 Son terrain fétiche, le **Pont des Deux Mondes**, est à son image : un pont-monument jeté entre deux rives, entre deux mondes, sous lequel glissent des barques indolentes et au-dessus duquel, à chaque échange de haut vol, déboule l'**événement du tapis volant** — un vrai tapis de contes, franges et arabesques au vent, qui traverse le ciel du match comme un clin d'œil des Mille et Une Nuits. Le Sultan adore : il prétend qu'à l'entraînement il s'assoit dessus pour surveiller ses adversaires de haut, jambes croisées, thé à la main. Personne n'a jamais pu prouver le contraire.
 
-Diplomate à géométrie très variable, le Sultan a fait de l'ambiguïté une doctrine. Membre par la carte d'une grande alliance de l'Ouest, il achète pourtant ses systèmes de défense à l'autocrate des neiges de Bourassie ; il ferme et ouvre le robinet migratoire vers l'Union comme on négocie au bazar ; il tance le jeune technocrate du Palais du Coq à propos du détroit et de la Méditerranée, puis lui téléphone le lendemain pour parler affaires. « En même temps », ricane-t-il en l'imitant. Il joue sur tous les tableaux parce qu'il possède, littéralement, le pont entre les deux.
+Diplomate à géométrie très variable, le Sultan a fait de l'ambiguïté une doctrine. Membre par la carte d'une grande alliance de l'Ouest, il achète pourtant ses systèmes de défense à l'autocrate des neiges de Bourassie ; il ferme et ouvre le robinet migratoire vers l'Union comme on négocie au bazar ; il tance le jeune technocrate du Palais Gallard à propos du détroit et de la mer intérieure, puis lui téléphone le lendemain pour parler affaires. « En même temps », ricane-t-il en l'imitant. Il joue sur tous les tableaux parce qu'il possède, littéralement, le pont entre les deux.
 
 Il se pose en protecteur des opprimés d'une moitié du monde et en pyromane de l'autre : bruyant défenseur d'une cause régionale sur la scène du Levant, muet sur les tourments des peuples cousins quand l'argent d'un grand voisin d'Orient l'exige. Ses fidèles y voient une habileté de grand joueur d'échecs ; ses rivaux, l'opportunisme d'un marchand de tapis qui vend la même pièce à deux clients. Lui appelle ça « la profondeur stratégique » et frappe le sol : le Séisme, toujours, pour rappeler qui tient les fondations.
 
@@ -103,7 +103,7 @@ const STORY_SULTAN = [
       { s: "gourou", t: "Namasté, Sultan. Tu prends parti pour mon rival du nord sur la question de la crête. Le karma note tout, tu sais." },
       { s: "sultan", t: "Je prends parti pour l'équilibre, Gourou. Et l'équilibre, ces temps-ci, penche du côté de ceux qui m'achètent des faucons de fer." },
       { s: "gourou", t: "Toujours le marchand. Ici on médite avant de frapper. Toi tu factures avant de servir." },
-      { s: "sultan", t: "Médite tant que tu veux : quand je frappe le sol, même ta vache sacrée s'arrête de mâcher." },
+      { s: "sultan", t: "Médite tant que tu veux : quand je frappe le sol, même ta vache qui traverse s'arrête de mâcher." },
       { s: "gourou", t: "Elle s'arrête par politesse, pas par peur. Servons, et respirons." }
     ],
     win:  [
@@ -140,37 +140,37 @@ const STORY_SULTAN = [
     ]
   },
   {
-    act: 2, title: "La route de la soie et du silence", sub: "Bosforie–Panguo · peuples cousins, gros contrats",
+    act: 2, title: "La route commerciale et du silence", sub: "Bosforie–Panguo · peuples cousins, gros contrats",
     left: "sultan", right: "timonier", terrain: 4, mode: "flame", ai: 2, doped: null,
     pre:  [
       { s: "narrator", t: "Cité du Matin. Lanternes rouges, lions de pierre, toits d'or. Deux empereurs se jaugent au-dessus d'un carnet de commandes très épais. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
       { s: "timonier", t: "Sultan. Tu te dis protecteur des peuples cousins de mes provinces de l'ouest. Puis tu signes mes contrats de la Route. Le tempo te contredit." },
       { s: "sultan", t: "Un empire sait quand parler fort et quand compter bas, Timonier. Sur le terrain, au moins, je frappe franc." },
-      { s: "timonier", t: "Franc et bruyant. Ma Grande Muraille montera au milieu de ton camp. Elle n'a pas besoin de trembler pour tenir." },
-      { s: "sultan", t: "Ma bannière pourpre a régné quand ta muraille n'arrêtait déjà plus rien. Le talon d'abord, le tempo ensuite." },
+      { s: "timonier", t: "Franc et bruyant. Mon Rempart montera au milieu de ton camp. Il n'a pas besoin de trembler pour tenir." },
+      { s: "sultan", t: "Ma bannière pourpre a régné quand ton rempart n'arrêtait déjà plus rien. Le talon d'abord, le tempo ensuite." },
       { s: "timonier", t: "L'orgueil est un bruit. L'harmonie est un silence. Servons, et écoutons lequel dure." }
     ],
     win:  [
-      { s: "sultan", t: "Ta muraille a tremblé, Timonier. Belle pierre, mauvaises fondations. Le carrefour du monde reste chez moi." },
+      { s: "sultan", t: "Ton rempart a tremblé, Timonier. Belle pierre, mauvaises fondations. Le carrefour du monde reste chez moi." },
       { s: "timonier", t: "Le tempo se rétablira. Il se rétablit toujours. Va compter tes péages, marchand de ponts." },
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ],
     lose:  [
-      { s: "timonier", t: "La muraille contient le tonnerre comme elle contient les steppes. Patiemment. Définitivement." },
-      { s: "sultan", t: "Une muraille finit toujours par avoir deux côtés, Timonier. Je reviendrai par l'autre." },
+      { s: "timonier", t: "Le rempart contient le tonnerre comme il contient les steppes. Patiemment. Définitivement." },
+      { s: "sultan", t: "Un rempart finit toujours par avoir deux côtés, Timonier. Je reviendrai par l'autre." },
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ]
   },
 
   // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
-    act: 3, title: "La porte de l'Union", sub: "Bosforie–Gallardie · adhésion, détroit & Méditerranée",
+    act: 3, title: "La porte de l'Union", sub: "Bosforie–Gallardie · adhésion, détroit & mer intérieure",
     left: "sultan", right: "cygne", terrain: 5, mode: "bomb", ai: 2, doped: null,
     pre:  [
       { s: "narrator", t: "Pont des Deux Mondes. La balle est une bombe à mèche. Sous le pont glissent les barques ; au-dessus, le tapis volant traverse le ciel du soir." },
       { s: "sultan", t: "Bienvenue chez moi, Cygne. Entre deux continents, sur MON pont. Trente ans que je frappe à votre porte. Ce soir je la défonce au smash." },
       { s: "cygne", t: "En même temps, cher Sultan, une porte, ça respecte des critères. On ne défonce pas l'état de droit à coups de talon." },
-      { s: "sultan", t: "L'état de droit ! Pendant que vous délibérez en Méditerranée, moi je fais des forages, des drones, des faits accomplis." },
+      { s: "sultan", t: "L'état de droit ! Pendant que vous délibérez sur la mer intérieure, moi je fais des forages, des drones, des faits accomplis." },
       { s: "cygne", t: "En même temps il faut du dialogue, et en même temps il faut des limites. Cette bombe, par exemple : ne la gardez pas de votre côté." },
       { s: "sultan", t: "Je ne garde rien, technocrate. Je renvoie. Toujours. Et je fais trembler le pont sous tes pieds bien élevés." }
     ],

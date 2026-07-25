@@ -126,8 +126,8 @@ function startPowerWindup(blob) {
   ball.y = h.y - 8;
   if (!noFx) {
     superFlash = "SUPER SMASH — dose !";
-    superFlashSub = "Maintiens F/X — vise — relâche pour frapper";
-    superFlashT = Math.max(superFlashT, 90);
+    superFlashSub = "Maintiens longtemps — vise — relâche pour frapper";
+    superFlashT = Math.max(superFlashT, 110);
     shake = Math.max(shake, 5);
     beep(660, 0.06, "square", 0.12, 0, 900);
   }
@@ -226,9 +226,9 @@ function stepPowerWindup(inL, inR, ins) {
   blob.x = Math.max(minX, Math.min(maxX, blob.x));
   blob._input = input;
   powerWindup.t++;
-  const maxT = typeof POWER_WINDUP_MAX === "number" ? POWER_WINDUP_MAX : 48;
-  const minT = typeof POWER_WINDUP_MIN === "number" ? POWER_WINDUP_MIN : 6;
-  powerWindup.charge = Math.min(1, 0.28 + (powerWindup.t / maxT) * 0.72);
+  const maxT = typeof POWER_WINDUP_MAX === "number" ? POWER_WINDUP_MAX : 84;
+  const minT = typeof POWER_WINDUP_MIN === "number" ? POWER_WINDUP_MIN : 40;
+  powerWindup.charge = Math.min(1, 0.22 + (powerWindup.t / maxT) * 0.78);
   powerWindup.ang = aimAngleFromInput(blob, input);
   // Balle collée à la tête
   const h = blob.headCircle;

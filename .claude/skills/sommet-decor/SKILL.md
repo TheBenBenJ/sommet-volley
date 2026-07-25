@@ -35,7 +35,7 @@ détail.
   des props : ils ne se détourent pas (relève de `sommet-map`).
 
 Mapping `TERRAINS.key` → dossier `assets/maps/<key>/` : les clés et dossiers
-sont alignés (`place-ecarlate`, `country-club-dore`, `palais-du-coq`,
+sont alignés (`place-ecarlate`, `country-club-dore`, `palais-gallard`,
 `esplanade-du-defile`, `cite-du-matin`, `pont-des-deux-mondes`, `stade-ashram`,
 `grande-foret`, `citadelle-du-levant`, `jardin-des-roses`).
 
@@ -52,7 +52,7 @@ Mêmes noms de fichier partout. La colonne « Source » dit qui le fabrique.
 
 **Pas besoin de générer** :
 - `warn.png` : l'alerte d'événement utilise **toujours** celle de Micron
-  (`mapEventWarnIcon` → `SPRITES.mapPalaisDuCoq.warn`) avec un fallback triangle « ! »
+  (`mapEventWarnIcon` → `SPRITES.mapPalaisGallard.warn`) avec un fallback triangle « ! »
   dans le code. Inutile par map — **ne pas le demander à Grok**.
 - `far.png` : couche de parallaxe lointaine **optionnelle**. `drawMapBackdrop`
   se contente de `skyline` seule. Ne l'ajouter que si on veut vraiment un plan

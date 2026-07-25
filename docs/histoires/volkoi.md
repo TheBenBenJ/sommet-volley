@@ -98,7 +98,7 @@ Le Tsar rejoue sa géopolitique givrée en neuf manches, camp gauche. Trois acte
   act: 2, title: "Le gaz et le gourou", sub: "Bourassie–Bharatie · neutralité intéressée",
   left: "volkoi", right: "gourou", terrain: 6, mode: "flame", ai: 1, doped: null,
   pre:  [
-    { s: "narrator", t: "Stade Ashram. Grès miel, guirlandes de soucis orange, palmiers. Une vache sacrée traverse le court avec l'autorité d'un arbitre." },
+    { s: "narrator", t: "Stade Ashram. Grès miel, guirlandes de soucis orange, palmiers. Une vache qui traverse traverse le court avec l'autorité d'un arbitre." },
     { s: "gourou", t: "Namasté, ami du froid. Le monde te boude, et moi je t'achète ton pétrole au rabais. La neutralité est un yoga." },
     { s: "volkoi", t: "Le seul qui reste debout quand tout le monde choisit un camp. Souple. Presque bourassien." },
     { s: "gourou", t: "Ma Méditation gèle ton camp façon zen. Tu gèles par la peur ; moi, par la sérénité. Même patinoire, autre température d'âme." },
@@ -218,7 +218,7 @@ Le Tsar rejoue sa géopolitique givrée en neuf manches, camp gauche. Trois acte
     { s: "narrator", t: "Le canon tonne pour l'ouverture. Le Cygne se dope à l'enjeu. Le dégel de l'Ouest se joue en un dernier échange." }
   ],
   win:  [
-    { s: "volkoi", t: "Le canon a parlé, l'hiver a répondu. Rentre au Palais du Coq, Cygne. Dis-leur que la neige, elle, ne négocie pas." },
+    { s: "volkoi", t: "Le canon a parlé, l'hiver a répondu. Rentre au Palais Gallard, Cygne. Dis-leur que la neige, elle, ne négocie pas." },
     { s: "volkoi", t: "J'ai gelé tous les fronts, un par un, sans jamais courir. On appelle ça la patience. Vous appelez ça un problème." },
     { s: "cygne", t: "Ce n'est pas une fin, c'est un front de plus. La diplomatie est un sport d'endurance — et l'endurance, je la garde." },
     { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }

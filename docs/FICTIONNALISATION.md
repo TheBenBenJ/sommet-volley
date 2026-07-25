@@ -39,7 +39,7 @@ assets/, packs sprites) — on ne touche qu'au **nom affiché** + textes.
 | dorf | Le magnat doré, mèche, cravate rouge, golf | **Doria** | Le Doré / Baron Dorf | Ego en béton · Le Mur |
 | cygne | Le technocrate « en même temps », énarque | **Gallardie** | Le Cygne / Manu-Ordinateur | En même temps · Passage en Force |
 | bebe | L'héritier dynastique, uniforme, défilés | **Ryonganie** | Maréchal Bébé | Discipline · Batterie AA |
-| timonier | L'empereur du contrôle, parti unique, muraille | **Panguo** | Le Grand Timonier | Mur invisible · Grande Muraille |
+| timonier | L'empereur du contrôle, parti unique, remparts | **Panguo** | Le Grand Timonier | Mur invisible · Le Rempart |
 | sultan | Le néo-sultan, deux continents, ambitions | **Bosforie** | Le Sultan (titre, OK) | Séisme · Séisme |
 | gourou | L'ascète-manager, méditation, démographie | **Bharatie** | Le Gourou / Swami | Ashram · Méditation |
 | capitaine | Le capitaine populiste, forêt, tronçonneuse | **Tropicalia** | Le Capitaine / Général Tronço | Tronçonneuse · Déforestation |
@@ -47,8 +47,7 @@ assets/, packs sprites) — on ne touche qu'au **nom affiché** + textes.
 
 Maps (renommer le `name` du terrain, l'archétype reste) : Place Grand-Rouge →
 **Place Écarlate** ; Pelouse Oval → **Country Club Doré** ; Palais de l'Hexagone
-→ **Palais du Coq** ; Esplanade du Défilé → inchangé ; Place du Matin → **Cité
-Interdite-bis** ; Palais du Bosphore → **Pont des Deux Mondes** ; Stade Ashram →
+→ **Palais Gallard** ; Esplanade du Défilé → inchangé ; Place du Matin → **Cité du Matin** ; Palais du Bosphore → **Pont des Deux Mondes** ; Stade Ashram →
 inchangé ; Amazonie Dorée → **Grande Forêt** ; Citadelle du Levant → inchangé
 (Levantie / Le Faucon).
 

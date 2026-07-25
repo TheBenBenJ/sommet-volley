@@ -40,7 +40,7 @@ aucune voix reconnaissable (Steam).
 | Spike / go-nogo | `raw/audio/_spike/` (+ `GO_NOGO.md`) |
 
 Clés map = **slugs officiels** (`place-ecarlate`, `country-club-dore`,
-`palais-du-coq`, `esplanade-du-defile`, `cite-du-matin`, `pont-des-deux-mondes`,
+`palais-gallard`, `esplanade-du-defile`, `cite-du-matin`, `pont-des-deux-mondes`,
 `stade-ashram`, `grande-foret`, `citadelle-du-levant`, `jardin-des-roses`) —
 **pas** les anciens `neige` / `vladou` / `plage` / etc.
 

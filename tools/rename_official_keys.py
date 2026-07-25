@@ -24,7 +24,7 @@ MAP_FOLDER_MAP = [
     # character-keyed packs currently loaded
     ("vladou", "place-ecarlate"),
     ("trompette", "country-club-dore"),
-    ("micron", "palais-du-coq"),
+    ("micron", "palais-gallard"),
     ("bebe", "esplanade-du-defile"),
     # thematic packs
     ("matin", "cite-du-matin"),
@@ -36,7 +36,7 @@ MAP_FOLDER_MAP = [
     # old TERRAINS.key folders in raw/maps
     ("neige", "place-ecarlate"),
     ("plage", "country-club-dore"),
-    ("prairie", "palais-du-coq"),
+    ("prairie", "palais-gallard"),
     ("parade", "esplanade-du-defile"),
 ]
 
@@ -44,7 +44,7 @@ MAP_FOLDER_MAP = [
 SPRITE_MAP = [
     ("mapVladou", "mapPlaceEcarlate"),
     ("mapTrompette", "mapCountryClubDore"),
-    ("mapMicron", "mapPalaisDuCoq"),
+    ("mapMicron", "mapPalaisGallard"),
     ("mapBebe", "mapEsplanadeDuDefile"),
     ("mapMatin", "mapCiteDuMatin"),
     ("mapBosphore", "mapPontDesDeuxMondes"),
@@ -54,7 +54,7 @@ SPRITE_MAP = [
     ("mapRoseraie", "mapJardinDesRoses"),
     ("initMapVladou", "initMapPlaceEcarlate"),
     ("initMapTrompette", "initMapCountryClubDore"),
-    ("initMapMicron", "initMapPalaisDuCoq"),
+    ("initMapMicron", "initMapPalaisGallard"),
     ("initMapBebe", "initMapEsplanadeDuDefile"),
     ("initMapMatin", "initMapCiteDuMatin"),
     ("initMapBosphore", "initMapPontDesDeuxMondes"),
@@ -64,7 +64,7 @@ SPRITE_MAP = [
     ("initMapRoseraie", "initMapJardinDesRoses"),
     ("mapVladouReady", "mapPlaceEcarlateReady"),
     ("mapTrompetteReady", "mapCountryClubDoreReady"),
-    ("mapMicronReady", "mapPalaisDuCoqReady"),
+    ("mapMicronReady", "mapPalaisGallardReady"),
     ("mapBebeReady", "mapEsplanadeDuDefileReady"),
     ("mapMatinReady", "mapCiteDuMatinReady"),
     ("mapBosphoreReady", "mapPontDesDeuxMondesReady"),
@@ -150,8 +150,8 @@ def rename_map_dirs() -> None:
         ("volkoi", "place-ecarlate"),
         ("trompette", "country-club-dore"),
         ("dorf", "country-club-dore"),
-        ("micron", "palais-du-coq"),
-        ("cygne", "palais-du-coq"),
+        ("micron", "palais-gallard"),
+        ("cygne", "palais-gallard"),
         ("bebe", "esplanade-du-defile"),
         ("matin", "cite-du-matin"),
         ("bosphore", "pont-des-deux-mondes"),
@@ -170,9 +170,9 @@ def rename_map_dirs() -> None:
         ("plage", "country-club-dore"),
         ("trompette", "country-club-dore"),
         ("dorf", "country-club-dore"),
-        ("prairie", "palais-du-coq"),
-        ("micron", "palais-du-coq"),
-        ("cygne", "palais-du-coq"),
+        ("prairie", "palais-gallard"),
+        ("micron", "palais-gallard"),
+        ("cygne", "palais-gallard"),
         ("parade", "esplanade-du-defile"),
         ("bebe", "esplanade-du-defile"),
         ("matin", "cite-du-matin"),
@@ -201,7 +201,7 @@ def replace_in_text(text: str) -> str:
     terrain_keys = [
         ("neige", "place-ecarlate"),
         ("plage", "country-club-dore"),
-        ("prairie", "palais-du-coq"),
+        ("prairie", "palais-gallard"),
         ("parade", "esplanade-du-defile"),
         ("matin", "cite-du-matin"),
         ("bosphore", "pont-des-deux-mondes"),

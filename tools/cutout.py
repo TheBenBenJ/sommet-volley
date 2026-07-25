@@ -687,7 +687,7 @@ def main():
     }
     # Drapeaux avec bandes blanches (FR / US / RU…) : ne pas percer les îlots.
     # Les autres (matin, bebe, ashram…) : percer le blanc entre mât et toile.
-    FLAG_KEEP_WHITE_MAPS = {"dorf", "country-club-dore", "cygne", "palais-du-coq", "volkoi", "place-ecarlate", "pont-des-deux-mondes"}
+    FLAG_KEEP_WHITE_MAPS = {"dorf", "country-club-dore", "cygne", "palais-gallard", "volkoi", "place-ecarlate", "pont-des-deux-mondes"}
     outs = []
     for src in sorted(raw_dir.glob("*.png")):
         if src.name.startswith("_"):

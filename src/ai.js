@@ -258,8 +258,10 @@ function aiInput(side, lvlOverride, god) {
   }
   // Super Smash : pendant le dosage, l'IA charge puis relâche
   if (typeof powerWindup !== "undefined" && powerWindup && powerWindup.side === side) {
-    const maxT = typeof POWER_WINDUP_MAX === "number" ? POWER_WINDUP_MAX : 48;
-    const holdUntil = Math.floor(maxT * (0.55 + aiLevel * 0.08));
+    const maxT = typeof POWER_WINDUP_MAX === "number" ? POWER_WINDUP_MAX : 84;
+    const minT = typeof POWER_WINDUP_MIN === "number" ? POWER_WINDUP_MIN : 40;
+    // Toujours tenir au-delà du mini, sinon l'IA annule en smash normal
+    const holdUntil = Math.max(minT + 2, Math.floor(maxT * (0.55 + aiLevel * 0.08)));
     input.smash = powerWindup.t < holdUntil;
     input.ax = side === 0 ? 0.75 : -0.75;
     input.ay = 0.4;

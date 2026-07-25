@@ -84,7 +84,7 @@ MAPS = [
               "Eiffel tower, NO tapered lattice/iron spire of any kind; no real US flags; flat "
               "pale sand volleyball court with painted lines, bright sunny blue sky (empty, no "
               "cars, no people, no boats)"},
-    {"key": "palais-du-coq",  "char": "cygne",    "name": "Palais du Coq",
+    {"key": "palais-gallard",  "char": "cygne",    "name": "Palais Gallard",
      "theme": "a grand neoclassical palace courtyard, a slender ornamental stone spire far in "
               "the distance (abstract, NOT the Eiffel tower), formal hedges, pigeons, blue sky"},
     {"key": "esplanade-du-defile",   "char": "bebe",      "name": "Esplanade du Défilé",

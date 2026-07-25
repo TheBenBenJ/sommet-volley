@@ -24,6 +24,7 @@ const SRC_ORDER = [
   "terrains.js",
   "menus.js",
   "story-campaigns.js",
+  "story-bios.js",
   "story.js",
   "simulation.js",
   "snapshots.js",
@@ -116,6 +117,9 @@ const EPILOGUE = `
   STORY_BY_CHAR: typeof STORY_BY_CHAR !== "undefined" ? STORY_BY_CHAR : null,
   STORY_CAMPAIGNS: typeof STORY_CAMPAIGNS !== "undefined" ? STORY_CAMPAIGNS : null,
   storySelectCampaign: typeof storySelectCampaign === "function" ? storySelectCampaign : null,
+  storyConfirmIntro: typeof storyConfirmIntro === "function" ? storyConfirmIntro : null,
+  storyCharFiche: typeof storyCharFiche === "function" ? storyCharFiche : null,
+  STORY_BIOS: typeof STORY_BIOS !== "undefined" ? STORY_BIOS : null,
   storyCharIdx: typeof storyCharIdx === "function" ? storyCharIdx : null,
   storyStartMatch: typeof storyStartMatch === "function" ? storyStartMatch : null,
   storySelectChapter: typeof storySelectChapter === "function" ? storySelectChapter : null,
@@ -137,6 +141,8 @@ const EPILOGUE = `
   SUPER_SLOW_MUL: typeof SUPER_SLOW_MUL !== "undefined" ? SUPER_SLOW_MUL : 0.55,
   POWER_GAUGE_MAX: typeof POWER_GAUGE_MAX !== "undefined" ? POWER_GAUGE_MAX : 840,
   POWER_GAUGE_TOUCH: typeof POWER_GAUGE_TOUCH !== "undefined" ? POWER_GAUGE_TOUCH : 36,
+  POWER_WINDUP_MIN: typeof POWER_WINDUP_MIN !== "undefined" ? POWER_WINDUP_MIN : 40,
+  POWER_WINDUP_MAX: typeof POWER_WINDUP_MAX !== "undefined" ? POWER_WINDUP_MAX : 84,
   getPowerGauge: () => [powerGauge[0]|0, powerGauge[1]|0],
   setPowerGauge: (a, b) => {
     powerGauge[0] = a | 0;

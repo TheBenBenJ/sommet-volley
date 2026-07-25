@@ -1,4 +1,4 @@
-# Le Gourou — gourou (Bharatie)
+# Le Gourou — gourou · Bharatie
 
 ## Biographie
 
@@ -12,15 +12,15 @@ Puis vint l'ascension nationale, et là, le Gourou inventa la politique-spectacl
 
 Son terrain de prédilection, le **Stade Ashram**, lui ressemble : une enceinte de **grès couleur miel**, chaude comme une fin d'après-midi, dont la **façade s'ouvre en arches festonnées** comme les portes d'un temple qu'on aurait converti en salle de sport. Partout pendent des **guirlandes de soucis orange**, ces fleurs de fête et d'offrande qu'on suspend aux tribunes comme aux dieux ; des palmiers montent la garde ; et l'air sent l'encens, le curcuma et la ferveur. C'est moins un stade qu'un lieu de culte où l'on vient l'adorer entre deux échanges.
 
-Là, régulièrement, une **vache sacrée traverse le court** de sa démarche placide, indifférente au score, et l'arbitre s'incline : on ne bouscule pas la vache. Le Gourou en a fait un art de gouverner. Chez lui, la vache n'est pas un aléa, c'est une politique : sacralisée, protégée, elle sépare les fidèles des autres, et gare à qui touche à son statut. Végétarien strict, jeûneur pendant les neuf nuits sacrées, il glisse volontiers que « la sérénité commence dans l'assiette » — et que ceux qui mangent trop lourd finissent essoufflés au troisième set.
+Là, régulièrement, une **vache qui traverse traverse le court** de sa démarche placide, indifférente au score, et l'arbitre s'incline : on ne bouscule pas la vache. Le Gourou en a fait un art de gouverner. Chez lui, la vache n'est pas un aléa, c'est une politique : sacralisée, protégée, elle sépare les fidèles des autres, et gare à qui touche à son statut. Végétarien strict, jeûneur pendant les neuf nuits sacrées, il glisse volontiers que « la sérénité commence dans l'assiette » — et que ceux qui mangent trop lourd finissent essoufflés au troisième set.
 
 Sa botte secrète, c'est la **Méditation**. Là où d'autres frappent, hurlent, ou dressent des murs, le Gourou **s'assoit en tailleur, ferme les yeux, respire — et glace le camp adverse d'un souffle zen**. Le froid ne vient pas de l'hiver, comme chez le Tsar : il vient du calme absolu, d'un lac parfaitement immobile qui gèle par la seule force de la quiétude. Il a exporté ce truc au monde entier sous le nom de **Journée Internationale du Souffle**, invitant chefs d'État et caméras à s'asseoir sur des tapis dans des stades, jambes croisées, pendant qu'il murmurait : « Inspirez la victoire, expirez l'adversaire. » Diplomatie du yoga, arme du bien-être, gel enrobé de bienveillance.
 
-Manager dans l'âme, il adore les **coups d'éclat économiques théâtraux** : un soir, sans prévenir, il a décrété que les vieilles balles n'avaient plus cours et que tout le monde devait aller échanger ses ballons au guichet — trois semaines de files d'attente, une pagaille monumentale, et lui, serein, expliquant que « le désordre passager purifie ». « Fabriqué en Bharatie », proclame-t-il en brandissant un ballon local ; et il a numérisé jusqu'aux offrandes, si bien qu'on peut désormais payer la vache sacrée par QR code.
+Manager dans l'âme, il adore les **coups d'éclat économiques théâtraux** : un soir, sans prévenir, il a décrété que les vieilles balles n'avaient plus cours et que tout le monde devait aller échanger ses ballons au guichet — trois semaines de files d'attente, une pagaille monumentale, et lui, serein, expliquant que « le désordre passager purifie ». « Fabriqué en Bharatie », proclame-t-il en brandissant un ballon local ; et il a numérisé jusqu'aux offrandes, si bien qu'on peut désormais payer la vache qui traverse par QR code.
 
 À l'international, le Gourou pratique le **non-alignement gourmand** : il fait ses courses partout, achète le pétrole du Tsar à prix d'ami, les avions du Cygne, les gadgets du Faucon, et se fait courtiser par le Baron Dorf lors de galas où l'on scande son nom. Ni tout à fait de l'Ouest, ni tout à fait de l'Est : il est **de lui-même**, pivot souriant que tout le monde veut à sa table. « Je ne choisis pas de camp, dit-il en joignant les paumes. Je choisis la Bharatie. Namasté. »
 
-Mais derrière la sérénité, il y a une **crête**. Sa grande obsession, sa rivalité fondatrice, c'est **Le Grand Timonier** de Panguo, l'autre géant du continent, celui avec qui il se dispute une ligne de montagne au sommet du monde. Deux empires démographiques, deux muraille et méditation, deux patiences qui s'affrontent en silence à très haute altitude. Contre le Timonier, le lac immobile se fend d'une vague : la balle devient **bombe**, et le Gourou range sa douceur au vestiaire. « L'harmonie, oui, sourit-il. Mais l'harmonie passe par où JE décide qu'elle passe. »
+Mais derrière la sérénité, il y a une **crête**. Sa grande obsession, sa rivalité fondatrice, c'est **Le Grand Timonier** de Panguo, l'autre géant du continent, celui avec qui il se dispute une ligne de montagne au sommet du monde. Deux empires démographiques, deux remparts et une méditation, deux patiences qui s'affrontent en silence à très haute altitude. Contre le Timonier, le lac immobile se fend d'une vague : la balle devient **bombe**, et le Gourou range sa douceur au vestiaire. « L'harmonie, oui, sourit-il. Mais l'harmonie passe par où JE décide qu'elle passe. »
 
 Ses manies achèvent le portrait : un **monologue radio mensuel** où il parle seul au pays de la mousson, du fitness et de la grandeur ; des journées de dix-huit heures sans jamais bâiller ; une **endurance** de marathonien qui use l'adversaire jusqu'à ce qu'il craque de fatigue avant lui. Il ne sprinte pas, il dure. Il ne s'emporte pas, il agace. Il ne répond pas, il médite — et pendant qu'on s'énerve contre son calme, le score, lentement, penche de son côté.
 
@@ -101,9 +101,9 @@ const STORY = [
     act: 2, title: "En même temps, namasté", sub: "Bharatie–Gallardie · Rafales, valeurs et courtoisie",
     left: "gourou", right: "cygne", terrain: 2, mode: "flame", ai: 1, doped: null,
     pre:  [
-      { s: "narrator", t: "Palais du Coq. Un partenaire d'armement en visite, entre ventes d'avions et petites leçons de morale. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+      { s: "narrator", t: "Palais Gallard. Un partenaire d'armement en visite, entre ventes d'avions et petites leçons de morale. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
       { s: "cygne", t: "Cher Gourou, nous vous vendons nos plus beaux appareils. En même temps, parlons un peu de vos… libertés." },
-      { s: "gourou", t: "Namasté, Cygne. J'achète tes avions, tu achètes mon marché. En même temps, garde tes leçons pour ton coq." },
+      { s: "gourou", t: "Namasté, Cygne. J'achète tes avions, tu achètes mon marché. En même temps, garde tes leçons pour ton palais." },
       { s: "cygne", t: "La démocratie, voyez-vous, c'est un art de l'équilibre. Un contre, une passe, un principe." },
       { s: "gourou", t: "L'équilibre, je le tiens en tailleur les yeux fermés. Toi, tu vacilles dès que le pigeon s'envole." },
       { s: "cygne", t: "Touché. Servons donc — et que le meilleur en même temps l'emporte." }
@@ -114,7 +114,7 @@ const STORY = [
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ],
     lose:  [
-      { s: "cygne", t: "L'équilibre l'emporte. En même temps, félicitez-vous d'avoir tenu si longtemps face au Coq." },
+      { s: "cygne", t: "L'équilibre l'emporte. En même temps, félicitez-vous d'avoir tenu si longtemps face au Cygne." },
       { s: "gourou", t: "Un revers courtois. Je le range dans le lac. La montagne, elle, ne bouge pas. Namasté." },
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ]
@@ -131,7 +131,7 @@ const STORY = [
       { s: "volkoi", t: "Assez de philosophie. Sers. On verra quelle glace craque la première." }
     ],
     win:  [
-      { s: "gourou", t: "Le lac immobile gèle plus profond que la Volga. Bel échange froid, Tsar. Restons en affaires. Namasté." },
+      { s: "gourou", t: "Le lac immobile gèle plus profond que le fleuve de Bourassie. Bel échange froid, Tsar. Restons en affaires. Namasté." },
       { s: "volkoi", t: "Un revers. Rare. Ton calme est une arme d'hiver. Je m'en souviendrai — et je patiente." },
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ],
@@ -210,25 +210,25 @@ const STORY = [
     ]
   },
   {
-    act: 3, title: "Le toit du monde", sub: "Bharatie–Panguo · la crête, la muraille et la méditation",
+    act: 3, title: "Le toit du monde", sub: "Bharatie–Panguo · la crête, le rempart et la méditation",
     left: "gourou", right: "timonier", terrain: 6, mode: "bomb", ai: 3, doped: "R",
     pre:  [
-      { s: "narrator", t: "Stade Ashram, chez le Gourou. Guirlandes de soucis, vache sacrée en lisière, et une bombe pour ballon. La rivalité fondatrice, deux géants pour un sommet." },
-      { s: "timonier", t: "Je suis venu sur ton grès miel, Gourou, poser ma Grande Muraille au milieu de ton ashram. L'harmonie passe où je le décide." },
-      { s: "gourou", t: "Namasté, Timonier. Bienvenue sous mes guirlandes. Mais la crête, au sommet du monde, est à moi. Ta muraille s'arrêtera au filet." },
+      { s: "narrator", t: "Stade Ashram, chez le Gourou. Guirlandes de soucis, vache qui traverse en lisière, et une bombe pour ballon. La rivalité fondatrice, deux géants pour un sommet." },
+      { s: "timonier", t: "Je suis venu sur ton grès miel, Gourou, poser mon Rempart au milieu de ton ashram. L'harmonie passe où je le décide." },
+      { s: "gourou", t: "Namasté, Timonier. Bienvenue sous mes guirlandes. Mais la crête, au sommet du monde, est à moi. Ton rempart s'arrêtera au filet." },
       { s: "timonier", t: "Je contrôle le tempo. Toujours. Deux milliards d'hommes retiennent leur souffle — et moi je respire lentement." },
-      { s: "gourou", t: "Respirer, c'est MON métier. Un milliard et demi de témoins m'accompagnent. Ta muraille est un mur ; mon lac gèle les murs." },
+      { s: "gourou", t: "Respirer, c'est MON métier. Un milliard et demi de témoins m'accompagnent. Ton rempart est un mur ; mon lac gèle les murs." },
       { s: "timonier", t: "Alors gelons-nous, sage. Le plus impassible restera. La patience du panda contre l'endurance du gourou." },
       { s: "gourou", t: "Que la vache passe, que la bombe fume : je ne cille pas. Servons pour le toit du monde." },
       { s: "narrator", t: "L'aura du Timonier vire au rouge : il ne joue plus, il domine. Renvoyez la bombe, ou l'ashram s'embrase." }
     ],
     win:  [
-      { s: "gourou", t: "La muraille s'énerve, le lac reste lisse. Le calme bat le mur quand le mur veut tout. La crête est méditée : elle est mienne. Namasté, voisin." },
+      { s: "gourou", t: "Le rempart s'énerve, le lac reste lisse. Le calme bat le mur quand le mur veut tout. La crête est méditée : elle est mienne. Namasté, voisin." },
       { s: "timonier", t: "Un revers. Sur ton propre grès. Temporaire, forcément. L'harmonie corrigera la trajectoire… un jour, à mon tempo." },
       { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ],
     lose:  [
-      { s: "timonier", t: "Le tempo, toujours le tempo. Même chez toi, sous tes soucis, la muraille tient. La patience impériale absorbe la ferveur." },
+      { s: "timonier", t: "Le tempo, toujours le tempo. Même chez toi, sous tes soucis, le rempart tient. La patience impériale absorbe la ferveur." },
       { s: "gourou", t: "Tu gagnes un set, pas la montagne. On médite, on respire, on remonte. La crête ne disparaît pas — et moi non plus. Namasté." },
       { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ]

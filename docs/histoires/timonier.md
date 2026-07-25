@@ -12,11 +12,11 @@ Son emblème est un **panda**. C'est un choix de génie. Qui pourrait craindre u
 
 Son parcours ? Une ascension sans bruit. Fils d'un dignitaire tombé puis réhabilité, envoyé jeune « à la campagne se rééduquer » dans une grotte de terre jaune, il en est ressorti sans une plainte et avec une conviction de fer : celui qui a connu la grotte ne craint plus rien du palais. Il a gravi les échelons du grand appareil comme on gravit une montagne sacrée — un pas, une pause, un pas — souriant aux uns, survivant aux autres, ne notant rien mais n'oubliant jamais. Le jour où il est arrivé au sommet, il a fait deux choses : abolir la limite qui l'aurait un jour forcé à partir, et faire ajouter son nom à la constitution, juste après celui des fondateurs. Puis il est allé nourrir les pandas.
 
-Sur le terrain, sa signature est le super **« Grande Muraille »** : d'un geste patient, il fait surgir un rempart au beau milieu du camp adverse. Pas un mur devant lui — devant lui, tout est calme. Un mur chez l'autre, qui coupe le terrain de l'ennemi en deux, l'enferme dans sa propre moitié de moitié, l'oblige à jouer à l'étroit, cerné par sa propre géographie. C'est toute sa politique en une image : je ne t'attaque pas, je te contiens ; je ne franchis pas ta frontière, je la déplace ; je bâtis chez toi le mur que tu finiras par appeler ta maison. La muraille est vieille de deux mille ans et elle n'a jamais servi à sortir — seulement à décider qui reste dedans.
+Sur le terrain, sa signature est le super **« Le Rempart »** : d'un geste patient, il fait surgir un rempart au beau milieu du camp adverse. Pas un mur devant lui — devant lui, tout est calme. Un mur chez l'autre, qui coupe le terrain de l'ennemi en deux, l'enferme dans sa propre moitié de moitié, l'oblige à jouer à l'étroit, cerné par sa propre géographie. C'est toute sa politique en une image : je ne t'attaque pas, je te contiens ; je ne franchis pas ta frontière, je la déplace ; je bâtis chez toi le mur que tu finiras par appeler ta maison. Le rempart est vieux comme l'empire et il n'a jamais servi à sortir — seulement à décider qui reste dedans.
 
 Sa voix est un métronome. Il parle du **« tempo »** comme d'autres parlent de Dieu. « Contrôle le tempo, et tu contrôles le monde » : il l'a fait broder sur les rideaux de la salle du trône. Il ne hausse jamais le ton, ne rit jamais aux éclats, ne transpire pas. Face aux gesticulations du Baron Dorf, aux gels du Tsar, aux fanfaronnades du Maréchal, il oppose la même chose, toujours : **l'harmonie**. Un mot doux qui, dans sa bouche, signifie « fais silence ». Ses menaces sont des proverbes ; ses ultimatums, des invitations à prendre le thé. On sort de son bureau flatté, apaisé, souriant — et l'on s'aperçoit trois semaines plus tard qu'on a signé la reddition de ses ports.
 
-Il a ses obsessions. La **ponctualité cosmique** : ses trains partent à l'heure, ses fleuves changent de lit à l'heure, ses recensements comptent tout, jusqu'aux nuages. Le **long terme** : il pense en dynasties, pas en mandats ; quand on lui demande le bilan d'une révolution vieille de deux siècles, il répond « c'est trop tôt pour juger ». Et une **nouvelle route de la soie** qu'il déroule autour de la planète comme un immense tapis, port après port, pont après pont, dette après dette — non pas pour conquérir, jure-t-il, mais pour « connecter ». Un jour, tout le monde sera connecté. Et le fil, forcément, remontera jusqu'à la Cité du Matin.
+Il a ses obsessions. La **ponctualité cosmique** : ses trains partent à l'heure, ses fleuves changent de lit à l'heure, ses recensements comptent tout, jusqu'aux nuages. Le **long terme** : il pense en dynasties, pas en mandats ; quand on lui demande le bilan d'une révolution vieille de deux siècles, il répond « c'est trop tôt pour juger ». Et une **grande route commerciale** qu'il déroule autour de la planète comme un immense tapis, port après port, pont après pont, dette après dette — non pas pour conquérir, jure-t-il, mais pour « connecter ». Un jour, tout le monde sera connecté. Et le fil, forcément, remontera jusqu'à la Cité du Matin.
 
 Son drapeau ne claque pas au vent ; il ondule. Rouge, comme les murs, comme les lanternes, comme la patience contenue d'un peuple immense. Le Grand Timonier le regarde monter chaque matin depuis la terrasse aux toits d'or, entre ses deux lions de pierre, et il sourit à peine. Il a le temps. Il a toujours eu le temps. Les Jeux du Sommet peuvent commencer : les autres viennent pour gagner un match. Lui vient pour gagner le siècle.
 
@@ -69,18 +69,18 @@ const STORY_TIMONIER = [
       { s: "volkoi", t: "Tu gagnes le set. Moi je garde l'hiver. On se comprend. C'est déjà rare." }
     ],
     lose:  [
-      { s: "volkoi", t: "Le gel a eu raison de ta muraille. Même les empires patients grelottent, parfois." },
+      { s: "volkoi", t: "Le gel a eu raison de ton rempart. Même les empires patients grelottent, parfois." },
       { s: "timonier", t: "Un revers. Temporaire. Tu as l'hiver ; moi j'ai le siècle. Je patiente." }
     ]
   },
   {
-    act: 1, title: "La route de la soie", sub: "Panguo–Bosforie · ports, ponts & dettes",
+    act: 1, title: "La grande route", sub: "Panguo–Bosforie · ports, ponts & dettes",
     left: "timonier", right: "sultan", terrain: 5, mode: "volley", ai: 1, doped: null,
     pre:  [
       { s: "narrator", t: "Pont des Deux Mondes. Un tapis volant passe au-dessus du détroit — bientôt il y aura aussi un port, une autoroute, et une facture." },
       { s: "sultan", t: "Sur MON détroit, entre deux continents, c'est moi le carrefour du monde ! Je défonce au smash !" },
       { s: "timonier", t: "Beau carrefour. Je voudrais y bâtir un port. Et un pont. Et une gare. Je paie tout. Tu signes ici." },
-      { s: "sultan", t: "Tu déroules ta route de la soie jusque sous mes dômes ! Grandiose… mais coûteux, non ?" },
+      { s: "sultan", t: "Tu déroules ta grande route jusque sous mes dômes ! Grandiose… mais coûteux, non ?" },
       { s: "timonier", t: "Coûteux pour toi plus tard. Gratuit pour toi maintenant. C'est la beauté du tapis : on ne voit pas où il mène." },
       { s: "sultan", t: "Un néo-sultan et un empereur, à négocier sur un pont. L'Histoire adore ce genre de scène. Servons !" }
     ],
@@ -99,12 +99,12 @@ const STORY_TIMONIER = [
     act: 2, title: "Le dérisquage", sub: "Panguo–Gallardie · « en même temps » stratégique",
     left: "timonier", right: "cygne", terrain: 2, mode: "flame", ai: 2, doped: null,
     pre:  [
-      { s: "narrator", t: "Palais du Coq. Un coq héraldique doré fanfaronne sur sa bannière bleue. En face, un mur cramoisi patiente. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+      { s: "narrator", t: "Palais Gallard. Un cygne stylisé doré fanfaronne sur sa bannière bleue. En face, un mur cramoisi patiente. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
       { s: "cygne", t: "Cher Timonier, nous ne nous découplons pas. Nous « dérisquons ». En même temps, nous restons partenaires." },
       { s: "timonier", t: "« Dérisquer », « découpler »… jolis verbes. Pendant que tu les conjugues, je livre tes voitures et tes panneaux solaires." },
-      { s: "cygne", t: "L'Europe cherche son autonomie stratégique. En même temps, elle aime beaucoup ton marché. C'est subtil." },
-      { s: "timonier", t: "C'est surtout contradictoire. Le coq chante fort et court peu. Moi je marche lentement et j'arrive partout." },
-      { s: "cygne", t: "En même temps… un coq, ça réveille. Servons, empereur. On verra qui tient la distance." }
+      { s: "cygne", t: "Gallardie cherche son autonomie stratégique. En même temps, elle aime beaucoup ton marché. C'est subtil." },
+      { s: "timonier", t: "C'est surtout contradictoire. Le discours chante fort et court peu. Moi je marche lentement et j'arrive partout." },
+      { s: "cygne", t: "En même temps… une verticale, ça réveille. Servons, empereur. On verra qui tient la distance." }
     ],
     win:  [
       { s: "timonier", t: "Autonomie stratégique : le rêve de dépendre un peu moins de moi, tout en achetant un peu plus. Charmant." },
@@ -112,7 +112,7 @@ const STORY_TIMONIER = [
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ],
     lose:  [
-      { s: "cygne", t: "Le coq a chanté juste ! Partenaires, rivaux, systémiques — tout à la fois. C'est ça, la Gallardie." },
+      { s: "cygne", t: "La nuance a chanté juste ! Partenaires, rivaux, systémiques — tout à la fois. C'est ça, la Gallardie." },
       { s: "timonier", t: "Chante donc. Tes usines commandent mes batteries en coulisse. L'harmonie se moque des slogans." },
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ]
@@ -134,7 +134,7 @@ const STORY_TIMONIER = [
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ],
     lose:  [
-      { s: "capitaine", t: "Gagné contre le Timonier ! La tronçonneuse a smashé la muraille ! Grande soirée, patron !" },
+      { s: "capitaine", t: "Gagné contre le Timonier ! La tronçonneuse a smashé le rempart ! Grande soirée, patron !" },
       { s: "timonier", t: "Gagne le match. Je garde le carnet de commandes. C'est moi qui écris la fin de l'histoire." },
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ]
@@ -156,7 +156,7 @@ const STORY_TIMONIER = [
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ],
     lose:  [
-      { s: "safran", t: "Le voile d'or a ralenti ta muraille, empereur. Même les patients trébuchent sur une roseraie." },
+      { s: "safran", t: "Le voile d'or a ralenti ton rempart, empereur. Même les patients trébuchent sur une roseraie." },
       { s: "timonier", t: "Un set perdu dans un jardin. Le baril, lui, coule toujours vers mes ports. Je patiente." },
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ]
@@ -169,10 +169,10 @@ const STORY_TIMONIER = [
     pre:  [
       { s: "narrator", t: "Citadelle du Levant. Sur les remparts de grès, un faucon guette. Le ballon est une bombe : ce soir, on ne parle plus commerce, mais secrets." },
       { s: "faucon", t: "Tes puces sont partout dans mes systèmes, empereur. Et tes ingénieurs copient les miens. Ça s'appelle un vol." },
-      { s: "timonier", t: "« Vol », « copie »… Je préfère « transfert de technologie ». Tout ce qui traverse ma muraille devient mien. C'est la géographie." },
+      { s: "timonier", t: "« Vol », « copie »… Je préfère « transfert de technologie ». Tout ce qui traverse mon rempart devient mien. C'est la géographie." },
       { s: "faucon", t: "Je frappe vite et sans prévenir. Mon Raid Éclair t'interdit de sauter. Reste au sol, pendant que je vole tes brevets en retour." },
       { s: "narrator", t: "Le regard du Faucon vire au rouge. L'espionnage rend nerveux — et le carburant militaire, plus vif encore." },
-      { s: "timonier", t: "Frappe vite. Moi je bâtis lent. Ma muraille coupe ton camp en deux avant que ton aigle n'ait battu de l'aile. Sers." }
+      { s: "timonier", t: "Frappe vite. Moi je bâtis lent. Mon rempart coupe ton camp en deux avant que ton aigle n'ait battu de l'aile. Sers." }
     ],
     win:  [
       { s: "timonier", t: "Tu voles mes puces ; je bâtis les tiennes. Devine qui, dans dix ans, tient encore l'usine." },
@@ -180,17 +180,17 @@ const STORY_TIMONIER = [
       { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ],
     lose:  [
-      { s: "faucon", t: "Raid réussi, muraille percée. La vitesse mange la patience quand la patience s'endort." },
+      { s: "faucon", t: "Raid réussi, rempart percé. La vitesse mange la patience quand la patience s'endort." },
       { s: "timonier", t: "Tu perces un mur. J'en bâtis mille. Frappe l'éclair ; moi je grave le silicium. Le siècle nous départagera." },
       { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ]
   },
   {
-    act: 3, title: "La guerre froide des tarifs", sub: "Panguo–Doria · muraille d'or contre muraille rouge",
+    act: 3, title: "La guerre froide des tarifs", sub: "Panguo–Doria · rempart d'or contre rempart rouge",
     left: "timonier", right: "dorf", terrain: 4, mode: "bomb", ai: 3, doped: null,
     pre:  [
       { s: "narrator", t: "Cité du Matin. Les lanternes rouges se balancent. Face à l'empereur, le Baron dresse un mur d'or contre un mur cramoisi. La bombe compte les points." },
-      { s: "dorf", t: "Des tarifs ! Des tarifs colossaux ! Cent pour cent sur tes ballons, deux cents sur ton filet, mille pour cent sur ta muraille !" },
+      { s: "dorf", t: "Des tarifs ! Des tarifs colossaux ! Cent pour cent sur tes ballons, deux cents sur ton filet, mille pour cent sur ton rempart !" },
       { s: "timonier", t: "Taxe tout. Tes usines, tes jouets, tes drapeaux « fabriqués chez toi »… c'est encore ma Cité qui les assemble." },
       { s: "dorf", t: "Je bâtis LE plus beau mur du monde, un mur d'or, et je te ferme mon marché ! On se découple, empereur !" },
       { s: "timonier", t: "Tu bâtis un mur devant toi ; moi j'en bâtis un au milieu de ton camp. Le tien te protège. Le mien t'enferme." },
@@ -203,7 +203,7 @@ const STORY_TIMONIER = [
     ],
     lose:  [
       { s: "dorf", t: "Boum ! Chez toi ! On gagne la guerre des tarifs ! On gagne tellement que la Cité en pleure !" },
-      { s: "timonier", t: "Une manche pour l'or. Le temps, lui, joue en rouge. J'attends. J'ai deux mille ans d'entraînement." }
+      { s: "timonier", t: "Une manche pour l'or. Le temps, lui, joue en rouge. J'attends. J'ai des siècles d'entraînement." }
     ]
   },
   {
@@ -213,17 +213,17 @@ const STORY_TIMONIER = [
       { s: "narrator", t: "Finale, à la Cité du Matin. Les lanternes rouges brûlent bas, les lions de pierre veillent. Deux milliards d'âmes retiennent leur souffle : c'est la frontière qui se joue." },
       { s: "gourou", t: "Namasté, empereur. Mais ce soir j'ai laissé le namasté au vestiaire. Sur la crête, tu as poussé ta ligne trop loin." },
       { s: "timonier", t: "La ligne passe où l'harmonie le décide. Et l'harmonie, c'est moi. Ta démographie ne joue pas au volley pour toi." },
-      { s: "gourou", t: "Non. Mais elle carbure. Regarde mes veines : ce soir je ne médite plus, je brûle. Ta muraille va rencontrer ma colère." },
+      { s: "gourou", t: "Non. Mais elle carbure. Regarde mes veines : ce soir je ne médite plus, je brûle. Ton rempart va rencontrer ma colère." },
       { s: "narrator", t: "L'œil du Gourou s'injecte de rouge. La patience de l'empire contre la fureur ascétique — et une bombe entre les deux camps." },
-      { s: "timonier", t: "Brûle donc. Le feu s'épuise ; la muraille reste. Je bâtis un mur au cœur de ton camp et je contrôle le tempo. Sers, voisin." }
+      { s: "timonier", t: "Brûle donc. Le feu s'épuise ; le rempart reste. Je bâtis un mur au cœur de ton camp et je contrôle le tempo. Sers, voisin." }
     ],
     win:  [
-      { s: "timonier", t: "Le calme a tenu la crête. Deux mille ans de patience contre une nuit de carburant : le siècle a choisi la muraille." },
+      { s: "timonier", t: "Le calme a tenu la crête. Des siècles de patience contre une nuit de carburant : le siècle a choisi le rempart." },
       { s: "gourou", t: "J'ai troqué mon souffle contre du feu, et j'ai perdu la ligne. La montagne, elle, se souviendra de tout." },
       { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ],
     lose:  [
-      { s: "gourou", t: "Le feu a fendu ta muraille, empereur. Même la patience du panda a un versant qui s'effondre." },
+      { s: "gourou", t: "Le feu a fendu ton rempart, empereur. Même la patience du panda a un versant qui s'effondre." },
       { s: "timonier", t: "Une frontière cède un soir. L'empire compte en dynasties, pas en défaites. Je rentre au palais. Et je patiente." },
       { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ]
@@ -233,7 +233,7 @@ const STORY_TIMONIER = [
 
 ### Notes de campagne
 
-- **Acte I (Volley, ai 0→1)** — L'empereur range ses vassaux et partenaires *dociles* : le petit frère **Maréchal Bébé** (parrainage énergétique), l'ami « sans limites » **Tsar Volkoï** (axe de revers, pétrole au rabais), le carrefour **Le Sultan** (route de la soie, ports & dettes). Ton : patience-menace souriante, aucune bombe.
+- **Acte I (Volley, ai 0→1)** — L'empereur range ses vassaux et partenaires *dociles* : le petit frère **Maréchal Bébé** (parrainage énergétique), l'ami « sans limites » **Tsar Volkoï** (axe de revers, pétrole au rabais), le carrefour **Le Sultan** (grande route, ports & dettes). Ton : patience-menace souriante, aucune bombe.
 - **Acte II (Volley tendu, ai 2)** — Le monde *résiste* poliment : **Le Cygne** et son « dérisquage » (en même temps), **Le Capitaine** grenier-du-monde (soja/minerais, zéro leçon de morale), **Le Safran** sous embargo (brut à prix d'ami). Rivalités commerciales, encore sans mèche.
 - **Acte III (Bombe, ai 3)** — Les *vraies* lignes : la guerre du silicium/espionnage avec **Le Faucon** (`doped: "R"`), la guerre froide des tarifs avec **Baron Dorf** (mur d'or contre mur rouge, non dopé — il fanfaronne, il ne « carbure » pas), puis la **finale** de frontière contre **Le Gourou** (`doped: "R"`) à domicile, sur la crête himalayenne transposée.
-- **Voix du Timonier** : jamais un cri. « Le tempo », « l'harmonie », « je patiente », « le siècle nous départagera ». Chaque menace est un proverbe ; chaque contrat, une politesse. Son super **Grande Muraille** revient comme un leitmotiv : *il ne se protège pas, il enferme l'autre*.
+- **Voix du Timonier** : jamais un cri. « Le tempo », « l'harmonie », « je patiente », « le siècle nous départagera ». Chaque menace est un proverbe ; chaque contrat, une politesse. Son super **Le Rempart** revient comme un leitmotiv : *il ne se protège pas, il enferme l'autre*.

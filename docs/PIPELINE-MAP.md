@@ -56,7 +56,7 @@ Mapping **terrainKey → dossier pack** actuel :
 |----------------|------------------------|
 | place-ecarlate | place-ecarlate |
 | country-club-dore | country-club-dore |
-| palais-du-coq | palais-du-coq |
+| palais-gallard | palais-gallard |
 | esplanade-du-defile | esplanade-du-defile |
 | cite-du-matin | cite-du-matin |
 | pont-des-deux-mondes | pont-des-deux-mondes |

@@ -8,13 +8,13 @@ Avant de régner, il fut, dit la légende, banquier des choses invisibles, inspe
 
 Il gouverne depuis un **palais néoclassique** dont les colonnes semblent avoir été calibrées par un logiciel : ni trop hautes (arrogance), ni trop basses (faiblesse), « en même temps » monumentales et raisonnables. Dans la cour d'honneur trône un **obélisque abstrait** — une aiguille de pierre sans inscription, sans dieu, sans peuple, juste une flèche pointée vers le haut, que Le Cygne contemple chaque matin en murmurant : « Voilà. Une verticale. Une trajectoire. Une ambition sans contenu obligatoire. » Les mauvaises langues disent qu'il l'a fait ériger le jour où on lui a expliqué qu'un dirigeant devait « incarner une direction » ; il a demandé qu'on lui en fabrique une, littéralement, et l'a plantée au milieu de sa cour.
 
-Sur sa bannière flotte le **coq héraldique doré sur champ d'azur** : un gallinacé fier, ergot dressé, bec ouvert sur un cri qu'on n'entend jamais mais qu'on devine bilingue. Le Cygne adore ce coq. « C'est un oiseau qui chante les pieds dans le fumier », aime-t-il théoriser devant des diplomates médusés. « Voilà tout mon projet : chanter magnifiquement, en toutes circonstances, y compris dans le fumier. Surtout dans le fumier. » Personne n'a jamais osé lui faire remarquer qu'il avait choisi pour emblème un coq, alors qu'il se fait appeler Le Cygne — la contradiction, chez lui, n'est pas un bug, c'est le système d'exploitation.
+Sur sa bannière flotte un **cygne stylisé doré sur champ d'azur** : ailes ouvertes, cou en S, regard qui promet l'élégance et livre la procédure. Le Cygne adore cet emblème. « C'est un oiseau qui glisse les pieds dans le fumier », aime-t-il théoriser devant des diplomates médusés. « Voilà tout mon projet : paraître magnifiquement, en toutes circonstances, y compris dans le fumier. Surtout dans le fumier. » La contradiction, chez lui, n'est pas un bug : c'est le système d'exploitation.
 
 Car sa doctrine tient en deux mots, gravés (par lui-même, la nuit) au fronton de son palais : **« En même temps »**. En même temps de gauche et de droite, en même temps du marché et de l'État, en même temps austère et généreux, en même temps ferme et souple, en même temps là et pas là. Ses adversaires appellent ça de l'opportunisme ; lui appelle ça « tenir les deux bouts de la corde » ; ses conseillers appellent ça « une position d'équilibre extrêmement fatigante à maintenir sur un terrain de volley ». Au filet, il renvoie une balle de la main droite et vous serre la main de la gauche — parfois dans le même geste, ce qui déroute prodigieusement l'adversaire.
 
 Son coup signature s'appelle le **Passage en Force**. Le principe : quand Le Cygne frappe, sa balle ne peut plus être smashée — impossible de la contrer, impossible de la renvoyer violemment, elle passe, un point c'est tout, que le camp d'en face soit d'accord ou non. C'est, dit-on, la transposition sportive de sa méthode de gouvernement préférée : quand le débat s'éternise, quand les tribunes grondent, quand une réforme n'a pas la majorité — il ne négocie pas, il ne recule pas, il **fait passer**. « Le dialogue, c'est essentiel », proclame-t-il avant chaque service, « et en même temps, à un moment, il faut décider. Et décider, mon ami, c'est un peu passer en force sur les indécis. Avec le sourire. »
 
-Le terrain qu'il préfère, celui de son propre **Palais du Coq**, a une particularité qui rend fous ses visiteurs : les **pigeons**. Des nuées entières de pigeons parisiens — gris, roucoulants, absolument sans gêne — traversent le court en plein match, se posent sur le filet, chapardent les miettes des tribunes et déposent leur avis sur les épaulettes des dignitaires. Le Cygne a interdit qu'on les chasse. « Ce sont mes électeurs », philosophe-t-il. « Ni tout à fait des aigles, ni tout à fait rien. Le peuple-pigeon. Il roucoule, il vote, il fiente sur mon obélisque, et en même temps il est chez lui. C'est ça, la démocratie. » Certains soupçonnent qu'il les garde surtout parce qu'un pigeon, vu de loin et sous un bon éclairage, ressemble un peu à un cygne — et que Le Cygne aime être entouré d'imitateurs approximatifs.
+Le terrain qu'il préfère, celui de son propre **Palais Gallard**, a une particularité qui rend fous ses visiteurs : les **pigeons**. Des nuées entières de pigeons de la capitale — gris, roucoulants, absolument sans gêne — traversent le court en plein match, se posent sur le filet, chapardent les miettes des tribunes et déposent leur avis sur les épaulettes des dignitaires. Le Cygne a interdit qu'on les chasse. « Ce sont mes électeurs », philosophe-t-il. « Ni tout à fait des aigles, ni tout à fait rien. Le peuple-pigeon. Il roucoule, il vote, il fiente sur mon obélisque, et en même temps il est chez lui. C'est ça, la démocratie. » Certains soupçonnent qu'il les garde surtout parce qu'un pigeon, vu de loin et sous un bon éclairage, ressemble un peu à un cygne — et que Le Cygne aime être entouré d'imitateurs approximatifs.
 
 On lui prête mille manies. Il parle de lui à la troisième personne quand il est fatigué et à la première personne du pluriel majestueux quand il est en forme. Il a une théorie sur tout, une contre-théorie pour l'équilibrer, et une synthèse des deux qu'il baptise « dépassement des clivages ». Il cite des philosophes que personne n'a lus pour justifier des décisions que tout le monde conteste. Il convoque des grands débats de six heures dont il ressort en expliquant qu'il a « beaucoup appris », puis fait exactement ce qu'il avait prévu de faire avant — par **Passage en Force**, naturellement.
 
@@ -59,7 +59,7 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
     { s: "cygne", t: "J'entends votre patience, et en même temps je vous propose un partenariat exigeant : ni naïf, ni hostile. Un dialogue lucide." },
     { s: "timonier", t: "Un dialogue lucide. Joli. Chez moi ça veut dire : tu achètes, tu ne critiques pas, tu souris aux lions." },
     { s: "cygne", t: "Je souris à tout le monde, c'est mon problème. Mais je passe en force quand il le faut. Regardez ce service : imparable." },
-    { s: "timonier", t: "Sers donc. La muraille attend. Elle a le temps. Elle a toujours le temps." }
+    { s: "timonier", t: "Sers donc. Le rempart attend. Elle a le temps. Elle a toujours le temps." }
   ],
   win:  [
     { s: "cygne", t: "Vous voyez ? On peut être ferme et courtois. En même temps. C'est toute ma doctrine, résumée en un point gagnant." },
@@ -74,7 +74,7 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   act: 1, title: "La leçon de sérénité", sub: "Gallardie–Bharatie · deux premiers de la classe",
   left: "cygne", right: "gourou", terrain: 6, mode: "volley", ai: 1, doped: null,
   pre:  [
-    { s: "narrator", t: "Stade Ashram, grès couleur miel, guirlandes de soucis orange, une vache sacrée qui décide de traverser le court quand ça lui chante." },
+    { s: "narrator", t: "Stade Ashram, grès couleur miel, guirlandes de soucis orange, une vache qui traverse qui décide de traverser le court quand ça lui chante." },
     { s: "gourou", t: "Namasté, Cygne. Tu cours vite à la surface. Mais le mental, en dessous ? Agité comme un étang à pigeons." },
     { s: "cygne", t: "Vous méditez, j'admire ; et en même temps, j'agis. Je suis un contemplatif qui n'a pas le temps de contempler." },
     { s: "gourou", t: "Voilà ton mal, ami. Tu veux tenir les deux bouts de la corde, et la corde te tient." },
@@ -180,7 +180,7 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   ]
 },
 {
-  act: 3, title: "Le poumon du monde", sub: "Gallardie–Tropicalia · la querelle de l'Amazonie",
+  act: 3, title: "Le poumon du monde", sub: "Gallardie–Tropicalia · la querelle de la forêt",
   left: "cygne", right: "capitaine", terrain: 7, mode: "bomb", ai: 3, doped: "R",
   pre:  [
     { s: "narrator", t: "Grande Forêt. Canopée dorée, court en terre rouge, un ara qui crie dans la fumée. La forêt brûle à l'horizon. Le ballon est une bombe, et le Capitaine a l'aura rouge des grands soirs." },
@@ -202,24 +202,24 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   ]
 },
 {
-  act: 3, title: "L'hiver au Palais du Coq", sub: "Gallardie–Bourassie · la finale, chez le Cygne",
+  act: 3, title: "L'hiver au Palais Gallard", sub: "Gallardie–Bourassie · la finale, chez le Cygne",
   left: "cygne", right: "volkoi", terrain: 2, mode: "bomb", ai: 3, doped: "R",
   pre:  [
-    { s: "narrator", t: "Finale. Palais du Coq. Colonnes néoclassiques, obélisque abstrait, coq doré sur azur. Les pigeons ont fui : ils sentent l'hiver arriver. La bombe est là, et le Tsar rougeoie." },
+    { s: "narrator", t: "Finale. Palais Gallard. Colonnes néoclassiques, obélisque abstrait, cygne doré sur azur. Les pigeons ont fui : ils sentent l'hiver arriver. La bombe est là, et le Tsar rougeoie." },
     { s: "volkoi", t: "Me voilà chez toi, Cygne. Sous ton beau palais de premier de la classe. J'ai apporté mon hiver. Il travaille toujours pour moi." },
     { s: "cygne", t: "J'ai passé des heures au téléphone avec vous, Tsar. Des heures. La main tendue, et en même temps la fermeté. On peut encore parler." },
     { s: "volkoi", t: "Parler. Tu adores parler. Pendant que tu parles, je gèle ton camp, tronçon par tronçon. Le dialogue, c'est du dégel. Et il n'y aura pas de dégel." },
     { s: "cygne", t: "Vous ne me gèlerez pas. Mon Passage en Force est imparable : quand je frappe, vous ne pouvez pas smasher. Ma balle passe. Ma ligne tient. Toujours." },
     { s: "volkoi", t: "Imparable ? Tout craque, à la longue, sous le gel. Même les cygnes. Surtout les cygnes. Ils ont le cou si fin." },
-    { s: "narrator", t: "Le Tsar se dope. L'hiver tombe sur le Palais du Coq. La mèche crépite. Passe en force, Cygne — ou l'hiver gagne le Sommet." }
+    { s: "narrator", t: "Le Tsar se dope. L'hiver tombe sur le Palais Gallard. La mèche crépite. Passe en force, Cygne — ou l'hiver gagne le Sommet." }
   ],
   win:  [
-    { s: "cygne", t: "Sur mon terrain, sous mon coq, l'hiver n'a pas passé. Fermeté ET dialogue, en même temps, jusqu'au bout. Voilà la Gallardie. Voilà le Sommet remporté." },
+    { s: "cygne", t: "Sur mon terrain, sous mon emblème, l'hiver n'a pas passé. Fermeté ET dialogue, en même temps, jusqu'au bout. Voilà la Gallardie. Voilà le Sommet remporté." },
     { s: "volkoi", t: "Un revers. Temporaire. L'hiver est patient, et j'ai de la patience pour deux siècles. On se reverra sur la glace, oiseau." },
-    { s: "narrator", t: "Le Cygne lève les bras. Les pigeons reviennent se poser sur l'obélisque. Le coq doré, enfin, semble chanter. Jeux du Sommet : Le Cygne triomphe. En même temps. Le ballon est une bombe : le camp où elle tombe perd." }
+    { s: "narrator", t: "Le Cygne lève les bras. Les pigeons reviennent se poser sur l'obélisque. Le cygne doré, enfin, semble briller. Jeux du Sommet : Le Cygne triomphe. En même temps. Le ballon est une bombe : le camp où elle tombe perd." }
   ],
   lose:  [
-    { s: "volkoi", t: "Boum. Sous ton propre palais. Ton coq a gelé le bec ouvert. Ton « en même temps » a fini en glaçon. Comme prévu." },
+    { s: "volkoi", t: "Boum. Sous ton propre palais. Ton emblème a gelé les ailes ouvertes. Ton « en même temps » a fini en glaçon. Comme prévu." },
     { s: "cygne", t: "L'hiver a gagné une bataille, pas la partie. Je me relève. Je retends la main, et je retends la corde. Premier de la classe, on ne le reste qu'en recommençant." }
   ]
 }

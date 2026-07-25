@@ -7,7 +7,7 @@
 const TERRAINS = [
   { key: "place-ecarlate",    name: "Place Écarlate",          character: 0 }, // Volkoï / Bourassie
   { key: "country-club-dore",    name: "Country Club Doré",       character: 1 }, // Baron Dorf / Doria
-  { key: "palais-du-coq",  name: "Palais du Coq",           character: 2 }, // Le Cygne / Gallardie
+  { key: "palais-gallard",  name: "Palais Gallard",           character: 2 }, // Le Cygne / Gallardie
   { key: "esplanade-du-defile",   name: "Esplanade du Défilé",     character: 3 }, // Maréchal Bébé / Ryonganie
   { key: "cite-du-matin",    name: "Cité du Matin",           character: 4 }, // Grand Timonier / Panguo
   { key: "pont-des-deux-mondes", name: "Pont des Deux Mondes",    character: 5 }, // Le Sultan / Bosforie
@@ -28,7 +28,7 @@ const CHARACTERS = [
   // Casting satirique Sommet Volley — fiches docs/chars/*.yaml
   // stats /5 + multiplicateurs moteur (speed, jump, power, control)
   {
-    key: "volkoi", name: "Tsar Volkoï",
+    key: "volkoi", name: "Tsar Volkoï", nation: "Bourassie",
     color: "#b43a2e", darkColor: "#7a281e",
     stats: { vitesse: 3, detente: 3, puissance: 4, controle: 4 },
     speed: 1.06, jump: 1.06, power: 1.18, control: 0.91,
@@ -38,7 +38,7 @@ const CHARACTERS = [
     superDesc: "Gèle le camp adverse ~5 s : ils glissent sur la glace. Visuel : voile bleu glacial + flocons sur leur moitié."
   },
   {
-    key: "dorf", name: "Baron Dorf",
+    key: "dorf", name: "Baron Dorf", nation: "Doria",
     color: "#f0a060", darkColor: "#c97838",
     stats: { vitesse: 3, detente: 2, puissance: 4, controle: 3 },
     speed: 1.06, jump: 0.94, power: 1.18, control: 0.82,
@@ -48,7 +48,7 @@ const CHARACTERS = [
     superDesc: "Mur doré dans le camp adverse ~5,3 s : bloque les courses au sol (il faut sauter pour passer). Visuel : colonne d’or + halo au pied."
   },
   {
-    key: "cygne", name: "Le Cygne",
+    key: "cygne", name: "Le Cygne", nation: "Gallardie",
     color: "#3d5afe", darkColor: "#1a237e",
     stats: { vitesse: 4, detente: 3, puissance: 3, controle: 4 },
     speed: 1.18, jump: 1.06, power: 1.06, control: 0.91,
@@ -58,7 +58,7 @@ const CHARACTERS = [
     superDesc: "~5 s : tes frappes ne peuvent plus être smashées, et partent plus franchement vers l’adversaire. Visuel : aura bleue."
   },
   {
-    key: "bebe", name: "Maréchal Bébé",
+    key: "bebe", name: "Maréchal Bébé", nation: "Ryonganie",
     color: "#2d3a2e", darkColor: "#1a241c",
     stats: { vitesse: 3, detente: 2, puissance: 4, controle: 3 },
     speed: 1.06, jump: 0.94, power: 1.18, control: 0.82,
@@ -67,16 +67,16 @@ const CHARACTERS = [
     superDesc: "Interdit de sauter au camp adverse ~3,7 s — collés au sol. Visuel : bande rouge + pulses d’alerte."
   },
   {
-    key: "timonier", name: "Le Grand Timonier",
+    key: "timonier", name: "Le Grand Timonier", nation: "Panguo",
     color: "#c62828", darkColor: "#8e0000",
     stats: { vitesse: 3, detente: 3, puissance: 3, controle: 5 },
     speed: 1.06, jump: 1.06, power: 1.06, control: 1.0,
     trait: "Mur invisible : contrôle max, placements précis.",
-    superName: "Grande Muraille",
-    superDesc: "Mur dans le camp adverse ~6 s : coupe le terrain (durée longue). Visuel : muraille dorée lumineuse."
+    superName: "Le Rempart",
+    superDesc: "Mur dans le camp adverse ~6 s : coupe le terrain (durée longue). Visuel : rempart doré lumineux."
   },
   {
-    key: "sultan", name: "Le Sultan",
+    key: "sultan", name: "Le Sultan", nation: "Bosforie",
     color: "#6a1b9a", darkColor: "#4a148c",
     stats: { vitesse: 3, detente: 4, puissance: 3, controle: 3 },
     speed: 1.06, jump: 1.18, power: 1.06, control: 0.82,
@@ -85,7 +85,7 @@ const CHARACTERS = [
     superDesc: "Interdit de sauter au camp adverse ~3,7 s. Visuel : tremblement d’écran + bande rouge au sol."
   },
   {
-    key: "gourou", name: "Le Gourou",
+    key: "gourou", name: "Le Gourou", nation: "Bharatie",
     color: "#ef6c00", darkColor: "#e65100",
     stats: { vitesse: 4, detente: 3, puissance: 3, controle: 4 },
     speed: 1.18, jump: 1.06, power: 1.06, control: 0.91,
@@ -94,7 +94,7 @@ const CHARACTERS = [
     superDesc: "Gèle le camp adverse ~4,7 s (glisse). Visuel : voile clair + particules, façon Hiver zen."
   },
   {
-    key: "capitaine", name: "Le Capitaine",
+    key: "capitaine", name: "Le Capitaine", nation: "Tropicalia",
     color: "#2e7d32", darkColor: "#1b5e20",
     stats: { vitesse: 3, detente: 2, puissance: 5, controle: 2 },
     speed: 1.06, jump: 0.94, power: 1.28, control: 0.75,
@@ -104,7 +104,7 @@ const CHARACTERS = [
     superDesc: "Mur de troncs au camp adverse ~5,3 s : bloque les courses. Visuel : mur forêt + lueur verte."
   },
   {
-    key: "faucon", name: "Le Faucon",
+    key: "faucon", name: "Le Faucon", nation: "Levantie",
     color: "#556270", darkColor: "#333b45",
     stats: { vitesse: 3, detente: 3, puissance: 4, controle: 3 },
     speed: 1.06, jump: 1.06, power: 1.18, control: 0.82,
@@ -113,7 +113,7 @@ const CHARACTERS = [
     superDesc: "Interdit de sauter au camp adverse ~3,7 s — collés au sol. Visuel : bande d’alerte au sol."
   },
   {
-    key: "safran", name: "Le Safran",
+    key: "safran", name: "Le Safran", nation: "Ramenie",
     color: "#c45c26", darkColor: "#8a3d14",
     stats: { vitesse: 3, detente: 3, puissance: 3, controle: 4 },
     speed: 1.06, jump: 1.06, power: 1.06, control: 0.91,
@@ -269,7 +269,7 @@ const battle = {
 // ---------- Combos & techniques signature ----------
 // Chaque camp charge un SUPER en gagnant SUPER_NEED points d'affilée.
 //   Volkoï → Hiver Général · Dorf → Le Mur · Cygne → Passage en Force · Bébé → Batterie AA
-//   Panda → Grande Muraille · Sultan → Séisme · Yogi → Méditation · Jair → Déforestation
+//   Timonier → Le Rempart · Sultan → Séisme · Gourou → Méditation · Capitaine → Déforestation
 const SUPER_NEED = 3;
 const SUPER_FLASH_T = 240;      // ~4 s pour lire nom + description
 const SUPER_READY_FLASH_T = 180; // ~3 s quand la jauge est prête
@@ -284,7 +284,7 @@ const SUPER_DUR = {
   dorf: 320,       // Le Mur ~5,3 s (+ egoCharge)
   cygne: 300,      // Passage en Force ~5 s
   bebe: 220,       // Batterie AA ~3,7 s (noground court)
-  timonier: 360,   // Grande Muraille ~6 s (compense pas d’egoCharge)
+  timonier: 360,   // Le Rempart ~6 s (compense pas d’egoCharge)
   sultan: 220,     // Séisme ~3,7 s
   gourou: 280,     // Méditation ~4,7 s
   capitaine: 320,  // Déforestation ~5,3 s (+ egoCharge)

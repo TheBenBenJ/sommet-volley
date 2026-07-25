@@ -1,7 +1,7 @@
 # Sommet Volley
 
 Volley 2D satirique : Tsar Volkoï, Baron Dorf et Le Cygne s’affrontent
-sur Place Écarlate, Country Club Doré ou Palais du Coq. Techniques signature,
+sur Place Écarlate, Country Club Doré ou Palais Gallard. Techniques signature,
 météo dynamique, public en délire… et un **mode multijoueur en ligne** (1v1 et
 2v2) en pair-à-pair.
 

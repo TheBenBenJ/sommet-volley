@@ -45,7 +45,7 @@ function storyCharName(key) {
 const STORY_SOMMET = [
   // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
-    act: 1, title: "La poignée de main à quatre", sub: "Relation transatlantique · double OTAN",
+    act: 1, title: "La poignée de main à quatre", sub: "Relation transatlantique · double Alliance",
     left: "cygne", right: "dorf", ally: "safran", right2: "volkoi",
     terrain: 1, mode: "2v2", ai: 0, doped: null,
     pre: [
@@ -80,7 +80,7 @@ const STORY_SOMMET = [
       { s: "gourou", t: "Non. Mais elle regarde. Servons." }
     ],
     win: [
-      { s: "gourou", t: "Le calme bat la muraille quand la muraille s'énerve. Bon match, voisin." },
+      { s: "gourou", t: "Le calme bat le rempart quand le rempart s'énerve. Bon match, voisin." },
       { s: "timonier", t: "Un revers. Temporaire. L'harmonie corrigera la trajectoire." }
     ],
     lose: [
@@ -360,7 +360,8 @@ function storyOpen() {
   state = "storySelect";
 }
 
-// Choisit une campagne : `STORY` pointe dessus, on charge sa progression, hub.
+// Choisit une campagne : `STORY` pointe dessus, on charge sa progression,
+// puis fiche d'intro (bio + kit) avant le hub.
 function storySelectCampaign(i) {
   if (i < 0 || i >= STORY_CAMPAIGNS.length) return;
   storyCampaign = STORY_CAMPAIGNS[i];
@@ -372,7 +373,32 @@ function storySelectCampaign(i) {
   // curseur sur le dernier chapitre débloqué (reprise naturelle)
   storyNavIdx = Math.max(0, Math.min(STORY.length - 1, storyProgress.unlocked));
   navIdx = storyNavIdx;
-  state = "storyMenu";
+  storySceneFrame = 0;
+  state = "storyCharIntro";
+}
+
+/** Données fiche : nation / map / blurb (STORY_BIOS) + kit CHARACTERS. */
+function storyCharFiche(key) {
+  const bio = (typeof STORY_BIOS !== "undefined" && STORY_BIOS && STORY_BIOS[key]) || {};
+  const ci = storyCharIdx(key);
+  const a = (ci >= 0 && typeof CHARACTERS !== "undefined") ? CHARACTERS[ci] : null;
+  let mapName = bio.map || "";
+  if (!mapName && a && typeof TERRAINS !== "undefined") {
+    const t = TERRAINS.find(x => x.character === ci);
+    if (t) mapName = t.name;
+  }
+  return {
+    key,
+    name: a ? a.name : key,
+    nation: bio.nation || (a && a.nation) || "",
+    map: mapName,
+    blurb: bio.blurb || "",
+    char: a
+  };
+}
+
+function storyConfirmIntro() {
+  storyOpenHub();
 }
 
 function storyLeave() {
@@ -539,6 +565,11 @@ function storyHandleKeys(code) {
     if (code === "Enter" || code === "Space" || code === "KeyF") { storyAdvanceScene(); return true; }
     return true;
   }
+  if (state === "storyCharIntro") {
+    if (code === "Escape") { if (STORY_CAMPAIGNS.length > 1) storyOpen(); else storyLeave(); return true; }
+    if (code === "Enter" || code === "Space" || code === "KeyF") { storyConfirmIntro(); return true; }
+    return true;
+  }
   if (state === "storyActIntro") {
     if (code === "Escape") { storyOpenHub(); return true; }
     if (code === "Enter" || code === "Space" || code === "KeyF") { storyBeginScene("pre"); return true; }
@@ -551,14 +582,24 @@ function storyHandleKeys(code) {
   return false;
 }
 // clic souris (le hub enregistre des hitboxes "StoryChN")
+// Ne traite QUE les codes Story* et seulement dans un état histoire.
 function storyHandleClickCode(code) {
+  if (typeof code !== "string" || code.indexOf("Story") !== 0) return false;
+  const inStory = state === "storySelect" || state === "storyCharIntro" || state === "storyMenu" ||
+    state === "storyScene" || state === "storyActIntro" || state === "storyEnding";
+  if (!inStory) return false;
   if (code === "StoryBack") { if (STORY_CAMPAIGNS.length > 1) storyOpen(); else storyLeave(); return true; }
   if (code === "StorySelBack") { storyLeave(); return true; }
-  const sm = /^StorySel(\d+)$/.exec(code || "");
-  if (sm) { const i = sm[1] | 0; storySelIdx = i; navIdx = i; storySelectCampaign(i); return true; }
-  const m = /^StoryCh(\d+)$/.exec(code || "");
-  if (m) { const i = m[1] | 0; storyNavIdx = i; navIdx = i; storySelectChapter(i); return true; }
+  const sm = /^StorySel(\d+)$/.exec(code);
+  if (sm && state === "storySelect") {
+    const i = sm[1] | 0; storySelIdx = i; navIdx = i; storySelectCampaign(i); return true;
+  }
+  const m = /^StoryCh(\d+)$/.exec(code);
+  if (m && state === "storyMenu") {
+    const i = m[1] | 0; storyNavIdx = i; navIdx = i; storySelectChapter(i); return true;
+  }
   if (state === "storyScene" && code === "StoryNext") { storyAdvanceScene(); return true; }
+  if (state === "storyCharIntro" && code === "StoryIntroNext") { storyConfirmIntro(); return true; }
   if (state === "storyActIntro" && code === "StoryActNext") { storyBeginScene("pre"); return true; }
   if (state === "storyEnding" && code === "StoryEndNext") { storyOpenHub(); return true; }
   return false;
@@ -1017,6 +1058,137 @@ function drawStoryScene() {
     ctx.fillText((scene.idx + 1) + "/" + scene.lines.length, bx + bw - 20, by + 26);
     ctx.textAlign = "left";
   }
+}
+
+// ---------- Fiche d'intro campagne (bio + infos perso) ----------
+const STORY_SOMMET_FICHE = {
+  title: "Les Jeux du Sommet",
+  nation: "Tournoi mondial",
+  map: "9 terrains · 10 dirigeants",
+  blurb: "Neuf chapitres croisés entre dirigeants fictifs : d'abord le volley diplomatique, puis le ballon enflammé, enfin la bombe. Chaque match raconte une rivalité, une alliance, un ego. Choisis cette campagne pour l'arc original — ou prends un dirigeant et affronte ses neuf rivaux."
+};
+
+function storyWrapLines(text, maxW, font) {
+  if (!text) return [];
+  ctx.font = font;
+  const words = String(text).split(/\s+/);
+  const lines = [];
+  let line = "";
+  for (const w of words) {
+    const test = line ? line + " " + w : w;
+    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w; }
+    else line = test;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function drawStoryCharIntro() {
+  storySceneFrame++;
+  const isChar = storyCampaign && storyCampaign.key.indexOf("char:") === 0;
+  const key = isChar ? storyCampaign.key.slice(5) : null;
+  const fiche = isChar ? storyCharFiche(key) : null;
+  const a = fiche && fiche.char;
+
+  menuScreenBase({
+    title: isChar ? (fiche.name || "Campagne") : STORY_SOMMET_FICHE.title,
+    kicker: isChar ? "Fiche dirigeant · Mode Histoire" : "Campagne originale · Mode Histoire",
+    titleSize: 40,
+    noEscHint: true
+  });
+
+  const mx = UI.mx;
+  const leftX = mx + 10;
+  const rightX = mx + 280;
+  const contentW = W - rightX - mx;
+
+  // Portrait
+  const pBox = 210;
+  const pcx = leftX + pBox / 2;
+  const pcy = 250;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(leftX, pcy - pBox / 2, pBox, pBox, 14);
+  else ctx.rect(leftX, pcy - pBox / 2, pBox, pBox);
+  ctx.fillStyle = "rgba(255,246,232,0.08)";
+  ctx.fill();
+  ctx.strokeStyle = (a && a.color) ? a.color : UI.gold;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  if (isChar) {
+    storyDrawPortrait(key, pcx, pcy, pBox - 16, pBox - 16, {});
+  } else {
+    ctx.textAlign = "center";
+    ctx.font = "72px " + UI.sans;
+    ctx.fillText("🏆", pcx, pcy + 18);
+  }
+
+  // Nation + map sous le portrait
+  ctx.textAlign = "center";
+  ctx.fillStyle = UI.gold;
+  ctx.font = "800 13px " + UI.sans;
+  const nation = isChar ? fiche.nation : STORY_SOMMET_FICHE.nation;
+  const mapName = isChar ? fiche.map : STORY_SOMMET_FICHE.map;
+  ctx.fillText(nation || "—", pcx, pcy + pBox / 2 + 28);
+  ctx.fillStyle = UI.muted;
+  ctx.font = "600 12px " + UI.sans;
+  ctx.fillText(mapName || "", pcx, pcy + pBox / 2 + 46);
+
+  // Colonne infos
+  let y = 188;
+  ctx.textAlign = "left";
+  if (a) {
+    uiLabel("KIT DE JEU", rightX, y, 11, UI.gold, 1.2);
+    y += 18;
+    if (typeof drawStatGauge === "function") {
+      drawStatGauge(rightX, y + 10, "Vitesse", a.stats.vitesse); y += 22;
+      drawStatGauge(rightX, y + 10, "Détente", a.stats.detente); y += 22;
+      drawStatGauge(rightX, y + 10, "Puissance", a.stats.puissance); y += 22;
+      drawStatGauge(rightX, y + 10, "Contrôle", a.stats.controle); y += 28;
+    }
+    ctx.fillStyle = UI.ink;
+    ctx.font = "700 13px " + UI.sans;
+    const traitLines = storyWrapLines(a.trait, contentW, ctx.font);
+    traitLines.forEach((l, i) => ctx.fillText(l, rightX, y + i * 16));
+    y += traitLines.length * 16 + 14;
+    ctx.fillStyle = UI.gold;
+    ctx.font = "800 15px " + UI.display;
+    ctx.fillText("★ " + a.superName, rightX, y);
+    y += 18;
+    ctx.fillStyle = "rgba(255,246,232,0.85)";
+    ctx.font = "600 12px " + UI.sans;
+    const sd = storyWrapLines(a.superDesc, contentW, ctx.font);
+    sd.forEach((l, i) => ctx.fillText(l, rightX, y + i * 15));
+    y += sd.length * 15 + 18;
+  } else {
+    uiLabel("9 CHAPITRES CROISÉS", rightX, y, 11, UI.gold, 1.2);
+    y += 22;
+    ctx.fillStyle = UI.ink;
+    ctx.font = "600 14px " + UI.sans;
+    ["Acte I — Volley & alliances", "Acte II — Ballon enflammé", "Acte III — Mode Bombe"].forEach((l, i) => {
+      ctx.fillText(l, rightX, y + i * 22);
+    });
+    y += 80;
+  }
+
+  // Bio
+  uiLabel(isChar ? "HISTOIRE" : "LE TOURNOI", rightX, y, 11, UI.gold, 1.2);
+  y += 18;
+  const blurb = isChar ? fiche.blurb : STORY_SOMMET_FICHE.blurb;
+  ctx.fillStyle = "rgba(255,246,232,0.88)";
+  ctx.font = "600 13px " + UI.sans;
+  const bioLines = storyWrapLines(blurb, contentW, ctx.font);
+  const maxBio = Math.min(bioLines.length, 9);
+  for (let i = 0; i < maxBio; i++) ctx.fillText(bioLines[i], rightX, y + i * 17);
+
+  if ((storySceneFrame % 40) < 26) {
+    ctx.textAlign = "center";
+    ctx.fillStyle = UI.gold;
+    ctx.font = "800 14px " + UI.sans;
+    ctx.fillText("▸ Espace — voir les chapitres", W / 2, H - 36);
+    ctx.textAlign = "left";
+  }
+  uiLabel("Échap ← campagnes", mx, H - 20, 12, UI.muted, 0.3);
+  hit(W / 2, H / 2, W, H, "StoryIntroNext");
 }
 
 // ---------- Carte d'intro d'acte ----------

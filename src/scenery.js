@@ -28,7 +28,7 @@ function drawCrowd() {
   if (key === "place-ecarlate") {
     stand = "#aabecd"; rail = "#8299ab";
     pal = ["#e57373", "#64b5f6", "#ffffff", "#ffb74d", "#ba68c8", "#4db6ac"];
-  } else if (key === "palais-du-coq") {
+  } else if (key === "palais-gallard") {
     stand = "#8fae52"; rail = "#6b8a3a";
     pal = ["#ff6f61", "#ffd93d", "#7ed957", "#4db3ff", "#c07bff", "#ffffff"];
   } else if (key === "esplanade-du-defile") {
@@ -231,7 +231,7 @@ function weatherClimate() {
       pLeaveClear: 0.4, pStormFromRain: 0.12, pClearFromStorm: 0.82
     },
     // Gallardie — océanique, pluie fine plutôt qu'orages
-    "palais-du-coq": {
+    "palais-gallard": {
       clear: [1200, 2400], rain: [480, 960], storm: [160, 320],
       pLeaveClear: 0.58, pStormFromRain: 0.14, pClearFromStorm: 0.75
     },
@@ -344,7 +344,7 @@ function mapEventKind() {
   const k = TERRAINS[terrain] && TERRAINS[terrain].key;
   if (k === "place-ecarlate") return "cannon";
   if (k === "country-club-dore") return "cart";
-  if (k === "palais-du-coq") return "march";
+  if (k === "palais-gallard") return "march";
   if (k === "esplanade-du-defile") return "radar";
   if (k === "cite-du-matin") return "lantern";
   if (k === "pont-des-deux-mondes") return "carpet";
@@ -1087,7 +1087,7 @@ function drawBackground() {
   const key = TERRAINS[terrain].key;
   if (key === "country-club-dore") drawBgPlage();
   else if (key === "place-ecarlate") drawBgNeige();
-  else if (key === "palais-du-coq" || key === "cite-du-matin" || key === "pont-des-deux-mondes") drawBgPrairie();
+  else if (key === "palais-gallard" || key === "cite-du-matin" || key === "pont-des-deux-mondes") drawBgPrairie();
   else if (key === "esplanade-du-defile" || key === "stade-ashram") drawBgParade();
   else if (key === "grande-foret") drawBgPlage();
   else if (key === "citadelle-du-levant") drawBgColline();

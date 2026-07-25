@@ -31,11 +31,11 @@ qu'une clé d'inspiration pour toi — il ne doit PAS apparaître littéralement
 |---|---|---|---|---|---|---|---|
 | volkoi | Tsar Volkoï | Bourassie | autocrate slave | **Hiver Général** (gèle/glace le camp adverse) | Place Écarlate (0) | canon d'apparat (tir) | forteresse de briques cramoisies enneigée, bulbe rouge lointain, bannières bleu/vert, canon sur traîneau, drapeau héraldique |
 | dorf | Baron Dorf | Doria | magnat-président | **Le Mur** (mur d'or bloque le sol adverse) | Country Club Doré (1) | voiturette de golf klaxon | resort doré, tour hôtel dorée à toit plat, fontaine, palmiers, gazon |
-| cygne | Le Cygne | Gallardie | jeune technocrate | **Passage en Force** (tes frappes ne peuvent + être smashées) | Palais du Coq (2) | pigeons | palais néoclassique, obélisque abstrait, coq héraldique doré sur bannière bleue |
+| cygne | Le Cygne | Gallardie | jeune technocrate | **Passage en Force** (tes frappes ne peuvent + être smashées) | Palais Gallard (2) | pigeons | palais néoclassique, obélisque abstrait, cygne stylisé doré sur bannière bleue |
 | bebe | Maréchal Bébé | Ryonganie | héritier dynastique | **Batterie AA** (interdit de sauter au camp adverse) | Esplanade du Défilé (3) | radar (allumé/éteint) | esplanade brutaliste, gradins de granit, arc abstrait, bannières unies, radar militaire |
-| timonier | Le Grand Timonier | Panguo | empereur impassible | **Grande Muraille** (mur au milieu du camp adverse) | Cité du Matin (4) | lanternes | palais aux murs cramoisis, toits d'or, lanternes rouges, lions gardiens de pierre |
-| sultan | Le Sultan | Bosforie | néo-sultan | **Séisme** (interdit de sauter + tremblement) | Pont des Deux Mondes (5) | tapis volant | palais sur détroit entre deux continents, dômes/tours, barques, bannière ottomane violette à liseré doré |
-| gourou | Le Gourou | Bharatie | gourou-manager | **Méditation** (gèle/glace le camp adverse, façon zen) | Stade Ashram (6) | vache qui traverse | stade de grès miel, façade à arches festonnées, guirlandes de soucis orange, palmiers, vache sacrée |
+| timonier | Le Grand Timonier | Panguo | empereur impassible | **Le Rempart** (mur au milieu du camp adverse) | Cité du Matin (4) | lanternes | palais aux murs cramoisis, toits d'or, lanternes rouges, lions gardiens de pierre |
+| sultan | Le Sultan | Bosforie | néo-sultan | **Séisme** (interdit de sauter + tremblement) | Pont des Deux Mondes (5) | tapis volant | palais sur détroit entre deux continents, dômes/tours, barques, bannière violette à liseré doré |
+| gourou | Le Gourou | Bharatie | gourou-manager | **Méditation** (gèle/glace le camp adverse, façon zen) | Stade Ashram (6) | vache qui traverse | stade de grès miel, façade à arches festonnées, guirlandes de soucis orange, palmiers, vache qui traverse |
 | capitaine | Le Capitaine | Tropicalia | ex-militaire populiste | **Déforestation** (mur de troncs bloque le sol) | Grande Forêt (7) | ara (macaw) | clairière de jungle dorée, huttes sur pilotis, canopée, court en terre rouge |
 | faucon | Le Faucon | Levantie | faucon composite | **Raid Éclair** (interdit de sauter au camp adverse) | Citadelle du Levant (8) | faucon en vol | citadelle de grès sur colline désertique face à la mer, dômes anciens + tours de verre, remparts, faucon |
 | safran | Le Safran | Ramenie | premier composite des hautes terres | **Voile d'Or** (ralentit le camp adverse) | Jardin des Roses (9) | paon | jardin de roses de palais, arcades à tuiles turquoise, dômes en dôme, roseraie |
@@ -48,12 +48,12 @@ faucon≈Netanyahou/composite Israël · safran≈composite Iran.
 ### Pistes de relations réelles (transposées) pour choisir Volley / Flamme / Bombe
 - **Bourassie (volkoi)** : conflit ouvert avec l'Ouest (Cygne, Faucon) → *bombe* ; entente froide avec Panguo, Ryonganie, Ramenie → *volley* ; rivalité-flatterie ambiguë avec Baron Dorf → *volley*.
 - **Baron Dorf (dorf)** : bravade/rivalité avec presque tous (*volley*), guerre commerciale avec le Timonier, « bromance » étrange avec Maréchal Bébé, tension d'alliance avec Le Cygne ; duel plus dur avec Le Safran (*bombe* possible).
-- **Le Cygne (cygne)** : allié de l'Ouest (*volley*), friction Méditerranée/adhésion avec Le Sultan, clash écolo célèbre avec Le Capitaine (Amazonie !), *bombe* avec le Tsar.
+- **Le Cygne (cygne)** : allié de l'Ouest (*volley*), friction mer intérieure/adhésion avec Le Sultan, clash écolo célèbre avec Le Capitaine (forêt !), *bombe* avec le Tsar.
 - **Maréchal Bébé (bebe)** : nucléaire/isolé → beaucoup de *bombe* avec l'Ouest ; entente avec Panguo, Bourassie.
 - **Le Grand Timonier (timonier)** : rivalité de frontière avec Le Gourou → *bombe* ; guerre froide commerciale avec Baron Dorf ; alliances Bourassie/Ryonganie.
-- **Le Sultan (sultan)** : tensions UE/Cygne, Méditerranée, dossiers régionaux.
+- **Le Sultan (sultan)** : tensions Union/Cygne, mer intérieure, dossiers régionaux.
 - **Le Gourou (gourou)** : conflit de crête avec Le Timonier (*bombe*), rivalités régionales.
-- **Le Capitaine (capitaine)** : Amazonie vs Cygne (le fameux clash — *bombe* ou volley musclé), style populiste.
+- **Le Capitaine (capitaine)** : forêt vs Cygne (le fameux clash — *bombe* ou volley musclé), style populiste.
 - **Le Faucon (faucon)** : Moyen-Orient → **grand duel *bombe* avec Le Safran** ; tensions multiples.
 - **Le Safran (safran)** : conflit avec Le Faucon (*bombe*) et Baron Dorf (*bombe*) ; ententes Bourassie/Panguo.
 
@@ -67,7 +67,7 @@ Deux parties :
 ### 1) Biographie (`## Biographie`)
 6 à 12 paragraphes riches. Ton : satirique, drôle, cultivé. **Farfelu mais
 reconnaissable**. Fais référence à : sa nation fictive, son parcours transposé,
-sa **map** et son **décor** (ex. le canon de la Place Écarlate, le coq du Palais,
+sa **map** et son **décor** (ex. le canon de la Place Écarlate, l'obélisque du Palais,
 la vache du Stade Ashram, le tapis volant du Pont des Deux Mondes…), son **drapeau**,
 son **super** (comme un « trait de caractère » : le Tsar qui gèle tout, le Baron
 qui bâtit des murs, etc.), son **event de map**. Invente une mythologie personnelle
