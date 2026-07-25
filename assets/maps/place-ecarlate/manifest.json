@@ -1,5 +1,5 @@
 {
-  "key": "volkoi",
+  "key": "place-ecarlate",
   "name": "Place Écarlate",
   "layers": [
     "far",
@@ -12,5 +12,5 @@
   ],
   "event": "cannon",
   "thumb": "thumb.png",
-  "notes": "Bourassie / Tsar Volkoï (clé vladou, terrainKey neige). Skyline Gemini 16:9 bgFullHeight. Props Grok raccordés (net_post, flag, cannon/cannon_fire → cannon_0/1). Event: canon cérémoniel. snowman/shot/warn legacy optionnels."
+  "notes": "Bourassie / Tsar Volkoï. Skyline Gemini 2026-07-25 (2752×1536 ~16:9), forteresse rouge neige + clock gate. bgFullHeight + baselineFromBottom=60. Event: canon cérémoniel."
 }

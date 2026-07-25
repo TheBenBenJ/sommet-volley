@@ -2,11 +2,11 @@
 name: sommet-character
 description: >
   Intègre un nouveau personnage (dirigeant caricaturé) dans le jeu Sommet Volley.
-  Pipeline pixels : Grok crée l'ANCRE d'identité (idle_1), puis Codex CLI dérive
-  les 26 autres poses par LOTS de 3–4 (référence image + LOCK identité), fond
-  MAGENTA chroma-key. Ensuite INTÉGRATION : détourage, manifest, roster
-  CHARACTERS, portraits/sélection, vérif. Utiliser dès qu'on veut ajouter,
-  remplacer, ou regénérer un perso pour cohérence pose-à-pose.
+  Pipeline pixels : Grok crée l'ANCRE d'identité (idle_0 / idle_1 / idle_face_0),
+  puis Codex CLI dérive les 26 autres poses par LOTS de 3–4 (référence image +
+  LOCK identité), fond MAGENTA chroma-key — une session Codex à la fois. Ensuite
+  INTÉGRATION : détourage, manifest (idle:2 walk:4), roster CHARACTERS, vérif.
+  Utiliser dès qu'on veut ajouter, remplacer, ou regénérer un perso.
 ---
 
 # sommet-character — ajouter/intégrer un personnage
@@ -143,66 +143,83 @@ rendu est immédiatement identifiable → regénérer l’ancre (exagérer chibi
 échelle OK, Steam OK. Sinon refaire Grok — ne pas empiler 26 poses sur une
 mauvaise ancre.
 
-### 1B — Codex CLI : dériver les 26 autres poses par lots de 3–4
+### 1B — Codex CLI : dériver les autres poses par lots de 3–4
 
-**Référence jointe** : toujours `assets/<key>/idle_1.png` (ou `raw/<key>/idle_1.png`
-après cutout ancre). **Ne jamais écraser `idle_1`.**
+**Ancre LOCK** (choisie par l’utilisateur / l’agent) = **une** de :
+`idle_0` | `idle_1` | `idle_face_0`. Joindre **cette** image (`-i`).
+**Ne jamais écraser l’ancre** (ni raw ni assets).
 
-Écrire un prompt de session dans `raw/<key>/_regen_codex_prompt.md` (voir
-modèle ci-dessous / `raw/dorf/_regen_codex_prompt.md`), puis lancer **un lot
-à la fois** (recommandé) ou une session qui traite les lots séquentiellement :
+| Ancre | Frames à générer (26) | Lot 1 adapté |
+|-------|------------------------|--------------|
+| `idle_1` | tout sauf `idle_1` | `idle_face_0`, `idle_0` |
+| `idle_0` | tout sauf `idle_0` | `idle_face_0`, `idle_1` |
+| `idle_face_0` | tout sauf `idle_face_0` | `idle_0`, `idle_1` (corps entier dérivés du visage + tenue visible / casting) |
+
+Si l’ancre est `idle_face_0` (buste face) : les poses corps = **même visage /
+cheveux / tenue**, vue côté face à droite, proportions chibi cohérentes — ne
+pas inventer une autre tête.
+
+Écrire `raw/<key>/_regen_codex_prompt.md` (ex. `raw/dorf/`, `raw/faucon/`),
+puis **une session Codex par perso** (ne pas paralléliser 2+ gens image — rate
+limit / WS drop). Lots **séquentiels** dans la session :
 
 ```bash
 codex exec \
   --dangerously-bypass-approvals-and-sandbox \
   --skip-git-repo-check \
   -C "$(pwd)" \
-  -i "assets/<key>/idle_1.png" \
+  -i "assets/<key>/<ANCRE>.png" \
   - \
   < "raw/<key>/_regen_codex_prompt.md"
 ```
 
-Pour un lot suivant (même session) : `codex exec resume <session_id> "…"` avec
-le prochain lot + la même LOCK identité.
+**Resume** (si coupure mid-flight) — **pas de `-C`** sur `resume` :
+
+```bash
+codex exec resume <session_id> \
+  --dangerously-bypass-approvals-and-sandbox \
+  --skip-git-repo-check \
+  -i "assets/<key>/<ANCRE>.png" \
+  - <<'EOF'
+…lots restants + rappel LOCK…
+EOF
+```
+
+Récupérer `session id:` dans le log. Relancer seulement les lots manquants ;
+copier d’abord les PNG déjà générés dans `~/.codex/generated_images/<session>/`.
 
 #### Lots canoniques (3–4 frames) — ordre fixe
 
 | lot | fichiers | notes |
 |-----|----------|--------|
-| 1 | `idle_face_0`, `idle_0` | (+ rappel : `idle_1` LOCK, ne pas régénérer). Manifest `idle: 2`. |
-| 2 | `walk_0`, `walk_1`, `walk_2`, `walk_3` | **lot critique** — QA walk avant de continuer |
-| 3 | `jump_0`, `jump_1`, `jump_2` | |
+| 1 | selon ancre (table ci-dessus) | Manifest final `idle: 2` |
+| 2 | `walk_0`..`walk_3` | **critique** — QA walk avant de continuer |
+| 3 | `jump_0`..`jump_2` | |
 | 4 | `receive_0`, `receive_1`, `aim_0`, `aim_1` | mains vides |
-| 5 | `smash_0`, `smash_1`, `smash_2` | main ouverte, pas de balle |
-| 6 | `super_0`, `super_1`, `super_2`, `super_3` | |
+| 5 | `smash_0`..`smash_2` | main ouverte, pas de balle |
+| 6 | `super_0`..`super_3` | |
 | 7 | `panic_0`, `panic_1`, `victory_0`, `victory_1` | |
-| 8 | `defeat_0`, `defeat_1` | finir + cutout global |
+| 8 | `defeat_0`, `defeat_1` | puis cutout global |
 
-Après **chaque lot** : copier les PNG dans `raw/<key>/`, contact sheet rapide,
-QA (identité + pose). Si une frame dérive → **regénérer ce lot seulement**
-(même `-i idle_1`), pas tout le set.
-
-Pourquoi 3–4 : assez pour cohérence de série, assez court pour Codex (évite
-les waits / dérives d’une méga-session 26).
+Après **chaque lot** : `cp` → `raw/<key>/`, contact sheet, QA. Frame
+fautive → **regénérer le lot** (même `-i` ancre), pas tout le set.
 
 #### LOCK identité (à coller dans chaque prompt Codex)
 
-- Même perso que la référence jointe : visage, cheveux, **tenue EXACTE**,
-  proportions, échelle, trait (contours noirs, cel shading).
-- OUTFIT LOCK : tenue IDENTIQUE sur chaque frame (ne pas « améliorer »).
+- Même perso que la référence jointe : visage, cheveux, **tenue EXACTE**
+  (celle de l’ancre, pas une « amélioration » casting), proportions, trait.
 - Fond MAGENTA #FF00FF, perso SEUL, mains VIDES, face à DROITE (sauf
-  `idle_face` = FACE), corps entier tête→pieds.
-- Une image = une pose = un fichier `raw/<key>/<anim>_<n>.png`.
+  `idle_face` = FACE), corps entier tête→pieds (sauf portrait).
+- Une image = une pose = `raw/<key>/<anim>_<n>.png`.
 
-Inclure dans le prompt la table des fichiers **du lot courant** avec la
-description de pose (colonne « action » + `<POSE JAMBES>` pour walk).
-
-Quand les 26 + `idle_1` sont là → cutout global (étape 2).
+Quand les 26 + ancre sont là → cutout (étape 2). Forcer `idle: 2`, `walk: 4`
+dans le manifest (Codex laisse parfois `idle: 1`).
 
 ### Regen d’un perso existant (cohérence)
 
-Même pipeline **sans** Grok si l’ancre est bonne : partir de
-`assets/<key>/idle_1.png`, lots Codex 1→8, cutout. Ex. Dorf 2026-07-25.
+Sans Grok si l’ancre est bonne : `-i` sur l’ancre choisie, lots 1→8, cutout.
+Ex. Dorf (`idle_1`), Faucon (`idle_0`). File d’attente multi-persos =
+**séquentielle** (un `codex exec` à la fois).
 
 ---
 
