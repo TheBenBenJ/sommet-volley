@@ -1662,6 +1662,8 @@ function drawBall() {
   }
   // mode bombe : la balle est une bombe à mèche
   if (bombMode) { drawBomb(); return; }
+  // mode flamme : ballon toujours en feu (stages 0..3)
+  if (flameMode) { drawFlameBall(); return; }
   // traînée (enflammée pendant un smash destructeur)
   const fiery = ball.smash > 0;
   for (let i = 0; i < ball.trail.length; i++) {
@@ -1720,6 +1722,83 @@ function drawBall() {
   ctx.restore();
 }
 
+/** Intensité du ballon enflammé : 0 (braises) → 3 (brasier), selon le pire PV. */
+function flameBallStage() {
+  let burn = 0;
+  for (const b of activeBlobs) {
+    const hp = (b.flameHp == null) ? FLAME_HP_MAX : b.flameHp;
+    burn = Math.max(burn, FLAME_HP_MAX - hp);
+  }
+  return Math.max(0, Math.min(3, burn));
+}
+
+function drawFlameBall() {
+  const stage = flameBallStage();
+  // traînée orange toujours allumée
+  for (let i = 0; i < ball.trail.length; i++) {
+    const t = ball.trail[i];
+    const f = (i + 1) / ball.trail.length;
+    ctx.fillStyle = "rgba(255," + Math.floor(40 + f * 140) + ",0," + (f * 0.45).toFixed(2) + ")";
+    ctx.beginPath(); ctx.arc(t.x, t.y, BALL_R * (0.45 + f * 0.75), 0, Math.PI * 2); ctx.fill();
+  }
+  const pulse = 0.5 + 0.5 * Math.sin((typeof tick === "number" ? tick : 0) / 7);
+  ctx.fillStyle = "rgba(255," + (80 + stage * 30) + ",0," + (0.18 + stage * 0.08 + pulse * 0.08).toFixed(3) + ")";
+  ctx.beginPath(); ctx.arc(ball.x, ball.y, BALL_R + 6 + stage * 3 + pulse * 2, 0, Math.PI * 2); ctx.fill();
+
+  const shScale = Math.max(0.3, 1 - (GROUND_Y - ball.y) / 400);
+  ctx.fillStyle = "rgba(0,0,0," + (0.25 * shScale) + ")";
+  ctx.beginPath();
+  ctx.ellipse(ball.x, GROUND_Y + 6, BALL_R * shScale + 4, 5 * shScale + 2, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.save();
+  ctx.translate(ball.x, ball.y);
+  ctx.rotate(ball.angle);
+  const flames = SPRITES.ballFlame;
+  let spr = flames && flames[stage];
+  if (!spriteReady(spr) && flames) {
+    for (let i = stage; i >= 0; i--) { if (spriteReady(flames[i])) { spr = flames[i]; break; } }
+  }
+  if (!spriteReady(spr)) spr = SPRITES.ballPurple;
+  if (spriteReady(spr)) {
+    const d = BALL_R * (2.25 + stage * 0.08);
+    ctx.drawImage(spr, -d / 2, -d / 2, d, d);
+  } else {
+    ctx.fillStyle = "#ff6a20";
+    ctx.beginPath(); ctx.arc(0, 0, BALL_R, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+/** Jauge PV flamme au-dessus de chaque joueur. */
+function drawFlameHUD() {
+  for (const b of activeBlobs) {
+    const max = FLAME_HP_MAX;
+    const hp = Math.max(0, b.flameHp == null ? max : b.flameHp);
+    const pipW = 10, gap = 3;
+    const totalW = max * pipW + (max - 1) * gap;
+    const x0 = b.x - totalW / 2;
+    const y0 = b.y - ((typeof CHAR_BASE_H !== "undefined") ? CHAR_BASE_H : 110) - 14;
+    for (let i = 0; i < max; i++) {
+      const on = i < hp;
+      ctx.fillStyle = on ? "#ff6a20" : "rgba(20,12,8,0.55)";
+      ctx.strokeStyle = on ? "#ffe08a" : "rgba(255,200,120,0.25)";
+      ctx.lineWidth = 1.2;
+      const x = x0 + i * (pipW + gap);
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x, y0, pipW, 7, 2);
+      else ctx.rect(x, y0, pipW, 7);
+      ctx.fill(); ctx.stroke();
+    }
+    if (b.flameIgniteT > 0) {
+      ctx.fillStyle = "rgba(255,80,0," + Math.min(0.7, b.flameIgniteT / 70).toFixed(2) + ")";
+      ctx.beginPath();
+      ctx.arc(b.x, b.y - 55, 28 + (70 - b.flameIgniteT) * 0.15, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+
 // bandeau du mode bombe : compte à rebours central + camp en danger
 function drawBombHUD() {
   // voile rouge pulsé sur la moitié de terrain où se trouve la bombe
@@ -1764,6 +1843,7 @@ function drawHUD() {
     if (bombFlash < 0.02) bombFlash = 0;
   }
   if (bombMode && (state === "play" || state === "serve")) drawBombHUD();
+  if (flameMode && (state === "play" || state === "serve" || state === "point")) drawFlameHUD();
 
   // ---- scores strictement sous le terrain (bande SCORE_BAND)
   const DISP = (typeof UI !== "undefined" ? UI.display : "'Fredoka', sans-serif");

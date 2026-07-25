@@ -31,7 +31,7 @@ Le brief de rédaction commun : [_BRIEF.md](_BRIEF.md).
 2. `## Mode Histoire de <Nom>` — les 9 rencontres en **3 actes**, chacune au format
    exact d'un chapitre `src/story.js` :
    ```js
-   { act, title, sub, left:"<ce perso>", right:"<rival>", terrain, mode:"volley"|"bomb",
+   { act, title, sub, left:"<ce perso>", right:"<rival>", terrain, mode:"volley"|"bomb"|"flame",
      ai:0..3, doped:null|"R", pre:[{s,t}…], win:[{s,t}…], lose:[{s,t}…] }
    ```
 

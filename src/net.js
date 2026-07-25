@@ -358,6 +358,7 @@ function onNetData(m) {
       ballSkin = Math.max(0, Math.min(BALL_SKINS.length - 1, m.ballSkin | 0));
       bombMode = !!m.bomb;                          // l'hôte décide de la règle Bombe…
       bombTime = m.bt || BOMB_TIME;                 // …et de la durée de mèche
+      flameMode = !!m.flame && !bombMode;           // …ou Ballon enflammé
       mapEventsQuiet = !!m.quiet;                   // …et terrain calme (sans events)
       guestResetMatch();
       vsAI = false;
@@ -420,7 +421,8 @@ function hostStartMatch() {
   guestBallGen = 0; appliedGuestBallGen = -1;
   const seed = (Math.random() * 2 ** 31) | 0;
   sendRel({ t: "start", m: matchId, seed, terrain, ballSkin, a: [blobL.charId, blobR.charId],
-            bomb: bombMode ? 1 : 0, bt: bombTime, quiet: mapEventsQuiet ? 1 : 0 });
+            bomb: bombMode ? 1 : 0, bt: bombTime, flame: flameMode ? 1 : 0,
+            quiet: mapEventsQuiet ? 1 : 0 });
   vsAI = false;
   setMode("1v1"); mySlot = 0; // hôte 1v1 = Rouge (slot 0)
   newGame(seed);
@@ -679,12 +681,13 @@ function hostStartMatch2v2() {
   newGame(seed); // réinitialise positions/scores (n'écrase pas charId/speedMul en ligne)
   activeBlobs.forEach((b, s) => {
     b.charId = anims[s];
-    b.speedMul = (s === 0 || occ[s]) ? 1 : AI_LEVELS[aiLevel].speedMul; // IA sur slots libres
+    b.speedMul = 1; // humain ou IA : mêmes stats perso (pas de boost difficulté)
   });
   for (const g of guests) {
     if (g.rel && g.rel.open) {
       g.rel.send({ t: "start", m: matchId, mode: "2v2", slot: g.slot, seed, terrain, ballSkin, a: anims,
-                   bomb: bombMode ? 1 : 0, bt: bombTime, quiet: mapEventsQuiet ? 1 : 0 });
+                   bomb: bombMode ? 1 : 0, bt: bombTime, flame: flameMode ? 1 : 0,
+                   quiet: mapEventsQuiet ? 1 : 0 });
     }
   }
 }
@@ -954,6 +957,7 @@ function applyDiscrete(d) {
   if (d.superCharge) { superCharge[0] = d.superCharge[0]; superCharge[1] = d.superCharge[1]; }
   if (d.weather !== undefined) { weather = d.weather; weatherTimer = d.weatherTimer; }
   if (d.bombMode !== undefined) { bombMode = d.bombMode; bombTimer = d.bombTimer || 0; }
+  if (d.flameMode !== undefined) flameMode = !!d.flameMode;
   // Physique balle : ne pas écraser si on simule localement (anti rubber-band)
   if (!iOwnBall) {
     ball.frozen = d.ball.frozen; ball.popped = !!d.ball.popped;
@@ -980,6 +984,9 @@ function applyDiscrete(d) {
     if (sb.charId !== undefined) b.charId = sb.charId;
     b.scramble = sb.scramble || 0;
     b.superT = sb.superT || 0; b.superKind = sb.superKind || ""; b.superSmash = !!sb.superSmash;
+    if (sb.flameHp !== undefined) b.flameHp = sb.flameHp | 0;
+    if (sb.flameIgniteT !== undefined) b.flameIgniteT = sb.flameIgniteT | 0;
+    if (sb.charredT !== undefined) b.charredT = sb.charredT | 0;
   });
 }
 
@@ -995,6 +1002,10 @@ function guestDetectEvents(prev, d) {
   if (d.bombMode && prev.bombTimer > 0 && (d.bombTimer || 0) <= 0) {
     bombFlash = 1; shake = Math.max(shake, 18);
     sfxBombBlast();
+    const hitSide = (d.ball && d.ball.x < NET_X) ? 0 : 1;
+    for (const b of activeBlobs) {
+      if (b.side === hitSide) b.charredT = Math.max(b.charredT || 0, 110);
+    }
   }
   // déclenchement d'un SUPER (superT passe de 0 à >0)
   for (let i = 0; i < activeBlobs.length; i++) {

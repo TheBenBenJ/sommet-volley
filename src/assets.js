@@ -3,6 +3,10 @@
 
 const SPRITES = {
   ballPurple: null,      // ballon volley violet / crème
+  ballFlame: [null, null, null, null], // mode Ballon enflammé — stages 0..3
+  fxFlameFeet: [null, null, null],     // overlays feu pieds 0..2
+  fxFlameBody: [null, null, null],     // overlays feu corps 0..2
+  fxFlameHead: [null, null],           // overlays feu tête 0..1
   mapPlaceEcarlate: null,       // Place Écarlate (Volkoï)
   mapCountryClubDore: null,    // Country Club Doré (Dorf)
   mapPalaisDuCoq: null,       // Palais du Coq (Cygne)
@@ -38,6 +42,16 @@ function loadMapPack(key, files) {
 
 function initSprites() {
   SPRITES.ballPurple = loadSprite("assets/ball/volley_purple.png");
+  for (let i = 0; i < 4; i++) {
+    SPRITES.ballFlame[i] = loadSprite("assets/ball/flame_" + i + ".png");
+  }
+  for (let i = 0; i < 3; i++) {
+    SPRITES.fxFlameFeet[i] = loadSprite("assets/fx/flame_feet_" + i + ".png");
+    SPRITES.fxFlameBody[i] = loadSprite("assets/fx/flame_body_" + i + ".png");
+  }
+  for (let i = 0; i < 2; i++) {
+    SPRITES.fxFlameHead[i] = loadSprite("assets/fx/flame_head_" + i + ".png");
+  }
   initMapPlaceEcarlate();
   initMapCountryClubDore();
   initMapPalaisDuCoq();

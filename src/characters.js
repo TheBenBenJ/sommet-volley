@@ -11,6 +11,11 @@ function drawCharacter(b) {
   const key = A.key;
   drawSuperAura(b);
   const menu = b.groundY != null;
+  const charred = !menu && (b.charredT | 0) > 0;
+  if (charred) {
+    ctx.save();
+    ctx.filter = "brightness(0)";
+  }
   const sprited = menu
     ? (typeof drawSpriteCharMenu === "function" && drawSpriteCharMenu(b))
     : (typeof drawSpriteChar === "function" && drawSpriteChar(b));
@@ -21,9 +26,51 @@ function drawCharacter(b) {
     else if (key === "bebe") drawBebe(b);
     else drawGenericChar(b);
   }
+  if (charred) ctx.restore();
+  if (!menu && typeof drawFlameOverlay === "function") drawFlameOverlay(b);
   drawSuperOverlay(b);
   drawCharSuperFX(b);
   drawEmote(b);
+}
+
+/** Overlays feu (pieds / corps / tête) selon les PV restants en mode flamme. */
+function drawFlameOverlay(b) {
+  if (typeof flameMode === "undefined" || !flameMode) return;
+  if (b.groundY != null) return;
+  const max = (typeof FLAME_HP_MAX !== "undefined") ? FLAME_HP_MAX : 3;
+  const hp = (b.flameHp == null) ? max : b.flameHp;
+  let burn = max - hp;
+  if ((b.flameIgniteT | 0) > 0) burn = Math.max(burn, max);
+  if (burn <= 0) return;
+
+  let spr = null;
+  const t = (typeof tick === "number" ? tick : 0);
+  if (burn >= 3) {
+    const frames = SPRITES.fxFlameHead || [];
+    spr = frames[Math.min(frames.length - 1, (t >> 3) % Math.max(1, frames.length))];
+  } else if (burn === 2) {
+    const frames = SPRITES.fxFlameBody || [];
+    spr = frames[Math.min(frames.length - 1, burn - 1 + ((t >> 4) & 1))];
+    if (!spriteReady(spr)) spr = frames[Math.min(2, burn)];
+  } else {
+    const frames = SPRITES.fxFlameFeet || [];
+    spr = frames[Math.min(frames.length - 1, (t >> 4) % Math.max(1, frames.length))];
+  }
+  if (!spriteReady(spr)) return;
+
+  const pack = (typeof charPack === "function") ? charPack(CHARACTERS[b.charId].key) : null;
+  const baseH = (pack && pack.manifest && pack.manifest.baseH) || CHAR_BASE_H;
+  const footPad = (pack && pack.manifest && pack.manifest.footPad) || 2;
+  const scaleX = (pack && pack.manifest && pack.manifest.scaleX) || 1;
+  const h = baseH * 1.08;
+  const w = h * (spr.naturalWidth / spr.naturalHeight) * scaleX;
+  const faceRight = (typeof charFaceRight === "function") ? charFaceRight(b) : (b.side === 0);
+  ctx.save();
+  ctx.translate(b.x, b.y);
+  if (!faceRight) ctx.scale(-1, 1);
+  ctx.globalAlpha = (b.flameIgniteT | 0) > 0 ? 0.95 : 0.82;
+  ctx.drawImage(spr, -w / 2, -h + footPad, w, h);
+  ctx.restore();
 }
 
 /** Vrais joueurs uniquement (pas les aperçus menu). Inclut le 2v2. */

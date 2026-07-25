@@ -435,8 +435,13 @@ function loadSfx(name, section) {
   return sfxLoading[name];
 }
 
-/** Joue un buffer préchargé ; false → caller doit fallback synth. */
+/**
+ * Joue un buffer préchargé ; false → caller doit fallback synth.
+ * Gameplay : toujours synth (les MP3 sfx/ étaient moins bons).
+ * Story : stingers MP3 OK si présents.
+ */
 function playSfxBuffer(name, section) {
+  if (section !== "story") return false;
   const buf = sfxBuffers[name];
   if (!buf) {
     loadSfx(name, section); // warm cache for next time
@@ -461,8 +466,7 @@ function playSfxBuffer(name, section) {
 function preloadAudioPack() {
   loadAudioManifest().then(m => {
     if (!m) return;
-    const names = Object.keys(m.sfx || {});
-    for (const n of names) loadSfx(n, "sfx");
+    // Pas de précharge sfx/ gameplay — on garde le synth WebAudio.
     for (const n of Object.keys(m.story || {})) loadSfx(n, "story");
   });
 }
@@ -510,15 +514,32 @@ function applyMusicGain(mapKey) {
   musicGain.gain.setTargetAtTime(base * musicVolume, audioCtx.currentTime, 0.05);
 }
 
+/** Clé map en match ; null = musique menu (mayor-parade). */
+function musicKeyForState() {
+  const inMatch = state === "play" || state === "serve" ||
+    state === "point" || state === "gameover";
+  if (!inMatch) return null;
+  try {
+    if (typeof TERRAINS !== "undefined" && typeof terrain === "number" && TERRAINS[terrain]) {
+      return TERRAINS[terrain].key;
+    }
+  } catch (e) { /* ignore */ }
+  return null;
+}
+
 function setMusicTerrain(key) {
-  if (!key) return;
   const url = musicForTerrain(key);
+  const trackId = key || "__menu__";
   ensureMusicGraph();
-  if (musicTerrainKey === key && musicEl.src && musicEl.src.indexOf(key) !== -1) {
+  const srcOk = musicEl.src && (
+    key ? musicEl.src.indexOf(key) !== -1
+        : (musicEl.src.indexOf("mayor-parade") !== -1)
+  );
+  if (musicTerrainKey === trackId && srcOk) {
     applyMusicGain(key);
     return;
   }
-  musicTerrainKey = key;
+  musicTerrainKey = trackId;
   const doSwap = () => {
     try {
       musicEl.loop = true;
@@ -546,12 +567,10 @@ function musicTick() {
     ensureMusicGraph();
     loadAudioManifest();
   } catch (e) { return; }
-  // Piste selon le terrain courant (menus inclus).
+  // Match → BGM de la map ; menus / story / lobbies → parade d'origine.
   try {
-    if (typeof TERRAINS !== "undefined" && typeof terrain === "number" && TERRAINS[terrain]) {
-      setMusicTerrain(TERRAINS[terrain].key);
-    }
-  } catch (e) { /* TERRAINS pas encore prêt */ }
+    setMusicTerrain(musicKeyForState());
+  } catch (e) { /* ignore */ }
   const want = musicOn && !muted && state !== "netError" && audioCtx.state === "running";
   if (want) {
     if (musicEl.paused) musicEl.play().catch(() => { /* geste utilisateur requis */ });

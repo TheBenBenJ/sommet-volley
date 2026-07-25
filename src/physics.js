@@ -66,6 +66,29 @@ function registerTouch(blob) {
   ball.lastTouchTick = tick;
   if (ball.touches[blob.side] > MAX_TOUCHES) {
     awardPoint(1 - blob.side, `Plus de ${MAX_TOUCHES} touches !`);
+    return;
+  }
+  if (flameMode && newContact) applyFlameBurn(blob);
+}
+
+/** Mode flamme : 1 PV par contact. À 0 → embrasement + point pour l'adversaire. */
+function applyFlameBurn(blob) {
+  if (!flameMode) return;
+  if (state !== "play" && state !== "serve") return;
+  if (blob.flameHp == null) blob.flameHp = FLAME_HP_MAX;
+  if (blob.flameHp <= 0) return;
+  blob.flameHp--;
+  if (!noFx) {
+    beep(380, 0.05, "sawtooth", 0.07, 0, 220);
+    spawnSand(blob.x, blob.y - 20, 3);
+  }
+  if (blob.flameHp <= 0) {
+    blob.flameIgniteT = 70;
+    if (!noFx) {
+      spawnBoom(blob.x, blob.y - 48);
+      shake = Math.max(shake, 12);
+    }
+    awardPoint(1 - blob.side, "🔥 BRÛLÉ !");
   }
 }
 
@@ -467,6 +490,7 @@ function keyboardJumpServe(blob) {
   blob._serveAwaitRelease = false;
   if (typeof setCharPose === "function") setCharPose(blob, "aim", 30);
   beep(520, 0.08, "sine", 0.1, 0, 820);
+  if (flameMode) applyFlameBurn(blob);
   return true;
 }
 

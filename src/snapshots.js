@@ -59,6 +59,7 @@ function getSnapshot() {
     state, servingSide, pointTimer, pointMsg, tick, serveCountdown,
     scores: [scores[0], scores[1]],
     rngSeed, weather, weatherTimer, bombMode, bombTimer,
+    flameMode: !!flameMode,
     mapEventsQuiet: mapEventsQuiet ? 1 : 0,
     mapEvent: {
       p: mapEvent.phase, t: mapEvent.t | 0, tm: mapEvent.timer | 0,
@@ -93,7 +94,10 @@ function getSnapshot() {
       charId: b.charId, scramble: b.scramble,
       superT: b.superT, superKind: b.superKind, superSmash: b.superSmash,
       poseAnim: b.poseAnim || "", poseT: b.poseT | 0, poseDur: b.poseDur | 0,
-      battleStunT: b.battleStunT | 0
+      battleStunT: b.battleStunT | 0,
+      flameHp: (b.flameHp == null ? FLAME_HP_MAX : b.flameHp) | 0,
+      flameIgniteT: b.flameIgniteT | 0,
+      charredT: b.charredT | 0
     }))
   };
 }
@@ -107,6 +111,7 @@ function applySnapshot(s) {
   if (s.superCharge) { superCharge[0] = s.superCharge[0]; superCharge[1] = s.superCharge[1]; }
   if (s.weather !== undefined) { weather = s.weather; weatherTimer = s.weatherTimer; }
   if (s.bombMode !== undefined) { bombMode = s.bombMode; bombTimer = s.bombTimer || 0; }
+  if (s.flameMode !== undefined) flameMode = !!s.flameMode;
   if (s.mapEventsQuiet !== undefined) mapEventsQuiet = !!s.mapEventsQuiet;
   if (s.mapEvent) {
     mapEvent.phase = s.mapEvent.p || "idle";
@@ -160,5 +165,8 @@ function applySnapshot(s) {
     if (s.blobs[i].poseT !== undefined) b.poseT = s.blobs[i].poseT | 0;
     if (s.blobs[i].poseDur !== undefined) b.poseDur = s.blobs[i].poseDur | 0;
     b.battleStunT = s.blobs[i].battleStunT | 0;
+    if (s.blobs[i].flameHp !== undefined) b.flameHp = s.blobs[i].flameHp | 0;
+    if (s.blobs[i].flameIgniteT !== undefined) b.flameIgniteT = s.blobs[i].flameIgniteT | 0;
+    if (s.blobs[i].charredT !== undefined) b.charredT = s.blobs[i].charredT | 0;
   });
 }

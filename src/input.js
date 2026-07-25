@@ -195,10 +195,11 @@ function navOptions() {
     case "aiDifficulty":  return ["Digit1", "Digit2", "Digit3", "Digit4"];
     case "bombDuration":  return ["Digit1", "Digit2", "Digit3"];
     case "bombFormat":    return ["Digit1", "Digit2"];
-    // le nombre d'options dépend du contexte : 1v1/équipes/Bombe possibles
-    // (solo vs IA ou en ligne), sinon juste 1v1/Bombe (multijoueur local)
+    case "flameFormat":   return ["Digit1", "Digit2"];
+    // le nombre d'options dépend du contexte : 1v1/équipes/Bombe/Flamme possibles
+    // (solo vs IA ou en ligne), sinon 1v1/Bombe/Flamme (multijoueur local)
     case "gameModeSelect": return pendingMode && (pendingMode.vsAI || pendingMode.online)
-      ? ["Digit1", "Digit2", "Digit3"] : ["Digit1", "Digit2"];
+      ? ["Digit1", "Digit2", "Digit3", "Digit4"] : ["Digit1", "Digit2", "Digit3"];
     case "onlineMenu":    return ["Digit1", "Digit2"];
     case "selectCharacter": {
       const vis = characterIndices();

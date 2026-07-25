@@ -133,11 +133,13 @@ function aiGameplayV2(side, lvl, me, opp, input) {
   const nearNet = Math.abs(me.x - NET_X) < (lvl.aim ? 155 : 120);
   const fwd = side === 0 ? 1 : -1;
 
-  // Fenêtre de frappe un peu généreuse : mieux frapper que « coller » / rater
-  const inHitWindow = dist <= RECEIVE_R + 10 && descending && aligned &&
+  // Fenêtre de frappe : plus serrée aux niveaux faibles (même hitbox perso).
+  const hitSlack = 3 + (lvl.react || 0.8) * 8;
+  const inHitWindow = dist <= RECEIVE_R + hitSlack && descending && aligned &&
     (ball.y < me.y - 24) && (ball.y > me.y - 205);
   const canReachHit = inHitWindow ||
-    (dist <= RECEIVE_R + 2 && descending && Math.abs(ball.x - me.x) < alignSlop + 8 &&
+    (dist <= RECEIVE_R + hitSlack * 0.35 && descending &&
+     Math.abs(ball.x - me.x) < alignSlop + 6 &&
      ball.y < me.y - 20 && ball.y > me.y - 210);
 
   function tryJumpForBall() {
@@ -334,7 +336,9 @@ function aiInput(side, lvlOverride, god) {
     : Math.max(NET_X + 36, Math.min(W - 40, targetX));
 
   const dx = targetX - me.x;
-  const step = BLOB_SPEED * lvl.speedMul * charOf(me).speed;
+  // Même vitesse de déplacement que Blob.update (pas de boost via le niveau IA).
+  const kitSp = me.kitSpeed != null ? me.kitSpeed : charOf(me).speed;
+  const step = BLOB_SPEED * (me.speedMul || 1) * kitSp;
   aiSteerToward(me, input, dx, step, lvl);
 
   // V1 : sauts de frappe passifs. V2 : géré dans aiGameplayV2 (cloche / smash).
@@ -412,7 +416,8 @@ function aiInput2v2(me, lvlOverride) {
   targetX = Math.max(minX + 6, Math.min(maxX - 6, targetX));
 
   const dx = targetX - me.x;
-  const step2v2 = BLOB_SPEED * lvl.speedMul * charOf(me).speed;
+  const kitSp2 = me.kitSpeed != null ? me.kitSpeed : charOf(me).speed;
+  const step2v2 = BLOB_SPEED * (me.speedMul || 1) * kitSp2;
   aiSteerToward(me, input, dx, step2v2, lvl);
 
   const opp = activeBlobs.find(b => b.side !== side) || (side === 0 ? blobR : blobL);

@@ -135,6 +135,34 @@ test("bombe : touche le sol → explosion et point à l'adversaire", () => {
   }
   assert.ok(scored, "la bombe au sol doit marquer un point");
   assert.strictEqual(g.scores[0], 1, "bombe à droite → le camp gauche marque");
+  assert.ok(g.blobR.charredT > 0, "perso du camp touché noirci");
+});
+
+test("flamme : 3 touches brûlent le joueur et donnent le point à l'adversaire", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(0);
+  g.setFlameMode(true);
+  g.setBombMode(false);
+  g.newGame(11);
+  g.setState("play"); g.setServeCountdown(0);
+  g.ball.frozen = false; g.ball.inHands = false;
+  assert.strictEqual(g.blobL.flameHp, g.FLAME_HP_MAX, "PV pleins en début de rallye");
+  for (let i = 0; i < g.FLAME_HP_MAX; i++) g.applyFlameBurn(g.blobL);
+  assert.strictEqual(g.blobL.flameHp, 0, "PV à zéro après FLAME_HP_MAX brûlures");
+  assert.strictEqual(g.scores[1], 1, "brûlé → point à l'adversaire");
+  assert.ok(g.blobL.flameIgniteT > 0, "embrasement visuel armé");
+});
+
+test("flamme : startRally recharge les PV ; snapshot sérialise flameMode", () => {
+  const g = loadGame();
+  g.setFlameMode(true);
+  g.newGame(3);
+  g.blobL.flameHp = 1;
+  g.startRally();
+  assert.strictEqual(g.blobL.flameHp, g.FLAME_HP_MAX, "PV reset au service");
+  const snap = g.getSnapshot();
+  assert.strictEqual(snap.flameMode, true, "flameMode sérialisé");
+  assert.strictEqual(snap.blobs[0].flameHp, g.FLAME_HP_MAX, "flameHp sérialisé");
 });
 
 test("filet : une balle très rapide ne traverse pas le poteau (anti-tunnel)", () => {
@@ -227,26 +255,30 @@ test("roster : noms fictionnalisés (casting Steam)", () => {
   assert.strictEqual(maps["grande-foret"], "Grande Forêt");
 });
 
-test("audio : musique par terrain + pack SFX sur disque", () => {
+test("audio : musique map en match, parade en menu ; fichiers sur disque", () => {
   const fs = require("fs");
   const path = require("path");
   const g = loadGame();
   assert.ok(typeof g.musicForTerrain === "function", "musicForTerrain exposé");
+  assert.ok(g.musicForTerrain(null).includes("mayor-parade"), "menu → parade");
   for (const t of g.TERRAINS) {
     const url = g.musicForTerrain(t.key);
-    assert.ok(url.includes(t.key) || url.includes("mayor-parade"), t.key + " → " + url);
-    const rel = url.replace(/^assets\//, "");
-    const abs = path.join(__dirname, "..", "assets", rel);
-    // Convention maps/<key>.mp3 (fallback parade OK si manquant)
+    assert.ok(url.includes(t.key), t.key + " → " + url);
     const mapPath = path.join(__dirname, "..", "assets", "audio", "maps", t.key + ".mp3");
-    assert.ok(fs.existsSync(mapPath) || fs.existsSync(abs), "fichier musique " + t.key);
+    assert.ok(fs.existsSync(mapPath), "fichier musique " + t.key);
   }
+  g.setState("menu");
+  assert.strictEqual(g.musicKeyForState(), null, "menu → pas de BGM map");
+  g.setTerrain(0);
+  g.setState("play");
+  assert.strictEqual(g.musicKeyForState(), g.TERRAINS[0].key, "play → BGM map");
+  g.setState("serve");
+  assert.strictEqual(g.musicKeyForState(), g.TERRAINS[0].key, "serve → BGM map");
   const man = path.join(__dirname, "..", "assets", "audio", "manifest.json");
   assert.ok(fs.existsSync(man), "manifest.json");
   const j = JSON.parse(fs.readFileSync(man, "utf8"));
   assert.ok(j.maps && Object.keys(j.maps).length >= 10, "10 maps dans manifest");
-  assert.ok(j.sfx && j.sfx.hit && j.sfx.smash, "SFX core");
-  assert.ok(j.story && j.story.hub, "stingers story");
+  assert.ok(j.fallbackMusic, "fallbackMusic menu");
 });
 
 test("sprites : défaut walk = 4 frames (packs walk_0..3)", () => {
@@ -442,6 +474,22 @@ test("V2 : IA sert (lancer X) puis envoie la balle", () => {
   assert.ok(tossed, "l'IA doit lancer au smash");
   assert.ok(hit, "l'IA doit frapper vers l'adversaire après le lancer");
   assert.ok(hitVy < -3, "service en cloche (pas piqué vers le bas), vy=" + hitVy);
+});
+
+test("IA : speedMul reste 1 (pas de buff vitesse selon la difficulté)", () => {
+  const g = loadGame();
+  g.setVsAI(true);
+  for (const lvl of [0, 1, 2, 3]) {
+    g.setAiLevel(lvl);
+    g.newGame(100 + lvl);
+    assert.strictEqual(g.blobR.speedMul, 1, "1v1 niveau " + lvl);
+  }
+  g.setMode("2v2");
+  g.setAiLevel(3);
+  g.newGame(99);
+  assert.strictEqual(g.blobR.speedMul, 1, "2v2 adversaire");
+  assert.strictEqual(g.blob2R.speedMul, 1, "2v2 adversaire 2");
+  assert.strictEqual(g.blob2L.speedMul, 1, "2v2 coéquipier");
 });
 
 test("IA : le niveau Impitoyable bat un adversaire scripté moyen", () => {
@@ -1414,7 +1462,7 @@ test("campagne : chapitres cohérents (persos, terrain, mode, dopage, dialogues)
     assert.ok(keys.has(ch.right), "ch" + i + " right invalide: " + ch.right);
     assert.notStrictEqual(ch.left, ch.right, "ch" + i + " oppose un perso à lui-même");
     assert.ok(ch.terrain >= 0 && ch.terrain < g.TERRAINS.length, "ch" + i + " terrain hors bornes");
-    assert.ok(ch.mode === "volley" || ch.mode === "bomb", "ch" + i + " mode invalide");
+    assert.ok(ch.mode === "volley" || ch.mode === "bomb" || ch.mode === "flame", "ch" + i + " mode invalide");
     assert.ok(ch.ai >= 0 && ch.ai <= 3, "ch" + i + " niveau IA hors bornes");
     // design : le joueur (gauche) AFFRONTE des dopés — il ne joue jamais le dopé.
     assert.ok(ch.doped === null || ch.doped === "R", "ch" + i + " : seul l'adversaire (R) peut être dopé");
@@ -1447,7 +1495,7 @@ test("campagnes par personnage : 10 campagnes, chacune = les 9 rivaux, format va
       assert.strictEqual(ch.left, key, key + "[" + i + "] left doit être le protagoniste");
       assert.ok(keySet.has(ch.right) && ch.right !== key, key + "[" + i + "] rival valide");
       assert.ok(ch.terrain >= 0 && ch.terrain < g.TERRAINS.length, key + "[" + i + "] terrain hors bornes");
-      assert.ok(ch.mode === "volley" || ch.mode === "bomb", key + "[" + i + "] mode invalide");
+      assert.ok(ch.mode === "volley" || ch.mode === "bomb" || ch.mode === "flame", key + "[" + i + "] mode invalide");
       assert.ok(ch.doped === null || ch.doped === "R", key + "[" + i + "] seul l'adversaire (R) est dopé");
       for (const phase of ["pre", "win", "lose"]) {
         assert.ok(Array.isArray(ch[phase]) && ch[phase].length > 0, key + "[" + i + "] " + phase + " vide");
@@ -1513,6 +1561,7 @@ test("storyStartMatch configure persos / terrain / mode / dopage", () => {
   g.setStoryChapter(volIdx);
   g.storyStartMatch();
   assert.strictEqual(g.getBombMode(), false, "volley = pas de bombe");
+  assert.strictEqual(g.getFlameMode(), false, "volley = pas de flamme");
   assert.strictEqual(g.blobR.doped, false, "pas de dopage en rivalité légère");
 });
 

@@ -116,12 +116,14 @@ function handleMenuKeys(code, key) {
     // (voir "bombFormat"), sinon (local) va direct à la durée de mèche.
     const teamChoice = pendingMode.vsAI || pendingMode.online;
     if (teamChoice) {
-      if (code === "Digit1") { startCharacterSelect(); }                       // Classique (1v1)
-      if (code === "Digit2") { setTeamMode(true); startCharacterSelect(); }     // En équipes (2v2)
-      if (code === "Digit3") { pendingMode.bomb = true; state = "bombFormat"; } // Bombe -> 1v1 ou équipes ?
+      if (code === "Digit1") { pendingMode.bomb = false; pendingMode.flame = false; startCharacterSelect(); }
+      if (code === "Digit2") { pendingMode.bomb = false; pendingMode.flame = false; setTeamMode(true); startCharacterSelect(); }
+      if (code === "Digit3") { pendingMode.bomb = true; pendingMode.flame = false; state = "bombFormat"; }
+      if (code === "Digit4") { pendingMode.flame = true; pendingMode.bomb = false; state = "flameFormat"; }
     } else {
-      if (code === "Digit1") { startCharacterSelect(); }                       // Classique (1v1)
-      if (code === "Digit2") { pendingMode.bomb = true; state = "bombDuration"; } // Bombe (1v1 uniquement en local)
+      if (code === "Digit1") { pendingMode.bomb = false; pendingMode.flame = false; startCharacterSelect(); }
+      if (code === "Digit2") { pendingMode.bomb = true; pendingMode.flame = false; state = "bombDuration"; }
+      if (code === "Digit3") { pendingMode.flame = true; pendingMode.bomb = false; startCharacterSelect(); }
       // clavier VS manette : bascule le côté piloté par la manette unique
       if (code === "KeyG" && padConnected) {
         setPadSideLocal(padSideLocal === 1 ? 0 : 1);
@@ -140,6 +142,12 @@ function handleMenuKeys(code, key) {
     if (code === "Digit1") { state = "bombDuration"; }                      // Bombe 1v1
     if (code === "Digit2") { setTeamMode(true); state = "bombDuration"; }   // Bombe en équipes
     if (code === "Escape") { pendingMode.bomb = false; state = "gameModeSelect"; }
+
+  } else if (state === "flameFormat") {
+    // Ballon enflammé : 1v1 ou équipes (pas de sous-option durée)
+    if (code === "Digit1") { startCharacterSelect(); }
+    if (code === "Digit2") { setTeamMode(true); startCharacterSelect(); }
+    if (code === "Escape") { pendingMode.flame = false; state = "gameModeSelect"; }
 
   } else if (state === "bombDuration") {
     // durée de la mèche, commune à tous les modes (offline & hôte online)
@@ -276,6 +284,7 @@ function commitSetup() {
   ballSkin = 0; // ballon cartoon unique
   bombMode = !!pendingMode.bomb;
   bombTime = pendingMode.bombTime || BOMB_TIME;
+  flameMode = !!pendingMode.flame && !bombMode;
   if (pendingMode.online) {
     // l'hôte diffusera bombMode/bombTime dans son message "start" (voir net.js)
     if (pendingMode.o2v2) { state = "hostLobby"; initHostPeer2v2(); }
@@ -293,14 +302,13 @@ function newGame(seed) {
   setSeed(seed !== undefined ? seed : (Math.random() * 2 ** 31) | 0);
   tick = 0;
   scores[0] = 0; scores[1] = 0;
+  // Stats physiques = celles du perso (speedMul 1). L'IA ne court pas plus vite.
   blobL.speedMul = 1;
-  blobR.speedMul = vsAI ? AI_LEVELS[aiLevel].speedMul : 1;
+  blobR.speedMul = 1;
   if (mode === "2v2" && !online) {
-    // HORS-LIGNE : les trois IA (blob2L coéquipier, blobR + blob2R adverses)
-    // prennent la vitesse du niveau ; le joueur (blobL) garde 1. Persos tous distincts.
-    // (En ligne, l'hôte fixe persos et vitesses — voir hostStartMatch2v2.)
-    const sm = AI_LEVELS[aiLevel].speedMul;
-    blob2L.speedMul = sm; blobR.speedMul = sm; blob2R.speedMul = sm;
+    // HORS-LIGNE : coéquipier + adversaires IA — même vitesse qu'un humain.
+    // (En ligne, l'hôte fixe persos — voir hostStartMatch2v2.)
+    blob2L.speedMul = 1; blobR.speedMul = 1; blob2R.speedMul = 1;
     const used = new Set([blobL.charId]);
     for (const b of [blob2L, blobR, blob2R]) {
       b.charId = randomCharacterIdx([...used]);
@@ -360,6 +368,7 @@ function startTutorial() {
   tutorialAdvanceLock = 0;
   tutorialStepArmed = true;
   bombMode = false;
+  flameMode = false;
   mapEventsQuiet = true;
   vsAI = true;
   aiLevel = 0;
@@ -509,7 +518,9 @@ function makeMenuActor(side, charIdx) {
     color: a.color, darkColor: a.darkColor,
     onGround: true, vx: 0, vy: 0,
     dispVx: side === 0 ? spd : -spd,
-    walkPhase: Math.random() * 24, squash: 0,
+    walkPhase: Math.floor(Math.random() * 4), squash: 0,
+    scramble: 0,
+    _menuActor: true, // décor menu : marche ou saut, jamais patinage / slip
     _walking: true, _faceRight: side === 0, _faceLock: 0,
     _walkAcc: 0,
     minX, maxX, hopT: 90 + Math.floor(Math.random() * 160)
@@ -522,34 +533,44 @@ function ensureMenuBackdrop() {
 }
 
 function tickMenuActors() {
-  // ~16 px par frame d'anim → ~64 px / cycle (4 frames) : plus de « sur place »
+  // ~16 px par frame d'anim → ~64 px / cycle (4 frames) : foulée lisible
   const STRIDE = 16;
   for (const b of [menuActors.L, menuActors.R]) {
     if (!b) continue;
+    b._menuActor = true;
+    b.scramble = 0; // jamais de patinage décoratif (ex. Trompette slip)
     const spd = Math.max(1.2, Math.abs(b.dispVx) || 1.4);
     let dir = b.dispVx >= 0 ? 1 : -1;
-    b.x += dir * spd;
-    if (b.x <= b.minX) { b.x = b.minX; dir = 1; }
-    if (b.x >= b.maxX) { b.x = b.maxX; dir = -1; }
-    b.dispVx = dir * spd;
-    b.vx = b.dispVx;
-    b._faceRight = dir > 0;
-    b._faceLock = 0;
-    b._walking = true;
-    // Animation pilotée par la distance (pas un timer découplé)
-    b._walkAcc = (b._walkAcc || 0) + spd;
-    while (b._walkAcc >= STRIDE) {
-      b._walkAcc -= STRIDE;
-      b.walkPhase += 1;
-    }
     b.hopT--;
     if (b.hopT <= 0 && b.onGround) {
       b.vy = -3.4; b.onGround = false; b.hopT = 200 + Math.floor(Math.random() * 220);
     }
     if (!b.onGround) {
+      // Saut : déplacement aérien + anim jump (pas de cycle walk)
+      b.x += dir * spd;
+      if (b.x <= b.minX) { b.x = b.minX; dir = 1; }
+      if (b.x >= b.maxX) { b.x = b.maxX; dir = -1; }
       b.vy += 0.28; b.y += b.vy;
       if (b.y >= GROUND_Y) { b.y = GROUND_Y; b.vy = 0; b.onGround = true; b.squash = 4; }
-    } else if (b.squash > 0) b.squash -= 0.25;
+      b._walking = false;
+      b._walkAcc = 0;
+    } else {
+      // Marche au sol : avance synchro avec walkPhase
+      b.x += dir * spd;
+      if (b.x <= b.minX) { b.x = b.minX; dir = 1; }
+      if (b.x >= b.maxX) { b.x = b.maxX; dir = -1; }
+      b._walking = true;
+      b._walkAcc = (b._walkAcc || 0) + spd;
+      while (b._walkAcc >= STRIDE) {
+        b._walkAcc -= STRIDE;
+        b.walkPhase = (b.walkPhase | 0) + 1;
+      }
+      if (b.squash > 0) b.squash -= 0.25;
+    }
+    b.dispVx = dir * spd;
+    b.vx = dir * spd;
+    b._faceRight = dir > 0;
+    b._faceLock = 0;
   }
   // Ballon qui rebondit doucement au-dessus du filet
   menuBg.ballVy += 0.06;
@@ -911,6 +932,7 @@ function wizardTotal() {
        + 1                                                            /* Format */
        + (pendingMode.bomb && hasTeamChoice ? 1 : 0)                  /* Bombe : 1v1 ou équipes ? */
        + (pendingMode.bomb ? 1 : 0)                                   /* Durée de mèche */
+       + (pendingMode.flame && hasTeamChoice ? 1 : 0)                 /* Flamme : 1v1 ou équipes ? */
        + 2;                                                            /* Personnage + Terrain */
 }
 function wizardStep(idx, label) { return "Étape " + idx + "/" + wizardTotal() + " · " + label; }
@@ -938,12 +960,14 @@ function drawGameModeSelect() {
   const items = teamChoice ? [
     "1  —  Classique",
     "2  —  En équipes",
-    "3  —  Bombe"
+    "3  —  Bombe",
+    "4  —  Ballon enflammé"
   ] : [
     "1  —  Classique",
-    "2  —  Bombe"
+    "2  —  Bombe",
+    "3  —  Ballon enflammé"
   ];
-  drawOptionList(items, 236, 48);
+  drawOptionList(items, 236, 44);
 
   // clavier VS manette (1v1 local uniquement) : qui prend la manette ?
   if (!teamChoice) {
@@ -980,6 +1004,16 @@ function drawBombDuration() {
     "3  —  Posé"
   ];
   drawOptionList(items, 240, 52);
+}
+
+function drawFlameFormat() {
+  menuScreenBase({ title: "Ballon enflammé", kicker: wizardStep(wizardTotal() - 2, "Format"),
+                   subtitle: "Chaque touche brûle — 1v1, ou en équipes ?" });
+  const items = [
+    "1  —  1v1",
+    "2  —  En équipes"
+  ];
+  drawOptionList(items, 238, 50);
 }
 
 // ---------- Tutoriel : commandes + démo de visée ----------

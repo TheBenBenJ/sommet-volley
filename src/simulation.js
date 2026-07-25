@@ -148,6 +148,11 @@ function bombBlast(x, y) {
   shake = Math.max(shake, 18);
   bombFlash = 1;         // éclair plein écran (visuel, se résorbe au rendu)
   sfxBombBlast();
+  // Persos du camp touché : noirci canvas (V1, pas de sprites dédiés)
+  const hitSide = x < NET_X ? 0 : 1;
+  for (const b of activeBlobs) {
+    if (b.side === hitSide) b.charredT = Math.max(b.charredT || 0, 110);
+  }
 }
 
 // décompte de la mèche + explosion en fin de compte. Appelé en fin de stepGame,

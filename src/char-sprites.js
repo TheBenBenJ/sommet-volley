@@ -92,6 +92,15 @@ function charWantPanic(b) {
 function charPickAnim(b) {
   const key = charOf(b).key;
 
+  // Décor de menu : uniquement marche (sol) ou saut (air) — pas de slip / idle en glisse.
+  if (b._menuActor) {
+    if (!b.onGround && charAnimReady(key, "jump")) return "jump";
+    if (b.onGround && charAnimReady(key, "walk")) return "walk";
+    if (charAnimReady(key, "idle")) return "idle";
+    if (charAnimReady(key, "idle_face")) return "idle_face";
+    return null;
+  }
+
   // Fin de point / match : célébration ou défaite — seulement au sol
   // (sinon le perso « s'assoit » en l'air pendant la chute).
   if ((state === "point" || state === "gameover") && b.onGround) {
@@ -185,6 +194,11 @@ function charPickFrame(b, anim) {
 function charFaceRight(b) {
   // Aperçus menu : toujours orientés vers le centre du terrain
   if (b.groundY != null) return b.side === 0;
+  // Acteurs décor menu : direction de marche explicite (ignore slip)
+  if (b._menuActor) {
+    if (b._faceRight !== undefined) return !!b._faceRight;
+    return (b.vx || b.dispVx || 0) >= 0;
+  }
   const a = charOf(b);
   const mv = (a && a.slip && typeof b.dispVx === "number") ? b.dispVx : (b.vx || 0);
   if (b._faceRight === undefined) b._faceRight = b.side === 0;

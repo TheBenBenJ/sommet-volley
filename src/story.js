@@ -445,6 +445,7 @@ function storyStartMatch() {
   if (typeof mapEventsQuiet !== "undefined") mapEventsQuiet = false;
   bombMode = ch.mode === "bomb";
   bombTime = BOMB_TIME;
+  flameMode = ch.mode === "flame";
   setMode("1v1");
   terrain = ch.terrain;
   ballSkin = 0;
@@ -454,9 +455,10 @@ function storyStartMatch() {
   blobR.charId = storyCharIdx(ch.right);
   blobL.doped = false;
   blobR.doped = false;
-  newGame();                       // seed, scores, blobR.speedMul = AI_LEVELS[aiLevel]
+  newGame();                       // seed, scores — speedMul reste 1 (stats perso)
   if (ch.doped === "R") {
     blobR.doped = true;
+    // Dopage Histoire = exception narrative (pas un buff de difficulté IA).
     blobR.speedMul = Math.max(blobR.speedMul, 1.5);
   } else if (ch.doped === "L") {
     blobL.doped = true;

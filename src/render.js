@@ -101,6 +101,7 @@ function render() {
   if (state === "aiDifficulty") { drawAiDifficulty(); return; }
   if (state === "gameModeSelect") { drawGameModeSelect(); return; }
   if (state === "bombFormat") { drawBombFormat(); return; }
+  if (state === "flameFormat") { drawFlameFormat(); return; }
   if (state === "bombDuration") { drawBombDuration(); return; }
   if (state === "rules") { drawRules(); return; }
   if (state === "tutorialHelp") { drawTutorial(); return; }

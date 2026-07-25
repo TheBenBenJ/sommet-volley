@@ -232,21 +232,23 @@ let pendingMode = null;        // mode choisi au menu, en attente des sélection
 let selPlayer = 0;             // quel joueur choisit son perso
 
 const AI_LEVELS = [
+  // PAS de speedMul / powerMul : l'IA joue avec les stats du perso (comme un humain).
+  // La difficulté = décisions (erreur, réaction, rush, aim…), pas des buffs physiques.
   // rush : propension à foncer au filet pour provoquer un Smash Battle
   // attack : décalage derrière la balle pour viser franchement le camp adverse
   // react : anticipation (0=lent, 1=parfait) · dbl : utilise le double saut
   // aim : 1 = place ses frappes LOIN de l'adversaire (drive profond / amorti court)
-  // tous les réglages progressent de façon monotone d'un niveau à l'autre
-  { name: "Facile",      speedMul: 0.9,  err: 26, jumpDist: 105, rush: 0.22, attack: 10, react: 0.65, dbl: false, aim: 0 },
-  { name: "Normale",     speedMul: 1.08, err: 10, jumpDist: 122, rush: 0.48, attack: 16, react: 0.85, dbl: true,  aim: 0 },
-  { name: "Difficile",   speedMul: 1.3,  err: 2,  jumpDist: 142, rush: 0.82, attack: 24, react: 1.0,  dbl: true,  aim: 1 },
-  { name: "Impitoyable", speedMul: 1.55, err: 0,  jumpDist: 165, rush: 0.92, attack: 28, react: 1.0,  dbl: true,  aim: 1 }
+  { name: "Facile",      err: 40, rush: 0.10, attack: 6,  react: 0.42, dbl: false, aim: 0 },
+  { name: "Normale",     err: 20, rush: 0.32, attack: 12, react: 0.68, dbl: true,  aim: 0 },
+  { name: "Difficile",   err: 6,  rush: 0.70, attack: 20, react: 0.90, dbl: true,  aim: 1 },
+  { name: "Impitoyable", err: 0,  rush: 0.90, attack: 26, react: 1.0,  dbl: true,  aim: 1 }
 ];
 let aiLevel = 1;
 let aiErr = 0, aiErrTimer = 0;  // erreur de placement volontaire de l'IA
 let aiRush = false;             // envie du moment : provoquer un duel au filet
 
-const X_LEVEL = { name: "X", speedMul: 1.2, err: 0, jumpDist: 999, rush: 1, attack: 30, react: 1, dbl: true, aim: 1 };
+// Mode triche X : seul endroit où on accélère volontairement un blob.
+const X_LEVEL = { name: "X", speedMul: 1.2, err: 0, rush: 1, attack: 30, react: 1, dbl: true, aim: 1 };
 const xOn = [false, false, false, false];
 
 const scores = [0, 0]; // [gauche, droite]
@@ -333,6 +335,9 @@ class Blob {
     this._faceRight = this.side === 0; // orientation visuelle (suit le déplacement)
     this._celebHop = 0;      // petit saut de joie après un point
     this.battleStunT = 0;    // stun post Smash Battle (perdant)
+    this.flameHp = (typeof FLAME_HP_MAX !== "undefined") ? FLAME_HP_MAX : 3;
+    this.flameIgniteT = 0;   // ticks restants d'embrasement (mode flamme, PV à 0)
+    this.charredT = 0;       // ticks restants noirci (explosion mode Bombe)
   }
   // deux cercles de collision : corps + tête (alignés sur le dessin)
   get bodyCircle() { return { x: this.x, y: this.y - 30, r: 28 }; }
@@ -344,6 +349,8 @@ class Blob {
       this.poseT--;
       if (this.poseT <= 0) { this.poseAnim = ""; this.poseDur = 0; }
     }
+    if (this.flameIgniteT > 0) this.flameIgniteT--;
+    if (this.charredT > 0) this.charredT--;
     // Stun post-duel : pas de contrôle, juste l'inertie du knockback
     if (this.battleStunT > 0) {
       this.battleStunT--;
@@ -521,6 +528,11 @@ const BOMB_DURATIONS = [
   { secs: 7,  ticks: 420 },
   { secs: 10, ticks: 600 }
 ];
+
+// ---------- Mode Ballon enflammé ----------
+// La balle est toujours en feu. Chaque touche retire 1 PV au joueur qui frappe.
+// PV à 0 → embrasement + perte du point. Score / sol sinon inchangés.
+let flameMode = false;
 
 // Soft ownership 1v1 : l'invité différé awardPoint → l'hôte valide (anti-divergence).
 let netDeferScore = false;
