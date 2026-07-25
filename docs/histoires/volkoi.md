@@ -112,7 +112,7 @@ Le Tsar rejoue sa géopolitique givrée en neuf manches, camp gauche. Trois acte
 },
 {
   act: 2, title: "Le blé et l'ara", sub: "Bourassie–Tropicalia · céréales, engrais, populisme",
-  left: "volkoi", right: "capitaine", terrain: 7, mode: "volley", ai: 2, doped: null,
+  left: "volkoi", right: "capitaine", terrain: 7, mode: "flame", ai: 2, doped: null,
   pre: [
     { s: "narrator", t: "Grande Forêt. Clairière de jungle dorée, huttes sur pilotis, court en terre rouge. Un ara traverse en hurlant comme un supporter." },
     { s: "capitaine", t: "Alors le Tsar ! On me vend ton engrais, ton blé, ta nostalgie de fer. Ici on aime les gars qui parlent fort et taillent le bois !" },

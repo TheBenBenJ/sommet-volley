@@ -1724,12 +1724,13 @@ function drawBall() {
 
 /** Intensité du ballon enflammé : 0 (braises) → 3 (brasier), selon le pire PV. */
 function flameBallStage() {
-  let burn = 0;
+  let worstFrac = 0;
   for (const b of activeBlobs) {
     const hp = (b.flameHp == null) ? FLAME_HP_MAX : b.flameHp;
-    burn = Math.max(burn, FLAME_HP_MAX - hp);
+    const frac = 1 - Math.max(0, hp) / FLAME_HP_MAX;
+    worstFrac = Math.max(worstFrac, frac);
   }
-  return Math.max(0, Math.min(3, burn));
+  return Math.max(0, Math.min(3, Math.floor(worstFrac * 3.999)));
 }
 
 function drawFlameBall() {
@@ -1770,25 +1771,29 @@ function drawFlameBall() {
   ctx.restore();
 }
 
-/** Jauge PV flamme au-dessus de chaque joueur. */
+/** Jauge PV flamme au-dessus de chaque joueur (barre compacte + pips). */
 function drawFlameHUD() {
   for (const b of activeBlobs) {
     const max = FLAME_HP_MAX;
     const hp = Math.max(0, b.flameHp == null ? max : b.flameHp);
-    const pipW = 10, gap = 3;
-    const totalW = max * pipW + (max - 1) * gap;
-    const x0 = b.x - totalW / 2;
+    const barW = 54, barH = 7;
+    const x0 = b.x - barW / 2;
     const y0 = b.y - ((typeof CHAR_BASE_H !== "undefined") ? CHAR_BASE_H : 110) - 14;
-    for (let i = 0; i < max; i++) {
-      const on = i < hp;
-      ctx.fillStyle = on ? "#ff6a20" : "rgba(20,12,8,0.55)";
-      ctx.strokeStyle = on ? "#ffe08a" : "rgba(255,200,120,0.25)";
-      ctx.lineWidth = 1.2;
-      const x = x0 + i * (pipW + gap);
+    ctx.fillStyle = "rgba(20,12,8,0.55)";
+    ctx.strokeStyle = "rgba(255,200,120,0.35)";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x0, y0, barW, barH, 2);
+    else ctx.rect(x0, y0, barW, barH);
+    ctx.fill(); ctx.stroke();
+    const fillW = barW * (hp / max);
+    if (fillW > 0.5) {
+      const hot = hp <= Math.ceil(max / 3);
+      ctx.fillStyle = hot ? "#ff4030" : "#ff6a20";
       ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(x, y0, pipW, 7, 2);
-      else ctx.rect(x, y0, pipW, 7);
-      ctx.fill(); ctx.stroke();
+      if (ctx.roundRect) ctx.roundRect(x0, y0, fillW, barH, 2);
+      else ctx.rect(x0, y0, fillW, barH);
+      ctx.fill();
     }
     if (b.flameIgniteT > 0) {
       ctx.fillStyle = "rgba(255,80,0," + Math.min(0.7, b.flameIgniteT / 70).toFixed(2) + ")";

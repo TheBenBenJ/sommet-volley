@@ -13,6 +13,7 @@ mode Histoire est terminé.
 
 Même procédé que le mode Histoire actuel (`src/story.js`) :
 - **Petite rivalité / allié** → mode **Volley**.
+- **Tension qui chauffe** → mode **Ballon enflammé** (`flame`) — chaque contact brûle, PV à 0 = point perdu.
 - **Conflit ouvert** → mode **Bombe** (la balle est une bombe à mèche).
 - Certains adversaires se **« dopent »** aux gros enjeux (IA impitoyable, aura rouge) : `doped: "R"`.
 
@@ -43,7 +44,7 @@ volkoi≈Poutine/Russie · dorf≈Trump/USA · cygne≈Macron/France · bebe≈K
 timonier≈Xi/Chine · sultan≈Erdoğan/Turquie · gourou≈Modi/Inde · capitaine≈Bolsonaro/Brésil ·
 faucon≈Netanyahou/composite Israël · safran≈composite Iran.
 
-### Pistes de relations réelles (transposées) pour choisir Volley vs Bombe
+### Pistes de relations réelles (transposées) pour choisir Volley / Flamme / Bombe
 - **Bourassie (volkoi)** : conflit ouvert avec l'Ouest (Cygne, Faucon) → *bombe* ; entente froide avec Panguo, Ryonganie, Ramenie → *volley* ; rivalité-flatterie ambiguë avec Baron Dorf → *volley*.
 - **Baron Dorf (dorf)** : bravade/rivalité avec presque tous (*volley*), guerre commerciale avec le Timonier, « bromance » étrange avec Maréchal Bébé, tension d'alliance avec Le Cygne ; duel plus dur avec Le Safran (*bombe* possible).
 - **Le Cygne (cygne)** : allié de l'Ouest (*volley*), friction Méditerranée/adhésion avec Le Sultan, clash écolo célèbre avec Le Capitaine (Amazonie !), *bombe* avec le Tsar.
@@ -55,8 +56,9 @@ faucon≈Netanyahou/composite Israël · safran≈composite Iran.
 - **Le Faucon (faucon)** : Moyen-Orient → **grand duel *bombe* avec Le Safran** ; tensions multiples.
 - **Le Safran (safran)** : conflit avec Le Faucon (*bombe*) et Baron Dorf (*bombe*) ; ententes Bourassie/Panguo.
 
-> Tu choisis toi-même la répartition volley/bombe et l'ordre, en cohérence avec
-> ces pistes. Vise ~3-4 *bombe* max par perso (les vrais conflits), le reste en *volley*.
+> Tu choisis toi-même la répartition volley/flamme/bombe et l'ordre, en cohérence
+> avec ces pistes. Vise ~1 chapitre *flame* (souvent fin d'Acte II), ~3-4 *bombe*
+> max par perso (les vrais conflits), le reste en *volley*.
 
 ## Format du fichier `<key>.md`
 Deux parties :
@@ -72,13 +74,13 @@ cocasse (surnoms, manies, obsessions) qui colle à l'archétype réel transposé
 
 ### 2) Mode Histoire (`## Mode Histoire de <Nom>`)
 Le perso rencontre **les 9 autres**. Organise en **3 actes** (Acte I petites
-rivalités/volley → Acte II montée des tensions → Acte III conflits/bombe + finale).
+rivalités/volley → Acte II montée des tensions / *flame* → Acte III conflits/bombe + finale).
 Pour CHAQUE rencontre, un bloc au format `src/story.js` (données JS, prêtes à coller) :
 
 ```js
 {
   act: 1, title: "…", sub: "…thème transposé…",
-  left: "<CE PERSO>", right: "<clé rival>", terrain: <idx>, mode: "volley"|"bomb", ai: 0..3, doped: null|"R",
+  left: "<CE PERSO>", right: "<clé rival>", terrain: <idx>, mode: "volley"|"flame"|"bomb", ai: 0..3, doped: null|"R",
   pre:  [ { s: "narrator", t: "…" }, { s: "<perso>", t: "…" }, … ],
   win:  [ { s: "…", t: "…" }, … ],   // dialogue quand LE JOUEUR (ce perso) gagne
   lose: [ { s: "…", t: "…" }, … ]    // dialogue quand le joueur perd

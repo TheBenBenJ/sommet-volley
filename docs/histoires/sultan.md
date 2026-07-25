@@ -133,7 +133,7 @@ const STORY_SULTAN = [
   },
   {
     act: 2, title: "La route de la soie et du silence", sub: "Bosforie–Panguo · peuples cousins, gros contrats",
-    left: "sultan", right: "timonier", terrain: 4, mode: "volley", ai: 2, doped: null,
+    left: "sultan", right: "timonier", terrain: 4, mode: "flame", ai: 2, doped: null,
     pre: [
       { s: "narrator", t: "Cité du Matin. Lanternes rouges, lions de pierre, toits d'or. Deux empereurs se jaugent au-dessus d'un carnet de commandes très épais." },
       { s: "timonier", t: "Sultan. Tu te dis protecteur des peuples cousins de mes provinces de l'ouest. Puis tu signes mes contrats de la Route. Le tempo te contredit." },

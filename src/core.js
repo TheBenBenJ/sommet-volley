@@ -97,7 +97,7 @@ const BOMB_TIME = 600;      // 10 s à 60 Hz : durée de la mèche avant explosi
 // --- Mode Ballon enflammé ---
 // Chaque contact avec la balle retire 1 PV. À 0 → le perso s'enflamme et perd le point.
 // Les PV se rechargent à chaque rallye (startRally → Blob.reset).
-const FLAME_HP_MAX = 3;
+const FLAME_HP_MAX = 9; // ×3 vs V1 (3) — rallies plus longs
 
 // --- Soft ownership balle (1v1 en ligne, camp invité) ---
 // L'invité ne simule la balle que si elle est CLAIREMENT dans son camp

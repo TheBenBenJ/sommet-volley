@@ -42,7 +42,7 @@ for (const key of KEYS) {
   arr.forEach((c, i) => {
     if (c.left !== key) throw new Error(`${key}[${i}] left=${c.left} ≠ ${key}`);
     if (!VALID.has(c.right)) throw new Error(`${key}[${i}] right invalide: ${c.right}`);
-    if (!["volley", "bomb"].includes(c.mode)) throw new Error(`${key}[${i}] mode invalide: ${c.mode}`);
+    if (!["volley", "bomb", "flame"].includes(c.mode)) throw new Error(`${key}[${i}] mode invalide: ${c.mode}`);
     if (typeof c.terrain !== "number") throw new Error(`${key}[${i}] terrain non numérique`);
     for (const ph of ["pre", "win", "lose"]) {
       if (!Array.isArray(c[ph])) throw new Error(`${key}[${i}] ${ph} absent`);
@@ -62,7 +62,7 @@ console.log("TOTAL:", totalEnc);
 
 const header = `// sommet-volley · Campagnes du Mode Histoire PAR PERSONNAGE
 // GÉNÉRÉ depuis docs/histoires/<key>.md par tools/extract_campaigns.js — ne pas éditer à la main.
-// Chaque clé = une campagne (le perso affronte ses 9 rivaux, 3 actes, volley/bombe/dopage).
+// Chaque clé = une campagne (le perso affronte ses 9 rivaux, 3 actes, volley/flamme/bombe/dopage).
 "use strict";
 
 const STORY_BY_CHAR = ${JSON.stringify(byChar, null, 2)};

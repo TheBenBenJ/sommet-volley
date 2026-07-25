@@ -172,8 +172,8 @@ function celestialPos() {
 
 // ---------- Météo (toutes maps) ----------
 // État déterministe (RNG + snapshots) pour le sync en ligne.
-// "clear" → "rain" → "storm" | "clear". Habillage par flavor :
-//   neige → flocons/blizzard · plage → sable · sinon → pluie/orage+éclairs.
+// FSM : clear ↔ rain ↔ storm, mais durées + proba selon le CLIMAT du pays.
+// Habillage (flavor) : neige · sable · pluie.
 let weather = "clear";        // "clear" | "rain" | "storm"
 let weatherTimer = 0;         // ticks avant le prochain changement
 let rainDrops = [];           // gouttes proches (visuel local)
@@ -184,9 +184,86 @@ let fogPuffs = [];            // brume (legacy)
 let weatherFlash = 0;         // frames d'éclair restantes (visuel local)
 let weatherFlashCool = 0;     // cooldown entre éclairs
 
+/** Tire une durée [min,max] en ticks (déterministe via rng). */
+function weatherRollDur(range) {
+  const lo = range[0], hi = range[1];
+  return lo + Math.floor(rng() * (hi - lo + 1));
+}
+
+/**
+ * Profil climatique par map (réaliste / satiré, pas « pluie partout »).
+ * clear/rain/storm = plages de durée (ticks @ 60 Hz).
+ * pLeaveClear = proba de vraiment quitter le beau temps (sinon on prolonge clear).
+ * pStormFromRain = proba pluie → orage (sinon → clear).
+ * pClearFromStorm = proba orage → clear (sinon → rain).
+ */
+function weatherClimate() {
+  const key = TERRAINS[terrain] && TERRAINS[terrain].key;
+  // Défaut : océanique doux (peu de tempêtes, beau temps majoritaire)
+  const mild = {
+    clear: [1400, 2800], rain: [420, 840], storm: [180, 360],
+    pLeaveClear: 0.55, pStormFromRain: 0.18, pClearFromStorm: 0.7
+  };
+  const table = {
+    // Bourassie — hiver long, averses de neige, blizzards rares
+    "place-ecarlate": {
+      clear: [1600, 3200], rain: [700, 1400], storm: [280, 520],
+      pLeaveClear: 0.5, pStormFromRain: 0.28, pClearFromStorm: 0.55
+    },
+    // Doria — golf ensoleillé, poussière rare
+    "country-club-dore": {
+      clear: [2800, 5200], rain: [160, 360], storm: [100, 200],
+      pLeaveClear: 0.28, pStormFromRain: 0.12, pClearFromStorm: 0.88
+    },
+    // Levantie — désert / citadelle sèche
+    "citadelle-du-levant": {
+      clear: [3200, 5600], rain: [100, 260], storm: [80, 160],
+      pLeaveClear: 0.22, pStormFromRain: 0.08, pClearFromStorm: 0.92
+    },
+    // Ramenie — jardin aride, averses occasionnelles
+    "jardin-des-roses": {
+      clear: [2600, 4800], rain: [200, 420], storm: [100, 220],
+      pLeaveClear: 0.3, pStormFromRain: 0.1, pClearFromStorm: 0.88
+    },
+    // Bosforie — méditerranéen
+    "pont-des-deux-mondes": {
+      clear: [2000, 4000], rain: [280, 560], storm: [140, 280],
+      pLeaveClear: 0.4, pStormFromRain: 0.12, pClearFromStorm: 0.82
+    },
+    // Gallardie — océanique, pluie fine plutôt qu'orages
+    "palais-du-coq": {
+      clear: [1200, 2400], rain: [480, 960], storm: [160, 320],
+      pLeaveClear: 0.58, pStormFromRain: 0.14, pClearFromStorm: 0.75
+    },
+    // Panguo — continental tempéré
+    "cite-du-matin": {
+      clear: [1500, 3000], rain: [400, 800], storm: [180, 340],
+      pLeaveClear: 0.5, pStormFromRain: 0.18, pClearFromStorm: 0.68
+    },
+    // Ryonganie — continental froid, ciel souvent clair
+    "esplanade-du-defile": {
+      clear: [1800, 3400], rain: [320, 640], storm: [180, 360],
+      pLeaveClear: 0.42, pStormFromRain: 0.2, pClearFromStorm: 0.65
+    },
+    // Bharatie — mousson : long beau temps, puis pluie soutenue
+    "stade-ashram": {
+      clear: [1800, 3600], rain: [900, 1800], storm: [300, 560],
+      pLeaveClear: 0.45, pStormFromRain: 0.22, pClearFromStorm: 0.5
+    },
+    // Tropicalia — averses tropicales courtes, éclaircies entre
+    "grande-foret": {
+      clear: [900, 1700], rain: [300, 600], storm: [200, 400],
+      pLeaveClear: 0.7, pStormFromRain: 0.28, pClearFromStorm: 0.6
+    }
+  };
+  return table[key] || mild;
+}
+
 function resetWeather() {
   weather = "clear";
-  weatherTimer = 600 + Math.floor(rng() * 1200); // ~10-30 s avant 1er changement
+  const c = weatherClimate();
+  // Départ toujours au sec ; premier éventuel changement pas trop tôt
+  weatherTimer = weatherRollDur(c.clear);
   rainDrops = [];
   rainDropsFar = [];
   rainSplashes = [];
@@ -748,19 +825,35 @@ function stepMapEvent() {
 }
 
 // avancé une fois par tick DANS la simulation (déterministe).
-// Toutes les maps : même FSM ; l'habillage dépend de weatherFlavor().
+// Transitions + durées selon weatherClimate() ; habillage = weatherFlavor().
 function stepWeather() {
   if (--weatherTimer > 0) return;
+  const c = weatherClimate();
   const r = rng();
   if (weather === "clear") {
+    // Climats secs : souvent on prolonge le beau temps plutôt que d'enchaîner la pluie.
+    if (r > c.pLeaveClear) {
+      weatherTimer = weatherRollDur(c.clear);
+      return;
+    }
     weather = "rain";
-    weatherTimer = 480 + Math.floor(rng() * 720);
+    weatherTimer = weatherRollDur(c.rain);
   } else if (weather === "rain") {
-    weather = r < 0.5 ? "clear" : "storm";
-    weatherTimer = 360 + Math.floor(rng() * 720);
-  } else { // storm
-    weather = "rain";
-    weatherTimer = 360 + Math.floor(rng() * 600);
+    if (r < c.pStormFromRain) {
+      weather = "storm";
+      weatherTimer = weatherRollDur(c.storm);
+    } else {
+      weather = "clear";
+      weatherTimer = weatherRollDur(c.clear);
+    }
+  } else { // storm → clear le plus souvent (évite rain↔storm en ping-pong)
+    if (r < c.pClearFromStorm) {
+      weather = "clear";
+      weatherTimer = weatherRollDur(c.clear);
+    } else {
+      weather = "rain";
+      weatherTimer = weatherRollDur(c.rain);
+    }
   }
 }
 
@@ -768,13 +861,13 @@ function stepWeather() {
 function sunVisible() { return weather === "clear" || weather === "rain"; }
 
 
-// adhérence du sol : 1 (sec) → 0.8 (intempérie) → 0.6 (déchaînée). Tous terrains.
-// Sur la banquise, la neige rend déjà le sol un peu glissant même au "sec".
+// adhérence du sol : effets adoucis (la météo ne doit pas « casser » le match).
+// Sur la banquise, un peu glissant même au sec.
 function groundGrip(blob) {
-  const icy = TERRAINS[terrain].key === "place-ecarlate" ? 0.92 : 1;
+  const icy = TERRAINS[terrain].key === "place-ecarlate" ? 0.94 : 1;
   let g = 1;
-  if (weather === "storm") g = 0.6 * (icy < 1 ? 0.9 : 1);
-  else if (weather === "rain") g = 0.8 * icy;
+  if (weather === "storm") g = 0.78 * (icy < 1 ? 0.92 : 1);
+  else if (weather === "rain") g = 0.9 * icy;
   else g = icy;
   // Hiver Général : glisse extrême sur le camp gelé (sauf Sang froid)
   if (blob && typeof hasSuperEffect === "function" && hasSuperEffect("ice", blob.side)) {
@@ -784,8 +877,8 @@ function groundGrip(blob) {
 }
 // facteur appliqué à la gravité/rebond de la balle : plus lourd = monte moins haut
 function ballLift() {
-  if (weather === "storm") return 1.4;
-  if (weather === "rain") return 1.2;
+  if (weather === "storm") return 1.22;
+  if (weather === "rain") return 1.08;
   return 1;
 }
 

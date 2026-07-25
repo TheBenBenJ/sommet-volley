@@ -133,7 +133,7 @@ const STORY_TIMONIER = [
   },
   {
     act: 2, title: "Le pétrole sous embargo", sub: "Panguo–Ramenie · brut à prix d'ami",
-    left: "timonier", right: "safran", terrain: 9, mode: "volley", ai: 2, doped: null,
+    left: "timonier", right: "safran", terrain: 9, mode: "flame", ai: 2, doped: null,
     pre: [
       { s: "narrator", t: "Jardin des Roses. Un paon déploie sa roue sous les arcades turquoise. En face, un empereur qui n'admire jamais rien trop longtemps." },
       { s: "safran", t: "L'Occident m'étrangle de sanctions, empereur. Mais toi… toi tu achètes mon brut. Discrètement. Sagement." },

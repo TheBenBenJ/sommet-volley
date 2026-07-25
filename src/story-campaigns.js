@@ -1,6 +1,6 @@
 // sommet-volley · Campagnes du Mode Histoire PAR PERSONNAGE
 // GÉNÉRÉ depuis docs/histoires/<key>.md par tools/extract_campaigns.js — ne pas éditer à la main.
-// Chaque clé = une campagne (le perso affronte ses 9 rivaux, 3 actes, volley/bombe/dopage).
+// Chaque clé = une campagne (le perso affronte ses 9 rivaux, 3 actes, volley/flamme/bombe/dopage).
 "use strict";
 
 const STORY_BY_CHAR = {
@@ -240,7 +240,7 @@ const STORY_BY_CHAR = {
       "left": "volkoi",
       "right": "capitaine",
       "terrain": 7,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
@@ -557,7 +557,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "cygne",
-          "t": "Vous ne monterez rien du tout. Je vais vous montrer une passe décisive. À la gallarde, avec un peu de méthode."
+          "t": "Vous ne monterez rien du tout. Je vais vous montrer une passe décisive. À la française, avec un peu de méthode."
         },
         {
           "s": "dorf",
@@ -751,7 +751,7 @@ const STORY_BY_CHAR = {
       "left": "dorf",
       "right": "faucon",
       "terrain": 8,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
@@ -938,7 +938,7 @@ const STORY_BY_CHAR = {
       "win": [
         {
           "s": "dorf",
-          "t": "Battu son truc rouge ! Sous les roses ! Sans carburant, juste avec MOI ! Le plus grand exploit du sport, croyez-moi, les gens pleuraient."
+          "t": "Battu son truc dopé ! Sous les roses ! Sans carburant, juste avec MOI ! Le plus grand exploit du sport, croyez-moi, les gens pleuraient."
         },
         {
           "s": "safran",
@@ -952,7 +952,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "dorf",
-          "t": "Il était SURVOLTÉ ! Aura rouge ! Match volé ! La plus grande injustice depuis la dernière ! Enquête, sanctions, tarifs sur les roses !"
+          "t": "Il était DOPÉ ! Aura rouge ! Match volé ! La plus grande injustice depuis la dernière ! Enquête, sanctions, tarifs sur les roses !"
         }
       ]
     },
@@ -985,7 +985,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Ses veines pulsent, l'aura rouge irradie. Machine d'État à plein régime, à ciel ouvert, sur la plus belle pelouse du monde. Baron Dorf, pour une fois, joue pour lui seul."
+          "t": "Ses veines pulsent, l'aura rouge irradie. Le dopage d'État, à ciel ouvert, sur la plus belle pelouse du monde. Baron Dorf, pour une fois, joue pour lui seul."
         },
         {
           "s": "dorf",
@@ -995,7 +995,7 @@ const STORY_BY_CHAR = {
       "win": [
         {
           "s": "dorf",
-          "t": "CHAMPION ! À domicile ! À mains nues ! Le plus grand vainqueur de l'histoire des sommets ! J'ai gelé le glacier ! On construit une tour pour fêter ça !"
+          "t": "CHAMPION ! À domicile ! Sans dopage ! Le plus grand vainqueur de l'histoire des sommets ! J'ai gelé le glacier ! On construit une tour pour fêter ça !"
         },
         {
           "s": "volkoi",
@@ -1048,11 +1048,11 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "cygne",
-          "t": "La Gallardie a des principes, des valeurs, et un excellent poignet. Vous allez découvrir ma passe décisive. À la gallarde."
+          "t": "La Gallardie a des principes, des valeurs, et un excellent poignet. Vous allez découvrir ma passe décisive. À la française."
         },
         {
           "s": "dorf",
-          "t": "Une passe gallarde ? C'est quand tu recules en disant que t'avances, c'est ça ?"
+          "t": "Une passe française ? C'est quand tu recules en disant que t'avances, c'est ça ?"
         }
       ],
       "win": [
@@ -1254,7 +1254,7 @@ const STORY_BY_CHAR = {
       "left": "cygne",
       "right": "safran",
       "terrain": 9,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
@@ -1435,7 +1435,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "capitaine",
-          "t": "Alors, le donneur de leçons du Palais du Coq vient m'expliquer MA forêt ? Elle est chez moi, Cygne. Je fais ce que je veux avec MON jardin."
+          "t": "Alors, le donneur de leçons parisien vient m'expliquer MA forêt ? Elle est chez moi, Cygne. Je fais ce que je veux avec MON jardin."
         },
         {
           "s": "cygne",
@@ -1838,7 +1838,7 @@ const STORY_BY_CHAR = {
       "left": "bebe",
       "right": "capitaine",
       "terrain": 7,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
@@ -2039,7 +2039,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Le Faucon a l'aura rouge — impitoyable, sans un battement de cil. Ne laisse surtout pas la mèche s'éteindre de ton côté."
+          "t": "Le Faucon est dopé — impitoyable, sans un battement de cil. Ne laisse surtout pas la mèche s'éteindre de ton côté."
         }
       ],
       "win": [
@@ -2265,7 +2265,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "cygne",
-          "t": "La Gallardie cherche son autonomie stratégique. En même temps, elle aime beaucoup ton marché. C'est subtil."
+          "t": "L'Europe cherche son autonomie stratégique. En même temps, elle aime beaucoup ton marché. C'est subtil."
         },
         {
           "s": "timonier",
@@ -2300,7 +2300,7 @@ const STORY_BY_CHAR = {
     {
       "act": 2,
       "title": "Le grenier du monde",
-      "sub": "Panguo–Tropicalia · soja, minerais & deals",
+      "sub": "Panguo–Tropicalia · soja, minerais & BRICS",
       "left": "timonier",
       "right": "capitaine",
       "terrain": 7,
@@ -2361,7 +2361,7 @@ const STORY_BY_CHAR = {
       "left": "timonier",
       "right": "safran",
       "terrain": 9,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
@@ -2371,7 +2371,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "safran",
-          "t": "Les autres capitales m'étranglent de sanctions, empereur. Mais toi… toi tu achètes mon brut. Discrètement. Sagement."
+          "t": "L'Occident m'étrangle de sanctions, empereur. Mais toi… toi tu achètes mon brut. Discrètement. Sagement."
         },
         {
           "s": "timonier",
@@ -2715,7 +2715,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "capitaine",
-          "t": "Alors comme ça t'es le grand chef de Panguo ? Ici c'est ma clairière, mon micro, ma tronçonneuse. Bienvenue, cousin."
+          "t": "Alors comme ça t'es le grand chef de l'Orient ? Ici c'est ma clairière, mon micro, ma tronçonneuse. Bienvenue, cousin."
         },
         {
           "s": "sultan",
@@ -2876,7 +2876,7 @@ const STORY_BY_CHAR = {
       "left": "sultan",
       "right": "timonier",
       "terrain": 4,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
@@ -3057,7 +3057,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "sultan",
-          "t": "Faucon. Sur mon pont, entre les deux rives, tu vas comprendre pourquoi le monde entier attend chez MOI."
+          "t": "Faucon. Sur mon pont, entre l'Orient et l'Occident, tu vas comprendre pourquoi le monde entier attend chez MOI."
         },
         {
           "s": "faucon",
@@ -3399,7 +3399,7 @@ const STORY_BY_CHAR = {
       "left": "gourou",
       "right": "safran",
       "terrain": 9,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
@@ -3910,7 +3910,7 @@ const STORY_BY_CHAR = {
       "left": "capitaine",
       "right": "safran",
       "terrain": 9,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
@@ -3991,7 +3991,7 @@ const STORY_BY_CHAR = {
       "win": [
         {
           "s": "capitaine",
-          "t": "BOUM chez le Timonier ! Je l'avais dit, je l'avais crié ! La tronçonneuse et la vérité, même combat."
+          "t": "BOUM chez le communiste ! Je l'avais dit, je l'avais crié ! La tronçonneuse et la vérité, même combat."
         },
         {
           "s": "timonier",
@@ -4091,7 +4091,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Regardez ses yeux. Le premier de la classe a surchauffé pour ce match. L'aura rouge du Cygne éclaire la canopée. Ce n'est plus de la diplomatie — c'est une guerre de troncs."
+          "t": "Regardez ses yeux. Le premier de la classe s'est dopé pour ce match. L'aura rouge du Cygne éclaire la canopée. Ce n'est plus de la diplomatie — c'est une guerre de troncs."
         },
         {
           "s": "capitaine",
@@ -4115,7 +4115,7 @@ const STORY_BY_CHAR = {
       "lose": [
         {
           "s": "cygne",
-          "t": "Le sport propre, avec juste ce qu'il faut d'éclat, a tenu debout. La forêt vous survivra, Capitaine. J'y veillerai. En même temps."
+          "t": "Le sport propre, dopé juste ce qu'il faut, a tenu debout. La forêt vous survivra, Capitaine. J'y veillerai. En même temps."
         },
         {
           "s": "capitaine",
@@ -4360,7 +4360,7 @@ const STORY_BY_CHAR = {
       "left": "faucon",
       "right": "cygne",
       "terrain": 8,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
@@ -4537,7 +4537,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Pont des Deux Mondes, entre deux continents, dômes et barques sous les bannières. La bombe siffle. Le Sultan joue survolté : aura rouge, smash impérial."
+          "t": "Pont des Deux Mondes, entre deux continents, dômes et barques sous les bannières. La bombe siffle. Le Sultan joue dopé : aura rouge, smash impérial."
         },
         {
           "s": "sultan",
@@ -4577,7 +4577,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "faucon",
-          "t": "Tu gagnes un soir en rouge. L'aura s'éteint, la doctrine reste. Je reviendrai à froid, et à froid je ne rate pas."
+          "t": "Tu gagnes un soir dopé. Le rouge s'éteint, la doctrine reste. Je reviendrai à froid, et à froid je ne rate pas."
         }
       ]
     },
@@ -4867,7 +4867,7 @@ const STORY_BY_CHAR = {
       "left": "safran",
       "right": "timonier",
       "terrain": 4,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
@@ -5056,7 +5056,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "L'aura rouge enveloppe le Baron : la pression maximale l'a fait basculer. Renvoyez la bombe. Le Voile d'Or est votre seule patience."
+          "t": "L'aura rouge enveloppe le Baron : la pression maximale l'a dopé. Renvoyez la bombe. Le Voile d'Or est votre seule patience."
         }
       ],
       "win": [

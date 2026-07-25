@@ -121,7 +121,7 @@ Au fond — mais il ne l'avouera jamais, et si vous le citez il dira que c'est *
 },
 {
   act: 2, title: "Le deal du siècle", sub: "Doria–Levantie · l'art de la négociation",
-  left: "dorf", right: "faucon", terrain: 8, mode: "volley", ai: 2, doped: null,
+  left: "dorf", right: "faucon", terrain: 8, mode: "flame", ai: 2, doped: null,
   pre: [
     { s: "narrator", t: "Citadelle du Levant, grès sur colline désertique. Un faucon décrit des cercles. En bas, on prépare non pas un match, mais un « accord historique »." },
     { s: "dorf", t: "Mon ami ! On va signer le plus grand accord de tous les temps. La paix, le volley, l'immobilier. Tu me donnes le point, je te donne mon amitié éternelle." },

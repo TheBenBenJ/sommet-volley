@@ -125,7 +125,7 @@ Sous la vanne, il y a un joueur redoutable. Rustre, oui. Imprévisible, oui. Mai
 },
 {
   act: 2, title: "Le jardin et la clairière", sub: "Tropicalia–Ramenie · deux méfiances polies",
-  left: "capitaine", right: "safran", terrain: 9, mode: "volley", ai: 2, doped: null,
+  left: "capitaine", right: "safran", terrain: 9, mode: "flame", ai: 2, doped: null,
   pre: [
     { s: "narrator", t: "Jardin des Roses, arcades turquoise et roseraie de palais. Un paon fait la roue. Deux hommes qui ne se comprennent pas s'observent avec une courtoisie glaçante." },
     { s: "safran", t: "Vous faites beaucoup de bruit, Capitaine, pour un homme qui n'a que des arbres à défendre." },

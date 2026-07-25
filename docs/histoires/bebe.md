@@ -136,7 +136,7 @@ Physiquement, le Maréchal est un **chibi à très grosse tête**, sanglé dans 
 },
 {
   act: 2, title: "Le capitaine et le caporal", sub: "Ryonganie–Tropicalia · deux grandes gueules en treillis",
-  left: "bebe", right: "capitaine", terrain: 7, mode: "volley", ai: 2, doped: null,
+  left: "bebe", right: "capitaine", terrain: 7, mode: "flame", ai: 2, doped: null,
   pre: [
     { s: "narrator", t: "Grande Forêt. Un ara hurle dans la canopée. Deux amateurs d'uniforme et de gros mots se retrouvent sur la terre rouge." },
     { s: "capitaine", t: "Alors comme ça t'es le plus jeune Maréchal ? Moi j'étais capitaine. Un vrai. Avec de la boue aux bottes." },

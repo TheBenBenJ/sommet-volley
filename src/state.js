@@ -335,7 +335,7 @@ class Blob {
     this._faceRight = this.side === 0; // orientation visuelle (suit le déplacement)
     this._celebHop = 0;      // petit saut de joie après un point
     this.battleStunT = 0;    // stun post Smash Battle (perdant)
-    this.flameHp = (typeof FLAME_HP_MAX !== "undefined") ? FLAME_HP_MAX : 3;
+    this.flameHp = (typeof FLAME_HP_MAX !== "undefined") ? FLAME_HP_MAX : 9;
     this.flameIgniteT = 0;   // ticks restants d'embrasement (mode flamme, PV à 0)
     this.charredT = 0;       // ticks restants noirci (explosion mode Bombe)
   }

@@ -37,21 +37,23 @@ function drawCharacter(b) {
 function drawFlameOverlay(b) {
   if (typeof flameMode === "undefined" || !flameMode) return;
   if (b.groundY != null) return;
-  const max = (typeof FLAME_HP_MAX !== "undefined") ? FLAME_HP_MAX : 3;
+  const max = (typeof FLAME_HP_MAX !== "undefined") ? FLAME_HP_MAX : 9;
   const hp = (b.flameHp == null) ? max : b.flameHp;
   let burn = max - hp;
   if ((b.flameIgniteT | 0) > 0) burn = Math.max(burn, max);
   if (burn <= 0) return;
+  // Paliers 1..3 selon la fraction de PV perdus (indépendant du max)
+  const tier = Math.max(1, Math.min(3, Math.ceil((burn / max) * 3)));
 
   let spr = null;
   const t = (typeof tick === "number" ? tick : 0);
-  if (burn >= 3) {
+  if (tier >= 3) {
     const frames = SPRITES.fxFlameHead || [];
     spr = frames[Math.min(frames.length - 1, (t >> 3) % Math.max(1, frames.length))];
-  } else if (burn === 2) {
+  } else if (tier === 2) {
     const frames = SPRITES.fxFlameBody || [];
-    spr = frames[Math.min(frames.length - 1, burn - 1 + ((t >> 4) & 1))];
-    if (!spriteReady(spr)) spr = frames[Math.min(2, burn)];
+    spr = frames[Math.min(frames.length - 1, ((t >> 4) & 1))];
+    if (!spriteReady(spr)) spr = frames[Math.min(2, frames.length - 1)];
   } else {
     const frames = SPRITES.fxFlameFeet || [];
     spr = frames[Math.min(frames.length - 1, (t >> 4) % Math.max(1, frames.length))];

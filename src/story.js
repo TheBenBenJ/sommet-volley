@@ -3,8 +3,8 @@
 // Campagne satirique : une tournée de confrontations entre dirigeants caricaturés,
 // rejouant l'histoire des nations, des relations internationales, du sport et des
 // Jeux olympiques — sur un terrain de volley. Petites rivalités = mode Volley ;
-// vrais conflits = mode Bombe. Au fil des enjeux, certains se « dopent » (mode
-// impitoyable) jusqu'au scandale final.
+// tensions qui chauffent = mode Ballon enflammé ; vrais conflits = mode Bombe.
+// Au fil des enjeux, certains se « dopent » (mode impitoyable) jusqu'au scandale final.
 //
 // Tout est DONNÉE (STORY[]) : ajouter un chapitre = ajouter une entrée. Le moteur
 // (dialogue, lancement de match, dopage, progression) est générique.
@@ -31,7 +31,7 @@ function storyCharName(key) {
 //   sub        : sous-titre / thème historique
 //   left,right : clés perso (left = joueur, right = adversaire IA)
 //   terrain    : index TERRAINS
-//   mode       : "volley" (rivalité légère) | "bomb" (conflit)
+//   mode       : "volley" (rivalité) | "flame" (ballon enflammé) | "bomb" (conflit)
 //   ai         : niveau IA 0..3 (Facile..Impitoyable)
 //   doped      : null | "R" (adversaire dopé → impitoyable + aura rouge)
 //   pre        : dialogue d'avant-match [{s:cléPerso|"narrator", t:"texte"}]
@@ -123,7 +123,7 @@ const STORY_SOMMET = [
   },
   {
     act: 2, title: "La guerre des puces", sub: "Doria–Panguo · tarifs & silicium",
-    left: "timonier", right: "dorf", terrain: 4, mode: "bomb", ai: 2, doped: null,
+    left: "timonier", right: "dorf", terrain: 4, mode: "flame", ai: 2, doped: null,
     pre: [
       { s: "narrator", t: "Cité du Matin. Enjeu : qui fabrique le monde. La bombe tourne — comme les chaînes d'approvisionnement." },
       { s: "dorf", t: "Des taxes ! Des taxes sur tout ! Sur le ballon, sur le filet, sur l'air que tu respires !" },
@@ -257,7 +257,7 @@ const ACT_META = [
     tagline: "Le monde sourit encore. On règle ses comptes au filet, entre rivaux.",
     color: "#3eb5ff" },
   { num: "II",  title: "Les tensions montent",
-    tagline: "Le ballon devient bombe. Les sourires tombent. Le premier se dope.",
+    tagline: "Le ballon s'enflamme. Les sourires tombent. Puis viennent les bombes.",
     color: "#9ec9ff" },
   { num: "III", title: "Conflits ouverts",
     tagline: "Seringues, veines saillantes, grands duels. Renverse tous tes rivaux.",
@@ -838,7 +838,10 @@ function drawStoryHub() {
     ctx.textAlign = "left";
     ctx.fillText((i + 1).toString().padStart(2, "0"), rx + 10, baseY);
     // icône mode
-    const icon = !unlocked ? "🔒" : ch.mode === "bomb" ? "💣" : "🏐";
+    const icon = !unlocked ? "🔒"
+      : ch.mode === "bomb" ? "💣"
+      : ch.mode === "flame" ? "🔥"
+      : "🏐";
     ctx.font = "13px " + UI.sans;
     ctx.fillText(icon, rx + 32, baseY);
     // dopage
@@ -897,6 +900,7 @@ function drawStoryScene() {
   uiLabel(ch.title, mx, 84, 22, UI.ink, 0.4);
   uiLabel(ch.sub, mx, 108, 12, UI.muted, 0.4);
   if (ch.mode === "bomb") uiLabel("💣  Conflit — mode Bombe", W - mx, 84, 13, UI.accent, 0.4, "right");
+  else if (ch.mode === "flame") uiLabel("🔥  Tension — Ballon enflammé", W - mx, 84, 13, "#ff6a20", 0.4, "right");
   else uiLabel("🏐  Rivalité — mode Volley", W - mx, 84, 13, UI.sky, 0.4, "right");
   if (ch.doped) uiLabel("☠️  Aura rouge — adversaire impitoyable", W - mx, 108, 12, "#ff6b6b", 0.4, "right");
 

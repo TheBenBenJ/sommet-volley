@@ -135,7 +135,7 @@ const STORY = [
   },
   {
     act: 2, title: "Le port des roses", sub: "Bharatie–Ramenie · corridor d'énergie sous sanctions",
-    left: "gourou", right: "safran", terrain: 9, mode: "volley", ai: 2, doped: null,
+    left: "gourou", right: "safran", terrain: 9, mode: "flame", ai: 2, doped: null,
     pre: [
       { s: "narrator", t: "Jardin des Roses, arcades turquoise. Deux vieilles civilisations discutent d'un port stratégique entre deux odeurs de pétales." },
       { s: "safran", t: "Bienvenue, Gourou. Tu construis mon port, tu achètes mon brut — mais toujours d'un œil sur les sanctions des autres." },

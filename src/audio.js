@@ -539,8 +539,14 @@ function setMusicTerrain(key) {
     applyMusicGain(key);
     return;
   }
+  // musicTick appelle ça chaque frame : si un fondu vers CETTE piste est
+  // déjà lancé, ne pas clearTimeout — sinon le swap ne part jamais et le
+  // gain reste à ~0 (silence en match).
+  if (musicTerrainKey === trackId && musicSwitchTimer) return;
+
   musicTerrainKey = trackId;
   const doSwap = () => {
+    musicSwitchTimer = null;
     try {
       musicEl.loop = true;
       musicEl.src = url;

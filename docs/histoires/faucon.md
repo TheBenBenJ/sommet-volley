@@ -121,7 +121,7 @@ const STORY_FAUCON = [
   },
   {
     act: 2, title: "La leçon de morale", sub: "Levantie–Gallardie · l'allié qui sermonne",
-    left: "faucon", right: "cygne", terrain: 8, mode: "volley", ai: 2, doped: null,
+    left: "faucon", right: "cygne", terrain: 8, mode: "flame", ai: 2, doped: null,
     pre: [
       { s: "narrator", t: "Citadelle du Levant. Grès chaud, dômes anciens, tours de verre, remparts. Au-dessus des créneaux, le faucon tourne et pique." },
       { s: "cygne", t: "Cher Faucon, en même temps que je vous soutiens, je dois vous dire, avec amitié, que la mesure serait plus sage." },

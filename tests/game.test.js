@@ -138,7 +138,7 @@ test("bombe : touche le sol → explosion et point à l'adversaire", () => {
   assert.ok(g.blobR.charredT > 0, "perso du camp touché noirci");
 });
 
-test("flamme : 3 touches brûlent le joueur et donnent le point à l'adversaire", () => {
+test("flamme : FLAME_HP_MAX touches brûlent le joueur et donnent le point à l'adversaire", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(0);
   g.setFlameMode(true);
@@ -279,6 +279,13 @@ test("audio : musique map en match, parade en menu ; fichiers sur disque", () =>
   const j = JSON.parse(fs.readFileSync(man, "utf8"));
   assert.ok(j.maps && Object.keys(j.maps).length >= 10, "10 maps dans manifest");
   assert.ok(j.fallbackMusic, "fallbackMusic menu");
+  // Garde-fou régression : setMusicTerrain ne doit pas clearTimeout à chaque
+  // musicTick pendant un fondu (sinon silence en match — gain coincé à ~0).
+  const src = fs.readFileSync(path.join(__dirname, "..", "src", "audio.js"), "utf8");
+  assert.ok(
+    src.includes("musicTerrainKey === trackId && musicSwitchTimer"),
+    "fondu musique : ne pas relancer le timer chaque frame"
+  );
 });
 
 test("sprites : défaut walk = 4 frames (packs walk_0..3)", () => {
@@ -350,16 +357,43 @@ test("météo : flavor snow/sand/rain selon terrain", () => {
   assert.strictEqual(g.weatherFlavor(), "rain");
 });
 
-test("météo : country-club-dore et jardin-des-roses ne sont plus bloquées au clear", () => {
+test("météo : climats secs = long clear ; intempéries possibles sans ping-pong", () => {
   const g = loadGame();
+  assert.ok(typeof g.weatherClimate === "function", "weatherClimate exposé");
   const byKey = Object.fromEntries(g.TERRAINS.map((t, i) => [t.key, i]));
+
+  g.setTerrain(byKey["citadelle-du-levant"]);
+  const desert = g.weatherClimate();
+  g.setTerrain(byKey["grande-foret"]);
+  const jungle = g.weatherClimate();
+  assert.ok(desert.clear[0] > jungle.clear[0], "désert : clear plus long que tropical");
+  assert.ok(desert.pLeaveClear < jungle.pLeaveClear, "désert : quitte moins souvent le beau temps");
+  assert.ok(desert.pStormFromRain < 0.2, "désert : peu d'orages");
+
+  // Maps arides : peuvent quand même passer en rain (pas bloquées au clear)
   for (const key of ["country-club-dore", "jardin-des-roses"]) {
     g.setTerrain(byKey[key]);
+    g.newGame(77);
     g.resetWeather();
-    g.setWeather("clear", 1);
-    g.stepWeather();
-    assert.strictEqual(g.getWeather(), "rain", key + " doit pouvoir passer en rain");
+    let sawWet = false;
+    for (let i = 0; i < 80; i++) {
+      g.setWeather("clear", 1);
+      g.stepWeather();
+      if (g.getWeather() === "rain" || g.getWeather() === "storm") { sawWet = true; break; }
+    }
+    assert.ok(sawWet, key + " doit pouvoir avoir de l'intempérie");
   }
+
+  // Après un orage, retour clear fréquent (pas rain↔storm brutal)
+  g.setTerrain(byKey["palais-du-coq"]);
+  g.newGame(12);
+  let toClear = 0;
+  for (let i = 0; i < 40; i++) {
+    g.setWeather("storm", 1);
+    g.stepWeather();
+    if (g.getWeather() === "clear") toClear++;
+  }
+  assert.ok(toClear >= 20, "orage → clear majoritaire (" + toClear + "/40)");
 });
 
 test("V2 : balle rapide + smash touche malgré la vitesse", () => {
@@ -1491,11 +1525,13 @@ test("campagnes par personnage : 10 campagnes, chacune = les 9 rivaux, format va
     const rivals = camp.map(c => c.right).sort();
     const expected = keys.filter(k => k !== key).sort();
     assert.deepStrictEqual(rivals, expected, key + " : affronte exactement ses 9 rivaux");
+    let flameCount = 0;
     camp.forEach((ch, i) => {
       assert.strictEqual(ch.left, key, key + "[" + i + "] left doit être le protagoniste");
       assert.ok(keySet.has(ch.right) && ch.right !== key, key + "[" + i + "] rival valide");
       assert.ok(ch.terrain >= 0 && ch.terrain < g.TERRAINS.length, key + "[" + i + "] terrain hors bornes");
       assert.ok(ch.mode === "volley" || ch.mode === "bomb" || ch.mode === "flame", key + "[" + i + "] mode invalide");
+      if (ch.mode === "flame") flameCount++;
       assert.ok(ch.doped === null || ch.doped === "R", key + "[" + i + "] seul l'adversaire (R) est dopé");
       for (const phase of ["pre", "win", "lose"]) {
         assert.ok(Array.isArray(ch[phase]) && ch[phase].length > 0, key + "[" + i + "] " + phase + " vide");
@@ -1505,6 +1541,7 @@ test("campagnes par personnage : 10 campagnes, chacune = les 9 rivaux, format va
         }
       }
     });
+    assert.ok(flameCount >= 1, key + " : au moins un chapitre Ballon enflammé");
   }
 });
 
@@ -1563,6 +1600,14 @@ test("storyStartMatch configure persos / terrain / mode / dopage", () => {
   assert.strictEqual(g.getBombMode(), false, "volley = pas de bombe");
   assert.strictEqual(g.getFlameMode(), false, "volley = pas de flamme");
   assert.strictEqual(g.blobR.doped, false, "pas de dopage en rivalité légère");
+
+  // chapitre Ballon enflammé (campagne curée ou perso)
+  const flameIdx = g.STORY.findIndex(c => c.mode === "flame");
+  assert.ok(flameIdx >= 0, "au moins un chapitre flame dans STORY active");
+  g.setStoryChapter(flameIdx);
+  g.storyStartMatch();
+  assert.strictEqual(g.getFlameMode(), true, "mode flamme actif");
+  assert.strictEqual(g.getBombMode(), false, "flamme exclut bombe");
 });
 
 test("progression : victoire débloque le chapitre suivant, défaite non", () => {

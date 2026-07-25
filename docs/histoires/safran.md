@@ -107,7 +107,7 @@ Car c'est là, au fond, tout Le Safran : un joueur qui a compris que dans un mon
 },
 {
   act: 2, title: "Le client idéal", sub: "Ramenie–Panguo · l'or contre le silence",
-  left: "safran", right: "timonier", terrain: 4, mode: "volley", ai: 2, doped: null,
+  left: "safran", right: "timonier", terrain: 4, mode: "flame", ai: 2, doped: null,
   pre: [
     { s: "narrator", t: "Cité du Matin, lanternes rouges. Le meilleur client du Safran l'accueille — celui qui paie rubis sur l'ongle et ne demande jamais rien." },
     { s: "timonier", t: "Je t'achète ton safran, ton essence, ton pétrole. Je paie à l'heure. Et je ne pose aucune question. C'est ça, l'harmonie." },

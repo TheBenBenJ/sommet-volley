@@ -110,7 +110,7 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
 },
 {
   act: 2, title: "Le voile et le protocole", sub: "Gallardie–Ramenie · l'accord introuvable",
-  left: "cygne", right: "safran", terrain: 9, mode: "volley", ai: 2, doped: null,
+  left: "cygne", right: "safran", terrain: 9, mode: "flame", ai: 2, doped: null,
   pre: [
     { s: "narrator", t: "Jardin des Roses, arcades turquoise, un paon qui fait la roue près du filet. Deux négociateurs se retrouvent après un accord jadis signé, jadis déchiré." },
     { s: "safran", t: "On avait un accord, Cygne. Élégant. Équilibré. Puis ton grand allié doré l'a jeté à la corbeille, et tu as regardé sans bouger." },
