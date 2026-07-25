@@ -25,11 +25,11 @@ Car c'est là, au fond, tout Le Safran : un joueur qui a compris que dans un mon
 ## Mode Histoire de Le Safran
 
 ```js
-// ===================== ACTE I — Courtoisies du plateau (Volley) =====================
+// ===================== ACTE I — Petites rivalités (Volley) =====================
 {
   act: 1, title: "La table est toujours là", sub: "Ramenie–Gallardie · retour à l'Accord",
   left: "safran", right: "cygne", terrain: 2, mode: "volley", ai: 0, doped: null,
-  pre: [
+  pre:  [
     { s: "narrator", t: "Palais du Coq. Le Cygne accueille Le Safran pour « relancer le dialogue ». Sur la table : du thé, et une très vieille feuille déchirée." },
     { s: "cygne", t: "Cher ami, revenons à la table. En même temps que la fermeté, un peu de confiance. Rouvrons vos ateliers, refermons vos alambics." },
     { s: "safran", t: "Nous avons déjà pesé des grammes ensemble, Le Cygne. Des nuits entières. Puis quelqu'un a déchiré la feuille. Ce n'était pas moi." },
@@ -37,11 +37,11 @@ Car c'est là, au fond, tout Le Safran : un joueur qui a compris que dans un mon
     { s: "safran", t: "Vous avez toujours une nouvelle proposition. C'est votre charme. Servez donc : on verra si votre équilibre tient trois échanges." },
     { s: "narrator", t: "Balle au centre. Le premier voile doré se lève déjà sur le camp du Coq." }
   ],
-  win: [
+  win:  [
     { s: "safran", t: "Vous couriez si vite vers l'accord que vous avez raté la balle. La précipitation, Le Cygne. Toujours." },
     { s: "cygne", t: "Un revers technique. En même temps, le dialogue continue. Je reviens avec une feuille neuve." }
   ],
-  lose: [
+  lose:  [
     { s: "cygne", t: "Voilà ! De la fermeté ET de la main tendue. C'est ça, la doctrine du Cygne." },
     { s: "safran", t: "Joli point. Gardez la feuille au chaud. À mon avis, quelqu'un la déchirera encore." }
   ]
@@ -49,18 +49,18 @@ Car c'est là, au fond, tout Le Safran : un joueur qui a compris que dans un mon
 {
   act: 1, title: "Le poumon et le crocus", sub: "Ramenie–Tropicalia · deux façons de brûler",
   left: "safran", right: "capitaine", terrain: 9, mode: "volley", ai: 1, doped: null,
-  pre: [
+  pre:  [
     { s: "narrator", t: "Jardin des Roses. Le Capitaine débarque en rangers dans la roseraie, un peu perdu au milieu des arcades turquoise." },
     { s: "capitaine", t: "C'est quoi, tout ce parfum ? Chez moi, on abat la forêt pour faire pousser du bœuf. Ça, au moins, ça se mange." },
     { s: "safran", t: "Vous brûlez votre poumon pour un steak. Moi je récolte mon or fleur par fleur, à l'aube. Devinez lequel de nos deux commerces dure mille ans." },
     { s: "capitaine", t: "Mille ans ! Moi je pense au prochain trimestre, à la tronçonneuse ! Assez de poésie, on joue." },
     { s: "safran", t: "La poésie, justement, c'est ce qui reste quand la tronçonneuse a fini. Servez, Capitaine. Doucement : le paon dort." }
   ],
-  win: [
+  win:  [
     { s: "safran", t: "Vous avez foncé, coupé, hurlé. Et la balle vous a attendus, tranquille, dans le voile doré. La forêt vous salue." },
     { s: "capitaine", t: "Bah ! Trop de fleurs, ça endort. Je préfère perdre debout dans ma boue rouge." }
   ],
-  lose: [
+  lose:  [
     { s: "capitaine", t: "La tronçonneuse bat le jardinier ! Bruta força, mon vieux fleuriste !" },
     { s: "safran", t: "Prenez votre point. Le jardin, lui, sera encore là quand votre trimestre sera oublié." }
   ]
@@ -68,107 +68,114 @@ Car c'est là, au fond, tout Le Safran : un joueur qui a compris que dans un mon
 {
   act: 1, title: "Deux vieux mondes", sub: "Ramenie–Bharatie · le safran et l'ashram",
   left: "safran", right: "gourou", terrain: 6, mode: "volley", ai: 1, doped: null,
-  pre: [
+  pre:  [
     { s: "narrator", t: "Stade Ashram, guirlandes de soucis orange. Deux des plus anciennes civilisations du monde se saluent — poliment, longuement." },
     { s: "gourou", t: "Namasté, ami du plateau. Vous m'achetez mon marché, je vous achète votre essence. Le commerce, c'est déjà de la méditation." },
     { s: "safran", t: "Vous êtes bien le seul, avec le Timonier, à me payer sans me faire la morale. Ça repose. Un client qui médite au lieu de sermonner." },
     { s: "gourou", t: "Je médite ET j'encaisse. Ma dévotion a un très bon taux de change. Mon endurance aussi : vous allez courir, ami." },
     { s: "safran", t: "Courir ? Voyons. Je vais plutôt ralentir. Le safran ne court pas : il infuse. Voile d'Or, et laissez le temps s'épaissir." }
   ],
-  win: [
+  win:  [
     { s: "safran", t: "Deux vieux mondes, un seul vainqueur ce soir. Nous nous reverrons dans mille ans pour la revanche." },
     { s: "gourou", t: "Namasté. Le safran a infusé plus vite que ma méditation. Je note. Je reviens. Je respire." }
   ],
-  lose: [
+  lose:  [
     { s: "gourou", t: "L'endurance de l'ashram triomphe du voile doré. Om, et bon commerce quand même." },
     { s: "safran", t: "Beau point, ami. Notre thé refroidit ; nos empires, non. À la prochaine caravane." }
   ]
 },
 
-// ===================== ACTE II — Le club des mal-aimés (montée) =====================
+// ===================== ACTE I — Petites rivalités (Volley) =====================
 {
   act: 2, title: "Le club des sanctionnés", sub: "Ramenie–Bourassie · camaraderie de l'embargo",
-  left: "safran", right: "volkoi", terrain: 0, mode: "volley", ai: 2, doped: null,
-  pre: [
-    { s: "narrator", t: "Place Écarlate sous la neige. Deux habitués des listes noires de l'Ouest se retrouvent au filet, entre gens qui se comprennent." },
+  left: "safran", right: "volkoi", terrain: 0, mode: "flame", ai: 2, doped: null,
+  pre:  [
+    { s: "narrator", t: "Place Écarlate sous la neige. Deux habitués des listes noires de l'Ouest se retrouvent au filet, entre gens qui se comprennent. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
     { s: "volkoi", t: "Safran. On nous sanctionne tous les deux. On nous déteste tous les deux. Ça crée des liens, le mépris de l'Ouest." },
     { s: "safran", t: "Nous ne nous aimons pas, Tsar. Nous nous comprenons. C'est bien plus solide qu'une amitié. Et bien moins cher à entretenir." },
     { s: "volkoi", t: "Je gèle, tu ralentis. Le froid et le miel. L'Ouest transpire entre les deux." },
     { s: "safran", t: "Vous figez d'un coup ; moi je laisse mariner. Deux écoles de la patience. Servez, camarade — je vous préviens que le miel colle." }
   ],
-  win: [
+  win:  [
     { s: "safran", t: "Le miel a été plus lent que votre glace, et pourtant j'y suis arrivé le premier. Curieux, la patience." },
-    { s: "volkoi", t: "Hm. Bien joué, Safran. On reste dans le même club. J'apporte la vodka, tu apportes le thé." }
+    { s: "volkoi", t: "Hm. Bien joué, Safran. On reste dans le même club. J'apporte la vodka, tu apportes le thé." },
+    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ],
-  lose: [
+  lose:  [
     { s: "volkoi", t: "Le froid l'emporte sur le miel. Comme prévu. La glace, elle, n'attend jamais." },
-    { s: "safran", t: "Gardez ce point, Tsar. Entre sanctionnés, on ne se compte plus les défaites. On se compte les hivers." }
+    { s: "safran", t: "Gardez ce point, Tsar. Entre sanctionnés, on ne se compte plus les défaites. On se compte les hivers." },
+    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ]
 },
 {
   act: 2, title: "Le client idéal", sub: "Ramenie–Panguo · l'or contre le silence",
   left: "safran", right: "timonier", terrain: 4, mode: "flame", ai: 2, doped: null,
-  pre: [
-    { s: "narrator", t: "Cité du Matin, lanternes rouges. Le meilleur client du Safran l'accueille — celui qui paie rubis sur l'ongle et ne demande jamais rien." },
+  pre:  [
+    { s: "narrator", t: "Cité du Matin, lanternes rouges. Le meilleur client du Safran l'accueille — celui qui paie rubis sur l'ongle et ne demande jamais rien. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
     { s: "timonier", t: "Je t'achète ton safran, ton essence, ton pétrole. Je paie à l'heure. Et je ne pose aucune question. C'est ça, l'harmonie." },
     { s: "safran", t: "Un client qui paie et se tait : dans ce roster, c'est un miracle. Les autres m'achètent des sermons ; vous, du silence. Précieux." },
     { s: "timonier", t: "Je contrôle le tempo du monde. Toi celui du plateau. Deux patiences ne devraient pas s'affronter." },
     { s: "safran", t: "Elles devraient s'admirer. Mais admirons-nous en jouant : voyons quelle patience place la balle en premier. Voile d'Or." }
   ],
-  win: [
+  win:  [
     { s: "safran", t: "Deux muraille de patience, et c'est la mienne qui a tenu. Continuez d'acheter, Timonier. Le safran monte encore." },
-    { s: "timonier", t: "Un revers mineur dans un très long calendrier. J'ai le temps. Toi aussi. On se revend ça demain." }
+    { s: "timonier", t: "Un revers mineur dans un très long calendrier. J'ai le temps. Toi aussi. On se revend ça demain." },
+    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ],
-  lose: [
+  lose:  [
     { s: "timonier", t: "Le tempo, toujours le tempo. Ma muraille était plus lente que ton voile, et plus haute." },
-    { s: "safran", t: "Belle patience, client fidèle. Vous gagnez le set ; moi je garde le contrat. Chacun son or." }
+    { s: "safran", t: "Belle patience, client fidèle. Vous gagnez le set ; moi je garde le contrat. Chacun son or." },
+    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ]
 },
 {
   act: 2, title: "Deux fiertés sur un détroit", sub: "Ramenie–Bosforie · rivalité des empires voisins",
-  left: "safran", right: "sultan", terrain: 5, mode: "bomb", ai: 2, doped: null,
-  pre: [
-    { s: "narrator", t: "Pont des Deux Mondes. Deux héritiers d'empires immenses se toisent — et le ballon, cette fois, est une bombe à mèche." },
+  left: "safran", right: "sultan", terrain: 5, mode: "flame", ai: 2, doped: null,
+  pre:  [
+    { s: "narrator", t: "Pont des Deux Mondes. Deux héritiers d'empires immenses se toisent — et le ballon, cette fois, est un ballon enflammé à brûlure." },
     { s: "sultan", t: "Mon empire régnait quand le tien s'endormait dans ses roses. Je défonce, je smashe, je m'étends. Toi, tu infuses." },
     { s: "safran", t: "Le vôtre s'est effondré en une génération, Sultan. Le mien dure depuis l'aube du monde. On ne mesure pas la même chose, vous et moi." },
-    { s: "sultan", t: "Grandiloquence contre nostalgie ! Le détroit est à moi, la région est à moi, la mèche brûle pour toi." },
-    { s: "safran", t: "Elle brûle pour celui qui s'agite. Moi je ralentis. Renvoyez cette bombe doucement, Sultan — la précipitation fait de très beaux cratères." },
-    { s: "narrator", t: "Ne gardez pas la bombe. Renvoyez. Le voile doré rend chaque geste plus lent qu'il n'y paraît." }
+    { s: "sultan", t: "Grandiloquence contre nostalgie ! Le détroit est à moi, la région est à moi, la brûlure brûle pour toi." },
+    { s: "safran", t: "Elle brûle pour celui qui s'agite. Moi je ralentis. Renvoyez cette ballon enflammé doucement, Sultan — la précipitation fait de très beaux cratères." },
+    { s: "narrator", t: "Ne gardez pas le ballon enflammé. Renvoyez. Le voile doré rend chaque geste plus lent qu'il n'y paraît." }
   ],
-  win: [
-    { s: "safran", t: "Vous avez voulu défoncer. Le voile a épaissi l'air, la mèche a fait le reste. La patience désamorce ce que l'orgueil allume." },
+  win:  [
+    { s: "safran", t: "Vous avez voulu défoncer. Le voile a épaissi l'air, la brûlure a fait le reste. La patience désamorce ce que l'orgueil allume." },
     { s: "sultan", t: "Un cratère de mon côté ! Impossible. Le détroit reste à moi, entends-tu ? Le détroit !" }
   ],
-  lose: [
+  lose:  [
     { s: "sultan", t: "BOUM ! De ton côté, fleuriste ! Deux continents m'admirent et un seul empire éclate ce soir : le tien." },
-    { s: "safran", t: "Faites vibrer votre pont. Le mien n'a jamais eu besoin de deux rives pour tenir debout." }
+    { s: "safran", t: "Faites vibrer votre pont. Le mien n'a jamais eu besoin de deux rives pour tenir debout." },
+    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ]
 },
 
-// ===================== ACTE III — La pression maximale (Bombe & finale) =====================
+// ===================== ACTE I — Petites rivalités (Volley) =====================
 {
   act: 3, title: "Fraternité des parias", sub: "Ramenie–Ryonganie · deux embargos, une tendresse",
-  left: "safran", right: "bebe", terrain: 3, mode: "volley", ai: 3, doped: null,
-  pre: [
-    { s: "narrator", t: "Esplanade du Défilé, le radar tourne. Deux champions du monde de l'embargo se retrouvent — presque avec émotion." },
+  left: "safran", right: "bebe", terrain: 3, mode: "bomb", ai: 3, doped: null,
+  pre:  [
+    { s: "narrator", t: "Esplanade du Défilé, le radar tourne. Deux champions du monde de l'embargo se retrouvent — presque avec émotion. Le ballon est une bombe : le camp où elle tombe perd." },
     { s: "bebe", t: "Grand frère du plateau ! On nous sanctionne, on nous encercle, et on fanfaronne quand même ! On est pareils, toi et moi !" },
     { s: "safran", t: "Presque, petit Maréchal. Vous fanfaronnez ; moi je souris. Vous montrez vos fusées ; moi je cache mes crocus. Mais l'embargo, oui : c'est notre langue commune." },
     { s: "bebe", t: "Ma Batterie te cloue au sol, tu ne sauteras plus ! Applaudissez, applaudissez, le SUPER se charge !" },
     { s: "safran", t: "Sautez tant que vous voulez, moi je ralentis. Deux parias au filet, ce soir : au moins, personne ne viendra nous sermonner." }
   ],
-  win: [
+  win:  [
     { s: "safran", t: "Le voile a été plus patient que votre batterie, petit frère. Restons soudés : le monde nous déteste, autant s'amuser ensemble." },
-    { s: "bebe", t: "Perdu ! Mais contre toi, ça compte pas ! On est du même club, grand frère. Vive l'embargo !" }
+    { s: "bebe", t: "Perdu ! Mais contre toi, ça compte pas ! On est du même club, grand frère. Vive l'embargo !" },
+    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
   ],
-  lose: [
+  lose:  [
     { s: "bebe", t: "VICTOIRE DU MARÉCHAL ! Même le safran plie devant ma Batterie ! On fêtera ça au défilé !" },
-    { s: "safran", t: "Prenez votre point, jeune homme. Entre encerclés, la victoire de l'un console l'autre. C'est ça, la fraternité." }
+    { s: "safran", t: "Prenez votre point, jeune homme. Entre encerclés, la victoire de l'un console l'autre. C'est ça, la fraternité." },
+    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
   ]
 },
 {
   act: 3, title: "Le mur d'or contre la roseraie", sub: "Ramenie–Doria · la pression maximale",
   left: "safran", right: "dorf", terrain: 9, mode: "bomb", ai: 3, doped: "R",
-  pre: [
+  pre:  [
     { s: "narrator", t: "Jardin des Roses. Le Baron Dorf plante sa voiturette de golf dans la roseraie, klaxonne, et pose sur le filet une liasse d'embargos." },
     { s: "dorf", t: "Pression maximale ! La plus grande pression de l'histoire ! Tes petits alambics, je les ferme, et ton or safran, je le taxe. Fantastique !" },
     { s: "safran", t: "Vous bâtissez des murs d'or, Baron ; moi je cultive des roses. Devinez lequel de nous deux nourrit ses gens quand vient l'hiver." },
@@ -176,11 +183,11 @@ Car c'est là, au fond, tout Le Safran : un joueur qui a compris que dans un mon
     { s: "safran", t: "Vous déchirez, vous klaxonnez, vous taxez. Beaucoup de bruit pour un homme si pressé. La bombe brûle, Baron. Et vous n'aimez pas attendre." },
     { s: "narrator", t: "L'aura rouge enveloppe le Baron : la pression maximale l'a dopé. Renvoyez la bombe. Le Voile d'Or est votre seule patience." }
   ],
-  win: [
+  win:  [
     { s: "safran", t: "Tout ce mur d'or, et vous voilà au ralenti dans ma poussière dorée pendant que la mèche s'éteint chez vous. Le safran survit aux sanctions, Baron. Il les vieillit en bouteille." },
     { s: "dorf", t: "Truqué ! Le jardin est truqué, le paon est truqué, TOUT est truqué ! J'ajoute des sanctions ! Le double !" }
   ],
-  lose: [
+  lose:  [
     { s: "dorf", t: "BOUM chez le fleuriste ! Pression maximale, résultat maximal ! Personne ne fait exploser les roses comme moi !" },
     { s: "safran", t: "Emportez votre cratère et votre klaxon, Baron. Vous fermez mes ateliers ce soir ; ils rouvriront quand vous serez oublié. Le safran a l'éternité pour lui." }
   ]
@@ -188,7 +195,7 @@ Car c'est là, au fond, tout Le Safran : un joueur qui a compris que dans un mon
 {
   act: 3, title: "L'ombre et le raid", sub: "Ramenie–Levantie · le grand duel du berceau du monde",
   left: "safran", right: "faucon", terrain: 8, mode: "bomb", ai: 3, doped: "R",
-  pre: [
+  pre:  [
     { s: "narrator", t: "Citadelle du Levant, un faucon tournoie au-dessus des remparts. Deux fiertés du même berceau, deux ennemis de toujours. La finale. La bombe." },
     { s: "faucon", t: "Je te surveille depuis toujours, Safran. Tes alambics, tes proxys, tes ombres. Je frappe vite, je frappe fort, je frappe le premier." },
     { s: "safran", t: "Vous voyez un ennemi dans chaque ombre, Faucon. Ça doit être épuisant, cette vigilance. Moi je n'ai qu'un adversaire — vous. Ça me laisse du temps pour les roses." },
@@ -197,14 +204,15 @@ Car c'est là, au fond, tout Le Safran : un joueur qui a compris que dans un mon
     { s: "faucon", t: "Assez de poésie du plateau. Raid Éclair : tu ne sauteras plus. La citadelle jugera." },
     { s: "narrator", t: "Deux auras rouges au-dessus des remparts : le vieux conflit les dope tous les deux. Renvoyez la bombe. Ici, la patience affronte enfin la vitesse." }
   ],
-  win: [
+  win:  [
     { s: "safran", t: "Vous avez frappé vite, Faucon. Si vite que vous n'avez pas vu le voile d'or épaissir l'air. La mèche s'est éteinte de votre côté. La patience gagne le siècle, pas le raid." },
     { s: "faucon", t: "Ce n'est qu'un round. Ce conflit-là ne se règle pas en trois sets, Safran. Il ne se règle jamais." },
     { s: "safran", t: "Je sais. C'est pour ça que j'ai planté des roses. Elles, au moins, refleurissent chaque année. À la prochaine ombre, Faucon." }
   ],
-  lose: [
+  lose:  [
     { s: "faucon", t: "Le raid éclair désamorce la patience. Tes ateliers sont à terre, Safran, et ta roseraie avec. Frappé le premier, comme toujours." },
-    { s: "safran", t: "Frappez, Faucon, frappez. Vous gagnez ce soir et vous recommencerez demain, épuisé, à guetter l'ombre. Moi je rentre tailler mes roses. Elles refleuriront bien avant que vous dormiez." }
+    { s: "safran", t: "Frappez, Faucon, frappez. Vous gagnez ce soir et vous recommencerez demain, épuisé, à guetter l'ombre. Moi je rentre tailler mes roses. Elles refleuriront bien avant que vous dormiez." },
+    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
   ]
 }
 ```

@@ -183,7 +183,7 @@ const STORY_BY_CHAR = {
       "left": "volkoi",
       "right": "gourou",
       "terrain": 6,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 1,
       "doped": null,
       "pre": [
@@ -209,7 +209,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Deux immobilités s'affrontent. La plus froide gagnera. Ou la plus calme."
+          "t": "Deux immobilités s'affrontent. La plus froide gagnera. Ou la plus calme. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "win": [
@@ -220,6 +220,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Un revers m'enseigne. Respirons. Je reviendrai, et j'aurai encore besoin de ton gaz."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -230,6 +234,10 @@ const STORY_BY_CHAR = {
         {
           "s": "volkoi",
           "t": "Match nul pour l'histoire, victoire pour toi. Garde ta neutralité. Elle m'arrange plus que la tienne."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -266,7 +274,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Populistes des deux hémisphères. L'un vend le grain, l'autre le rugit."
+          "t": "Populistes des deux hémisphères. L'un vend le grain, l'autre le rugit. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "win": [
@@ -277,6 +285,10 @@ const STORY_BY_CHAR = {
         {
           "s": "capitaine",
           "t": "Truqué ! Fraude ! … Bon, remets-moi une cargaison, on oublie. Entre durs, on se comprend."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -287,6 +299,10 @@ const STORY_BY_CHAR = {
         {
           "s": "volkoi",
           "t": "Tu gagnes une manche et tu coupes tes propres poumons. Chacun sa méthode pour se refroidir."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -297,13 +313,13 @@ const STORY_BY_CHAR = {
       "left": "volkoi",
       "right": "sultan",
       "terrain": 5,
-      "mode": "bomb",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Pont des Deux Mondes. Détroit, dômes, bannière violette à liseré doré, tapis volant en approche. Le ballon est une bombe : le camp où elle tombe perd."
+          "t": "Pont des Deux Mondes. Détroit, dômes, bannière violette à liseré doré, tapis volant en approche. Le ballon s’enflamme : chaque contact brûle — à zéro PV, c’est perdu."
         },
         {
           "s": "sultan",
@@ -311,7 +327,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "volkoi",
-          "t": "Tu contrôles le détroit, moi le robinet. Tant qu'on a besoin l'un de l'autre, la mèche brûle lentement."
+          "t": "Tu contrôles le détroit, moi le robinet. Tant qu'on a besoin l'un de l'autre, la braise couve lentement."
         },
         {
           "s": "sultan",
@@ -323,13 +339,13 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Ne laisse pas la bombe de ton côté. Entre le froid et le séisme, une seule mèche décidera."
+          "t": "Ne te brûle pas les doigts : renvoie avant d’être à zéro. Entre le froid et le séisme, une seule braise décidera."
         }
       ],
       "win": [
         {
           "s": "volkoi",
-          "t": "Le sang-froid éteint la mèche. On reste amis, Sultan — amis qui gardent un doigt sur le robinet."
+          "t": "Le sang-froid éteint la brûlure. On reste amis, Sultan — amis qui gardent un doigt sur le robinet."
         },
         {
           "s": "sultan",
@@ -344,6 +360,10 @@ const STORY_BY_CHAR = {
         {
           "s": "volkoi",
           "t": "Grandiose, comme toujours. Profite. Le gaz continue de couler, et l'hiver a de la mémoire."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -354,7 +374,7 @@ const STORY_BY_CHAR = {
       "left": "volkoi",
       "right": "dorf",
       "terrain": 1,
-      "mode": "volley",
+      "mode": "bomb",
       "ai": 2,
       "doped": null,
       "pre": [
@@ -380,7 +400,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Volley de flatteries. Chacun croit tenir l'autre en laisse. Les analystes, eux, ne dorment plus."
+          "t": "Volley de flatteries. Chacun croit tenir l'autre en laisse. Les analystes, eux, ne dorment plus. Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "win": [
@@ -391,6 +411,10 @@ const STORY_BY_CHAR = {
         {
           "s": "dorf",
           "t": "Truqué ! Mais élégamment truqué. On refait ça au sommet, entre gars forts. Les plus forts !"
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -401,6 +425,10 @@ const STORY_BY_CHAR = {
         {
           "s": "volkoi",
           "t": "Savoure, associé. Je préfère te laisser la coupe et garder la partie. C'est plus chaud pour toi, plus utile pour moi."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ]
     },
@@ -448,6 +476,10 @@ const STORY_BY_CHAR = {
         {
           "s": "faucon",
           "t": "Une manche. Rien n'est réglé. Le rapace revient toujours, et il revient plus bas."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -458,6 +490,10 @@ const STORY_BY_CHAR = {
         {
           "s": "volkoi",
           "t": "Rapide, brutal, précis. Et pressé. C'est ta faiblesse : tu comptes en secondes, je compte en siècles."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ]
     },
@@ -513,6 +549,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "Ce n'est pas une fin, c'est un front de plus. La diplomatie est un sport d'endurance — et l'endurance, je la garde."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -523,6 +563,10 @@ const STORY_BY_CHAR = {
         {
           "s": "volkoi",
           "t": "Une manche perdue chez moi. Je ne concède pas : je suspends. L'hiver, contrairement à ta victoire, reviendra. Il revient toujours."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ]
     }
@@ -698,13 +742,13 @@ const STORY_BY_CHAR = {
       "left": "dorf",
       "right": "sultan",
       "terrain": 5,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Pont des Deux Mondes. Un tapis volant survole le détroit. Deux bâtisseurs de tours se toisent, chacun persuadé d'avoir la plus grande."
+          "t": "Pont des Deux Mondes. Un tapis volant survole le détroit. Deux bâtisseurs de tours se toisent, chacun persuadé d'avoir la plus grande. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "sultan",
@@ -757,7 +801,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Citadelle du Levant, grès sur colline désertique. Un faucon décrit des cercles. En bas, on prépare non pas un match, mais un « accord historique »."
+          "t": "Citadelle du Levant, grès sur colline désertique. Un faucon décrit des cercles. En bas, on prépare non pas un match, mais un « accord historique ». Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "dorf",
@@ -804,13 +848,13 @@ const STORY_BY_CHAR = {
       "left": "dorf",
       "right": "timonier",
       "terrain": 4,
-      "mode": "bomb",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Cité du Matin, murs cramoisis, toits d'or. Le ballon n'est plus un ballon : c'est une bombe à mèche. Enjeu : qui fabrique le monde ?"
+          "t": "Cité du Matin, murs cramoisis, toits d'or. Le ballon n'est plus un ballon : c'est un ballon enflammé à brûlure. Enjeu : qui fabrique le monde ?"
         },
         {
           "s": "dorf",
@@ -826,13 +870,13 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "timonier",
-          "t": "Le tempo, l'harmonie, la mèche qui brûle. Tu klaxonnes ; moi je livre à l'heure. Renvoie la bombe si tu peux."
+          "t": "Le tempo, l'harmonie, la brûlure qui brûle. Tu klaxonnes ; moi je livre à l'heure. Renvoie le ballon enflammé si tu peux."
         }
       ],
       "win": [
         {
           "s": "dorf",
-          "t": "Made in Doria ! On gagne ! On gagne tellement que le monde entier est jaloux ! La bombe a explosé chez toi, le plus beau boum du monde."
+          "t": "Made in Doria ! On gagne ! On gagne tellement que le monde entier est jaloux ! le ballon enflammé a explosé chez toi, le plus beau boum du monde."
         },
         {
           "s": "timonier",
@@ -857,13 +901,13 @@ const STORY_BY_CHAR = {
       "left": "dorf",
       "right": "capitaine",
       "terrain": 7,
-      "mode": "volley",
+      "mode": "bomb",
       "ai": 3,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Grande Forêt, clairière de jungle dorée, court en terre rouge. Un ara pousse un cri. Deux fanfarons se reconnaissent — et se méfient d'autant plus."
+          "t": "Grande Forêt, clairière de jungle dorée, court en terre rouge. Un ara pousse un cri. Deux fanfarons se reconnaissent — et se méfient d'autant plus. Le ballon est une bombe : le camp où elle tombe perd."
         },
         {
           "s": "capitaine",
@@ -1197,13 +1241,13 @@ const STORY_BY_CHAR = {
       "left": "cygne",
       "right": "sultan",
       "terrain": 5,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Pont des Deux Mondes, entre deux continents. Une candidature qui dure depuis si longtemps qu'on a arrêté de compter les décennies."
+          "t": "Pont des Deux Mondes, entre deux continents. Une candidature qui dure depuis si longtemps qu'on a arrêté de compter les décennies. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "sultan",
@@ -1234,6 +1278,10 @@ const STORY_BY_CHAR = {
         {
           "s": "sultan",
           "t": "Tu gagnes le match, pas le détroit. Je reste sur le pas de ta porte. Debout. Immense. Et j'ai la clé."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -1244,6 +1292,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "Puissant, indéniablement. Défaite honorable. Nos critères, eux, restent debout. Comme mon obélisque."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -1260,7 +1312,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Jardin des Roses, arcades turquoise, un paon qui fait la roue près du filet. Deux négociateurs se retrouvent après un accord jadis signé, jadis déchiré."
+          "t": "Jardin des Roses, arcades turquoise, un paon qui fait la roue près du filet. Deux négociateurs se retrouvent après un accord jadis signé, jadis déchiré. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "safran",
@@ -1291,6 +1343,10 @@ const STORY_BY_CHAR = {
         {
           "s": "safran",
           "t": "Joli point, technocrate. Mais tant que ton allié déchire mes accords, ton thé aura un goût de trahison."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -1301,6 +1357,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "Défaite mesurée pour un adversaire mesuré. Je repars, en même temps déçu et déterminé. Nous rebâtirons cet accord."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -1311,13 +1371,13 @@ const STORY_BY_CHAR = {
       "left": "cygne",
       "right": "faucon",
       "terrain": 8,
-      "mode": "bomb",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Citadelle du Levant, remparts de grès sur la mer. Un faucon tournoie. Ce soir, le ballon est une bombe : le camp où elle tombe perd."
+          "t": "Citadelle du Levant, remparts de grès sur la mer. Un faucon tournoie. Ce soir, le ballon est un ballon enflammé : chaque contact brûle — à zéro PV, c’est perdu."
         },
         {
           "s": "faucon",
@@ -1329,21 +1389,21 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "faucon",
-          "t": "« En même temps. » Ton poison préféré. Sur ce terrain, tu choisis, ou la bombe choisit pour toi. Il n'y a pas de troisième rive."
+          "t": "« En même temps. » Ton poison préféré. Sur ce terrain, tu choisis, ou le ballon enflammé choisit pour toi. Il n'y a pas de troisième rive."
         },
         {
           "s": "cygne",
-          "t": "Il y a toujours une troisième rive. C'est même ma spécialité. Renvoyez la bombe, Faucon, et discutons comme des adultes."
+          "t": "Il y a toujours une troisième rive. C'est même ma spécialité. Renvoyez le ballon enflammé, Faucon, et discutons comme des adultes."
         },
         {
           "s": "faucon",
-          "t": "Les adultes ne discutent pas avec une mèche allumée. Ils frappent. Sers, et prie pour que ton « en même temps » n'explose pas dans tes mains."
+          "t": "Les adultes ne discutent pas avec une brûlure allumée. Ils frappent. Sers, et prie pour que ton « en même temps » n'explose pas dans tes mains."
         }
       ],
       "win": [
         {
           "s": "cygne",
-          "t": "Vous voyez ? On peut être un allié loyal ET une conscience. La bombe est repartie. Le dialogue, lui, reste sur la table."
+          "t": "Vous voyez ? On peut être un allié loyal ET une conscience. le ballon enflammé est repartie. Le dialogue, lui, reste sur la table."
         },
         {
           "s": "faucon",
@@ -1405,6 +1465,10 @@ const STORY_BY_CHAR = {
         {
           "s": "bebe",
           "t": "Rejouons ! REJOUONS ! Mon radar exige une revanche ! Ce n'est pas une défaite, c'est un défilé interrompu !"
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -1466,6 +1530,10 @@ const STORY_BY_CHAR = {
         {
           "s": "capitaine",
           "t": "Tsss. Tu gagnes un match, pas ma forêt. Reviens quand tu voudras, l'oiseau : mes troncs t'attendent, et mon ara aussi."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -1530,7 +1598,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Le Cygne lève les bras. Les pigeons reviennent se poser sur l'obélisque. Le coq doré, enfin, semble chanter. Jeux du Sommet : Le Cygne triomphe. En même temps."
+          "t": "Le Cygne lève les bras. Les pigeons reviennent se poser sur l'obélisque. Le coq doré, enfin, semble chanter. Jeux du Sommet : Le Cygne triomphe. En même temps. Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -1656,7 +1724,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "bebe",
-          "t": "Tu as gagné parce qu'on est amis ! Contre un ennemi, j'aurais sorti la bombe. Tu as de la chance."
+          "t": "Tu as gagné parce qu'on est amis !Tu as de la chance."
         }
       ]
     },
@@ -1724,13 +1792,13 @@ const STORY_BY_CHAR = {
       "left": "bebe",
       "right": "gourou",
       "terrain": 6,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 1,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Stade Ashram. Une vache traverse tranquillement le court. Le Maréchal la regarde comme s'il envisageait un défilé militaire de bétail."
+          "t": "Stade Ashram. Une vache traverse tranquillement le court. Le Maréchal la regarde comme s'il envisageait un défilé militaire de bétail. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "gourou",
@@ -1761,6 +1829,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Tu gagnes le point, pas la paix intérieure. Reviens quand le bruit t'aura lassé."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -1771,6 +1843,10 @@ const STORY_BY_CHAR = {
         {
           "s": "bebe",
           "t": "Ta vache m'a déconcentré ! Je réclame une revanche sans bétail sur le terrain !"
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -1781,13 +1857,13 @@ const STORY_BY_CHAR = {
       "left": "bebe",
       "right": "sultan",
       "terrain": 5,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Pont des Deux Mondes. Un tapis vole au-dessus du détroit. Deux hommes habitués à ce qu'on les acclame se toisent, chacun persuadé d'être le plus grand."
+          "t": "Pont des Deux Mondes. Un tapis vole au-dessus du détroit. Deux hommes habitués à ce qu'on les acclame se toisent, chacun persuadé d'être le plus grand. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "sultan",
@@ -1818,6 +1894,10 @@ const STORY_BY_CHAR = {
         {
           "s": "sultan",
           "t": "Un point pour la jeunesse insolente. Mais l'orgueil, petit, ça se cultive toute une vie. Reviens."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -1828,6 +1908,10 @@ const STORY_BY_CHAR = {
         {
           "s": "bebe",
           "t": "Un tapis volant contre moi, c'est de la triche ! Je veux un terrain sans magie et avec plus de béton !"
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -1875,6 +1959,10 @@ const STORY_BY_CHAR = {
         {
           "s": "capitaine",
           "t": "Pas mal, le morveux. T'as du coffre. Reviens quand j'aurai fini de couper les arbres du court."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -1885,6 +1973,10 @@ const STORY_BY_CHAR = {
         {
           "s": "bebe",
           "t": "C'est la faute de l'ara ! Il a survolé mon camp ! Ma Batterie AA aurait dû l'abattre !"
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -1999,6 +2091,10 @@ const STORY_BY_CHAR = {
         {
           "s": "bebe",
           "t": "Complot ! Vous étiez tous ligués ! Mon radar était éteint une seconde et vous en avez profité, tricheurs !"
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ]
     },
@@ -2053,7 +2149,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Sur les gradins de granit, la foule applaudit sur commande. Sous l'arc abstrait, le radar tourne encore, victorieux et paranoïaque."
+          "t": "Sur les gradins de granit, la foule applaudit sur commande. Sous l'arc abstrait, le radar tourne encore, victorieux et paranoïaque. Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -2102,7 +2198,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Volley d'entraînement entre patron et protégé. La bombe reste au vestiaire — pour l'instant."
+          "t": "Volley d'entraînement entre patron et protégé."
         }
       ],
       "win": [
@@ -2247,13 +2343,13 @@ const STORY_BY_CHAR = {
       "left": "timonier",
       "right": "cygne",
       "terrain": 2,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Palais du Coq. Un coq héraldique doré fanfaronne sur sa bannière bleue. En face, un mur cramoisi patiente."
+          "t": "Palais du Coq. Un coq héraldique doré fanfaronne sur sa bannière bleue. En face, un mur cramoisi patiente. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "cygne",
@@ -2284,6 +2380,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "Match perdu, position nuancée. En même temps, la nuance est une victoire en soi. Non ?"
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -2294,6 +2394,10 @@ const STORY_BY_CHAR = {
         {
           "s": "timonier",
           "t": "Chante donc. Tes usines commandent mes batteries en coulisse. L'harmonie se moque des slogans."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -2304,13 +2408,13 @@ const STORY_BY_CHAR = {
       "left": "timonier",
       "right": "capitaine",
       "terrain": 7,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Grande Forêt. Un ara traverse la canopée dorée. En bas, l'empereur commande — poliment — la moitié de la récolte."
+          "t": "Grande Forêt. Un ara traverse la canopée dorée. En bas, l'empereur commande — poliment — la moitié de la récolte. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "capitaine",
@@ -2341,6 +2445,10 @@ const STORY_BY_CHAR = {
         {
           "s": "capitaine",
           "t": "Battu par l'empereur ! Bah, tant qu'il achète mon soja, je peux perdre au volley, moi."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -2351,6 +2459,10 @@ const STORY_BY_CHAR = {
         {
           "s": "timonier",
           "t": "Gagne le match. Je garde le carnet de commandes. C'est moi qui écris la fin de l'histoire."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -2367,7 +2479,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Jardin des Roses. Un paon déploie sa roue sous les arcades turquoise. En face, un empereur qui n'admire jamais rien trop longtemps."
+          "t": "Jardin des Roses. Un paon déploie sa roue sous les arcades turquoise. En face, un empereur qui n'admire jamais rien trop longtemps. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "safran",
@@ -2398,6 +2510,10 @@ const STORY_BY_CHAR = {
         {
           "s": "safran",
           "t": "Tu gagnes, et tu gagnes encore sur mon dos. Le Safran retient. Le paon aussi a de la mémoire."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -2408,6 +2524,10 @@ const STORY_BY_CHAR = {
         {
           "s": "timonier",
           "t": "Un set perdu dans un jardin. Le baril, lui, coule toujours vers mes ports. Je patiente."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -2455,6 +2575,10 @@ const STORY_BY_CHAR = {
         {
           "s": "faucon",
           "t": "Une manche perdue. Mes drones connaissent le chemin de ta Cité, maintenant. On se reverra."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -2465,6 +2589,10 @@ const STORY_BY_CHAR = {
         {
           "s": "timonier",
           "t": "Tu perces un mur. J'en bâtis mille. Frappe l'éclair ; moi je grave le silicium. Le siècle nous départagera."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ]
     },
@@ -2512,6 +2640,10 @@ const STORY_BY_CHAR = {
         {
           "s": "dorf",
           "t": "Truqué ! Subventionné ! Manipulation de monnaie ! … Bon. Combien pour rouvrir tes chaînes, au fait ?"
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -2569,6 +2701,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "J'ai troqué mon souffle contre du feu, et j'ai perdu la ligne. La montagne, elle, se souviendra de tout."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -2579,6 +2715,10 @@ const STORY_BY_CHAR = {
         {
           "s": "timonier",
           "t": "Une frontière cède un soir. L'empire compte en dynasties, pas en défaites. Je rentre au palais. Et je patiente."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ]
     }
@@ -2762,13 +2902,13 @@ const STORY_BY_CHAR = {
       "left": "sultan",
       "right": "gourou",
       "terrain": 6,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 1,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Stade Ashram. Guirlandes de soucis orange, une vache traverse tranquillement le terrain. Deux hommes qui parlent au nom de civilisations millénaires."
+          "t": "Stade Ashram. Guirlandes de soucis orange, une vache traverse tranquillement le terrain. Deux hommes qui parlent au nom de civilisations millénaires. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "gourou",
@@ -2799,6 +2939,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Une secousse passe, la montagne reste. Tu as gagné le point, pas le sommet."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -2809,6 +2953,10 @@ const STORY_BY_CHAR = {
         {
           "s": "sultan",
           "t": "Tu médites bien, mais tu ne possèdes pas de pont entre deux mondes. Moi si. On se retrouvera."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -2819,13 +2967,13 @@ const STORY_BY_CHAR = {
       "left": "sultan",
       "right": "volkoi",
       "terrain": 0,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Place Écarlate sous la neige. Le canon d'apparat tonne au loin. Deux hommes qui se vendent des armes le matin et se marchent dessus l'après-midi."
+          "t": "Place Écarlate sous la neige. Le canon d'apparat tonne au loin. Deux hommes qui se vendent des armes le matin et se marchent dessus l'après-midi. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "volkoi",
@@ -2856,6 +3004,10 @@ const STORY_BY_CHAR = {
         {
           "s": "volkoi",
           "t": "Un revers sans conséquence. Nous rejouerons. Nous rejouons toujours, toi et moi. C'est notre malédiction."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -2866,6 +3018,10 @@ const STORY_BY_CHAR = {
         {
           "s": "sultan",
           "t": "Une manche pour l'hiver. Mais c'est mon détroit qui décide quand ton blé sort. Souviens-t'en."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -2882,7 +3038,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Cité du Matin. Lanternes rouges, lions de pierre, toits d'or. Deux empereurs se jaugent au-dessus d'un carnet de commandes très épais."
+          "t": "Cité du Matin. Lanternes rouges, lions de pierre, toits d'or. Deux empereurs se jaugent au-dessus d'un carnet de commandes très épais. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "timonier",
@@ -2913,6 +3069,10 @@ const STORY_BY_CHAR = {
         {
           "s": "timonier",
           "t": "Le tempo se rétablira. Il se rétablit toujours. Va compter tes péages, marchand de ponts."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -2923,6 +3083,10 @@ const STORY_BY_CHAR = {
         {
           "s": "sultan",
           "t": "Une muraille finit toujours par avoir deux côtés, Timonier. Je reviendrai par l'autre."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -3027,6 +3191,10 @@ const STORY_BY_CHAR = {
         {
           "s": "safran",
           "t": "Une manche. La patience est mon arme longue, Sultan. Le désert, lui, ne se fatigue jamais. Nous rejouerons."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -3285,13 +3453,13 @@ const STORY_BY_CHAR = {
       "left": "gourou",
       "right": "cygne",
       "terrain": 2,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 1,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Palais du Coq. Un partenaire d'armement en visite, entre ventes d'avions et petites leçons de morale."
+          "t": "Palais du Coq. Un partenaire d'armement en visite, entre ventes d'avions et petites leçons de morale. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "cygne",
@@ -3322,6 +3490,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "Une belle défaite, si tant est. Reconnaissons-le : de l'endurance. Nous rediscuterons des valeurs."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -3332,6 +3504,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Un revers courtois. Je le range dans le lac. La montagne, elle, ne bouge pas. Namasté."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -3342,13 +3518,13 @@ const STORY_BY_CHAR = {
       "left": "gourou",
       "right": "volkoi",
       "terrain": 0,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Place Écarlate, sous la neige. Deux geleurs se rencontrent : l'un par l'hiver, l'autre par le zen. Le thermomètre panique."
+          "t": "Place Écarlate, sous la neige. Deux geleurs se rencontrent : l'un par l'hiver, l'autre par le zen. Le thermomètre panique. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "volkoi",
@@ -3379,6 +3555,10 @@ const STORY_BY_CHAR = {
         {
           "s": "volkoi",
           "t": "Un revers. Rare. Ton calme est une arme d'hiver. Je m'en souviendrai — et je patiente."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -3389,6 +3569,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Deux glaces, une craque. J'apprends. Namasté. Le pétrole coule, la revanche mûrit."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -3405,7 +3589,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Jardin des Roses, arcades turquoise. Deux vieilles civilisations discutent d'un port stratégique entre deux odeurs de pétales."
+          "t": "Jardin des Roses, arcades turquoise. Deux vieilles civilisations discutent d'un port stratégique entre deux odeurs de pétales. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "safran",
@@ -3436,6 +3620,10 @@ const STORY_BY_CHAR = {
         {
           "s": "safran",
           "t": "Concédé, avec mesure. Tu joues sur tous les tableaux et tu gagnes sur le mien. Habile funambule."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -3446,11 +3634,15 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Ralenti, pas vaincu. Je respire, je repars. La roseraie reverra mon souffle. Namasté."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
     {
-      "act": 2,
+      "act": 3,
       "title": "La porte du détroit",
       "sub": "Bharatie–Bosforie · un pont trop bavard sur la crête",
       "left": "gourou",
@@ -3497,6 +3689,10 @@ const STORY_BY_CHAR = {
         {
           "s": "sultan",
           "t": "Grr… ta sérénité m'exaspère plus que ta défense. Un jour, je crierai plus fort que ton silence."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -3558,6 +3754,10 @@ const STORY_BY_CHAR = {
         {
           "s": "bebe",
           "t": "Grrr ! Il a gagné SANS SAUTER ! C'est de la triche zen ! Je… je refais un défilé, na !"
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -3623,6 +3823,10 @@ const STORY_BY_CHAR = {
         {
           "s": "timonier",
           "t": "Un revers. Sur ton propre grès. Temporaire, forcément. L'harmonie corrigera la trajectoire… un jour, à mon tempo."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -3633,6 +3837,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Tu gagnes un set, pas la montagne. On médite, on respire, on remonte. La crête ne disparaît pas — et moi non plus. Namasté."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ]
     }
@@ -3804,13 +4012,13 @@ const STORY_BY_CHAR = {
       "left": "capitaine",
       "right": "volkoi",
       "terrain": 0,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Place Écarlate, neige et briques cramoisies. Sans les sacs d'engrais du Tsar, la Grande Forêt ne pousse plus. Le Capitaine est venu payer sa dette — sans jamais le dire."
+          "t": "Place Écarlate, neige et briques cramoisies. Sans les sacs d'engrais du Tsar, la Grande Forêt ne pousse plus. Le Capitaine est venu payer sa dette — sans jamais le dire. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "volkoi",
@@ -3837,6 +4045,10 @@ const STORY_BY_CHAR = {
         {
           "s": "volkoi",
           "t": "Une défaite. Le froid n'a pas de rancune, il a de la mémoire. Tu reviendras acheter — tu reviens toujours."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -3847,6 +4059,10 @@ const STORY_BY_CHAR = {
         {
           "s": "capitaine",
           "t": "Gelé par le Tsar sur sa banquise ! Bon… au moins j'ai perdu contre un vrai dur. Ça compte, ça, non ?"
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -3857,13 +4073,13 @@ const STORY_BY_CHAR = {
       "left": "capitaine",
       "right": "gourou",
       "terrain": 6,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Stade Ashram, grès couleur miel et guirlandes de soucis orange. Une vache traverse tranquillement le terrain. Deux mastodontes du Sud se saluent — presque frères, presque rivaux."
+          "t": "Stade Ashram, grès couleur miel et guirlandes de soucis orange. Une vache traverse tranquillement le terrain. Deux mastodontes du Sud se saluent — presque frères, presque rivaux. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "gourou",
@@ -3890,6 +4106,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Le souffle a cédé à la hache, ce soir. Je m'incline, ami bruyant. On se retrouve au prochain sommet."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -3900,6 +4120,10 @@ const STORY_BY_CHAR = {
         {
           "s": "capitaine",
           "t": "Épuisé par un type assis en tailleur ! Le monde est fou. Je reviens avec deux tronçonneuses et un thermos."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -3916,7 +4140,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Jardin des Roses, arcades turquoise et roseraie de palais. Un paon fait la roue. Deux hommes qui ne se comprennent pas s'observent avec une courtoisie glaçante."
+          "t": "Jardin des Roses, arcades turquoise et roseraie de palais. Un paon fait la roue. Deux hommes qui ne se comprennent pas s'observent avec une courtoisie glaçante. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "safran",
@@ -3943,6 +4167,10 @@ const STORY_BY_CHAR = {
         {
           "s": "safran",
           "t": "Une victoire de la force sur la patience. Rare. Savourez — ce sera bref, Capitaine."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -3953,6 +4181,10 @@ const STORY_BY_CHAR = {
         {
           "s": "capitaine",
           "t": "Endormi par un mec en robe qui parle doucement ! Réveillez-moi. Mon camp est au ralenti, c'est un scandale."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -4049,6 +4281,10 @@ const STORY_BY_CHAR = {
         {
           "s": "bebe",
           "t": "Une défaite temporaire. Le défilé continue, le radar tourne, et la lettre de plainte est déjà rédigée."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -4059,6 +4295,10 @@ const STORY_BY_CHAR = {
         {
           "s": "capitaine",
           "t": "Battu par un gamin en uniforme dans une ville sans bruit ! L'horreur. Je rentre à la forêt écouter l'ara m'insulter, ça au moins c'est franc."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ]
     },
@@ -4109,7 +4349,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Sous le cri de l'ara, Le Capitaine plante sa tronçonneuse comme un drapeau. Les Jeux du Sommet n'oublieront pas cette clairière en feu."
+          "t": "Sous le cri de l'ara, Le Capitaine plante sa tronçonneuse comme un drapeau. Les Jeux du Sommet n'oublieront pas cette clairière en feu. Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -4120,6 +4360,10 @@ const STORY_BY_CHAR = {
         {
           "s": "capitaine",
           "t": "Volé chez MOI par un cygne sous carburant ! Le monde à l'envers. Mais je reviendrai. Avec deux tronçonneuses. Et l'ara. Il t'aime pas non plus."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ]
     }
@@ -4303,13 +4547,13 @@ const STORY_BY_CHAR = {
       "left": "faucon",
       "right": "dorf",
       "terrain": 1,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 1,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Country Club Doré. Fontaine, palmiers, gazon parfait. Le grand parrain de l'ouest reçoit son protégé le plus intense."
+          "t": "Country Club Doré. Fontaine, palmiers, gazon parfait. Le grand parrain de l'ouest reçoit son protégé le plus intense. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "dorf",
@@ -4340,6 +4584,10 @@ const STORY_BY_CHAR = {
         {
           "s": "dorf",
           "t": "Match truqué ! Enfin… beau piqué. On refera un deal. Le plus grand deal de volley de l'histoire."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -4350,6 +4598,10 @@ const STORY_BY_CHAR = {
         {
           "s": "faucon",
           "t": "Profite. Mais souviens-toi : un protégé qui perd apprend à ne plus avoir besoin de protecteur."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -4366,7 +4618,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Citadelle du Levant. Grès chaud, dômes anciens, tours de verre, remparts. Au-dessus des créneaux, le faucon tourne et pique."
+          "t": "Citadelle du Levant. Grès chaud, dômes anciens, tours de verre, remparts. Au-dessus des créneaux, le faucon tourne et pique. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "cygne",
@@ -4397,6 +4649,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "En même temps, une défaite est une forme de dialogue. Nous reprendrons cette conversation. Poliment."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -4407,6 +4663,10 @@ const STORY_BY_CHAR = {
         {
           "s": "faucon",
           "t": "Tu gagnes un set sous mes remparts. Souviens-toi qui les a bâtis, et qui rentre chez lui avec la leçon."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -4417,13 +4677,13 @@ const STORY_BY_CHAR = {
       "left": "faucon",
       "right": "volkoi",
       "terrain": 0,
-      "mode": "bomb",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Place Écarlate, sous la neige. Le ballon est une bombe à mèche : le camp où elle tombe saute. Le Tsar joue à domicile, glacial."
+          "t": "Place Écarlate, sous la neige. Le ballon est un ballon enflammé à brûlure : le camp où elle tombe saute. Le Tsar joue à domicile, glacial."
         },
         {
           "s": "volkoi",
@@ -4435,7 +4695,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "volkoi",
-          "t": "La méfiance, oui. Tu frappes tes cibles, j'observe. Un jour, ta bombe tombera trop près de mes intérêts."
+          "t": "La méfiance, oui. Tu frappes tes cibles, j'observe. Un jour, ta ballon enflammé tombera trop près de mes intérêts."
         },
         {
           "s": "faucon",
@@ -4443,7 +4703,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Renvoyez la bombe. Toujours. Sur cette place, l'hiver ne pardonne pas l'hésitation."
+          "t": "Renvoyez le ballon enflammé. Toujours. Sur cette place, l'hiver ne pardonne pas l'hésitation."
         }
       ],
       "win": [
@@ -4454,6 +4714,10 @@ const STORY_BY_CHAR = {
         {
           "s": "volkoi",
           "t": "Une manche. L'hiver est patient. Tu voles vite, mais tu dois te poser un jour. Je serai là."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -4463,7 +4727,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "faucon",
-          "t": "Une bombe mal renvoyée n'efface pas la doctrine. La prochaine fois, je pique avant que tu observes."
+          "t": "un ballon enflammé mal renvoyée n'efface pas la doctrine. La prochaine fois, je pique avant que tu observes."
         }
       ]
     },
@@ -4511,6 +4775,10 @@ const STORY_BY_CHAR = {
         {
           "s": "bebe",
           "t": "Tricheur ! Mon radar était en panne ! Sabotage ! … Bon. Reviens, j'ai un nouveau modèle à te montrer. Pas à vendre. À montrer."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -4568,6 +4836,10 @@ const STORY_BY_CHAR = {
         {
           "s": "sultan",
           "t": "Une manche au faucon. Une seule ! La mer est vaste et ma mémoire longue. On se retrouvera sur ce pont."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -4629,6 +4901,10 @@ const STORY_BY_CHAR = {
         {
           "s": "safran",
           "t": "Une manche à toi, faucon. Pas la partie. Nous sommes deux vieux fauves qui ne mourront que le jour où l'autre baissera la garde. Ce ne sera pas ce soir."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -4814,13 +5090,13 @@ const STORY_BY_CHAR = {
       "left": "safran",
       "right": "volkoi",
       "terrain": 0,
-      "mode": "volley",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Place Écarlate sous la neige. Deux habitués des listes noires de l'Ouest se retrouvent au filet, entre gens qui se comprennent."
+          "t": "Place Écarlate sous la neige. Deux habitués des listes noires de l'Ouest se retrouvent au filet, entre gens qui se comprennent. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "volkoi",
@@ -4847,6 +5123,10 @@ const STORY_BY_CHAR = {
         {
           "s": "volkoi",
           "t": "Hm. Bien joué, Safran. On reste dans le même club. J'apporte la vodka, tu apportes le thé."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -4857,6 +5137,10 @@ const STORY_BY_CHAR = {
         {
           "s": "safran",
           "t": "Gardez ce point, Tsar. Entre sanctionnés, on ne se compte plus les défaites. On se compte les hivers."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -4873,7 +5157,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Cité du Matin, lanternes rouges. Le meilleur client du Safran l'accueille — celui qui paie rubis sur l'ongle et ne demande jamais rien."
+          "t": "Cité du Matin, lanternes rouges. Le meilleur client du Safran l'accueille — celui qui paie rubis sur l'ongle et ne demande jamais rien. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "timonier",
@@ -4900,6 +5184,10 @@ const STORY_BY_CHAR = {
         {
           "s": "timonier",
           "t": "Un revers mineur dans un très long calendrier. J'ai le temps. Toi aussi. On se revend ça demain."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ],
       "lose": [
@@ -4910,6 +5198,10 @@ const STORY_BY_CHAR = {
         {
           "s": "safran",
           "t": "Belle patience, client fidèle. Vous gagnez le set ; moi je garde le contrat. Chacun son or."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -4920,13 +5212,13 @@ const STORY_BY_CHAR = {
       "left": "safran",
       "right": "sultan",
       "terrain": 5,
-      "mode": "bomb",
+      "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Pont des Deux Mondes. Deux héritiers d'empires immenses se toisent — et le ballon, cette fois, est une bombe à mèche."
+          "t": "Pont des Deux Mondes. Deux héritiers d'empires immenses se toisent — et le ballon, cette fois, est un ballon enflammé à brûlure."
         },
         {
           "s": "sultan",
@@ -4938,21 +5230,21 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "sultan",
-          "t": "Grandiloquence contre nostalgie ! Le détroit est à moi, la région est à moi, la mèche brûle pour toi."
+          "t": "Grandiloquence contre nostalgie ! Le détroit est à moi, la région est à moi, la brûlure brûle pour toi."
         },
         {
           "s": "safran",
-          "t": "Elle brûle pour celui qui s'agite. Moi je ralentis. Renvoyez cette bombe doucement, Sultan — la précipitation fait de très beaux cratères."
+          "t": "Elle brûle pour celui qui s'agite. Moi je ralentis. Renvoyez cette ballon enflammé doucement, Sultan — la précipitation fait de très beaux cratères."
         },
         {
           "s": "narrator",
-          "t": "Ne gardez pas la bombe. Renvoyez. Le voile doré rend chaque geste plus lent qu'il n'y paraît."
+          "t": "Ne gardez pas le ballon enflammé. Renvoyez. Le voile doré rend chaque geste plus lent qu'il n'y paraît."
         }
       ],
       "win": [
         {
           "s": "safran",
-          "t": "Vous avez voulu défoncer. Le voile a épaissi l'air, la mèche a fait le reste. La patience désamorce ce que l'orgueil allume."
+          "t": "Vous avez voulu défoncer. Le voile a épaissi l'air, la brûlure a fait le reste. La patience désamorce ce que l'orgueil allume."
         },
         {
           "s": "sultan",
@@ -4967,6 +5259,10 @@ const STORY_BY_CHAR = {
         {
           "s": "safran",
           "t": "Faites vibrer votre pont. Le mien n'a jamais eu besoin de deux rives pour tenir debout."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         }
       ]
     },
@@ -4977,13 +5273,13 @@ const STORY_BY_CHAR = {
       "left": "safran",
       "right": "bebe",
       "terrain": 3,
-      "mode": "volley",
+      "mode": "bomb",
       "ai": 3,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Esplanade du Défilé, le radar tourne. Deux champions du monde de l'embargo se retrouvent — presque avec émotion."
+          "t": "Esplanade du Défilé, le radar tourne. Deux champions du monde de l'embargo se retrouvent — presque avec émotion. Le ballon est une bombe : le camp où elle tombe perd."
         },
         {
           "s": "bebe",
@@ -5010,6 +5306,10 @@ const STORY_BY_CHAR = {
         {
           "s": "bebe",
           "t": "Perdu ! Mais contre toi, ça compte pas ! On est du même club, grand frère. Vive l'embargo !"
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
@@ -5020,6 +5320,10 @@ const STORY_BY_CHAR = {
         {
           "s": "safran",
           "t": "Prenez votre point, jeune homme. Entre encerclés, la victoire de l'un console l'autre. C'est ça, la fraternité."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ]
     },
@@ -5142,6 +5446,10 @@ const STORY_BY_CHAR = {
         {
           "s": "safran",
           "t": "Frappez, Faucon, frappez. Vous gagnez ce soir et vous recommencerez demain, épuisé, à guetter l'ombre. Moi je rentre tailler mes roses. Elles refleuriront bien avant que vous dormiez."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ]
     }

@@ -11,10 +11,11 @@ représenté**, et un **mode Histoire dédié** : le perso (joué par le joueur,
 gauche) rencontre **TOUS ses rivaux** (les 9 autres) ; une fois tous battus, son
 mode Histoire est terminé.
 
-Même procédé que le mode Histoire actuel (`src/story.js`) :
-- **Petite rivalité / allié** → mode **Volley**.
-- **Tension qui chauffe** → mode **Ballon enflammé** (`flame`) — chaque contact brûle, PV à 0 = point perdu.
-- **Conflit ouvert** → mode **Bombe** (la balle est une bombe à mèche).
+Même procédé que le mode Histoire actuel (`src/story.js`) — **⅓ / ⅓ / ⅓** :
+- **Acte I** (3 rencontres) → mode **Volley** (rivalités légères).
+- **Acte II** (3 rencontres) → mode **Ballon enflammé** (`flame`) — chaque contact brûle, PV à 0 = point perdu.
+- **Acte III** (3 rencontres) → mode **Bombe** (la balle est une bombe à mèche).
+- Dialogues **adaptés au mode** (mécanique nommée au moins une fois par le narrateur).
 - Certains adversaires se **« dopent »** aux gros enjeux (IA impitoyable, aura rouge) : `doped: "R"`.
 
 ## ⚠️ Steam-safe (IMPÉRATIF)
@@ -56,9 +57,9 @@ faucon≈Netanyahou/composite Israël · safran≈composite Iran.
 - **Le Faucon (faucon)** : Moyen-Orient → **grand duel *bombe* avec Le Safran** ; tensions multiples.
 - **Le Safran (safran)** : conflit avec Le Faucon (*bombe*) et Baron Dorf (*bombe*) ; ententes Bourassie/Panguo.
 
-> Tu choisis toi-même la répartition volley/flamme/bombe et l'ordre, en cohérence
-> avec ces pistes. Vise ~1 chapitre *flame* (souvent fin d'Acte II), ~3-4 *bombe*
-> max par perso (les vrais conflits), le reste en *volley*.
+> Garde la montée en tension : 3 *volley* → 3 *flame* → 3 *bombe* (ordre des
+> chapitres = ordre de rivalité croissante). Les pistes ci-dessus aident à
+> choisir QUELS rivaux mettre dans quel acte, pas à casser le ⅓ / ⅓ / ⅓.
 
 ## Format du fichier `<key>.md`
 Deux parties :
@@ -73,8 +74,8 @@ qui bâtit des murs, etc.), son **event de map**. Invente une mythologie personn
 cocasse (surnoms, manies, obsessions) qui colle à l'archétype réel transposé.
 
 ### 2) Mode Histoire (`## Mode Histoire de <Nom>`)
-Le perso rencontre **les 9 autres**. Organise en **3 actes** (Acte I petites
-rivalités/volley → Acte II montée des tensions / *flame* → Acte III conflits/bombe + finale).
+Le perso rencontre **les 9 autres**. Organise en **3 actes × 3 rencontres** :
+Acte I *volley* → Acte II *flame* → Acte III *bomb* (+ dopage possible en finale).
 Pour CHAQUE rencontre, un bloc au format `src/story.js` (données JS, prêtes à coller) :
 
 ```js

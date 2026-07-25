@@ -190,12 +190,29 @@ function stepGame(inL, inR, ins, opts) {
   // skipBall laisse serveCountdown figé côté hôte ; sans le test d'état on
   // resterait coincé dans cette branche une fois en "play".
   if (state === "serve" && serveCountdown > 0) {
-    // pendant le décompte : on peut se déplacer mais pas sauter ni servir
+    // Pendant le décompte : déplacement OK, pas de saut. On transmet quand même
+    // smash/stick pour que prevSmashBtn suive le vrai état manette — sinon un X
+    // tenu pendant le GO crée un faux front et lance la balle tout seul.
     if (ins) {
-      activeBlobs.forEach((b, i) => b.update({ left: ins[i].left, right: ins[i].right, jump: false }));
+      activeBlobs.forEach((b, i) => b.update({
+        left: ins[i].left, right: ins[i].right, jump: false,
+        smash: !!ins[i].smash, super: false,
+        ax: ins[i].ax || 0, ay: ins[i].ay || 0,
+        up: !!ins[i].up, down: !!ins[i].down
+      }));
     } else {
-      blobL.update({ left: inL.left, right: inL.right, jump: false });
-      blobR.update({ left: inR.left, right: inR.right, jump: false });
+      blobL.update({
+        left: inL.left, right: inL.right, jump: false,
+        smash: !!inL.smash, super: false,
+        ax: inL.ax || 0, ay: inL.ay || 0,
+        up: !!inL.up, down: !!inL.down
+      });
+      blobR.update({
+        left: inR.left, right: inR.right, jump: false,
+        smash: !!inR.smash, super: false,
+        ax: inR.ax || 0, ay: inR.ay || 0,
+        up: !!inR.up, down: !!inR.down
+      });
     }
     // skipBall : le propriétaire distant gère décompte + balle
     if (!skipBall) {

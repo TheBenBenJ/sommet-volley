@@ -28,23 +28,23 @@ Son drapeau ne claque pas au vent ; il ondule. Rouge, comme les murs, comme les 
 // left = "timonier" partout. À coller dans le STORY[] de src/story.js.
 // =============================================================================
 const STORY_TIMONIER = [
-  // ===================== ACTE I — L'harmonie des vassaux (Volley) ==============
+  // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
     act: 1, title: "Le petit frère", sub: "Panguo–Ryonganie · parrainage & défilés",
     left: "timonier", right: "bebe", terrain: 3, mode: "volley", ai: 0, doped: null,
-    pre: [
+    pre:  [
       { s: "narrator", t: "Esplanade du Défilé. Sous le radar qui tourne, le plus jeune des dirigeants reçoit le plus patient. On sait déjà qui paie l'électricité." },
       { s: "bebe", t: "Grand voisin ! Tu as vu mon défilé ? Mille pas à la seconde, tous parfaitement synchrones. J'ai même un nouveau radar !" },
       { s: "timonier", t: "Beau défilé. Belle énergie. Le charbon qui l'alimente, il vient de chez moi. Comme le riz. Comme le reste." },
       { s: "bebe", t: "Détail ! Ce soir je saute au filet, j'interdis à ta muraille de bouger, et je fanfaronne devant les caméras !" },
       { s: "timonier", t: "Saute autant que tu veux, petit frère. Je contrôle le tempo. Et j'éteins l'électricité quand tu dépasses la mesure." },
-      { s: "narrator", t: "Volley d'entraînement entre patron et protégé. La bombe reste au vestiaire — pour l'instant." }
+      { s: "narrator", t: "Volley d'entraînement entre patron et protégé." }
     ],
-    win: [
+    win:  [
       { s: "timonier", t: "Voilà. On te laisse fanfaronner, on te laisse défiler. Tant que tu sers dans mon tempo." },
       { s: "bebe", t: "J'ai perdu MAIS c'était magnifique ! Je remets ça dès que tu rallumes le courant, d'accord ?" }
     ],
-    lose: [
+    lose:  [
       { s: "bebe", t: "Battu le grand voisin ! Nouveau bulletin spécial ! Défilé de la victoire à l'aube !" },
       { s: "timonier", t: "Amuse-toi. Le carburant de ta joie passe par mes gazoducs. L'harmonie revient toujours à moi." }
     ]
@@ -52,7 +52,7 @@ const STORY_TIMONIER = [
   {
     act: 1, title: "L'amitié sans limites", sub: "Panguo–Bourassie · axe de revers",
     left: "timonier", right: "volkoi", terrain: 0, mode: "volley", ai: 1, doped: null,
-    pre: [
+    pre:  [
       { s: "narrator", t: "Place Écarlate, sous la neige. Deux géants signent une amitié « sans limites »… en relisant deux fois les petites lignes." },
       { s: "volkoi", t: "L'hiver travaille pour moi, Timonier. Je gèle ton camp, et tu grelottes comme les autres." },
       { s: "timonier", t: "Gèle ce que tu veux. C'est encore moi qui t'achète ton pétrole, à mon prix, dans ma monnaie." },
@@ -60,11 +60,11 @@ const STORY_TIMONIER = [
       { s: "timonier", t: "« Sans limites » veut dire : ma limite à moi. Tu me vends ton gaz au rabais, je te vends ma patience. Sers." },
       { s: "volkoi", t: "Un partenaire junior qui se croit senior. Amusant. Balle au centre, camarade." }
     ],
-    win: [
+    win:  [
       { s: "timonier", t: "Une amitié équilibrée : tu offres le froid, j'offre le marché. Devine qui tient le portefeuille." },
       { s: "volkoi", t: "Tu gagnes le set. Moi je garde l'hiver. On se comprend. C'est déjà rare." }
     ],
-    lose: [
+    lose:  [
       { s: "volkoi", t: "Le gel a eu raison de ta muraille. Même les empires patients grelottent, parfois." },
       { s: "timonier", t: "Un revers. Temporaire. Tu as l'hiver ; moi j'ai le siècle. Je patiente." }
     ]
@@ -72,7 +72,7 @@ const STORY_TIMONIER = [
   {
     act: 1, title: "La route de la soie", sub: "Panguo–Bosforie · ports, ponts & dettes",
     left: "timonier", right: "sultan", terrain: 5, mode: "volley", ai: 1, doped: null,
-    pre: [
+    pre:  [
       { s: "narrator", t: "Pont des Deux Mondes. Un tapis volant passe au-dessus du détroit — bientôt il y aura aussi un port, une autoroute, et une facture." },
       { s: "sultan", t: "Sur MON détroit, entre deux continents, c'est moi le carrefour du monde ! Je défonce au smash !" },
       { s: "timonier", t: "Beau carrefour. Je voudrais y bâtir un port. Et un pont. Et une gare. Je paie tout. Tu signes ici." },
@@ -80,83 +80,89 @@ const STORY_TIMONIER = [
       { s: "timonier", t: "Coûteux pour toi plus tard. Gratuit pour toi maintenant. C'est la beauté du tapis : on ne voit pas où il mène." },
       { s: "sultan", t: "Un néo-sultan et un empereur, à négocier sur un pont. L'Histoire adore ce genre de scène. Servons !" }
     ],
-    win: [
+    win:  [
       { s: "timonier", t: "Ton port est magnifique. Il m'appartiendra dans quatre-vingt-dix-neuf ans. Merci de l'entretenir d'ici là." },
       { s: "sultan", t: "J'ai perdu le match mais gardé ma superbe. Et… j'ai vraiment signé ce contrat de port ?" }
     ],
-    lose: [
+    lose:  [
       { s: "sultan", t: "Le carrefour du monde reste debout ! Ton tapis s'arrête à mon pont, l'empereur !" },
       { s: "timonier", t: "Reste debout. Le fil de soie, lui, est déjà passé sous tes fondations. Je ne suis pas pressé." }
     ]
   },
 
-  // ===================== ACTE II — Le monde résiste (Volley tendu) =============
+  // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
     act: 2, title: "Le dérisquage", sub: "Panguo–Gallardie · « en même temps » stratégique",
-    left: "timonier", right: "cygne", terrain: 2, mode: "volley", ai: 2, doped: null,
-    pre: [
-      { s: "narrator", t: "Palais du Coq. Un coq héraldique doré fanfaronne sur sa bannière bleue. En face, un mur cramoisi patiente." },
+    left: "timonier", right: "cygne", terrain: 2, mode: "flame", ai: 2, doped: null,
+    pre:  [
+      { s: "narrator", t: "Palais du Coq. Un coq héraldique doré fanfaronne sur sa bannière bleue. En face, un mur cramoisi patiente. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
       { s: "cygne", t: "Cher Timonier, nous ne nous découplons pas. Nous « dérisquons ». En même temps, nous restons partenaires." },
       { s: "timonier", t: "« Dérisquer », « découpler »… jolis verbes. Pendant que tu les conjugues, je livre tes voitures et tes panneaux solaires." },
       { s: "cygne", t: "L'Europe cherche son autonomie stratégique. En même temps, elle aime beaucoup ton marché. C'est subtil." },
       { s: "timonier", t: "C'est surtout contradictoire. Le coq chante fort et court peu. Moi je marche lentement et j'arrive partout." },
       { s: "cygne", t: "En même temps… un coq, ça réveille. Servons, empereur. On verra qui tient la distance." }
     ],
-    win: [
+    win:  [
       { s: "timonier", t: "Autonomie stratégique : le rêve de dépendre un peu moins de moi, tout en achetant un peu plus. Charmant." },
-      { s: "cygne", t: "Match perdu, position nuancée. En même temps, la nuance est une victoire en soi. Non ?" }
+      { s: "cygne", t: "Match perdu, position nuancée. En même temps, la nuance est une victoire en soi. Non ?" },
+      { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ],
-    lose: [
+    lose:  [
       { s: "cygne", t: "Le coq a chanté juste ! Partenaires, rivaux, systémiques — tout à la fois. C'est ça, la Gallardie." },
-      { s: "timonier", t: "Chante donc. Tes usines commandent mes batteries en coulisse. L'harmonie se moque des slogans." }
+      { s: "timonier", t: "Chante donc. Tes usines commandent mes batteries en coulisse. L'harmonie se moque des slogans." },
+      { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ]
   },
   {
     act: 2, title: "Le grenier du monde", sub: "Panguo–Tropicalia · soja, minerais & BRICS",
-    left: "timonier", right: "capitaine", terrain: 7, mode: "volley", ai: 2, doped: null,
-    pre: [
-      { s: "narrator", t: "Grande Forêt. Un ara traverse la canopée dorée. En bas, l'empereur commande — poliment — la moitié de la récolte." },
+    left: "timonier", right: "capitaine", terrain: 7, mode: "flame", ai: 2, doped: null,
+    pre:  [
+      { s: "narrator", t: "Grande Forêt. Un ara traverse la canopée dorée. En bas, l'empereur commande — poliment — la moitié de la récolte. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
       { s: "capitaine", t: "Ma tronçonneuse rugit, l'empereur ! J'abats, je plante du soja, je te le vends. Pas de chichi entre nous." },
       { s: "timonier", t: "Ton soja, ton minerai de fer, ton bœuf : j'achète tout. Coupe autant d'arbres qu'il faut. Je regarde ailleurs." },
       { s: "capitaine", t: "Un client qui ne fait jamais la morale sur ma forêt ! Toi au moins tu comprends le business." },
       { s: "timonier", t: "La morale, je la laisse au Cygne. Moi je passe commande. Un partenaire, ça ne fait pas la leçon. Ça signe." },
       { s: "capitaine", t: "Deux fauves d'accord sur le fric ! Servons avant que l'écolo ne débarque avec ses pancartes." }
     ],
-    win: [
+    win:  [
       { s: "timonier", t: "Tu abats, je stocke. Ta forêt nourrit mes ports. Un partenariat sans questions gênantes." },
-      { s: "capitaine", t: "Battu par l'empereur ! Bah, tant qu'il achète mon soja, je peux perdre au volley, moi." }
+      { s: "capitaine", t: "Battu par l'empereur ! Bah, tant qu'il achète mon soja, je peux perdre au volley, moi." },
+      { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ],
-    lose: [
+    lose:  [
       { s: "capitaine", t: "Gagné contre le Timonier ! La tronçonneuse a smashé la muraille ! Grande soirée, patron !" },
-      { s: "timonier", t: "Gagne le match. Je garde le carnet de commandes. C'est moi qui écris la fin de l'histoire." }
+      { s: "timonier", t: "Gagne le match. Je garde le carnet de commandes. C'est moi qui écris la fin de l'histoire." },
+      { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ]
   },
   {
     act: 2, title: "Le pétrole sous embargo", sub: "Panguo–Ramenie · brut à prix d'ami",
     left: "timonier", right: "safran", terrain: 9, mode: "flame", ai: 2, doped: null,
-    pre: [
-      { s: "narrator", t: "Jardin des Roses. Un paon déploie sa roue sous les arcades turquoise. En face, un empereur qui n'admire jamais rien trop longtemps." },
+    pre:  [
+      { s: "narrator", t: "Jardin des Roses. Un paon déploie sa roue sous les arcades turquoise. En face, un empereur qui n'admire jamais rien trop longtemps. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
       { s: "safran", t: "L'Occident m'étrangle de sanctions, empereur. Mais toi… toi tu achètes mon brut. Discrètement. Sagement." },
       { s: "timonier", t: "Sanctionné, tu vends moins cher. Moins cher, j'achète plus. Ta colère contre l'Ouest fait mes marges." },
       { s: "safran", t: "Le paon fait la roue, mais c'est toi qui comptes les plumes. Mesuré. Presque cruel." },
       { s: "timonier", t: "Pas cruel. Patient. Ton pétrole, ma monnaie, mon rythme. Un axe où j'écris le tempo. Sers." },
       { s: "safran", t: "Un partenariat de survie contre un partenariat de conquête. Faisons semblant que c'est le même. Balle au filet." }
     ],
-    win: [
+    win:  [
       { s: "timonier", t: "Un client fidèle vaut mieux qu'un allié bruyant. Ton isolement, vois-tu, est ma meilleure remise." },
-      { s: "safran", t: "Tu gagnes, et tu gagnes encore sur mon dos. Le Safran retient. Le paon aussi a de la mémoire." }
+      { s: "safran", t: "Tu gagnes, et tu gagnes encore sur mon dos. Le Safran retient. Le paon aussi a de la mémoire." },
+      { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ],
-    lose: [
+    lose:  [
       { s: "safran", t: "Le voile d'or a ralenti ta muraille, empereur. Même les patients trébuchent sur une roseraie." },
-      { s: "timonier", t: "Un set perdu dans un jardin. Le baril, lui, coule toujours vers mes ports. Je patiente." }
+      { s: "timonier", t: "Un set perdu dans un jardin. Le baril, lui, coule toujours vers mes ports. Je patiente." },
+      { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ]
   },
 
-  // ===================== ACTE III — Les vraies frontières (Bombe) ==============
+  // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
     act: 3, title: "La puce et l'aigle", sub: "Panguo–Levantie · silicium, espions & drones",
     left: "timonier", right: "faucon", terrain: 8, mode: "bomb", ai: 3, doped: "R",
-    pre: [
+    pre:  [
       { s: "narrator", t: "Citadelle du Levant. Sur les remparts de grès, un faucon guette. Le ballon est une bombe : ce soir, on ne parle plus commerce, mais secrets." },
       { s: "faucon", t: "Tes puces sont partout dans mes systèmes, empereur. Et tes ingénieurs copient les miens. Ça s'appelle un vol." },
       { s: "timonier", t: "« Vol », « copie »… Je préfère « transfert de technologie ». Tout ce qui traverse ma muraille devient mien. C'est la géographie." },
@@ -164,19 +170,21 @@ const STORY_TIMONIER = [
       { s: "narrator", t: "Le regard du Faucon vire au rouge. L'espionnage rend nerveux — et le carburant militaire, plus vif encore." },
       { s: "timonier", t: "Frappe vite. Moi je bâtis lent. Ma muraille coupe ton camp en deux avant que ton aigle n'ait battu de l'aile. Sers." }
     ],
-    win: [
+    win:  [
       { s: "timonier", t: "Tu voles mes puces ; je bâtis les tiennes. Devine qui, dans dix ans, tient encore l'usine." },
-      { s: "faucon", t: "Une manche perdue. Mes drones connaissent le chemin de ta Cité, maintenant. On se reverra." }
+      { s: "faucon", t: "Une manche perdue. Mes drones connaissent le chemin de ta Cité, maintenant. On se reverra." },
+      { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ],
-    lose: [
+    lose:  [
       { s: "faucon", t: "Raid réussi, muraille percée. La vitesse mange la patience quand la patience s'endort." },
-      { s: "timonier", t: "Tu perces un mur. J'en bâtis mille. Frappe l'éclair ; moi je grave le silicium. Le siècle nous départagera." }
+      { s: "timonier", t: "Tu perces un mur. J'en bâtis mille. Frappe l'éclair ; moi je grave le silicium. Le siècle nous départagera." },
+      { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ]
   },
   {
     act: 3, title: "La guerre froide des tarifs", sub: "Panguo–Doria · muraille d'or contre muraille rouge",
     left: "timonier", right: "dorf", terrain: 4, mode: "bomb", ai: 3, doped: null,
-    pre: [
+    pre:  [
       { s: "narrator", t: "Cité du Matin. Les lanternes rouges se balancent. Face à l'empereur, le Baron dresse un mur d'or contre un mur cramoisi. La bombe compte les points." },
       { s: "dorf", t: "Des tarifs ! Des tarifs colossaux ! Cent pour cent sur tes ballons, deux cents sur ton filet, mille pour cent sur ta muraille !" },
       { s: "timonier", t: "Taxe tout. Tes usines, tes jouets, tes drapeaux « fabriqués chez toi »… c'est encore ma Cité qui les assemble." },
@@ -184,11 +192,12 @@ const STORY_TIMONIER = [
       { s: "timonier", t: "Tu bâtis un mur devant toi ; moi j'en bâtis un au milieu de ton camp. Le tien te protège. Le mien t'enferme." },
       { s: "dorf", t: "Guerre commerciale ! La plus grande guerre commerciale de l'histoire ! Et je vais la GAGNER, comme toujours !" }
     ],
-    win: [
+    win:  [
       { s: "timonier", t: "Deux murs, deux empires. Le tien brille ; le mien dure. Reviens quand tes rayons seront vides." },
-      { s: "dorf", t: "Truqué ! Subventionné ! Manipulation de monnaie ! … Bon. Combien pour rouvrir tes chaînes, au fait ?" }
+      { s: "dorf", t: "Truqué ! Subventionné ! Manipulation de monnaie ! … Bon. Combien pour rouvrir tes chaînes, au fait ?" },
+      { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ],
-    lose: [
+    lose:  [
       { s: "dorf", t: "Boum ! Chez toi ! On gagne la guerre des tarifs ! On gagne tellement que la Cité en pleure !" },
       { s: "timonier", t: "Une manche pour l'or. Le temps, lui, joue en rouge. J'attends. J'ai deux mille ans d'entraînement." }
     ]
@@ -196,7 +205,7 @@ const STORY_TIMONIER = [
   {
     act: 3, title: "Le toit du monde", sub: "Finale · Panguo–Bharatie · la crête et le tempo",
     left: "timonier", right: "gourou", terrain: 4, mode: "bomb", ai: 3, doped: "R",
-    pre: [
+    pre:  [
       { s: "narrator", t: "Finale, à la Cité du Matin. Les lanternes rouges brûlent bas, les lions de pierre veillent. Deux milliards d'âmes retiennent leur souffle : c'est la frontière qui se joue." },
       { s: "gourou", t: "Namasté, empereur. Mais ce soir j'ai laissé le namasté au vestiaire. Sur la crête, tu as poussé ta ligne trop loin." },
       { s: "timonier", t: "La ligne passe où l'harmonie le décide. Et l'harmonie, c'est moi. Ta démographie ne joue pas au volley pour toi." },
@@ -204,13 +213,15 @@ const STORY_TIMONIER = [
       { s: "narrator", t: "L'œil du Gourou s'injecte de rouge. La patience de l'empire contre la fureur ascétique — et une bombe entre les deux camps." },
       { s: "timonier", t: "Brûle donc. Le feu s'épuise ; la muraille reste. Je bâtis un mur au cœur de ton camp et je contrôle le tempo. Sers, voisin." }
     ],
-    win: [
+    win:  [
       { s: "timonier", t: "Le calme a tenu la crête. Deux mille ans de patience contre une nuit de carburant : le siècle a choisi la muraille." },
-      { s: "gourou", t: "J'ai troqué mon souffle contre du feu, et j'ai perdu la ligne. La montagne, elle, se souviendra de tout." }
+      { s: "gourou", t: "J'ai troqué mon souffle contre du feu, et j'ai perdu la ligne. La montagne, elle, se souviendra de tout." },
+      { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ],
-    lose: [
+    lose:  [
       { s: "gourou", t: "Le feu a fendu ta muraille, empereur. Même la patience du panda a un versant qui s'effondre." },
-      { s: "timonier", t: "Une frontière cède un soir. L'empire compte en dynasties, pas en défaites. Je rentre au palais. Et je patiente." }
+      { s: "timonier", t: "Une frontière cède un soir. L'empire compte en dynasties, pas en défaites. Je rentre au palais. Et je patiente." },
+      { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ]
   }
 ];

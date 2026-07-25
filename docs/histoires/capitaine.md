@@ -25,22 +25,22 @@ Sous la vanne, il y a un joueur redoutable. Rustre, oui. Imprévisible, oui. Mai
 ## Mode Histoire de Le Capitaine
 
 ```js
-// ===================== ACTE I — La fraternité des mentons levés (Volley) =====================
+// ===================== ACTE I — Petites rivalités (Volley) =====================
 {
   act: 1, title: "Casquette contre casquette", sub: "Tropicalia–Doria · les cousins populistes",
   left: "capitaine", right: "dorf", terrain: 1, mode: "volley", ai: 0, doped: null,
-  pre: [
+  pre:  [
     { s: "narrator", t: "Premier tour des Jeux du Sommet. Sur le gazon trop vert d'un resort doré, deux hommes en casquette se reconnaissent de loin — même démarche, même mépris pour l'arbitre." },
     { s: "dorf", t: "Regarde-moi ce type. Grande énergie. Une TRÈS grande énergie tropicale. J'adore. On est pareils, toi et moi." },
     { s: "capitaine", t: "Pareils ? Toi t'as des murs en or, mon frère. Moi mes murs, ils sont en bois. Et ils repoussent." },
     { s: "dorf", t: "Le bois, c'est bien. Mais l'or, c'est mieux. Le plus beau mur du monde, c'est le mien. Demande à n'importe qui." },
     { s: "capitaine", t: "Demande à l'ara, il est au-dessus de nos deux têtes. Il vote pour personne et il chie sur tout le monde. Sers." }
   ],
-  win: [
+  win:  [
     { s: "capitaine", t: "Battu le roi de l'or avec des bûches ! Rentre chez toi, cousin, et garde-moi une casquette." },
     { s: "dorf", t: "Match truqué. Le plus grand truquage forestier de l'histoire. Mais… j'aime ce gars. On remet ça." }
   ],
-  lose: [
+  lose:  [
     { s: "dorf", t: "GAGNÉ ! Le plus beau match jamais joué contre un homme des bois. Les gens pleuraient. De vraies larmes." },
     { s: "capitaine", t: "Ouais, ouais. La revanche sera en terre rouge, chez moi. On verra qui klaxonne encore." }
   ]
@@ -48,18 +48,18 @@ Sous la vanne, il y a un joueur redoutable. Rustre, oui. Imprévisible, oui. Mai
 {
   act: 1, title: "Deux menton-levés au filet", sub: "Tropicalia–Levantie · la fraternité des durs",
   left: "capitaine", right: "faucon", terrain: 8, mode: "volley", ai: 1, doped: null,
-  pre: [
+  pre:  [
     { s: "narrator", t: "Citadelle du Levant, remparts de grès sur la colline. Deux hommes qui détestent la même presse se retrouvent du bon côté du filet — pour une fois presque alliés." },
     { s: "faucon", t: "On est amis, Capitaine. Tu m'as toujours soutenu. Mais l'amitié s'arrête à la ligne de service." },
     { s: "capitaine", t: "Amis, oui ! Deux types qu'on traite de brutes dans les journaux. Sauf que moi, mes brutes, elles ont des plumes." },
     { s: "faucon", t: "Je ne négocie pas au filet. Un raid, un point, on n'en parle plus. C'est ma doctrine." },
     { s: "capitaine", t: "La doctrine ! Chez moi la doctrine c'est la tronçonneuse. Bruyante, efficace, et ça sent bon le sciure. Balle au centre." }
   ],
-  win: [
+  win:  [
     { s: "capitaine", t: "Désolé l'ami, même entre durs y'a un plus dur. Et le plus dur, il pousse des arbres dans ton camp." },
     { s: "faucon", t: "Bien joué. Rare que je le dise. Tu restes un allié — sur le terrain, un peu moins." }
   ],
-  lose: [
+  lose:  [
     { s: "faucon", t: "Le raid éclair a parlé. Pas de troncs qui tiennent contre la vitesse. Reviens quand tu veux." },
     { s: "capitaine", t: "Volé par un faucon ! Bon. Chez moi y'a un ara qui va lui expliquer les règles de l'air." }
   ]
@@ -67,98 +67,104 @@ Sous la vanne, il y a un joueur redoutable. Rustre, oui. Imprévisible, oui. Mai
 {
   act: 1, title: "Deux forêts, un pont", sub: "Tropicalia–Bosforie · les fiers susceptibles",
   left: "capitaine", right: "sultan", terrain: 5, mode: "volley", ai: 1, doped: null,
-  pre: [
+  pre:  [
     { s: "narrator", t: "Sur le Pont des Deux Mondes, entre deux continents, deux fiertés nationales grosses comme des dômes se toisent au-dessus du détroit." },
     { s: "sultan", t: "Je contrôle le passage entre deux mondes, Capitaine. Toi, tu contrôles quoi ? Des arbres et un perroquet." },
     { s: "capitaine", t: "Des arbres, un perroquet, un continent entier et zéro leçon à recevoir. C'est déjà pas mal, Sultan." },
     { s: "sultan", t: "Je défonce tout au smash. Le détroit tremble quand je saute. Prépare-toi à sentir la terre bouger." },
     { s: "capitaine", t: "Fais trembler ce que tu veux. Moi je plante, ça tremble plus après. Balle sur le pont, et arrête de causer." }
   ],
-  win: [
+  win:  [
     { s: "capitaine", t: "Un mur de troncs sur ton beau tapis volant, et te voilà cloué au sol. Salue l'ara en partant." },
     { s: "sultan", t: "Une manche, rien de plus. Le pont reste à moi. Mais tu as du coffre, l'homme de la forêt." }
   ],
-  lose: [
+  lose:  [
     { s: "sultan", t: "Le séisme a fissuré ta clairière ! Deux mondes s'inclinent, le tien attendra son tour." },
     { s: "capitaine", t: "Pfff. Un tremblement de terre pour gagner un set. Chez moi, on appelle ça de la triche parfumée." }
   ]
 },
 
-// ===================== ACTE II — Affaires, soja et méfiance (Volley musclé) =====================
+// ===================== ACTE I — Petites rivalités (Volley) =====================
 {
   act: 2, title: "L'engrais et l'ours", sub: "Tropicalia–Bourassie · le fournisseur qu'on admire",
-  left: "capitaine", right: "volkoi", terrain: 0, mode: "volley", ai: 2, doped: null,
-  pre: [
-    { s: "narrator", t: "Place Écarlate, neige et briques cramoisies. Sans les sacs d'engrais du Tsar, la Grande Forêt ne pousse plus. Le Capitaine est venu payer sa dette — sans jamais le dire." },
+  left: "capitaine", right: "volkoi", terrain: 0, mode: "flame", ai: 2, doped: null,
+  pre:  [
+    { s: "narrator", t: "Place Écarlate, neige et briques cramoisies. Sans les sacs d'engrais du Tsar, la Grande Forêt ne pousse plus. Le Capitaine est venu payer sa dette — sans jamais le dire. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
     { s: "volkoi", t: "Tu ne jures que par ta liberté, Capitaine, mais c'est mon engrais qui fait pousser ton soja. L'hiver travaille pour moi ; ta terre aussi." },
     { s: "capitaine", t: "T'es un dur, Tsar, ça je respecte. Deux vrais mâles alpha sur un terrain gelé. Mais mes bûches, elles gèlent pas, elles ÉCRASENT." },
     { s: "volkoi", t: "Le respect ne renvoie pas le ballon. Je vais geler ton camp, planter du givre entre tes troncs. Sers, et compte tes doigts." },
     { s: "capitaine", t: "Geler la forêt tropicale ? Bonne chance mon frère. Ici on transpire même sous ton blizzard. On y va !" }
   ],
-  win: [
+  win:  [
     { s: "capitaine", t: "Fait tomber l'ours dans sa propre neige ! Et t'inquiète, je reprends une palette d'engrais la semaine pro. Entre durs, ça se paie." },
-    { s: "volkoi", t: "Une défaite. Le froid n'a pas de rancune, il a de la mémoire. Tu reviendras acheter — tu reviens toujours." }
+    { s: "volkoi", t: "Une défaite. Le froid n'a pas de rancune, il a de la mémoire. Tu reviendras acheter — tu reviens toujours." },
+    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ],
-  lose: [
+  lose:  [
     { s: "volkoi", t: "L'Hiver Général ne négocie pas, Capitaine. Ta jungle bruyante s'est figée d'un coup. Rentre te réchauffer." },
-    { s: "capitaine", t: "Gelé par le Tsar sur sa banquise ! Bon… au moins j'ai perdu contre un vrai dur. Ça compte, ça, non ?" }
+    { s: "capitaine", t: "Gelé par le Tsar sur sa banquise ! Bon… au moins j'ai perdu contre un vrai dur. Ça compte, ça, non ?" },
+    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ]
 },
 {
   act: 2, title: "Les frères du Sud", sub: "Tropicalia–Bharatie · le club des grands orgueils",
-  left: "capitaine", right: "gourou", terrain: 6, mode: "volley", ai: 2, doped: null,
-  pre: [
-    { s: "narrator", t: "Stade Ashram, grès couleur miel et guirlandes de soucis orange. Une vache traverse tranquillement le terrain. Deux mastodontes du Sud se saluent — presque frères, presque rivaux." },
+  left: "capitaine", right: "gourou", terrain: 6, mode: "flame", ai: 2, doped: null,
+  pre:  [
+    { s: "narrator", t: "Stade Ashram, grès couleur miel et guirlandes de soucis orange. Une vache traverse tranquillement le terrain. Deux mastodontes du Sud se saluent — presque frères, presque rivaux. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
     { s: "gourou", t: "Namasté, Capitaine. Nous partageons tant : de grandes foules, de grands egos, et une allergie commune aux donneurs de leçons." },
     { s: "capitaine", t: "Namasté toi-même, Gourou. J'aime bien ton stade. Y'a une vache qui traverse. Chez moi c'est un ara qui vise ta tête. Chacun sa faune." },
     { s: "gourou", t: "Je respire, je médite, et je te fais courir jusqu'à ce que ta forêt te manque. L'endurance est ma prière." },
     { s: "capitaine", t: "Médite tant que tu veux, mon pote. Pendant que tu respires, je plante. Un mur, deux murs, et t'as plus de sol. Sers." }
   ],
-  win: [
+  win:  [
     { s: "capitaine", t: "Le zen c'est joli, mais ça renvoie pas les troncs. Bon match, frère du Sud. Gaffe à ta vache en sortant." },
-    { s: "gourou", t: "Le souffle a cédé à la hache, ce soir. Je m'incline, ami bruyant. On se retrouve au prochain sommet." }
+    { s: "gourou", t: "Le souffle a cédé à la hache, ce soir. Je m'incline, ami bruyant. On se retrouve au prochain sommet." },
+    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ],
-  lose: [
+  lose:  [
     { s: "gourou", t: "La méditation vainc la précipitation. Respire, Capitaine. Ta forêt sera toujours là — enfin, espérons." },
-    { s: "capitaine", t: "Épuisé par un type assis en tailleur ! Le monde est fou. Je reviens avec deux tronçonneuses et un thermos." }
+    { s: "capitaine", t: "Épuisé par un type assis en tailleur ! Le monde est fou. Je reviens avec deux tronçonneuses et un thermos." },
+    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ]
 },
 {
   act: 2, title: "Le jardin et la clairière", sub: "Tropicalia–Ramenie · deux méfiances polies",
   left: "capitaine", right: "safran", terrain: 9, mode: "flame", ai: 2, doped: null,
-  pre: [
-    { s: "narrator", t: "Jardin des Roses, arcades turquoise et roseraie de palais. Un paon fait la roue. Deux hommes qui ne se comprennent pas s'observent avec une courtoisie glaçante." },
+  pre:  [
+    { s: "narrator", t: "Jardin des Roses, arcades turquoise et roseraie de palais. Un paon fait la roue. Deux hommes qui ne se comprennent pas s'observent avec une courtoisie glaçante. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
     { s: "safran", t: "Vous faites beaucoup de bruit, Capitaine, pour un homme qui n'a que des arbres à défendre." },
     { s: "capitaine", t: "Et vous, le mesuré, vous parlez tout bas pour cacher que vous ralentissez tout le monde. Votre voile d'or, là — moi j'appelle ça un rideau." },
     { s: "safran", t: "Le calme est une force que les bûcherons ne comprennent pas. Je ralentis. Vous vous épuisez. Voyons qui tient." },
     { s: "capitaine", t: "Ralentis-moi tant que tu veux, l'ami sardonique. Un mur de troncs, ça attend pas. Ça pousse d'un coup. Balle au paon." }
   ],
-  win: [
+  win:  [
     { s: "capitaine", t: "Ton voile d'or contre mes bûches brutes : les bûches gagnent. Salue le paon, moi je rentre à la forêt." },
-    { s: "safran", t: "Une victoire de la force sur la patience. Rare. Savourez — ce sera bref, Capitaine." }
+    { s: "safran", t: "Une victoire de la force sur la patience. Rare. Savourez — ce sera bref, Capitaine." },
+    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ],
-  lose: [
+  lose:  [
     { s: "safran", t: "Le voile ralentit même les tronçonneuses. Vous avez couru dans le miel, et vous avez perdu. Sereinement." },
-    { s: "capitaine", t: "Endormi par un mec en robe qui parle doucement ! Réveillez-moi. Mon camp est au ralenti, c'est un scandale." }
+    { s: "capitaine", t: "Endormi par un mec en robe qui parle doucement ! Réveillez-moi. Mon camp est au ralenti, c'est un scandale." },
+    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ]
 },
 
-// ===================== ACTE III — Souveraineté, virus et le grand feu (Bombe) =========
+// ===================== ACTE I — Petites rivalités (Volley) =====================
 {
   act: 3, title: "L'accusation du matin", sub: "Tropicalia–Panguo · qui a lâché le virus ?",
   left: "capitaine", right: "timonier", terrain: 4, mode: "bomb", ai: 3, doped: null,
-  pre: [
+  pre:  [
     { s: "narrator", t: "Cité du Matin, retour brutal. Le ballon est devenu bombe. Un fléau a traversé le monde, et Le Capitaine a désigné un coupable — à voix très, très haute." },
     { s: "capitaine", t: "Ton virus, Timonier. TON virus. Sorti de ton atelier, comme tes ballons. Sauf que celui-là, on l'a pas commandé." },
     { s: "timonier", t: "Des accusations, encore. Tu cries au monde entier pendant que tu m'achètes mes vaccins en douce. Sers ta bombe, bavard." },
     { s: "capitaine", t: "J'achète rien, c'est de la grippette ! Enfin… disons que j'achète pour les autres. Renvoie, et fais gaffe où tombe la mèche." },
     { s: "timonier", t: "Le tempo, la patience, le silence. Toi tu hurles ; moi je gagne. La bombe tourne — ne la laisse pas de ton côté." }
   ],
-  win: [
+  win:  [
     { s: "capitaine", t: "BOUM chez le communiste ! Je l'avais dit, je l'avais crié ! La tronçonneuse et la vérité, même combat." },
     { s: "timonier", t: "Une explosion de bruit, rien de plus. L'histoire retiendra le tempo, pas les cris. Je patiente encore." }
   ],
-  lose: [
+  lose:  [
     { s: "timonier", t: "Tu accuses, tu t'agites, tu perds. La muraille au milieu de ton camp t'a coûté la mèche. Silence, maintenant." },
     { s: "capitaine", t: "Explosé par le type que j'ai insulté toute la semaine ET à qui je dois du fric ! Vie compliquée, mon frère." }
   ]
@@ -166,26 +172,28 @@ Sous la vanne, il y a un joueur redoutable. Rustre, oui. Imprévisible, oui. Mai
 {
   act: 3, title: "Le camarade et le capitaine", sub: "Tropicalia–Ryonganie · le rouge que je hais",
   left: "capitaine", right: "bebe", terrain: 3, mode: "bomb", ai: 3, doped: null,
-  pre: [
+  pre:  [
     { s: "narrator", t: "Esplanade du Défilé, granit et bannières unies. Le radar tourne, la bombe aussi. Le Capitaine a construit toute sa carrière sur la haine de ce que représente ce petit maréchal." },
     { s: "bebe", t: "Bienvenue chez moi, Capitaine. Ici, l'ordre est parfait, le peuple applaudit sur commande, et personne ne coupe d'arbres sans autorisation." },
     { s: "capitaine", t: "Ton ordre, gamin, c'est un défilé de pantins. Moi mon peuple il gueule, il rote, il vote de travers — mais il est VIVANT. C'est ça la liberté." },
     { s: "bebe", t: "La liberté ! Quel désordre charmant. Mon radar voit tout, ma discipline ne rate rien. Interdit de sauter dans mon camp." },
     { s: "capitaine", t: "Interdit de sauter ? Pas grave, je saute pas, je PLANTE. Un mur de troncs sur ton bel asphalte rouge. Renvoie ta bombe, petit soldat." }
   ],
-  win: [
+  win:  [
     { s: "capitaine", t: "Fait sauter le mausolée ambulant ! Voilà ce qui arrive quand un vrai capitaine rencontre un capitaine en carton." },
-    { s: "bebe", t: "Une défaite temporaire. Le défilé continue, le radar tourne, et la lettre de plainte est déjà rédigée." }
+    { s: "bebe", t: "Une défaite temporaire. Le défilé continue, le radar tourne, et la lettre de plainte est déjà rédigée." },
+    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
   ],
-  lose: [
+  lose:  [
     { s: "bebe", t: "La discipline écrase le folklore, Capitaine. Ton chaos coloré a explosé sous mes projecteurs. Salue en sortant." },
-    { s: "capitaine", t: "Battu par un gamin en uniforme dans une ville sans bruit ! L'horreur. Je rentre à la forêt écouter l'ara m'insulter, ça au moins c'est franc." }
+    { s: "capitaine", t: "Battu par un gamin en uniforme dans une ville sans bruit ! L'horreur. Je rentre à la forêt écouter l'ara m'insulter, ça au moins c'est franc." },
+    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
   ]
 },
 {
   act: 3, title: "La forêt en feu", sub: "Grande Forêt · Amazonie contre le Cygne · le grand duel",
   left: "capitaine", right: "cygne", terrain: 7, mode: "bomb", ai: 3, doped: "R",
-  pre: [
+  pre:  [
     { s: "narrator", t: "Grande Forêt. Terre rouge, huttes sur pilotis, canopée dorée — et à l'horizon, une lueur : des feux, ou « du barbecue », selon qui parle. La bombe est là. Le grand feuilleton des Jeux se joue ce soir." },
     { s: "cygne", t: "Votre forêt brûle, Capitaine, et c'est le poumon de la planète entière. Je viens défendre ce que vous laissez partir en fumée. En même temps." },
     { s: "capitaine", t: "MA forêt, Cygne. La MIENNE. Occupe-toi de ton coq héraldique et de ton obélisque. Ici on plante, on coupe, on vit. C'est pas ton jardin." },
@@ -193,14 +201,15 @@ Sous la vanne, il y a un joueur redoutable. Rustre, oui. Imprévisible, oui. Mai
     { s: "narrator", t: "Regardez ses yeux. Le premier de la classe s'est dopé pour ce match. L'aura rouge du Cygne éclaire la canopée. Ce n'est plus de la diplomatie — c'est une guerre de troncs." },
     { s: "capitaine", t: "Tu t'es shooté pour venir dans MA jungle me faire la leçon ? Parfait. TRONÇONNEUSE ! Un mur de troncs entre toi et le sol, et on cause plus. On smashe." }
   ],
-  win: [
+  win:  [
     { s: "capitaine", t: "La forêt a gardé son maître ! Coupé, planté, gagné. Rentre à ton palais, Cygne, et lâche-moi la canopée." },
     { s: "cygne", t: "Vous gagnez le match, pas le débat. La planète, elle, ne joue pas au volley. On se retrouvera au prochain sommet. En même temps." },
-    { s: "narrator", t: "Sous le cri de l'ara, Le Capitaine plante sa tronçonneuse comme un drapeau. Les Jeux du Sommet n'oublieront pas cette clairière en feu." }
+    { s: "narrator", t: "Sous le cri de l'ara, Le Capitaine plante sa tronçonneuse comme un drapeau. Les Jeux du Sommet n'oublieront pas cette clairière en feu. Le ballon est une bombe : le camp où elle tombe perd." }
   ],
-  lose: [
+  lose:  [
     { s: "cygne", t: "Le sport propre, dopé juste ce qu'il faut, a tenu debout. La forêt vous survivra, Capitaine. J'y veillerai. En même temps." },
-    { s: "capitaine", t: "Volé chez MOI par un cygne sous carburant ! Le monde à l'envers. Mais je reviendrai. Avec deux tronçonneuses. Et l'ara. Il t'aime pas non plus." }
+    { s: "capitaine", t: "Volé chez MOI par un cygne sous carburant ! Le monde à l'envers. Mais je reviendrai. Avec deux tronçonneuses. Et l'ara. Il t'aime pas non plus." },
+    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
   ]
 }
 ```

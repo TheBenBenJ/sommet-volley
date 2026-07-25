@@ -929,6 +929,58 @@ test("V2 : service — X manette maintenu après lancer ne sert pas tout seul", 
   assert.ok(g.ball.vx > 0, "vers l'adversaire");
 });
 
+test("V2 : service — double-tap X pendant la grâce ne sert pas tout seul", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(62);
+  g.setState("serve"); g.setServeCountdown(0);
+  g.setServingSide(0);
+  g.ball.reset(0);
+  const pad = { ...N0, smash:true, ax: 0.4, ay: -0.2 };
+  // 1er X = lancer
+  g.stepGame(pad, N0);
+  assert.ok(!g.ball.inHands, "lancé");
+  // Micro-relâche + 2ᵉ X pendant tossGrace (le front est « mangé » par la grâce)
+  g.stepGame({ ...N0, ax: 0.4, ay: -0.2 }, N0);
+  g.stepGame(pad, N0);
+  assert.ok((g.ball.tossGrace | 0) > 0 || g.ball.serveAimLock, "encore phase service");
+  // Maintien X jusqu'après la grâce, balle ramenée à portée
+  const grace = g.consts.SERVE_TOSS_GRACE || 10;
+  for (let i = 0; i < grace + 2; i++) {
+    g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y; g.blobL.onGround = true;
+    g.ball.x = 250; g.ball.y = g.blobL.y - 64; g.ball.vx = 0; g.ball.vy = 2;
+    g.ball.frozen = false; g.ball.inHands = false;
+    g.ball.serveAimLock = true;
+    g.stepGame(pad, N0);
+  }
+  assert.strictEqual(g.ball.serveAimLock, true, "maintien après double-tap ≠ service auto");
+  assert.strictEqual(g.ball.touches[0], 0, "pas de touche auto");
+  // Il faut un NOUVEAU front X pour servir
+  g.stepGame({ ...N0, ax: 0.4, ay: -0.2 }, N0);
+  g.blobL.lastActiveHitTick = -999;
+  g.ball.y = g.blobL.y - 64; g.ball.vy = 2; g.ball.serveAimLock = true;
+  g.stepGame(pad, N0);
+  assert.strictEqual(g.ball.serveAimLock, false, "vrai 2ᵉ appui (après grâce) sert");
+});
+
+test("V2 : service — X tenu pendant le décompte ne lance pas au GO", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(63);
+  g.setState("serve");
+  g.setServeCountdown(5);
+  g.setServingSide(0);
+  g.ball.reset(0);
+  const pad = { ...N0, smash:true, ax: 0.4 };
+  // 5 ticks de décompte avec X tenu, puis 1ʳᵉ frame jouable (cd=0) toujours tenu
+  for (let i = 0; i < 6; i++) g.stepGame(pad, N0);
+  assert.ok(g.ball.inHands && g.ball.frozen, "X tenu pendant GO ≠ lancer");
+  // Relâche puis vrai appui
+  g.stepGame({ ...N0, ax: 0.4 }, N0);
+  g.stepGame(pad, N0);
+  assert.strictEqual(g.ball.inHands, false, "nouvel appui après GO lance");
+});
+
 test("V2 : service — F + saut immédiat interdit (anti-triche)", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(1);
@@ -1491,12 +1543,14 @@ test("campagne : chapitres cohérents (persos, terrain, mode, dopage, dialogues)
   const g = loadGame();
   assert.ok(Array.isArray(g.STORY) && g.STORY.length >= 6, "au moins 6 chapitres");
   const keys = new Set(g.CHARACTERS.map(c => c.key));
+  const modeCount = { volley: 0, flame: 0, bomb: 0 };
   g.STORY.forEach((ch, i) => {
     assert.ok(keys.has(ch.left), "ch" + i + " left invalide: " + ch.left);
     assert.ok(keys.has(ch.right), "ch" + i + " right invalide: " + ch.right);
     assert.notStrictEqual(ch.left, ch.right, "ch" + i + " oppose un perso à lui-même");
     assert.ok(ch.terrain >= 0 && ch.terrain < g.TERRAINS.length, "ch" + i + " terrain hors bornes");
     assert.ok(ch.mode === "volley" || ch.mode === "bomb" || ch.mode === "flame", "ch" + i + " mode invalide");
+    modeCount[ch.mode]++;
     assert.ok(ch.ai >= 0 && ch.ai <= 3, "ch" + i + " niveau IA hors bornes");
     // design : le joueur (gauche) AFFRONTE des dopés — il ne joue jamais le dopé.
     assert.ok(ch.doped === null || ch.doped === "R", "ch" + i + " : seul l'adversaire (R) peut être dopé");
@@ -1509,6 +1563,10 @@ test("campagne : chapitres cohérents (persos, terrain, mode, dopage, dialogues)
       }
     }
   });
+  // Campagne Sommet (9 ch.) : ⅓ / ⅓ / ⅓
+  if (g.STORY.length === 9) {
+    assert.deepStrictEqual(modeCount, { volley: 3, flame: 3, bomb: 3 }, "Sommet : ⅓ volley/flame/bomb");
+  }
 });
 
 test("campagnes par personnage : 10 campagnes, chacune = les 9 rivaux, format valide", () => {
@@ -1525,14 +1583,25 @@ test("campagnes par personnage : 10 campagnes, chacune = les 9 rivaux, format va
     const rivals = camp.map(c => c.right).sort();
     const expected = keys.filter(k => k !== key).sort();
     assert.deepStrictEqual(rivals, expected, key + " : affronte exactement ses 9 rivaux");
-    let flameCount = 0;
+    const modeCount = { volley: 0, flame: 0, bomb: 0 };
     camp.forEach((ch, i) => {
       assert.strictEqual(ch.left, key, key + "[" + i + "] left doit être le protagoniste");
       assert.ok(keySet.has(ch.right) && ch.right !== key, key + "[" + i + "] rival valide");
       assert.ok(ch.terrain >= 0 && ch.terrain < g.TERRAINS.length, key + "[" + i + "] terrain hors bornes");
       assert.ok(ch.mode === "volley" || ch.mode === "bomb" || ch.mode === "flame", key + "[" + i + "] mode invalide");
-      if (ch.mode === "flame") flameCount++;
+      modeCount[ch.mode]++;
+      // Montée en rivalité : 0–2 volley, 3–5 flame, 6–8 bomb
+      const expectMode = i < 3 ? "volley" : i < 6 ? "flame" : "bomb";
+      assert.strictEqual(ch.mode, expectMode, key + "[" + i + "] mode selon rivalité");
+      assert.strictEqual(ch.act, i < 3 ? 1 : i < 6 ? 2 : 3, key + "[" + i + "] acte");
       assert.ok(ch.doped === null || ch.doped === "R", key + "[" + i + "] seul l'adversaire (R) est dopé");
+      const preTxt = (ch.pre || []).map(l => l.t).join(" ");
+      if (ch.mode === "flame") {
+        assert.ok(/enflamm|brûl|flamme|braise|PV/i.test(preTxt), key + "[" + i + "] dialogue flame");
+      }
+      if (ch.mode === "bomb") {
+        assert.ok(/bombe|mèche|BOUM|boum|explose/i.test(preTxt), key + "[" + i + "] dialogue bombe");
+      }
       for (const phase of ["pre", "win", "lose"]) {
         assert.ok(Array.isArray(ch[phase]) && ch[phase].length > 0, key + "[" + i + "] " + phase + " vide");
         for (const line of ch[phase]) {
@@ -1541,7 +1610,7 @@ test("campagnes par personnage : 10 campagnes, chacune = les 9 rivaux, format va
         }
       }
     });
-    assert.ok(flameCount >= 1, key + " : au moins un chapitre Ballon enflammé");
+    assert.deepStrictEqual(modeCount, { volley: 3, flame: 3, bomb: 3 }, key + " : ⅓ / ⅓ / ⅓");
   }
 });
 

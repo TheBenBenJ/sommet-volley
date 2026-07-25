@@ -28,14 +28,15 @@ Le brief de rédaction commun : [_BRIEF.md](_BRIEF.md).
 
 ## Structure de chaque fichier
 1. `## Biographie` — 9 à 11 paragraphes.
-2. `## Mode Histoire de <Nom>` — les 9 rencontres en **3 actes**, chacune au format
+2. `## Mode Histoire de <Nom>` — les 9 rencontres en **3 actes × 3**
+   (Acte I *volley* → Acte II *flame* → Acte III *bomb*), chacune au format
    exact d'un chapitre `src/story.js` :
    ```js
    { act, title, sub, left:"<ce perso>", right:"<rival>", terrain, mode:"volley"|"bomb"|"flame",
      ai:0..3, doped:null|"R", pre:[{s,t}…], win:[{s,t}…], lose:[{s,t}…] }
    ```
 
-**90 rencontres** au total (10 persos × 9 rivaux), avec dialogues pre/win/lose.
+**90 rencontres** au total (10 × 9), ~⅓ / ⅓ / ⅓ par mode, dialogues adaptés.
 
 ## Intégration (à faire)
 Le mode Histoire actuel (`src/story.js`) expose une campagne unique `STORY[]`.

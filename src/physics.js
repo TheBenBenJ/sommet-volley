@@ -736,8 +736,10 @@ function ballBlobCollision(blob) {
           if (tryLobBall(blob)) { applyHitExtras(blob, a); return; }
         }
       }
-      // Frappe explicite (manette X, ou F re-appuyé)
-      if (wantSmash(blob)) {
+      // Frappe explicite : FRONT montant seulement (pas le maintien).
+      // Sinon un double-tap X pendant la grâce post-lancer « mange » le 2ᵉ
+      // front, puis le maintien sert tout seul dès que tossGrace tombe à 0.
+      if (blob._smashEdge) {
         const near = ballPathDistToBlob(blob) <= RECEIVE_R;
         if (near && trySmashBall(blob)) { applyHitExtras(blob, a); return; }
         if (near && tryLobBall(blob)) applyHitExtras(blob, a);

@@ -101,23 +101,23 @@ const STORY_SOMMET = [
     ]
   },
 
-  // ===================== ACTE II — Le froid revient (Bombe) =====================
+  // ===================== ACTE II — Les tensions montent (Ballon enflammé) ====
   {
     act: 2, title: "Le dégel n'aura pas lieu", sub: "Guerre froide 2.0 · course aux armements",
-    left: "volkoi", right: "dorf", terrain: 0, mode: "bomb", ai: 1, doped: null,
+    left: "volkoi", right: "dorf", terrain: 0, mode: "flame", ai: 1, doped: null,
     pre: [
-      { s: "narrator", t: "Place Écarlate, sous la neige. Le ballon n'est plus un ballon : c'est une bombe. Le camp où elle tombe perd." },
-      { s: "volkoi", t: "Le froid ne me gêne pas. Je SUIS le froid. Toi, tu transpires déjà." },
-      { s: "dorf", t: "J'ai le plus gros bouton. Le plus gros ! Un très, très gros bouton bombe." },
-      { s: "volkoi", t: "Les boutons, c'est pour ceux qui doutent. Moi, je patiente. La mèche fait le travail." },
-      { s: "narrator", t: "Ne laissez pas la bombe de votre côté. Renvoyez. Toujours renvoyer." }
+      { s: "narrator", t: "Place Écarlate, sous la neige. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+      { s: "volkoi", t: "Le froid ne me gêne pas. Je SUIS le froid. Toi, tu transpires déjà — et bientôt tu brûleras." },
+      { s: "dorf", t: "J'ai le plus gros extincteur. Le plus gros ! Enfin… j’ai un très, très gros bouton. Ça compte." },
+      { s: "volkoi", t: "Les boutons, c'est pour ceux qui doutent. Moi, je patiente. La braise fait le travail." },
+      { s: "narrator", t: "Ne te brûle pas les doigts : renvoie avant d’être à zéro." }
     ],
     win: [
-      { s: "volkoi", t: "Le sang-froid l'emporte sur les gros boutons. Comme toujours. Comme prévu." },
-      { s: "dorf", t: "Sabotage ! Enquête ! … Bon. Prochaine fois j'apporte un plus gros ballon." }
+      { s: "volkoi", t: "Le sang-froid éteint la braise. Comme toujours. Comme prévu." },
+      { s: "dorf", t: "Sabotage ! Enquête ! … Bon. Prochaine fois j'apporte un plus gros ballon — ignifugé." }
     ],
     lose: [
-      { s: "dorf", t: "Boum ! De ton côté ! Le plus beau boum jamais vu. Fantastique." },
+      { s: "dorf", t: "Grillé ! De ton côté ! Le plus beau flambage jamais vu. Fantastique." },
       { s: "volkoi", t: "Profite. L'hiver est long, et j'ai de la patience pour deux." }
     ]
   },
@@ -125,11 +125,11 @@ const STORY_SOMMET = [
     act: 2, title: "La guerre des puces", sub: "Doria–Panguo · tarifs & silicium",
     left: "timonier", right: "dorf", terrain: 4, mode: "flame", ai: 2, doped: null,
     pre: [
-      { s: "narrator", t: "Cité du Matin. Enjeu : qui fabrique le monde. La bombe tourne — comme les chaînes d'approvisionnement." },
+      { s: "narrator", t: "Cité du Matin. Enjeu : qui fabrique le monde. Le ballon s’enflamme — comme les chaînes d'approvisionnement." },
       { s: "dorf", t: "Des taxes ! Des taxes sur tout ! Sur le ballon, sur le filet, sur l'air que tu respires !" },
-      { s: "timonier", t: "Taxe ce que tu veux. Tes usines, tes téléphones, tes bombes… c'est encore moi qui les assemble." },
-      { s: "dorf", t: "On se découple ! On rapatrie tout ! Enfin… après ce match. J'ai besoin de tes ballons." },
-      { s: "timonier", t: "Le tempo, l'harmonie, la patience. Tu klaxonnes ; je livre. Sers." }
+      { s: "timonier", t: "Taxe ce que tu veux. Tes usines, tes téléphones, tes puces… c'est encore moi qui les assemble." },
+      { s: "dorf", t: "On se découple ! On rapatrie tout ! Enfin… après ce match. J'ai besoin de tes ballons — même brûlés." },
+      { s: "timonier", t: "Le tempo, l'harmonie, la patience. Tu klaxonnes ; je livre. Sers — et ne te calcine pas." }
     ],
     win: [
       { s: "timonier", t: "Découple donc. Tu reviendras. Le monde entier revient toujours à l'atelier." },
@@ -142,13 +142,13 @@ const STORY_SOMMET = [
   },
   {
     act: 2, title: "Le carburant du régime", sub: "Dossier nucléaire · sommets ratés",
-    left: "dorf", right: "bebe", terrain: 3, mode: "bomb", ai: 3, doped: "R",
+    left: "dorf", right: "bebe", terrain: 3, mode: "flame", ai: 3, doped: "R",
     pre: [
-      { s: "narrator", t: "Esplanade du Défilé. On avait annoncé une poignée de main historique. On a eu autre chose." },
+      { s: "narrator", t: "Esplanade du Défilé. On avait annoncé une poignée de main historique. À la place : un ballon enflammé, et un adversaire à l’aura rouge." },
       { s: "bebe", t: "Nous nous étions écrit de si belles lettres, toi et moi. Puis tu es parti de la table." },
       { s: "dorf", t: "Grand leader ! Très grand ! On s'aimait beaucoup. Puis un peu moins. Puis plus du tout." },
-      { s: "narrator", t: "Regarde ses yeux. Injectés. On murmure qu'un « carburant militaire » coule dans ses veines." },
-      { s: "bebe", t: "Ce n'est pas de la triche. C'est de la DISCIPLINE nationale. Concentré. Prépare-toi." }
+      { s: "narrator", t: "Regarde ses yeux. Injectés. On murmure qu'un « carburant militaire » coule dans ses veines — et que la moindre touche brûle." },
+      { s: "bebe", t: "Ce n'est pas de la triche. C'est de la DISCIPLINE nationale. Concentré. Prépare-toi à griller." }
     ],
     win: [
       { s: "dorf", t: "Battu ton truc rouge ! Personne n'y croyait ! MOI si. Toujours." },
@@ -160,7 +160,7 @@ const STORY_SOMMET = [
     ]
   },
 
-  // ===================== ACTE III — Jeux impitoyables (Bombe + dopage) =========
+  // ===================== ACTE III — Conflits ouverts (Bombe + dopage) ==========
   {
     act: 3, title: "La forêt qui brûle", sub: "Grande Forêt · climat · alliances",
     left: "capitaine", right: "gourou", terrain: 7, mode: "bomb", ai: 2, doped: "R",
@@ -254,13 +254,13 @@ let STORY = storyCampaign.chapters;
 const ACT_META = [
   null,
   { num: "I",   title: "Petites rivalités",
-    tagline: "Le monde sourit encore. On règle ses comptes au filet, entre rivaux.",
+    tagline: "Volley classique. Le monde sourit encore — on règle ses comptes au filet.",
     color: "#3eb5ff" },
   { num: "II",  title: "Les tensions montent",
-    tagline: "Le ballon s'enflamme. Les sourires tombent. Puis viennent les bombes.",
-    color: "#9ec9ff" },
+    tagline: "Ballon enflammé. Chaque contact brûle. Les sourires tombent.",
+    color: "#ff8a3d" },
   { num: "III", title: "Conflits ouverts",
-    tagline: "Seringues, veines saillantes, grands duels. Renverse tous tes rivaux.",
+    tagline: "Mode Bombe. Mèche courte, auras rouges, grands duels.",
     color: "#ff5a4d" }
 ];
 

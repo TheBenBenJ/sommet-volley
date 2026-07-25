@@ -1839,6 +1839,103 @@ function drawBombHUD() {
   ctx.restore();
 }
 
+/**
+ * Messages d'info dans la bande score, entre les deux pastilles.
+ * @returns {boolean} true si un message a été dessiné (masque le VS).
+ */
+function drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph) {
+  // Wrap compact pour la zone centrale (~écart entre pastilles score).
+  function wrapLines(text, maxW, font) {
+    if (!text) return [];
+    ctx.font = font;
+    const words = String(text).split(" ");
+    const lines = [];
+    let line = "";
+    for (const w of words) {
+      const test = line ? line + " " + w : w;
+      if (ctx.measureText(test).width > maxW && line) {
+        lines.push(line);
+        line = w;
+      } else line = test;
+    }
+    if (line) lines.push(line);
+    return lines.slice(0, 2);
+  }
+
+  let title = "", sub = "", fill = "#ffd84a", alpha = 1;
+
+  if (typeof mapEventFlashT !== "undefined" && mapEventFlashT > 0 && mapEventFlash) {
+    title = mapEventFlash;
+    sub = mapEventFlashSub || "";
+    fill = "#ff9800";
+    alpha = Math.min(1, mapEventFlashT / 16);
+  } else if (superFlashT > 0 && superFlash) {
+    title = superFlash;
+    sub = superFlashSub || "";
+    fill = "#ffd84a";
+    alpha = Math.min(1, superFlashT / 36);
+  } else if ((state === "play" || state === "serve") && serveCountdown <= 0) {
+    for (const s of [0, 1]) {
+      if (scores[s] >= matchWinScore() - 1 && scores[s] - scores[1 - s] >= 1) {
+        title = "★ Balle de match — " + sideLabel(s) + " ★";
+        fill = sideColor(s);
+        break;
+      }
+    }
+    if (!title && state === "serve") {
+      title = "Service : " + sideLabel(servingSide);
+      sub = "X lancer, puis X frapper (pas le saut)";
+      fill = "#ffcc00";
+    }
+  }
+
+  if (!title) return false;
+
+  const boxW = Math.min(340, W * 0.36);
+  const textW = boxW - 20;
+  const titleFont = "700 13px " + DISP;
+  const subFont = "700 10px " + SANS;
+  const titleLines = wrapLines(title, textW, titleFont);
+  const subLines = wrapLines(sub, textW, subFont);
+  const boxH = Math.min(ph - 4, 18 + titleLines.length * 14 + (subLines.length ? 2 + subLines.length * 12 : 0));
+  const bx = NET_X - boxW / 2;
+  const by = py + Math.max(2, (ph - boxH) / 2);
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.textAlign = "center";
+  ctx.fillStyle = "rgba(12,20,42,0.88)";
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(bx, by, boxW, boxH, 10); else ctx.rect(bx, by, boxW, boxH);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(27,23,48,0.45)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  let ty = by + 14;
+  ctx.font = titleFont;
+  ctx.lineJoin = "round";
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = STROKE;
+  ctx.fillStyle = fill;
+  for (const ln of titleLines) {
+    ctx.strokeText(ln, NET_X, ty);
+    ctx.fillText(ln, NET_X, ty);
+    ty += 14;
+  }
+  if (subLines.length) {
+    ty += 2;
+    ctx.font = subFont;
+    ctx.fillStyle = "rgba(255,246,232,0.95)";
+    for (const ln of subLines) {
+      ctx.fillText(ln, NET_X, ty);
+      ty += 12;
+    }
+  }
+  ctx.restore();
+  return true;
+}
+
 function drawHUD() {
   // mode bombe : éclair d'explosion plein écran (visuel, se résorbe au rendu)
   if (bombFlash > 0) {
@@ -1895,18 +1992,6 @@ function drawHUD() {
     ctx.fillText(String(scores[s]), cx, py + 40);
     if (scorePop[s] > 0) scorePop[s]--;
   }
-  // pastille VS
-  ctx.textAlign = "center";
-  ctx.fillStyle = CREAM;
-  ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(NET_X - 20, py + 18, 40, 24, 10);
-  else ctx.rect(NET_X - 20, py + 18, 40, 24);
-  ctx.fill();
-  ctx.strokeStyle = "rgba(27,23,48,0.35)"; ctx.lineWidth = 2; ctx.stroke();
-  ctx.fillStyle = STROKE;
-  ctx.font = "700 12px " + DISP;
-  ctx.fillText("VS", NET_X, py + 35);
-
   // touches (pastilles) dans la bande score, sous la ligne de terrain
   for (const side of [0, 1]) {
     const baseX = side === 0 ? W * 0.22 - 24 : W * 0.78 - 24;
@@ -1943,95 +2028,23 @@ function drawHUD() {
     }
   }
 
-  // message flash de SUPER (nom + description longue, temps de lecture)
-  if (superFlashT > 0 && superFlash) {
-    const alpha = Math.min(1, superFlashT / 36);
+  // Infos de match (SUPER, event map, balle de match, service) entre les 2 scores.
+  // Les messages de POINT restent en haut (drawPointCelebBanner).
+  const infoDrawn = drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph);
+  if (!infoDrawn) {
     ctx.textAlign = "center";
-    ctx.globalAlpha = alpha;
-    const titleY = 108;
-    const boxW = Math.min(720, W - 36);
-    // Mesure le sous-titre wrapé pour dimensionner la boîte
-    ctx.font = "700 13px " + SANS;
-    const subLines = [];
-    if (superFlashSub) {
-      const words = superFlashSub.split(" ");
-      let line = "";
-      for (const w of words) {
-        const test = line ? line + " " + w : w;
-        if (ctx.measureText(test).width > boxW - 36 && line) {
-          subLines.push(line); line = w;
-        } else line = test;
-      }
-      if (line) subLines.push(line);
-    }
-    const boxH = 40 + (subLines.length ? 8 + subLines.length * 17 : 0);
-    const bx = NET_X - boxW / 2, by = titleY - 26;
-    ctx.fillStyle = "rgba(12,20,42,0.82)";
+    ctx.fillStyle = CREAM;
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(bx, by, boxW, boxH, 12); else ctx.rect(bx, by, boxW, boxH);
+    if (ctx.roundRect) ctx.roundRect(NET_X - 20, py + 18, 40, 24, 10);
+    else ctx.rect(NET_X - 20, py + 18, 40, 24);
     ctx.fill();
-    ctx.strokeStyle = STROKE;
-    ctx.lineWidth = 3; ctx.lineJoin = "round";
-    ctx.font = "700 24px " + DISP;
-    ctx.strokeText(superFlash, NET_X, titleY);
-    ctx.fillStyle = "#ffd84a";
-    ctx.fillText(superFlash, NET_X, titleY);
-    if (subLines.length) {
-      ctx.font = "700 13px " + SANS;
-      ctx.fillStyle = "rgba(255,246,232,0.96)";
-      let sy = titleY + 22;
-      for (const ln of subLines) {
-        ctx.fillText(ln, NET_X, sy);
-        sy += 17;
-      }
-    }
-    ctx.globalAlpha = 1;
+    ctx.strokeStyle = "rgba(27,23,48,0.35)"; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = STROKE;
+    ctx.font = "700 12px " + DISP;
+    ctx.fillText("VS", NET_X, py + 35);
   }
 
-  // Annonce événement de map
-  if (typeof mapEventFlashT !== "undefined" && mapEventFlashT > 0 && mapEventFlash) {
-    const alpha = Math.min(1, mapEventFlashT / 16);
-    ctx.textAlign = "center";
-    ctx.globalAlpha = alpha;
-    const titleY = (superFlashT > 0 && superFlash) ? 210 : 118;
-    const boxW = Math.min(660, W - 40);
-    const boxH = mapEventFlashSub ? 58 : 40;
-    const bx = NET_X - boxW / 2, by = titleY - 24;
-    ctx.fillStyle = "rgba(12,20,42,0.78)";
-    ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(bx, by, boxW, boxH, 12); else ctx.rect(bx, by, boxW, boxH);
-    ctx.fill();
-    ctx.font = "700 22px " + DISP;
-    ctx.strokeStyle = STROKE; ctx.lineWidth = 3; ctx.lineJoin = "round";
-    ctx.strokeText(mapEventFlash, NET_X, titleY);
-    ctx.fillStyle = "#ff9800";
-    ctx.fillText(mapEventFlash, NET_X, titleY);
-    if (mapEventFlashSub) {
-      ctx.font = "700 12px " + SANS;
-      ctx.fillStyle = "rgba(255,246,232,0.95)";
-      ctx.fillText(mapEventFlashSub, NET_X, titleY + 20);
-    }
-    ctx.globalAlpha = 1;
-  }
-
-  // balle de match
-  if (state === "play" || state === "serve") {
-    for (const s of [0, 1]) {
-      if (scores[s] >= matchWinScore() - 1 && scores[s] - scores[1 - s] >= 1) {
-        const txt = "★ Balle de match — " + sideLabel(s) + " ★";
-        ctx.textAlign = "center";
-        ctx.font = "700 16px " + DISP;
-        ctx.strokeStyle = STROKE; ctx.lineWidth = 4; ctx.lineJoin = "round";
-        ctx.strokeText(txt, NET_X, 36);
-        ctx.fillStyle = sideColor(s);
-        ctx.fillText(txt, NET_X, 36);
-      }
-    }
-  }
-
-  // décompte avant service, puis invite de service — fond plein arrondi
-  // systématique : jamais de texte flottant nu directement sur le décor
-  // (illisible dès que le fond est clair ou que sa couleur varie).
+  // décompte avant service — reste au centre du terrain (gros signal)
   if (state === "serve" && serveCountdown > 0) {
     const beat = typeof SERVE_BEAT !== "undefined" ? SERVE_BEAT : 51;
     const go = typeof SERVE_GO !== "undefined" ? SERVE_GO : 30;
@@ -2053,22 +2066,6 @@ function drawHUD() {
     ctx.strokeText(label, NET_X, H / 2 + 22 + bounce);
     ctx.fillStyle = n <= 0 ? "#7ed957" : "#ffd84a";
     ctx.fillText(label, NET_X, H / 2 + 22 + bounce);
-  } else if (state === "serve") {
-    const txt = "Service : " + sideLabel(servingSide) + " — X lancer, puis X frapper (pas le saut) !";
-    ctx.textAlign = "center";
-    ctx.font = "700 17px " + (typeof UI !== "undefined" ? UI.sans : "sans-serif");
-    const tw = ctx.measureText(txt).width;
-    // Haut d'écran libre (coach tutoriel en bas)
-    const pw = tw + 36, ph = 34, px = NET_X - pw / 2;
-    const py = 28;
-    // pastille pleine (au lieu de texte nu semi-transparent) : lisible sur
-    // n'importe quel terrain/ciel, clair ou sombre, sans distinction à gérer.
-    ctx.fillStyle = "rgba(10,12,18,0.68)";
-    ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 10); else ctx.rect(px, py, pw, ph);
-    ctx.fill();
-    ctx.fillStyle = "#ffcc00";
-    ctx.fillText(txt, NET_X, py + 23);
   }
 
   if (paused) {
