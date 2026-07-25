@@ -466,7 +466,7 @@ const MAP_LAYOUT = {
   "palais-du-coq":  { baselineFromBottom: 68,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
   "esplanade-du-defile":   { baselineFromBottom: 123, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
   "cite-du-matin":    { baselineFromBottom: 48,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
-  "pont-des-deux-mondes": { baselineFromBottom: 59,  netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
+  "pont-des-deux-mondes": { baselineFromBottom: 57,  netPost: { footPad: 3, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
   "stade-ashram":   { baselineFromBottom: 133,  netPost: { footPad: 4, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
   "citadelle-du-levant":  { baselineFromBottom: 45,  netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true },
   "jardin-des-roses": { baselineFromBottom: 41, netPost: { footPad: 2, xOff: 0, scale: 1 }, codeSeam: false, bgFullHeight: true }

@@ -11,7 +11,7 @@
     "net_post",
     "carpet"
   ],
-  "notes": "Style Micron, 16:9 (1920×1080), bgFullHeight + baselineFromBottom=60 (map_fit --full). Event: tapis volant.",
+  "notes": "Skyline Gemini 2026-07-25 (2752×1536 ~16:9), courtyard palace. bgFullHeight + baselineFromBottom=57 (map_fit --full). Event: tapis volant (carpet).",
   "thumb": "thumb.png",
   "event": "carpet"
 }

@@ -1,0 +1,1597 @@
+Reading prompt from stdin...
+OpenAI Codex v0.145.0
+--------
+workdir: /Users/benjaminmille/Downloads/sommet-volley
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: danger-full-access
+reasoning effort: none
+reasoning summaries: none
+session id: 019f9a10-a585-76a1-beff-0962264c593e
+--------
+user
+# Regen Baron Dorf — identité verrouillée sur idle_1
+
+Tu as l’image de référence jointe : `assets/dorf/idle_1.png` (Baron Dorf / Sommet Volley).
+
+## Mission
+
+Regénère **toutes les autres frames** du perso (PAS `idle_1` — celle-là reste la vérité).
+Écris les PNG dans `raw/dorf/<anim>_<n>.png` (écrase si besoin).
+
+## LOCK identité (OBLIGATOIRE — copie l’image, ne réinvente pas)
+
+Même personnage que la référence, pixel-identity :
+- grosse tête chibi, corps trapu
+- cheveux platine/blond volumineux asymétriques (vague d’un côté)
+- teint doré chaud (pas spray-tan orange criard)
+- costume marine oversized, boutons or, chemise crème/blanche
+- cravate OR courte OU pochette champagne (comme sur la ref — garder EXACTEMENT la tenue visible sur idle_1)
+- chaussures noires
+- même visage, mêmes proportions, même échelle, même trait (contours noirs, cel shading)
+
+OUTFIT LOCK : tenue IDENTIQUE sur chaque frame.
+
+## Format technique
+
+- Fond **MAGENTA uni #FF00FF** (chroma key), PAS blanc, PAS de sol/ombre/texte
+- Perso SEUL, mains VIDES, AUCUNE balle, aucun objet
+- Vue de **côté face à DROITE** (sauf `idle_face_0` = buste de FACE)
+- Corps entier tête→pieds, pieds visibles (sauf idle_face)
+- Une image = une pose = un fichier
+
+## Frames à générer (26)
+
+| fichier | pose |
+|---------|------|
+| `idle_face_0.png` | portrait buste de FACE, grosse tête, expression caractéristique |
+| `idle_0.png` | debout repos, poids sur les deux pieds (variation vs idle_1) |
+| `walk_0.png` | LEFT foot planted flat forward, right leg stretched back, clear stride, right arm forward |
+| `walk_1.png` | jambes rapprochées mid-step, pieds presque ensemble, bras neutres |
+| `walk_2.png` | RIGHT foot planted flat forward, left leg back (miroir walk_0), left arm forward |
+| `walk_3.png` | jambes rapprochées passage, bras opposés à walk_1 |
+| `jump_0.png` | flexion / crouch prêt à sauter |
+| `jump_1.png` | en l’air, montée |
+| `jump_2.png` | sommet / apex du saut |
+| `receive_0.png` | manchette : bras joints bas devant, mains vides |
+| `receive_1.png` | dig / réception contact, bras joints bas, mains vides |
+| `aim_0.png` | mains ouvertes levées au-dessus de la tête, regard haut, sans balle |
+| `aim_1.png` | même geste set/passe variation, sans balle |
+| `smash_0.png` | armé bras haut (en l’air), main ouverte, pas de balle |
+| `smash_1.png` | frappe smash, main ouverte, pas de balle |
+| `smash_2.png` | accompagnement / follow-through |
+| `super_0.png` | pose spéciale — wind-up |
+| `super_1.png` | pose spéciale — montée |
+| `super_2.png` | pose spéciale — pic |
+| `super_3.png` | pose spéciale — finish |
+| `panic_0.png` | surpris, penché en arrière, bras en l’air |
+| `panic_1.png` | panic plus marqué |
+| `victory_0.png` | célébration, bras levés |
+| `victory_1.png` | victory variation |
+| `defeat_0.png` | abattu, épaules basses |
+| `defeat_1.png` | defeat plus marqué |
+
+## Walk QA
+
+- walk_0 et walk_2 = pieds OPPOSÉS
+- walk_1 et walk_3 = passage (jambes rapprochées), PAS debout
+- PAS de thumbs-up, PAS de pose statue
+
+## Outils
+
+Utilise la génération d’images Codex. Pour chaque frame : génère, sauve dans `raw/dorf/`.
+Quand les 26 sont là, lance :
+
+```bash
+python3 tools/cutout.py raw/dorf assets/dorf
+```
+
+Puis vérifie que `assets/dorf/manifest.json` a `walk: 4` et les comptes d’anims canoniques.
+Ne touche PAS à `idle_1.png` (ni raw ni assets) — c’est la référence.
+
+codex
+J’utilise le skill `imagegen` parce que la mission exige une régénération bitmap fidèle à une référence. Je vais d’abord verrouiller le workflow de génération/édition, puis produire les 26 poses, les découper et contrôler le manifeste sans toucher à `idle_1.png`.
+exec
+/bin/zsh -lc "sed -n '1,240p' /Users/benjaminmille/.codex/skills/.system/imagegen/SKILL.md" in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 0ms:
+---
+name: "imagegen"
+description: "Generate or edit raster images when the task benefits from AI-created bitmap visuals such as photos, illustrations, textures, sprites, mockups, or transparent-background cutouts. Use when Codex should create a brand-new image, transform an existing image, or derive visual variants from references, and the output should be a bitmap asset rather than repo-native code or vector. Do not use when the task is better handled by editing existing SVG/vector/code-native assets, extending an established icon or logo system, or building the visual directly in HTML/CSS/canvas."
+---
+
+# Image Generation Skill
+
+Generates or edits images for the current project (for example website assets, game assets, UI mockups, product mockups, wireframes, logo design, photorealistic images, or infographics).
+
+## Top-level modes and rules
+
+This skill has exactly two top-level modes:
+
+- **Default built-in tool mode (preferred):** built-in `image_gen` tool for normal image generation, editing, and simple transparent-image requests. Does not require `OPENAI_API_KEY`.
+- **Fallback CLI mode:** `scripts/image_gen.py` CLI. Use when the user explicitly asks for the CLI/API/model path, or after the user explicitly confirms a true model-native transparency fallback with `gpt-image-1.5`. Requires `OPENAI_API_KEY`.
+
+Within CLI fallback, the CLI exposes three subcommands:
+
+- `generate`
+- `edit`
+- `generate-batch`
+
+Rules:
+- Use the built-in `image_gen` tool by default for normal image generation and editing requests.
+- Do not switch to CLI fallback for ordinary quality, size, or file-path control.
+- If the user explicitly asks for a transparent image/background, stay on built-in `image_gen` first: prompt for a flat removable chroma-key background, then remove it locally with the installed helper at `$CODEX_HOME/skills/.system/imagegen/scripts/remove_chroma_key.py`.
+- Never silently switch from built-in `image_gen` or CLI `gpt-image-2` to CLI `gpt-image-1.5`. Treat this as a model/path downgrade and ask the user before doing it, unless the user has already explicitly requested `gpt-image-1.5`, `scripts/image_gen.py`, or CLI fallback.
+- If a transparent request appears too complex for clean chroma-key removal, asks for true/native transparency, or local removal fails validation, explain that true transparency requires CLI `gpt-image-1.5 --background transparent --output-format png` because `gpt-image-2` does not support `background=transparent`, then ask whether to proceed. Run the CLI fallback only after the user confirms.
+- The word `batch` by itself does not mean CLI fallback. If the user asks for many assets or says to batch-generate assets without explicitly asking for CLI/API/model controls, stay on the built-in path and issue one built-in call per requested asset or variant.
+- If the built-in tool fails or is unavailable, tell the user the CLI fallback exists and that it requires `OPENAI_API_KEY`. Proceed only if the user explicitly asks for that fallback.
+- If the user explicitly asks for CLI mode, use the bundled `scripts/image_gen.py` workflow. Do not create one-off SDK runners.
+- Never modify `scripts/image_gen.py`. If something is missing, ask the user before doing anything else.
+
+Built-in save-path policy:
+- In built-in tool mode, Codex saves generated images under `$CODEX_HOME/*` by default.
+- Do not describe or rely on OS temp as the default built-in destination.
+- Do not describe or rely on a destination-path argument (if any) on the built-in `image_gen` tool. If a specific location is needed, generate first and then move or copy the selected output from `$CODEX_HOME/generated_images/...`.
+- Save-path precedence in built-in mode:
+  1. If the user names a destination, move or copy the selected output there.
+  2. If the image is meant for the current project, move or copy the final selected image into the workspace before finishing.
+  3. If the image is only for preview or brainstorming, render it inline; the underlying file can remain at the default `$CODEX_HOME/*` path.
+- Never leave a project-referenced asset only at the default `$CODEX_HOME/*` path.
+- Do not overwrite an existing asset unless the user explicitly asked for replacement; otherwise create a sibling versioned filename such as `hero-v2.png` or `item-icon-edited.png`.
+
+Shared prompt guidance for both modes lives in `references/prompting.md` and `references/sample-prompts.md`.
+
+Fallback-only docs/resources for CLI mode:
+- `references/cli.md`
+- `references/image-api.md`
+- `references/codex-network.md`
+- `scripts/image_gen.py`
+
+Local post-processing helper:
+- `$CODEX_HOME/skills/.system/imagegen/scripts/remove_chroma_key.py`: removes a flat chroma-key background from a generated image and writes a PNG/WebP with alpha. Prefer auto-key sampling, soft matte, and despill for antialiased edges.
+
+## When to use
+- Generate a new image (concept art, product shot, cover, website hero)
+- Generate a new image using one or more reference images for style, composition, or mood
+- Edit an existing image (inpainting, lighting or weather transformations, background replacement, object removal, compositing, transparent background)
+- Produce many assets or variants for one task
+
+## When not to use
+- Extending or matching an existing SVG/vector icon set, logo system, or illustration library inside the repo
+- Creating simple shapes, diagrams, wireframes, or icons that are better produced directly in SVG, HTML/CSS, or canvas
+- Making a small project-local asset edit when the source file already exists in an editable native format
+- Any task where the user clearly wants deterministic code-native output instead of a generated bitmap
+
+## Decision tree
+
+Think about two separate questions:
+
+1. **Intent:** is this a new image or an edit of an existing image?
+2. **Execution strategy:** is this one asset or many assets/variants?
+
+Intent:
+- If the user wants to modify an existing image while preserving parts of it, treat the request as **edit**.
+- If the user provides images only as references for style, composition, mood, or subject guidance, treat the request as **generate**.
+- If the user provides no images, treat the request as **generate**.
+
+Built-in edit semantics:
+- Built-in edit mode is for images already visible in the conversation context, such as attached images or images generated earlier in the thread.
+- If the user wants to edit a local image file with the built-in tool, first load it with built-in `view_image` tool so the image is visible in the conversation context, then proceed with the built-in edit flow.
+- Do not promise arbitrary filesystem-path editing through the built-in tool.
+- If a local file still needs direct file-path control, masks, or other explicit CLI-only parameters, use the explicit CLI fallback only when the user asks for it.
+- For edits, preserve invariants aggressively and save non-destructively by default.
+
+Execution strategy:
+- In the built-in default path, produce many assets or variants by issuing one `image_gen` call per requested asset or variant.
+- In the CLI fallback path, use the CLI `generate-batch` subcommand only when the user explicitly chose CLI mode and needs many prompts/assets.
+- For many distinct assets, do not use `n` as a substitute for separate prompts. `n` is for variants of one prompt; distinct assets need distinct built-in calls or distinct CLI `generate-batch` jobs.
+
+Assume the user wants a new image unless they clearly ask to change an existing one.
+
+## Workflow
+1. Decide the top-level mode: built-in by default, including simple transparent-output requests; fallback CLI only if explicitly requested or after the user explicitly confirms a transparent-output fallback.
+2. Decide the intent: `generate` or `edit`.
+3. Decide whether the output is preview-only or meant to be consumed by the current project.
+4. Decide the execution strategy: single asset vs repeated built-in calls vs CLI `generate-batch`.
+5. Collect inputs up front: prompt(s), exact text (verbatim), constraints/avoid list, and any input images.
+6. For every input image, label its role explicitly:
+   - reference image
+   - edit target
+   - supporting insert/style/compositing input
+7. If the edit target is only on the local filesystem and you are staying on the built-in path, inspect it with `view_image` first so the image is available in conversation context.
+8. If the user asked for a photo, illustration, sprite, product image, banner, or other explicitly raster-style asset, use `image_gen` rather than substituting SVG/HTML/CSS placeholders. If the request is for an icon, logo, or UI graphic that should match existing repo-native SVG/vector/code assets, prefer editing those directly instead.
+9. Augment the prompt based on specificity:
+   - If the user's prompt is already specific and detailed, normalize it into a clear spec without adding creative requirements.
+   - If the user's prompt is generic, add tasteful augmentation only when it materially improves output quality.
+10. Use the built-in `image_gen` tool by default.
+11. For transparent-output requests, follow the transparent image guidance below: generate with built-in `image_gen` on a flat chroma-key background, copy the selected output into the workspace or `tmp/imagegen/`, run the installed `$CODEX_HOME/skills/.system/imagegen/scripts/remove_chroma_key.py` helper, and validate the alpha result before using it. If this path looks unsuitable or fails, ask before switching to CLI `gpt-image-1.5`.
+12. Inspect outputs and validate: subject, style, composition, text accuracy, and invariants/avoid items.
+13. Iterate with a single targeted change, then re-check.
+14. For preview-only work, render the image inline; the underlying file may remain at the default `$CODEX_HOME/generated_images/...` path.
+15. For project-bound work, move or copy the selected artifact into the workspace and update any consuming code or references. Never leave a project-referenced asset only at the default `$CODEX_HOME/generated_images/...` path.
+16. For batches or multi-asset requests, persist every requested deliverable final in the workspace unless the user explicitly asked to keep outputs preview-only. Discarded variants do not need to be kept unless requested.
+17. If the user explicitly chooses or confirms the CLI fallback, then use the fallback-only docs for model, quality, size, `input_fidelity`, masks, output format, output paths, and network setup.
+18. Always report the final saved path(s) for any workspace-bound asset(s), plus the final prompt or prompt set and whether the built-in tool or fallback CLI mode was used.
+
+## Transparent image requests
+
+Transparent-image requests still use built-in `image_gen` first. Because the built-in tool does not expose a true transparent-background control, create a removable chroma-key source image and then convert the key color to alpha locally.
+
+Default sequence:
+1. Use built-in `image_gen` to generate the requested subject on a perfectly flat solid chroma-key background.
+2. Choose a key color that is unlikely to appear in the subject: default `#00ff00`, use `#ff00ff` for green subjects, and avoid `#0000ff` for blue subjects.
+3. After generation, move or copy the selected source image from `$CODEX_HOME/generated_images/...` into the workspace or `tmp/imagegen/`.
+4. Run the installed helper path, not a project-relative script path:
+   ```bash
+   python "${CODEX_HOME:-$HOME/.codex}/skills/.system/imagegen/scripts/remove_chroma_key.py" \
+     --input <source> \
+     --out <final.png> \
+     --auto-key border \
+     --soft-matte \
+     --transparent-threshold 12 \
+     --opaque-threshold 220 \
+     --despill
+   ```
+5. Validate that the output has an alpha channel, transparent corners, plausible subject coverage, and no obvious key-color fringe. If a thin fringe remains, retry once with `--edge-contract 1`; use `--edge-feather 0.25` only when the edge is visibly stair-stepped and the subject is not shiny or reflective.
+6. Save the final alpha PNG/WebP in the project if the asset is project-bound. Never leave a project-referenced transparent asset only under `$CODEX_HOME/*`.
+
+Prompt transparent requests like this:
+
+```text
+Create the requested subject on a perfectly flat solid #00ff00 chroma-key background for background removal.
+The background must be one uniform color with no shadows, gradients, texture, reflections, floor plane, or lighting variation.
+Keep the subject fully separated from the background with crisp edges and generous padding.
+Do not use #00ff00 anywhere in the subject.
+No cast shadow, no contact shadow, no reflection, no watermark, and no text unless explicitly requested.
+```
+
+Do not automatically use CLI `gpt-image-1.5 --background transparent --output-format png` instead of chroma keying. Ask the user first when the user asks for true/native transparency, when local removal fails validation, or when the requested image is complex: hair, fur, feathers, smoke, glass, liquids, translucent materials, reflective objects, soft shadows, realistic product grounding, or subject colors that conflict with all practical key colors.
+
+Use a concise confirmation like:
+
+```text
+This likely needs true native transparency. The default built-in path uses a chroma-key background plus local removal, but true transparency requires the CLI fallback with gpt-image-1.5 because gpt-image-2 does not support background=transparent. It also requires OPENAI_API_KEY. Should I proceed with that CLI fallback?
+```
+
+## Prompt augmentation
+
+Reformat user prompts into a structured, production-oriented spec. Make the user's goal clearer and more actionable, but do not blindly add detail.
+
+Treat this as prompt-shaping guidance, not a closed schema. Use only the lines that help, and add a short extra labeled line when it materially improves clarity.
+
+### Specificity policy
+
+Use the user's prompt specificity to decide how much augmentation is appropriate:
+
+- If the prompt is already specific and detailed, preserve that specificity and only normalize/structure it.
+- If the prompt is generic, you may add tasteful augmentation when it will materially improve the result.
+
+Allowed augmentations:
+- composition or framing hints
+- polish level or intended-use hints
+- practical layout guidance
+- reasonable scene concreteness that supports the stated request
+
+Not allowed augmentations:
+- extra characters or objects that are not implied by the request
+- brand names, slogans, palettes, or narrative beats that are not implied
+- arbitrary side-specific placement unless the surrounding layout supports it
+
+## Use-case taxonomy (exact slugs)
+
+Classify each request into one of these buckets and keep the slug consistent across prompts and references.
+
+Generate:
+- photorealistic-natural — candid/editorial lifestyle scenes with real texture and natural lighting.
+- product-mockup — product/packaging shots, catalog imagery, merch concepts.
+- ui-mockup — app/web interface mockups and wireframes; specify the desired fidelity.
+- infographic-diagram — diagrams/infographics with structured layout and text.
+- scientific-educational — classroom explainers, scientific diagrams, and learning visuals with required labels and accuracy constraints.
+- ads-marketing — campaign concepts and ad creatives with audience, brand position, scene, and exact tagline/copy.
+- productivity-visual — slide, chart, workflow, and data-heavy business visuals.
+- logo-brand — logo/mark exploration, vector-friendly.
+- illustration-story — comics, children’s book art, narrative scenes.
+- stylized-concept — style-driven concept art, 3D/stylized renders.
+- historical-scene — period-accurate/world-knowledge scenes.
+
+Edit:
+- text-localization — translate/replace in-image text, preserve layout.
+- identity-preserve — try-on, person-in-scene; lock face/body/pose.
+- precise-object-edit — remove/replace a specific element (including interior swaps).
+- lighting-weather — time-of-day/season/atmosphere changes only.
+- background-extraction — transparent background / clean cutout. Use built-in `image_gen` with chroma-key removal first for simple opaque subjects; ask before using CLI true transparency for complex subjects.
+- style-transfer — apply reference style while changing subject/scene.
+- compositing — multi-image insert/merge with matched lighting/perspective.
+- sketch-to-render — drawing/line art to photoreal render.
+
+## Shared prompt schema
+
+Use the following labeled spec as shared prompt scaffolding for both top-level modes:
+
+```text
+Use case: <taxonomy slug>
+Asset type: <where the asset will be used>
+Primary request: <user's main prompt>
+Input images: <Image 1: role; Image 2: role> (optional)
+Scene/backdrop: <environment>
+Subject: <main subject>
+Style/medium: <photo/illustration/3D/etc>
+Composition/framing: <wide/close/top-down; placement>
+Lighting/mood: <lighting + mood>
+Color palette: <palette notes>
+Materials/textures: <surface details>
+Text (verbatim): "<exact text>"
+Constraints: <must keep/must avoid>
+Avoid: <negative constraints>
+```
+
+Notes:
+- `Asset type` and `Input images` are prompt scaffolding, not dedicated CLI flags.
+- `Scene/backdrop` refers to the visual setting. It is not the same as the fallback CLI `background` parameter, which controls output transparency behavior.
+- Fallback-only execution notes such as `Quality:`, `Input fidelity:`, masks, output format, and output paths belong in the CLI path only. Do not treat them as built-in `image_gen` tool arguments.
+
+Augmentation rules:
+- Keep it short.
+- Add only the details needed to improve the prompt materially.
+- For edits, explicitly list invariants (`change only X; keep Y unchanged`).
+- If any critical detail is missing and blocks success, ask a question; otherwise proceed.
+
+exec
+/bin/zsh -lc "find raw/dorf assets/dorf -maxdepth 1 -type f -print | sort && sed -n '1,220p' tools/cutout.py" in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 0ms:
+assets/dorf/.DS_Store
+assets/dorf/aim_0.png
+assets/dorf/aim_1.png
+assets/dorf/defeat_0.png
+assets/dorf/defeat_1.png
+assets/dorf/idle_0.png
+assets/dorf/idle_1.png
+assets/dorf/idle_face_0.png
+assets/dorf/jump_0.png
+assets/dorf/jump_1.png
+assets/dorf/jump_2.png
+assets/dorf/manifest.json
+assets/dorf/panic_0.png
+assets/dorf/panic_1.png
+assets/dorf/receive_0.png
+assets/dorf/receive_1.png
+assets/dorf/smash_0.png
+assets/dorf/smash_1.png
+assets/dorf/smash_2.png
+assets/dorf/super_0.png
+assets/dorf/super_1.png
+assets/dorf/super_2.png
+assets/dorf/super_3.png
+assets/dorf/victory_0.png
+assets/dorf/victory_1.png
+assets/dorf/walk_0.png
+assets/dorf/walk_1.png
+assets/dorf/walk_2.png
+assets/dorf/walk_3.png
+raw/dorf/.DS_Store
+raw/dorf/_regen_codex_log.txt
+raw/dorf/_regen_codex_prompt.md
+raw/dorf/aim_0.png
+raw/dorf/aim_1.png
+raw/dorf/defeat_0.png
+raw/dorf/defeat_1.png
+raw/dorf/idle_0.png
+raw/dorf/idle_1.png
+raw/dorf/idle_face_0.png
+raw/dorf/jump_0.png
+raw/dorf/jump_1.png
+raw/dorf/jump_2.png
+raw/dorf/panic_0.png
+raw/dorf/panic_1.png
+raw/dorf/prompts.md
+raw/dorf/receive_0.png
+raw/dorf/receive_1.png
+raw/dorf/smash_0.png
+raw/dorf/smash_1.png
+raw/dorf/smash_2.png
+raw/dorf/super_0.png
+raw/dorf/super_1.png
+raw/dorf/super_2.png
+raw/dorf/super_3.png
+raw/dorf/victory_0.png
+raw/dorf/victory_1.png
+raw/dorf/walk_0.png
+raw/dorf/walk_1.png
+#!/usr/bin/env python3
+"""Détourage anti-aliasé + ancrage pieds — pipeline Sommet Volley (Phase 2).
+
+Usage:
+  python3 tools/cutout.py raw/volkoi assets/vladou
+
+Entrée : PNG fond blanc (raw/<key>/*.png)
+Sortie : PNG détourés + _contact.png (planche de contrôle)
+"""
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+try:
+    from PIL import Image, ImageDraw, ImageFilter
+except ImportError:
+    print("Installe Pillow : pip install Pillow", file=sys.stderr)
+    sys.exit(1)
+
+WHITE_THR = 245          # au-dessus = candidat fond (mode blanc, legacy)
+ALPHA_RAMP = 18          # largeur de rampe anti-alias (px distance)
+FOOT_ALIGN = True
+STAND_H = 512            # hauteur normalisée debout
+MARGIN = 0.04
+
+# ---------- Chroma key MAGENTA (#FF00FF) ----------
+# Standard de génération : fond magenta uni → le blanc/clair des vêtements et
+# drapeaux n'est JAMAIS confondu avec le fond (fini le blanc-sur-blanc). Le
+# magenta (r ET b hauts, g bas) n'existe sur aucun perso/prop ; le violet du
+# Sultan (r≈106) passe SOUS le seuil r≥150 → épargné. Auto-détecté : si le fond
+# n'est pas magenta, on retombe sur le keying blanc historique.
+def is_chroma_bg(im: Image.Image) -> bool:
+    rgba = im.convert("RGBA"); w, h = rgba.size; px = rgba.load()
+    def ism(x, y):
+        r, g, b, a = px[x, y]
+        return a > 10 and r > 170 and b > 170 and g < 110
+    corners = [(1, 1), (w - 2, 1), (1, h - 2), (w - 2, h - 2)]
+    return sum(ism(x, y) for x, y in corners) >= 3
+
+def chroma_key_magenta(im: Image.Image) -> Image.Image:
+    """Rend transparent le fond magenta + despill du liseré (anti-aliasé).
+    Ne touche PAS aux couleurs non-magenta (peau, rouge, bleu, violet, olive…)."""
+    rgba = im.convert("RGBA"); w, h = rgba.size; px = rgba.load()
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a == 0:
+                continue
+            mag = min(r, b) - g            # dominance magenta (r&b hauts, g bas)
+            if r >= 170 and b >= 170 and g <= 110:       # fond magenta franc
+                px[x, y] = (r, g, b, 0)
+            elif r >= 140 and b >= 140 and mag > 25:      # frange : despill + alpha
+                na = int(a * (1.0 - min(1.0, (mag - 25) / 55.0)))
+                g2 = min(min(r, b), g + (min(r, b) - g) // 2)  # remonte le vert → tue le magenta
+                px[x, y] = (r, g2, b, max(0, min(a, na)))
+    return rgba
+
+
+def flood_bg_mask(im: Image.Image, soft: bool = True) -> Image.Image:
+    """Masque du fond : flood fill depuis les bords (protège blancs internes).
+
+    soft=False → masque binaire (drapeaux/props : moins de liseré blanc).
+    """
+    rgba = im.convert("RGBA")
+    w, h = rgba.size
+    px = rgba.load()
+    # seed : pixels quasi-blancs sur le bord
+    from collections import deque
+    seen = [[False] * w for _ in range(h)]
+    q = deque()
+
+    def is_white(x, y):
+        r, g, b, a = px[x, y]
+        return a > 10 and r >= WHITE_THR and g >= WHITE_THR and b >= WHITE_THR
+
+    for x in range(w):
+        for y in (0, h - 1):
+            if is_white(x, y) and not seen[y][x]:
+                seen[y][x] = True
+                q.append((x, y))
+    for y in range(h):
+        for x in (0, w - 1):
+            if is_white(x, y) and not seen[y][x]:
+                seen[y][x] = True
+                q.append((x, y))
+
+    while q:
+        x, y = q.popleft()
+        for nx, ny in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+            if 0 <= nx < w and 0 <= ny < h and not seen[ny][nx] and is_white(nx, ny):
+                seen[ny][nx] = True
+                q.append((nx, ny))
+
+    mask = Image.new("L", (w, h), 0)
+    mp = mask.load()
+    for y in range(h):
+        for x in range(w):
+            if seen[y][x]:
+                mp[x, y] = 255
+    if soft:
+        return mask.filter(ImageFilter.GaussianBlur(radius=ALPHA_RAMP / 3))
+    return mask
+
+
+def remove_orphan_blobs(im: Image.Image, min_keep: int = 80) -> Image.Image:
+    """Supprime les îlots opaques minuscules (poussière / croix résiduelles)."""
+    from collections import deque
+    out = im.convert("RGBA")
+    w, h = out.size
+    px = out.load()
+    seen = [[False] * w for _ in range(h)]
+    components = []
+    for y in range(h):
+        for x in range(w):
+            if seen[y][x] or px[x, y][3] < 40:
+                continue
+            q = deque([(x, y)])
+            seen[y][x] = True
+            cells = []
+            while q:
+                cx, cy = q.popleft()
+                cells.append((cx, cy))
+                for nx, ny in ((cx - 1, cy), (cx + 1, cy), (cx, cy - 1), (cx, cy + 1)):
+                    if 0 <= nx < w and 0 <= ny < h and not seen[ny][nx] and px[nx, ny][3] >= 40:
+                        seen[ny][nx] = True
+                        q.append((nx, ny))
+            components.append(cells)
+    if not components:
+        return out
+    components.sort(key=len, reverse=True)
+    main = len(components[0])
+    for cells in components[1:]:
+        if len(cells) < min_keep or len(cells) < main * 0.02:
+            for x, y in cells:
+                r, g, b, _ = px[x, y]
+                px[x, y] = (r, g, b, 0)
+    return out
+
+
+def punch_enclosed_white(
+    im: Image.Image,
+    thr: int = 250,
+    min_size: int = 300,
+    max_size: int = 11000,
+) -> Image.Image:
+    """Percer les îlots de blanc ENFERMÉS hors torse (bras/jambes), pas la chemise.
+
+    La chemise / kurta blanche est aussi un îlot enfermé : on ne perce que les
+    composantes dans les zones de trou (dos/bras arrière, entre-jambes), avec
+    un plafond de taille pour ne pas manger un pantalon / plastron blanc.
+    """
+    from collections import deque
+    out = im.convert("RGBA")
+    w, h = out.size
+    px = out.load()
+
+    # bbox du personnage (non-blanc)
+    xs, ys = [], []
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a < 8:
+                continue
+            if r < thr - 5 or g < thr - 5 or b < thr - 5:
+                xs.append(x)
+                ys.append(y)
+    if not xs:
+        return out
+    left, right, top, bot = min(xs), max(xs), min(ys), max(ys)
+    bw, bh = max(1, right - left), max(1, bot - top)
+
+    seen = [[False] * w for _ in range(h)]
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if seen[y][x] or a < 8 or not (r >= thr and g >= thr and b >= thr):
+                continue
+            q = deque([(x, y)])
+            seen[y][x] = True
+            cells = []
+            touch_border = False
+            while q:
+                cx, cy = q.popleft()
+                cells.append((cx, cy))
+                if cx == 0 or cy == 0 or cx == w - 1 or cy == h - 1:
+                    touch_border = True
+                for nx, ny in ((cx - 1, cy), (cx + 1, cy), (cx, cy - 1), (cx, cy + 1)):
+                    if 0 <= nx < w and 0 <= ny < h and not seen[ny][nx]:
+                        rr, gg, bb, aa = px[nx, ny]
+                        if aa >= 8 and rr >= thr and gg >= thr and bb >= thr:
+                            seen[ny][nx] = True
+                            q.append((nx, ny))
+            n = len(cells)
+            if touch_border or n < min_size or n > max_size:
+                continue
+            xs_c = [p[0] for p in cells]
+            ys_c = [p[1] for p in cells]
+            cx = sum(xs_c) // n
+            cy = sum(ys_c) // n
+            iw = max(xs_c) - min(xs_c) + 1
+            ih = max(ys_c) - min(ys_c) + 1
+            rel_x = (cx - left) / bw
+            rel_y = (cy - top) / bh
+            # entre jambes uniquement (les « trous bras » mangent les manches
+            # blanches type kurta — le flood fill suffit pour les aisselles ouvertes)
+            between_legs = (
+                0.38 < rel_x < 0.62
+                and 0.65 < rel_y < 0.92
+                and iw < bw * 0.42
+                and ih > iw * 0.45
+            )
+            # Crook bras/torse fermé (ex. défaite à genoux) : gros îlot blanc
+            # latéral enfermé — distinct des manchettes (<< 800 px).
+            arm_gap = (
+                not between_legs
+                and 800 <= n <= 4500
+                and iw < bw * 0.40
+                and ih < bh * 0.40
+                and 0.30 < rel_y < 0.78
+
+codex
+La référence est bien lisible et le pipeline accepte déjà le magenta. Je lance maintenant les poses comme des dérivations directes de `idle_1` (référence d’identité), avec un prompt commun strict et seulement la pose qui change d’une frame à l’autre.
+exec
+/bin/zsh -lc "find /Users/benjaminmille/.codex/generated_images -type f -name '*.png' -mmin -10 -print0 | xargs -0 ls -lt" in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 0ms:
+-rw-r--r--@ 1 benjaminmille  staff  1533426 Jul 25 18:21 /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-37a0e856-ca8b-4c56-becf-d28aa029e100.png
+-rw-r--r--@ 1 benjaminmille  staff  1398191 Jul 25 18:20 /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-3ba08706-4402-444b-a26d-9565209618c8.png
+-rw-r--r--@ 1 benjaminmille  staff  1396816 Jul 25 18:19 /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-8b45d1fa-a835-4602-a2ac-22630124162c.png
+-rw-r--r--@ 1 benjaminmille  staff  1584748 Jul 25 18:18 /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-e7abec9f-6a69-4645-b9a1-d56e6d20e1cc.png
+
+exec
+/bin/zsh -lc 'which magick || which montage' in /Users/benjaminmille/Downloads/sommet-volley
+ exited 1 in 0ms:
+magick not found
+montage not found
+
+exec
+/bin/zsh -lc "python3 - <<'PY'
+from PIL import Image,ImageDraw
+from pathlib import Path
+fs=sorted(Path('/Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e').glob('*.png'),key=lambda p:p.stat().st_mtime)
+thumbs=[]
+for p in fs:
+ im=Image.open(p).convert('RGB'); im.thumbnail((260,260)); thumbs.append((p,im.copy()))
+out=Image.new('RGB',(520,600),'white'); d=ImageDraw.Draw(out)
+for i,(p,im) in enumerate(thumbs):
+ x=(i%2)*260;y=(i//2)*300;out.paste(im,(x,y));d.text((x+5,y+265),p.name,fill='black')
+out.save('/tmp/dorf_batch1.jpg')
+PY" in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 246ms:
+exec
+/bin/zsh -lc 'mkdir -p raw/dorf && cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-e7abec9f-6a69-4645-b9a1-d56e6d20e1cc.png raw/dorf/idle_face_0.png && cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-37a0e856-ca8b-4c56-becf-d28aa029e100.png raw/dorf/idle_0.png && cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-3ba08706-4402-444b-a26d-9565209618c8.png raw/dorf/walk_0.png && cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-8b45d1fa-a835-4602-a2ac-22630124162c.png raw/dorf/walk_1.png' in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 0ms:
+exec
+/bin/zsh -lc 'cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-27bf3f99-2582-4135-b890-02a0eecc710e.png raw/dorf/walk_2.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-987f5f8d-276a-4526-aaed-7bb9b4447150.png raw/dorf/walk_3.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-b23b9a70-6a50-4754-83b5-1f53ddb49f6d.png raw/dorf/jump_0.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-13bfdb6f-1341-43fb-b42f-30feea825cd5.png raw/dorf/jump_1.png' in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 0ms:
+codex
+Les quatre premières variantes et les deux premières phases de saut sont générées et rangées. Les poses de marche sont explicitement alternées gauche/droite et les passages sont traités comme des poses en mouvement, pas comme des idles.
+exec
+/bin/zsh -lc 'cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-c128828b-66a4-4f6e-b23e-19515d65fb17.png raw/dorf/jump_2.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-1170dcb6-d8b3-467e-9418-3f2305e0edbd.png raw/dorf/receive_0.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-f0413f98-7b22-41fc-a69a-5d805c632a73.png raw/dorf/receive_1.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-38088429-0991-4a1b-9205-bbbff41222a3.png raw/dorf/aim_0.png' in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 0ms:
+exec
+/bin/zsh -lc 'cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-d7e14c2f-53e4-4a27-8fc8-8d0e6f05c757.png raw/dorf/aim_1.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-deb99442-08ea-42aa-8768-6b1a0e017fc6.png raw/dorf/smash_0.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-02e51958-5413-4cdb-9295-c3561f813400.png raw/dorf/smash_1.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-2ef92f1d-af56-4765-9555-058d34b4d995.png raw/dorf/smash_2.png' in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 0ms:
+exec
+/bin/zsh -lc 'cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-46597e80-048e-4126-99eb-f55621504130.png raw/dorf/super_0.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-9716c8b5-bf3f-4ce4-add8-9dfe15eeca83.png raw/dorf/super_1.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-b82f0674-a620-4c82-84a5-b05610f9b9b9.png raw/dorf/super_2.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-179d97fd-641e-46bd-a53b-834281504e19.png raw/dorf/super_3.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-f78598fc-25c3-4e25-9856-8d726db80d9d.png raw/dorf/panic_0.png' in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 0ms:
+exec
+/bin/zsh -lc "cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-d4922495-9dbc-40fc-a0af-7efeff21914c.png raw/dorf/panic_1.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-bdf5204f-fe1f-4792-857d-1a10bd9ce5dc.png raw/dorf/victory_0.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-b286c65f-609d-4de7-b171-2a43f44811ac.png raw/dorf/victory_1.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-23b4136d-2d36-4ae7-a928-bf804d3f9e8d.png raw/dorf/defeat_0.png
+cp /Users/benjaminmille/.codex/generated_images/019f9a10-a585-76a1-beff-0962264c593e/exec-bcb42bfc-c090-4933-b5d3-415a08d5d53a.png raw/dorf/defeat_1.png
+rg -n \"glob|manifest|idle_1|for .*png\" tools/cutout.py | tail -40
+shasum -a 256 raw/dorf/idle_1.png assets/dorf/idle_1.png
+find raw/dorf -maxdepth 1 -type f -name '*.png' | wc -l" in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 0ms:
+692:    for src in sorted(raw_dir.glob("*.png")):
+d610827d56c4a1b6327b37378cf9ffe7e766ef2d5650c00e66c62df089a4462e  raw/dorf/idle_1.png
+d610827d56c4a1b6327b37378cf9ffe7e766ef2d5650c00e66c62df089a4462e  assets/dorf/idle_1.png
+      27
+
+codex
+Les 26 sources sont maintenant présentes dans `raw/dorf`. Avant le détourage, je protège explicitement les deux `idle_1.png` par empreinte SHA-256 et j’exclus temporairement la source de la boucle, afin que la commande demandée ne puisse pas réécrire la frame de vérité.
+exec
+/bin/zsh -lc 'tmp_idle=$(mktemp /tmp/dorf_idle_1.XXXXXX.png)
+mv raw/dorf/idle_1.png "$tmp_idle"
+python3 tools/cutout.py raw/dorf assets/dorf
+mv "$tmp_idle" raw/dorf/idle_1.png
+shasum -a 256 raw/dorf/idle_1.png assets/dorf/idle_1.png
+cat assets/dorf/manifest.json' in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 8571ms:
+  aim_0.png → assets/dorf/aim_0.png [chroma]
+  aim_1.png → assets/dorf/aim_1.png [chroma]
+  defeat_0.png → assets/dorf/defeat_0.png [chroma]
+  defeat_1.png → assets/dorf/defeat_1.png [chroma]
+  idle_0.png → assets/dorf/idle_0.png [chroma]
+  idle_face_0.png → assets/dorf/idle_face_0.png [chroma]
+  jump_0.png → assets/dorf/jump_0.png [chroma]
+  jump_1.png → assets/dorf/jump_1.png [chroma]
+  jump_2.png → assets/dorf/jump_2.png [chroma]
+  panic_0.png → assets/dorf/panic_0.png [chroma]
+  panic_1.png → assets/dorf/panic_1.png [chroma]
+  receive_0.png → assets/dorf/receive_0.png [chroma]
+  receive_1.png → assets/dorf/receive_1.png [chroma]
+  smash_0.png → assets/dorf/smash_0.png [chroma]
+  smash_1.png → assets/dorf/smash_1.png [chroma]
+  smash_2.png → assets/dorf/smash_2.png [chroma]
+  super_0.png → assets/dorf/super_0.png [chroma]
+  super_1.png → assets/dorf/super_1.png [chroma]
+  super_2.png → assets/dorf/super_2.png [chroma]
+  super_3.png → assets/dorf/super_3.png [chroma]
+  victory_0.png → assets/dorf/victory_0.png [chroma]
+  victory_1.png → assets/dorf/victory_1.png [chroma]
+  walk_0.png → assets/dorf/walk_0.png [chroma]
+  walk_1.png → assets/dorf/walk_1.png [chroma]
+  walk_2.png → assets/dorf/walk_2.png [chroma]
+  walk_3.png → assets/dorf/walk_3.png [chroma]
+  planche → assets/dorf/_contact.png
+d610827d56c4a1b6327b37378cf9ffe7e766ef2d5650c00e66c62df089a4462e  raw/dorf/idle_1.png
+d610827d56c4a1b6327b37378cf9ffe7e766ef2d5650c00e66c62df089a4462e  assets/dorf/idle_1.png
+{
+  "anims": {
+    "idle_face": 1,
+    "idle": 1,
+    "walk": 4,
+    "jump": 3,
+    "receive": 1,
+    "aim": 2,
+    "smash": 3,
+    "super": 4,
+    "panic": 1,
+    "victory": 1,
+    "defeat": 1
+  },
+  "baseH": 110,
+  "footPad": 2,
+  "lockAspect": 0.49,
+  "serveHands": {
+    "dx": 19.8,
+    "dy": -32.9
+  }
+}
+exec
+/bin/zsh -lc "sed -n '650,760p' tools/cutout.py && git status --short && python3 - <<'PY'
+from PIL import Image
+from pathlib import Path
+for d in ('raw/dorf','assets/dorf'):
+ print(d)
+ for p in sorted(Path(d).glob('*.png')):
+  if p.name=='_contact.png': continue
+  im=Image.open(p)
+  print(p.name, im.size, im.mode)
+PY" in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 0ms:
+        # (surtout PAS le despill blanc, qui mangerait vêtements/cheveux clairs)
+        norm = chroma_key_magenta(norm)
+    else:
+        # protéger tissus/cheveux blancs (Gourou, chemise, etc.)
+        norm = despill_white_fringe(norm, protect_white_fabric=True)
+        norm = choke_light_silhouette(norm, protect_white_fabric=True)
+    norm = remove_foot_shadow(norm)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    norm.save(dst)
+    print(f"  {src.name} → {dst}{' [chroma]' if chroma else ''}")
+
+
+def contact_sheet(paths, out: Path, cols=6):
+    imgs = [Image.open(p) for p in paths if p.exists()]
+    if not imgs:
+        return
+    tw, th = imgs[0].size
+    rows = (len(imgs) + cols - 1) // cols
+    sheet = Image.new("RGBA", (cols * tw, rows * th), (40, 40, 48, 255))
+    for i, im in enumerate(imgs):
+        x, y = (i % cols) * tw, (i // cols) * th
+        sheet.paste(im, (x, y), im)
+    sheet.save(out)
+    print(f"  planche → {out}")
+
+
+def main():
+    if len(sys.argv) < 3:
+        print(__doc__)
+        sys.exit(1)
+    raw_dir, out_dir = Path(sys.argv[1]), Path(sys.argv[2])
+    # Props maps : flag / warn / flower… — le reste passe en perso
+    PROP_NAMES = {
+        "flag", "warn", "flower", "palm", "net_post", "cart_0", "cart_1",
+        "cannon", "cannon_fire", "snowman", "radar_0", "radar_1", "pigeon",
+        "lantern", "carpet", "cow", "macaw", "whistle", "marchers_0", "marchers_1",
+        "falcon", "peacock",
+    }
+    # Drapeaux avec bandes blanches (FR / US / RU…) : ne pas percer les îlots.
+    # Les autres (matin, bebe, ashram…) : percer le blanc entre mât et toile.
+    FLAG_KEEP_WHITE_MAPS = {"dorf", "country-club-dore", "cygne", "palais-du-coq", "volkoi", "place-ecarlate", "pont-des-deux-mondes"}
+    outs = []
+    for src in sorted(raw_dir.glob("*.png")):
+        if src.name.startswith("_"):
+            continue
+        dst = out_dir / src.name
+        stem = src.stem
+        if stem in PROP_NAMES or src.name in {n + ".png" for n in PROP_NAMES}:
+            keep_w = stem == "flag" and raw_dir.name in FLAG_KEEP_WHITE_MAPS
+            process_prop(src, dst, preserve_white=keep_w)
+        else:
+            process_one(src, dst)
+        outs.append(dst)
+    contact_sheet(outs, out_dir / "_contact.png")
+
+
+if __name__ == "__main__":
+    main()
+ M assets/dorf/aim_0.png
+ M assets/dorf/aim_1.png
+ M assets/dorf/defeat_0.png
+ M assets/dorf/defeat_1.png
+ M assets/dorf/idle_0.png
+ M assets/dorf/idle_face_0.png
+ M assets/dorf/jump_0.png
+ M assets/dorf/jump_1.png
+ M assets/dorf/jump_2.png
+ M assets/dorf/panic_0.png
+ M assets/dorf/panic_1.png
+ M assets/dorf/receive_0.png
+ M assets/dorf/receive_1.png
+ M assets/dorf/smash_0.png
+ M assets/dorf/smash_1.png
+ M assets/dorf/smash_2.png
+ M assets/dorf/super_0.png
+ M assets/dorf/super_1.png
+ M assets/dorf/super_2.png
+ M assets/dorf/super_3.png
+ M assets/dorf/victory_0.png
+ M assets/dorf/victory_1.png
+ M assets/dorf/walk_0.png
+ M assets/dorf/walk_1.png
+ M assets/dorf/walk_2.png
+ M assets/dorf/walk_3.png
+ M assets/maps/country-club-dore/cart_0.png
+ M assets/maps/country-club-dore/cart_1.png
+?? assets/_bak_bebe_pre_chatgpt_2026-07-25/
+?? assets/_bak_panda_pre_chatgpt_2026-07-25/
+?? assets/dorf/_contact.png
+?? assets/maps/country-club-dore/_bak_cart_pre_2026-07-25/
+?? raw/_bak_bebe_pre_chatgpt_2026-07-25/
+?? raw/dorf/_regen_codex_log.txt
+?? raw/dorf/_regen_codex_prompt.md
+raw/dorf
+aim_0.png (835, 1883) RGB
+aim_1.png (837, 1879) RGB
+defeat_0.png (1024, 1536) RGB
+defeat_1.png (1023, 1537) RGB
+idle_0.png (1024, 1536) RGB
+idle_1.png (243, 536) RGBA
+idle_face_0.png (1086, 1448) RGB
+jump_0.png (1023, 1537) RGB
+jump_1.png (831, 1893) RGB
+jump_2.png (842, 1869) RGB
+panic_0.png (1024, 1536) RGB
+panic_1.png (1047, 1503) RGB
+receive_0.png (1024, 1536) RGB
+receive_1.png (931, 1690) RGB
+smash_0.png (1026, 1532) RGB
+smash_1.png (841, 1870) RGB
+smash_2.png (1024, 1536) RGB
+super_0.png (1027, 1531) RGB
+super_1.png (842, 1869) RGB
+super_2.png (1006, 1563) RGB
+super_3.png (1026, 1533) RGB
+victory_0.png (842, 1869) RGB
+victory_1.png (835, 1883) RGB
+walk_0.png (1024, 1535) RGB
+walk_1.png (1054, 1492) RGB
+walk_2.png (1023, 1537) RGB
+walk_3.png (846, 1859) RGB
+assets/dorf
+aim_0.png (244, 536) RGBA
+aim_1.png (265, 536) RGBA
+defeat_0.png (273, 536) RGBA
+defeat_1.png (362, 536) RGBA
+idle_0.png (231, 536) RGBA
+idle_1.png (243, 536) RGBA
+idle_face_0.png (385, 536) RGBA
+jump_0.png (471, 536) RGBA
+jump_1.png (283, 536) RGBA
+jump_2.png (288, 536) RGBA
+panic_0.png (362, 536) RGBA
+panic_1.png (400, 536) RGBA
+receive_0.png (311, 536) RGBA
+receive_1.png (359, 536) RGBA
+smash_0.png (354, 536) RGBA
+smash_1.png (340, 536) RGBA
+smash_2.png (330, 536) RGBA
+super_0.png (397, 536) RGBA
+super_1.png (276, 536) RGBA
+super_2.png (400, 536) RGBA
+super_3.png (427, 536) RGBA
+victory_0.png (289, 536) RGBA
+victory_1.png (301, 536) RGBA
+walk_0.png (319, 536) RGBA
+walk_1.png (267, 536) RGBA
+walk_2.png (315, 536) RGBA
+walk_3.png (243, 536) RGBA
+
+exec
+/bin/zsh -lc "rg -n '\"anims\"|\"walk\"|receive.*2|panic.*2' assets/*/manifest.json | head -80 && rg -n 'manifest.json|anims\\[' src game scripts . 2>/dev/null | head -100" in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 0ms:
+assets/safran/manifest.json:2:  "anims": {
+assets/safran/manifest.json:5:    "walk": 4,
+assets/safran/manifest.json:7:    "receive": 2,
+assets/safran/manifest.json:11:    "panic": 2,
+assets/_bak_bebe_pre_chatgpt_2026-07-25/manifest.json:2:  "anims": {
+assets/_bak_bebe_pre_chatgpt_2026-07-25/manifest.json:5:    "walk": 4,
+assets/_bak_bebe_pre_chatgpt_2026-07-25/manifest.json:7:    "receive": 2,
+assets/_bak_bebe_pre_chatgpt_2026-07-25/manifest.json:11:    "panic": 2,
+assets/dorf/manifest.json:2:  "anims": {
+assets/dorf/manifest.json:5:    "walk": 4,
+assets/_bak_panda_pre_chatgpt_2026-07-25/manifest.json:2:  "anims": {
+assets/_bak_panda_pre_chatgpt_2026-07-25/manifest.json:5:    "walk": 4,
+assets/_bak_panda_pre_chatgpt_2026-07-25/manifest.json:7:    "receive": 2,
+assets/_bak_panda_pre_chatgpt_2026-07-25/manifest.json:11:    "panic": 2,
+assets/sultan/manifest.json:2:  "anims": {
+assets/sultan/manifest.json:5:    "walk": 4,
+assets/sultan/manifest.json:7:    "receive": 2,
+assets/sultan/manifest.json:11:    "panic": 2,
+assets/capitaine/manifest.json:2:  "anims": {
+assets/capitaine/manifest.json:5:    "walk": 4,
+assets/capitaine/manifest.json:7:    "receive": 2,
+assets/capitaine/manifest.json:11:    "panic": 2,
+assets/faucon/manifest.json:2:  "anims": {
+assets/faucon/manifest.json:5:    "walk": 4,
+assets/faucon/manifest.json:7:    "receive": 2,
+assets/faucon/manifest.json:11:    "panic": 2,
+assets/timonier/manifest.json:2:  "anims": {
+assets/timonier/manifest.json:5:    "walk": 4,
+assets/timonier/manifest.json:7:    "receive": 2,
+assets/timonier/manifest.json:11:    "panic": 2,
+assets/cygne/manifest.json:2:  "anims": {
+assets/cygne/manifest.json:5:    "walk": 4,
+assets/cygne/manifest.json:7:    "receive": 2,
+assets/cygne/manifest.json:11:    "panic": 2,
+assets/volkoi/manifest.json:2:  "anims": {
+assets/volkoi/manifest.json:5:    "walk": 4,
+assets/volkoi/manifest.json:7:    "receive": 2,
+assets/volkoi/manifest.json:11:    "panic": 2,
+assets/bebe/manifest.json:2:  "anims": {
+assets/bebe/manifest.json:5:    "walk": 4,
+assets/bebe/manifest.json:7:    "receive": 2,
+assets/bebe/manifest.json:11:    "panic": 2,
+assets/gourou/manifest.json:2:  "anims": {
+assets/gourou/manifest.json:5:    "walk": 4,
+assets/gourou/manifest.json:7:    "receive": 2,
+assets/gourou/manifest.json:11:    "panic": 2,
+src/char-sprites.js:14:  return "assets/" + key + "/manifest.json";
+src/char-sprites.js:25:    const n = anims[anim] | 0;
+./src/char-sprites.js:14:  return "assets/" + key + "/manifest.json";
+./src/char-sprites.js:25:    const n = anims[anim] | 0;
+./docs/PIPELINE-MAP.md:189:`manifest.json` (`event`) + chargement dans `initMap*()` / `assets.js`.
+./docs/PIPELINE-MAP.md:195:- [ ] `assets/maps/<key>/` : skyline (+ props) + `manifest.json`
+./tests/game.test.js:242:    const man = path.join(root, d, "manifest.json");
+./docs/PIPELINE-ASSETS.md:24:   - persos : `tools/cutout.py` (détourage/ancrage) → `manifest.json` → roster
+src/net.js:677:    anims[s] = a;
+src/net.js:681:    b.charId = anims[s];
+./docs/PIPELINE-PERSONNAGE.md:127:1. `assets/<key>/manifest.json` :
+./src/net.js:677:    anims[s] = a;
+./src/net.js:681:    b.charId = anims[s];
+./raw/dorf/_regen_codex_log.txt:90:Puis vérifie que `assets/dorf/manifest.json` a `walk: 4` et les comptes d’anims canoniques.
+./raw/dorf/_regen_codex_log.txt:353:assets/dorf/manifest.json
+./raw/dorf/_regen_codex_log.txt:704:cat assets/dorf/manifest.json' in /Users/benjaminmille/Downloads/sommet-volley
+./raw/dorf/_regen_codex_prompt.md:77:Puis vérifie que `assets/dorf/manifest.json` a `walk: 4` et les comptes d’anims canoniques.
+
+exec
+/bin/zsh -lc 'cat assets/safran/manifest.json' in /Users/benjaminmille/Downloads/sommet-volley
+ succeeded in 0ms:
+{
+  "anims": {
+    "idle_face": 1,
+    "idle": 1,
+    "walk": 4,
+    "jump": 3,
+    "receive": 2,
+    "aim": 2,
+    "smash": 3,
+    "super": 4,
+    "panic": 2,
+    "victory": 2,
+    "defeat": 2
+  },
+  "baseH": 110,
+  "footPad": 2,
+  "lockAspect": 0.52,
+  "serveHands": {
+    "dx": 19.8,
+    "dy": -32.9
+  },
+  "notes": "Full 27-frame regen casting look (2026-07-22), walk\u00d74 distinct, Voile d'Or super."
+}
+
+apply patch
+patch: completed
+/Users/benjaminmille/Downloads/sommet-volley/assets/dorf/manifest.json
+diff --git a/assets/dorf/manifest.json b/assets/dorf/manifest.json
+index 93149af987ca2c216d0f7850dcb61496acc11e79..c0f9a9ee309282c792450fcbb1908d506919b40c
+--- a/assets/dorf/manifest.json
++++ b/assets/dorf/manifest.json
+@@ -4,13 +4,13 @@
+     "idle": 1,
+     "walk": 4,
+     "jump": 3,
+-    "receive": 1,
++    "receive": 2,
+     "aim": 2,
+     "smash": 3,
+     "super": 4,
+-    "panic": 1,
+-    "victory": 1,
+-    "defeat": 1
++    "panic": 2,
++    "victory": 2,
++    "defeat": 2
+   },
+   "baseH": 110,
+   "footPad": 2,
+@@ -19,4 +19,4 @@
+     "dx": 19.8,
+     "dy": -32.9
+   }
+-}
+\ No newline at end of file
++}
+
+diff --git a/assets/dorf/manifest.json b/assets/dorf/manifest.json
+index 93149af987ca2c216d0f7850dcb61496acc11e79..c0f9a9ee309282c792450fcbb1908d506919b40c
+--- a/assets/dorf/manifest.json
++++ b/assets/dorf/manifest.json
+@@ -4,13 +4,13 @@
+     "idle": 1,
+     "walk": 4,
+     "jump": 3,
+-    "receive": 1,
++    "receive": 2,
+     "aim": 2,
+     "smash": 3,
+     "super": 4,
+-    "panic": 1,
+-    "victory": 1,
+-    "defeat": 1
++    "panic": 2,
++    "victory": 2,
++    "defeat": 2
+   },
+   "baseH": 110,
+   "footPad": 2,
+@@ -19,4 +19,4 @@
+     "dx": 19.8,
+     "dy": -32.9
+   }
+-}
+\ No newline at end of file
++}
+
+diff --git a/assets/dorf/manifest.json b/assets/dorf/manifest.json
+index 93149af987ca2c216d0f7850dcb61496acc11e79..c0f9a9ee309282c792450fcbb1908d506919b40c
+--- a/assets/dorf/manifest.json
++++ b/assets/dorf/manifest.json
+@@ -4,13 +4,13 @@
+     "idle": 1,
+     "walk": 4,
+     "jump": 3,
+-    "receive": 1,
++    "receive": 2,
+     "aim": 2,
+     "smash": 3,
+     "super": 4,
+-    "panic": 1,
+-    "victory": 1,
+-    "defeat": 1
++    "panic": 2,
++    "victory": 2,
++    "defeat": 2
+   },
+   "baseH": 110,
+   "footPad": 2,
+@@ -19,4 +19,4 @@
+     "dx": 19.8,
+     "dy": -32.9
+   }
+-}
+\ No newline at end of file
++}
+
+exec
+/bin/zsh -lc "python3 - <<'PY'
+from PIL import Image
+from pathlib import Path
+import json,re
+raw=Path('raw/dorf'); assets=Path('assets/dorf')
+expected={'idle_face':1,'idle':1,'walk':4,'jump':3,'receive':2,'aim':2,'smash':3,'super':4,'panic':2,'victory':2,'defeat':2}
+files=[]
+for anim,n in expected.items():
+ for i in range(n): files.append(f'{anim}_{i}.png')
+assert len(files)==26
+assert all((raw/f).exists() for f in files)
+assert all((assets/f).exists() for f in files)
+for f in files:
+ im=Image.open(raw/f).convert('RGB'); w,h=im.size
+ corners=[im.getpixel((1,1)),im.getpixel((w-2,1)),im.getpixel((1,h-2)),im.getpixel((w-2,h-2))]
+ assert all(r>245 and g<10 and b>245 for r,g,b in corners),(f,corners)
+ out=Image.open(assets/f)
+ assert out.mode=='RGBA', (f,out.mode)
+ assert out.getbbox() is not None, f
+m=json.loads((assets/'manifest.json').read_text())
+assert m['anims']==expected,(m['anims'],expected)
+print('QA OK: 26 raw + 26 cutouts; magenta corners OK; RGBA cutouts OK; manifest canonical:',m['anims'])
+PY
+shasum -a 256 raw/dorf/idle_1.png assets/dorf/idle_1.png
+node --test tests/game.test.js" in /Users/benjaminmille/Downloads/sommet-volley
+diff --git a/assets/dorf/manifest.json b/assets/dorf/manifest.json
+index 93149af987ca2c216d0f7850dcb61496acc11e79..c0f9a9ee309282c792450fcbb1908d506919b40c
+--- a/assets/dorf/manifest.json
++++ b/assets/dorf/manifest.json
+@@ -4,13 +4,13 @@
+     "idle": 1,
+     "walk": 4,
+     "jump": 3,
+-    "receive": 1,
++    "receive": 2,
+     "aim": 2,
+     "smash": 3,
+     "super": 4,
+-    "panic": 1,
+-    "victory": 1,
+-    "defeat": 1
++    "panic": 2,
++    "victory": 2,
++    "defeat": 2
+   },
+   "baseH": 110,
+   "footPad": 2,
+@@ -19,4 +19,4 @@
+     "dx": 19.8,
+     "dy": -32.9
+   }
+-}
+\ No newline at end of file
++}
+
+ succeeded in 1507ms:
+sommet-volley — tests
+  ✓ les modules se chargent et exposent l'API
+  ✓ newGame initialise un état de service propre
+  ✓ gravité : une balle libre en l'air accélère vers le bas
+  ✓ déterminisme : même graine + mêmes entrées → snapshots identiques
+  ✓ un échange finit par marquer un point (physique + IA + score)
+  ✓ round-trip snapshot : appliquer un snapshot reproduit le même snapshot
+  ✓ 2v2 : setMode('2v2') active 4 joueurs et la simulation tourne
+  ✓ bombe : la mèche à zéro fait perdre le camp qui détient la bombe
+  ✓ bombe : touche le sol → explosion et point à l'adversaire
+  ✓ filet : une balle très rapide ne traverse pas le poteau (anti-tunnel)
+  ✓ service : contact filet = faute (pas de rebond qui sauve)
+  ✓ roster : Tsar Volkoï est le perso pilote (index 0)
+  ✓ roster : Le Faucon (Citadelle du Levant) est jouable
+  ✓ roster : Le Safran est jouable (Voile d’Or)
+  ✓ roster : noms fictionnalisés (casting Steam)
+  ✓ sprites : défaut walk = 4 frames (packs walk_0..3)
+  ✓ sprites : aucun PNG partagé entre deux persos (anti-contamination)
+  ✓ échelles décor : PROP_H cohérent vs CHAR_BASE_H
+  ✓ events map : chaque terrain a un kind non-null
+  ✓ météo : flavor snow/sand/rain selon terrain
+  ✓ météo : plage et roseraie ne sont plus bloquées au clear
+  ✓ V2 : balle rapide + smash touche malgré la vitesse
+  ✓ V2 : saut latéral sans smash → la balle traverse
+  ✓ V2 : en l'air sans X, balle sur la tête → smash auto clavier
+  ✓ V2 : balle qui tombe sur le joueur → cloche auto
+  ✓ V2 : IA récupère une balle (réception, pas smash)
+  ✓ V2 : IA sert (lancer X) puis envoie la balle
+  ✓ IA : le niveau Impitoyable bat un adversaire scripté moyen
+  ✓ bombe : fonctionne en 2v2 (mèche à zéro → point à l'autre équipe)
+  ✓ bombe : durée choisie appliquée (startRally) et présente dans le snapshot
+  ✓ filet : une balle qui passe AU-DESSUS n'est pas bloquée
+  ✓ filet : un lob qui frôle le sommet passe (pas de rejet latéral)
+  ✓ filet : une balle trop basse ne passe pas (anti sous-filet)
+  ✓ filet : balle coincée dans le poteau est éjectée (anti-stick)
+  ✓ soft ownership : zone invité hors filet (marge)
+  ✓ soft ownership : skipBall avance les corps sans bouger la balle
+  ✓ soft ownership : pack/applyBallState round-trip
+  ✓ soft ownership : cooldown frappe avance avec tick (smash post-réception invité)
+  ✓ V2 : smash/X au sol = cloche dirigée
+  ✓ V2 : smash dirigé sans ralenti
+  ✓ V2 : snapshots round-trip (heldBy reste -1)
+  ✓ V2 off : bounce passif V1 inchangé (smoke)
+  ✓ V2 : simulateArc renvoie une trajectoire qui finit au sol
+  ✓ persos uniques : 2v2 hors-ligne ne duplique pas
+  ✓ V2 : service — balle dans les mains, lancer vertical (smash/X)
+  ✓ V2 : au service, le SAUT seul ne sert pas — il faut F pour lancer
+  ✓ V2 : service — se retourner déplace la balle avec les mains
+  ✓ V2 : service — pas de cloche auto après lancer (il faut F)
+  ✓ V2 : service — sauter DANS la balle en l'air = smash auto (clavier), pas la manette
+  ✓ V2 : service — X manette maintenu après lancer ne sert pas tout seul
+  ✓ V2 : service — F + saut immédiat interdit (anti-triche)
+  ✓ V2 : service — saut manette pendant la montée du lancer
+  ✓ V2 : service — passe le filet depuis près du filet (tous persos)
+  ✓ V2 : service aérien (smash) — passe aussi le filet
+  ✓ V2 : service aérien — plus de punch qu'au sol (Yogi)
+  ✓ V2 : smash sous le bandeau — passe le filet (Yogi milieu de court)
+  ✓ V2 : service — cloche forcée vers l'adversaire
+  ✓ V2 : après lancer, smash/X = cloche
+  ✓ V2 : cloche suit l'angle du stick
+  ✓ V2 : clavier — réception légèrement vers l'avant (setup smash)
+  ✓ V2 : clavier — smash auto au contact en saut
+  ✓ V2 : clavier — smash piqué quand la balle est haute
+  ✓ V2 : clavier — smash depuis le fond passe le filet
+  ✓ V2 : cloche depuis le fond = passe haute légèrement avant (clavier)
+  ✓ V2 : après lancer, smash maintenu frappe vraiment
+  ✓ event canon : annonce puis tir déterministe (Place Écarlate)
+  ✓ event canon : collision dévie la balle
+  ✓ terrain calme : aucun événement canon
+  ✓ event cortège : Palais du Coq traverse le terrain
+  ✓ chaque terrain a un événement de map
+  ✓ Le Mur : une fois passé, pas de téléport derrière
+  ✓ Smash Battle : le gagnant marque — le perdant est stun et ne digue pas
+  ✓ events map : pas de trigger en pause / service / point
+  ✓ events map : boulet en vol coupé au passage en service (pas coincé)
+  ✓ campagne : chapitres cohérents (persos, terrain, mode, dopage, dialogues)
+  ✓ campagnes par personnage : 10 campagnes, chacune = les 9 rivaux, format valide
+  ✓ storySelectCampaign : bascule STORY sur la campagne du perso + progression dédiée
+  ✓ story : le premier chapitre est débloqué, les suivants verrouillés
+  ✓ storyStartMatch configure persos / terrain / mode / dopage
+  ✓ progression : victoire débloque le chapitre suivant, défaite non
+  ✓ story : chaque début d'acte affiche une carte d'intro, pas les autres
+  ✓ story : gagner la finale ouvre l'écran de fin ; sinon retour au hub
+  ✓ storyOnMatchEnd choisit la bonne branche selon le score
+
+83 réussis, 0 échoués
+✔ tests/game.test.js (592.877208ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 596.3435
+
+codex
+Le contrôle a détecté un point technique à corriger : le générateur a produit un magenta visuellement uni mais légèrement compressé (`247,6,248` aux coins au lieu de `255,0,255`). Je normalise uniquement les pixels de fond magenta vers `#FF00FF`, puis je relance le détourage et le contrôle. Les 83 tests du jeu passent déjà.
+exec
+/bin/zsh -lc "python3 - <<'PY'
+from PIL import Image
+from pathlib import Path
+for p in Path('raw/dorf').glob('*.png'):
+    if p.name == 'idle_1.png':
+        continue
+    im=Image.open(p).convert('RGB')
+    px=im.load(); w,h=im.size
+    for y in range(h):
+        for x in range(w):
+            r,g,b=px[x,y]
+            if r>=200 and b>=200 and g<=90 and min(r,b)-g>=130:
+                px[x,y]=(255,0,255)
+    im.save(p)
+PY
+tmp_idle="'$(mktemp /tmp/dorf_idle_1.XXXXXX.png)
+mv raw/dorf/idle_1.png "$tmp_idle"
+python3 tools/cutout.py raw/dorf assets/dorf
+mv "$tmp_idle" raw/dorf/idle_1.png' in /Users/benjaminmille/Downloads/sommet-volley
+diff --git a/assets/dorf/manifest.json b/assets/dorf/manifest.json
+index 93149af987ca2c216d0f7850dcb61496acc11e79..c0f9a9ee309282c792450fcbb1908d506919b40c
+--- a/assets/dorf/manifest.json
++++ b/assets/dorf/manifest.json
+@@ -4,13 +4,13 @@
+     "idle": 1,
+     "walk": 4,
+     "jump": 3,
+-    "receive": 1,
++    "receive": 2,
+     "aim": 2,
+     "smash": 3,
+     "super": 4,
+-    "panic": 1,
+-    "victory": 1,
+-    "defeat": 1
++    "panic": 2,
++    "victory": 2,
++    "defeat": 2
+   },
+   "baseH": 110,
+   "footPad": 2,
+@@ -19,4 +19,4 @@
+     "dx": 19.8,
+     "dy": -32.9
+   }
+-}
+\ No newline at end of file
++}
+
+ succeeded in 19700ms:
+  aim_0.png → assets/dorf/aim_0.png [chroma]
+  aim_1.png → assets/dorf/aim_1.png [chroma]
+  defeat_0.png → assets/dorf/defeat_0.png [chroma]
+  defeat_1.png → assets/dorf/defeat_1.png [chroma]
+  idle_0.png → assets/dorf/idle_0.png [chroma]
+  idle_face_0.png → assets/dorf/idle_face_0.png [chroma]
+  jump_0.png → assets/dorf/jump_0.png [chroma]
+  jump_1.png → assets/dorf/jump_1.png [chroma]
+  jump_2.png → assets/dorf/jump_2.png [chroma]
+  panic_0.png → assets/dorf/panic_0.png [chroma]
+  panic_1.png → assets/dorf/panic_1.png [chroma]
+  receive_0.png → assets/dorf/receive_0.png [chroma]
+  receive_1.png → assets/dorf/receive_1.png [chroma]
+  smash_0.png → assets/dorf/smash_0.png [chroma]
+  smash_1.png → assets/dorf/smash_1.png [chroma]
+  smash_2.png → assets/dorf/smash_2.png [chroma]
+  super_0.png → assets/dorf/super_0.png [chroma]
+  super_1.png → assets/dorf/super_1.png [chroma]
+  super_2.png → assets/dorf/super_2.png [chroma]
+  super_3.png → assets/dorf/super_3.png [chroma]
+  victory_0.png → assets/dorf/victory_0.png [chroma]
+  victory_1.png → assets/dorf/victory_1.png [chroma]
+  walk_0.png → assets/dorf/walk_0.png [chroma]
+  walk_1.png → assets/dorf/walk_1.png [chroma]
+  walk_2.png → assets/dorf/walk_2.png [chroma]
+  walk_3.png → assets/dorf/walk_3.png [chroma]
+  planche → assets/dorf/_contact.png
+
+exec
+/bin/zsh -lc "python3 - <<'PY'
+from PIL import Image
+from pathlib import Path
+import json
+raw=Path('raw/dorf'); assets=Path('assets/dorf')
+expected={'idle_face':1,'idle':1,'walk':4,'jump':3,'receive':2,'aim':2,'smash':3,'super':4,'panic':2,'victory':2,'defeat':2}
+files=[f'{anim}_{i}.png' for anim,n in expected.items() for i in range(n)]
+assert len(files)==26
+assert all((raw/f).exists() and (assets/f).exists() for f in files)
+for f in files:
+ im=Image.open(raw/f).convert('RGB'); w,h=im.size
+ assert all(im.getpixel(pt)==(255,0,255) for pt in ((0,0),(w-1,0),(0,h-1),(w-1,h-1))),f
+ out=Image.open(assets/f)
+ assert out.mode=='RGBA' and all(out.getpixel(pt)[3]==0 for pt in ((0,0),(out.width-1,0),(0,out.height-1),(out.width-1,out.height-1))),f
+m=json.loads((assets/'manifest.json').read_text())
+assert m['anims']==expected,(m['anims'],expected)
+print('QA OK — 26/26 raw, 26/26 assets, exact #FF00FF corners, transparent cutout corners')
+print('manifest:',json.dumps(m['anims'],ensure_ascii=False))
+PY
+shasum -a 256 raw/dorf/idle_1.png assets/dorf/idle_1.png
+git diff -- assets/dorf/manifest.json | cat" in /Users/benjaminmille/Downloads/sommet-volley
+diff --git a/assets/dorf/manifest.json b/assets/dorf/manifest.json
+index 93149af987ca2c216d0f7850dcb61496acc11e79..c0f9a9ee309282c792450fcbb1908d506919b40c
+--- a/assets/dorf/manifest.json
++++ b/assets/dorf/manifest.json
+@@ -4,13 +4,13 @@
+     "idle": 1,
+     "walk": 4,
+     "jump": 3,
+-    "receive": 1,
++    "receive": 2,
+     "aim": 2,
+     "smash": 3,
+     "super": 4,
+-    "panic": 1,
+-    "victory": 1,
+-    "defeat": 1
++    "panic": 2,
++    "victory": 2,
++    "defeat": 2
+   },
+   "baseH": 110,
+   "footPad": 2,
+@@ -19,4 +19,4 @@
+     "dx": 19.8,
+     "dy": -32.9
+   }
+-}
+\ No newline at end of file
++}
+
+ succeeded in 170ms:
+Traceback (most recent call last):
+  File "<stdin>", line 11, in <module>
+AssertionError: jump_1.png
+d610827d56c4a1b6327b37378cf9ffe7e766ef2d5650c00e66c62df089a4462e  raw/dorf/idle_1.png
+d610827d56c4a1b6327b37378cf9ffe7e766ef2d5650c00e66c62df089a4462e  assets/dorf/idle_1.png
+diff --git a/assets/dorf/manifest.json b/assets/dorf/manifest.json
+index 93149af..c0f9a9e 100644
+--- a/assets/dorf/manifest.json
++++ b/assets/dorf/manifest.json
+@@ -4,13 +4,13 @@
+     "idle": 1,
+     "walk": 4,
+     "jump": 3,
+-    "receive": 1,
++    "receive": 2,
+     "aim": 2,
+     "smash": 3,
+     "super": 4,
+-    "panic": 1,
+-    "victory": 1,
+-    "defeat": 1
++    "panic": 2,
++    "victory": 2,
++    "defeat": 2
+   },
+   "baseH": 110,
+   "footPad": 2,
+@@ -19,4 +19,4 @@
+     "dx": 19.8,
+     "dy": -32.9
+   }
+-}
+\ No newline at end of file
++}
+
+exec
+/bin/zsh -lc "python3 - <<'PY'
+from PIL import Image
+from pathlib import Path
+for p in sorted(Path('raw/dorf').glob('*.png')):
+ if p.name=='idle_1.png':continue
+ im=Image.open(p).convert('RGB');w,h=im.size
+ cs=[im.getpixel(pt) for pt in ((0,0),(w-1,0),(0,h-1),(w-1,h-1))]
+ if len(set(cs))>1 or cs[0]"'!=(255,0,255): print(p.name,cs)
+PY' in /Users/benjaminmille/Downloads/sommet-volley
+diff --git a/assets/dorf/manifest.json b/assets/dorf/manifest.json
+index 93149af987ca2c216d0f7850dcb61496acc11e79..c0f9a9ee309282c792450fcbb1908d506919b40c
+--- a/assets/dorf/manifest.json
++++ b/assets/dorf/manifest.json
+@@ -4,13 +4,13 @@
+     "idle": 1,
+     "walk": 4,
+     "jump": 3,
+-    "receive": 1,
++    "receive": 2,
+     "aim": 2,
+     "smash": 3,
+     "super": 4,
+-    "panic": 1,
+-    "victory": 1,
+-    "defeat": 1
++    "panic": 2,
++    "victory": 2,
++    "defeat": 2
+   },
+   "baseH": 110,
+   "footPad": 2,
+@@ -19,4 +19,4 @@
+     "dx": 19.8,
+     "dy": -32.9
+   }
+-}
+\ No newline at end of file
++}
+
+ succeeded in 261ms:
+jump_1.png [(255, 0, 255), (255, 0, 255), (232, 34, 194), (255, 0, 255)]
+panic_0.png [(255, 0, 255), (255, 0, 255), (233, 31, 195), (255, 0, 255)]
+smash_0.png [(255, 0, 255), (255, 0, 255), (231, 29, 196), (255, 0, 255)]
+
+exec
+/bin/zsh -lc "python3 - <<'PY'
+from PIL import Image
+from pathlib import Path
+for p in Path('raw/dorf').glob('*.png'):
+    if p.name == 'idle_1.png': continue
+    im=Image.open(p).convert('RGB'); px=im.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            r,g,b=px[x,y]
+            if r>=180 and b>=180 and g<=100 and min(r,b)-g>=110:
+                px[x,y]=(255,0,255)
+    im.save(p)
+PY
+tmp_idle="'$(mktemp /tmp/dorf_idle_1.XXXXXX.png)
+mv raw/dorf/idle_1.png "$tmp_idle"
+python3 tools/cutout.py raw/dorf assets/dorf >/tmp/dorf_cutout.log
+mv "$tmp_idle" raw/dorf/idle_1.png
+python3 - <<'"'PY'
+from PIL import Image
+from pathlib import Path
+import json
+raw=Path('raw/dorf'); assets=Path('assets/dorf')
+expected={'idle_face':1,'idle':1,'walk':4,'jump':3,'receive':2,'aim':2,'smash':3,'super':4,'panic':2,'victory':2,'defeat':2}
+files=[f'{a}_{i}.png' for a,n in expected.items() for i in range(n)]
+assert len(files)==26 and all((raw/f).exists() and (assets/f).exists() for f in files)
+for f in files:
+ im=Image.open(raw/f).convert('RGB'); w,h=im.size
+ assert all(im.getpixel(pt)==(255,0,255) for pt in ((0,0),(w-1,0),(0,h-1),(w-1,h-1))),f
+ out=Image.open(assets/f)
+ assert out.mode=='RGBA' and all(out.getpixel(pt)[3]==0 for pt in ((0,0),(out.width-1,0),(0,out.height-1),(out.width-1,out.height-1))),f
+assert json.loads((assets/'manifest.json').read_text())['anims']==expected
+print('QA OK: 26 raw + 26 assets; #FF00FF corners exact; RGBA corners transparent; canonical manifest exact')
+PY
+shasum -a 256 raw/dorf/idle_1.png assets/dorf/idle_1.png" in /Users/benjaminmille/Downloads/sommet-volley
+diff --git a/assets/dorf/manifest.json b/assets/dorf/manifest.json
+index 93149af987ca2c216d0f7850dcb61496acc11e79..c0f9a9ee309282c792450fcbb1908d506919b40c
+--- a/assets/dorf/manifest.json
++++ b/assets/dorf/manifest.json
+@@ -4,13 +4,13 @@
+     "idle": 1,
+     "walk": 4,
+     "jump": 3,
+-    "receive": 1,
++    "receive": 2,
+     "aim": 2,
+     "smash": 3,
+     "super": 4,
+-    "panic": 1,
+-    "victory": 1,
+-    "defeat": 1
++    "panic": 2,
++    "victory": 2,
++    "defeat": 2
+   },
+   "baseH": 110,
+   "footPad": 2,
+@@ -19,4 +19,4 @@
+     "dx": 19.8,
+     "dy": -32.9
+   }
+-}
+\ No newline at end of file
++}
+
+ succeeded in 18390ms:
+QA OK: 26 raw + 26 assets; #FF00FF corners exact; RGBA corners transparent; canonical manifest exact
+d610827d56c4a1b6327b37378cf9ffe7e766ef2d5650c00e66c62df089a4462e  raw/dorf/idle_1.png
+d610827d56c4a1b6327b37378cf9ffe7e766ef2d5650c00e66c62df089a4462e  assets/dorf/idle_1.png
+
+codex
+Régénération terminée.
+
+- 26 PNG générés dans [raw/dorf](/Users/benjaminmille/Downloads/sommet-volley/raw/dorf)
+- Détourage exécuté vers [assets/dorf](/Users/benjaminmille/Downloads/sommet-volley/assets/dorf)
+- Fond brut normalisé en `#FF00FF`
+- [manifest.json](/Users/benjaminmille/Downloads/sommet-volley/assets/dorf/manifest.json) corrigé avec les comptes canoniques, dont `walk: 4`
+- `idle_1.png` préservé dans les deux dossiers, empreinte SHA-256 inchangée
+- QA des 26 sources et cutouts validée
+- 83 tests du jeu réussis
+
+Génération effectuée avec l’outil imagegen intégré, en utilisant `idle_1.png` comme référence d’identité et un prompt verrouillant personnage, tenue, style et pose propre à chaque frame.
+diff --git a/assets/dorf/manifest.json b/assets/dorf/manifest.json
+index 93149af987ca2c216d0f7850dcb61496acc11e79..c0f9a9ee309282c792450fcbb1908d506919b40c
+--- a/assets/dorf/manifest.json
++++ b/assets/dorf/manifest.json
+@@ -4,13 +4,13 @@
+     "idle": 1,
+     "walk": 4,
+     "jump": 3,
+-    "receive": 1,
++    "receive": 2,
+     "aim": 2,
+     "smash": 3,
+     "super": 4,
+-    "panic": 1,
+-    "victory": 1,
+-    "defeat": 1
++    "panic": 2,
++    "victory": 2,
++    "defeat": 2
+   },
+   "baseH": 110,
+   "footPad": 2,
+@@ -19,4 +19,4 @@
+     "dx": 19.8,
+     "dy": -32.9
+   }
+-}
+\ No newline at end of file
++}
+
+tokens used
+104 545
+Régénération terminée.
+
+- 26 PNG générés dans [raw/dorf](/Users/benjaminmille/Downloads/sommet-volley/raw/dorf)
+- Détourage exécuté vers [assets/dorf](/Users/benjaminmille/Downloads/sommet-volley/assets/dorf)
+- Fond brut normalisé en `#FF00FF`
+- [manifest.json](/Users/benjaminmille/Downloads/sommet-volley/assets/dorf/manifest.json) corrigé avec les comptes canoniques, dont `walk: 4`
+- `idle_1.png` préservé dans les deux dossiers, empreinte SHA-256 inchangée
+- QA des 26 sources et cutouts validée
+- 83 tests du jeu réussis
+
+Génération effectuée avec l’outil imagegen intégré, en utilisant `idle_1.png` comme référence d’identité et un prompt verrouillant personnage, tenue, style et pose propre à chaque frame.

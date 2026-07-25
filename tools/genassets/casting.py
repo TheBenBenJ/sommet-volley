@@ -102,8 +102,11 @@ MAPS = [
               "NO Great Wall, no real flags or emblems; pale stone volleyball court with "
               "painted lines (empty, no people, no vehicles)"},
     {"key": "pont-des-deux-mondes", "char": "sultan",    "name": "Pont des Deux Mondes",
-     "theme": "a strait-side palace between two continents, abstract domed silhouettes and "
-              "slender towers, small boats on the water, warm dusk light"},
+     "theme": "a sunlit sandstone palace courtyard with twin colonnaded wings, central "
+              "tiered round tower with plain gold cupola (abstract — NOT Hagia Sophia, "
+              "NOT Blue Mosque, NO crescents, NO real flags), cypress alleys, terracotta "
+              "pots, geometric garden path, packed sandy volleyball court with white lines, "
+              "clear blue sky; 100% static décor"},
     {"key": "stade-ashram",   "char": "gourou",      "name": "Stade Ashram",
      "theme": "a sunbaked honey-sandstone stadium beside an ornate palace: tiered sandstone "
               "stands, a palace facade with scalloped arches and small jharokha balconies "
