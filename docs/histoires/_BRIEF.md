@@ -98,6 +98,15 @@ Pour CHAQUE rencontre, un bloc au format `src/story.js` (données JS, prêtes à
   le Sultan est grandiloquent, le Gourou est serein-piquant, le Capitaine est rude-blagueur,
   le Faucon est intransigeant, le Safran est mesuré-sardonique).
 
+## 2v2 / alliances (IMPÉRATIF)
+Le chapitre d'ouverture (acte I, mode `2v2`) doit coller à des **alliances plausibles**
+(transposées) : `ally` = partenaire crédible du protagoniste ; `right`+`right2` = camp
+adverse cohérent. Exemples stables :
+- Occident : Cygne ↔ Dorf ; Faucon ↔ Dorf
+- Axe Est : Volkoï ↔ Timonier ; Bébé sous tutelle du Timonier ; Safran ↔ Volkoï
+- Gourou ↔ Faucon (sécurité) ; Capitaine ↔ Dorf (populistes) ; Sultan ↔ Volkoï (deal froid)
+Éviter les absurdes (ex. Cygne+Safran contre Dorf, Bébé qui affronte le Timonier en binôme adverse).
+
 ## Rappels de style (voix existantes, à réutiliser)
 - **Baron Dorf** : superlatifs, « le plus beau … du monde », « match truqué ! », vantardise.
 - **Le Cygne** : « en même temps… », posture de premier de la classe, formules diplomatiques.

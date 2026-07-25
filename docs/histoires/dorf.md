@@ -38,25 +38,25 @@ Au fond — mais il ne l'avouera jamais, et si vous le citez il dira que c'est *
 
 ```js
 {
-  act: 1, title: "L'Alliance qui coûte cher", sub: "Alliance élargie · double contre le Cygne",
-  left: "dorf", right: "cygne", ally: "faucon", right2: "volkoi", terrain: 1, mode: "2v2", ai: 0, doped: null,
+  act: 1, title: "L'Alliance qui coûte cher", sub: "Doria–Levantie vs Bourassie–Ramenie · double sous haute tension",
+  left: "dorf", right: "volkoi", ally: "faucon", right2: "safran", terrain: 0, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Resort doré. Aujourd'hui l'Alliance joue en double : le Baron et le Faucon d'un côté, le Cygne et le Tsar de l'autre. Personne n'avait prévu ce tableau." },
+    { s: "narrator", t: "Place Écarlate, sous la neige. Aujourd'hui l'Alliance joue en double : le Baron et le Faucon d'un côté, le Tsar et Safran de l'autre. Personne n'avait prévu ce tableau." },
     { s: "dorf", t: "Toi, Faucon, tu es mon partenaire. Le meilleur. Le plus dur. On paie l'Alliance… en smashs." },
     { s: "faucon", t: "Je ne paie rien. Je sécurise. Toi, tu parles ; moi, je digue. Deal." },
-    { s: "cygne", t: "En même temps alliés, en même temps adversaires… et en même temps en 2v2. C'est dense." },
-    { s: "volkoi", t: "Tu m'as mis avec l'oiseau bavard. Parfait. Je gèle, il parle, vous perdez." },
+    { s: "volkoi", t: "Tu m'as mis avec le paria du désert. Parfait. Je gèle, il ralentit, vous perdez à deux vitesses." },
+    { s: "safran", t: "Alliance de circonstance, mais alliance quand même. L'Ouest se réunit contre nous ; nous, on patiente, ensemble." },
     { s: "narrator", t: "Deux équipes, quatre egos. L'alliance se joue aussi entre partenaires de filet." },
   ],
   win:  [
     { s: "dorf", t: "ÉNORME ! Meilleure alliance du monde ! Faucon, t'es pas mauvais — pour un allié." },
     { s: "faucon", t: "On a tenu la ligne. Le reste est du bruit de sommet." },
-    { s: "cygne", t: "Défaite instructive. Mon partenaire gelé et moi, on retiendra la leçon. En même temps." },
     { s: "volkoi", t: "Un revers. Temporaire. Même en double, l'hiver revient." },
+    { s: "safran", t: "Défaite mesurée. Le voile retombera, patient, sur ton mur d'or trop pressé." },
   ],
   lose:  [
-    { s: "cygne", t: "Voilà : un partenariat exigeant, et un point décisif. En même temps ferme, en même temps élégant." },
     { s: "volkoi", t: "Le gel à deux, ça marche. Tu peux garder ton Alliance, Baron — elle vient de geler." },
+    { s: "safran", t: "Un partenariat de patience contre un partenariat de bruit. Devinez lequel a tenu plus longtemps ce soir." },
     { s: "dorf", t: "Truqué ! Mon partenaire a… enfin, LE filet était de travers !" },
     { s: "faucon", t: "On recommence. Sans discours. Avec plus de digues." },
   ]
@@ -205,24 +205,24 @@ Au fond — mais il ne l'avouera jamais, et si vous le citez il dira que c'est *
   ]
 },
 {
-  act: 3, title: "Le sommet à domicile", sub: "Doria–Bourassie · flatterie, bombe et mèche courte",
-  left: "dorf", right: "volkoi", terrain: 1, mode: "bomb", ai: 3, doped: "R",
+  act: 3, title: "Le sommet à domicile", sub: "Doria–Gallardie · friction transatlantique, bombe et mèche courte",
+  left: "dorf", right: "cygne", terrain: 1, mode: "bomb", ai: 3, doped: "R",
   pre:  [
-    { s: "narrator", t: "Finale. Retour au Country Club Doré, fontaine allumée, palmiers au garde-à-vous. Le Tsar glacial débarque sur le gazon le plus vert du monde. La bombe attend." },
-    { s: "volkoi", t: "Alors c'est ici ton palais. Beaucoup d'or. Beaucoup de bruit. J'apporte le froid. Ton gazon va geler pendant que tu klaxonnes." },
-    { s: "dorf", t: "Grand Tsar ! On s'aime bien, toi et moi, tout le monde le dit — enfin, personne le dit, mais moi je le dis. Sur MON terrain, c'est MOI qui gagne." },
-    { s: "volkoi", t: "T'aimer ? Je te tolère tant que tu m'es utile. Ce soir tu ne l'es plus. Le froid ne négocie pas. La mèche fait le travail." },
-    { s: "narrator", t: "Ses veines pulsent, l'aura rouge irradie. Le dopage d'État, à ciel ouvert, sur la plus belle pelouse du monde. Baron Dorf, pour une fois, joue pour lui seul." },
-    { s: "dorf", t: "Le plus grand match de tous les temps. Le froid contre l'or. Et je vais gagner. Sans carburant. Juste avec MOI, ma mèche et Le Mur. Servons." }
+    { s: "narrator", t: "Finale. Retour au Country Club Doré, fontaine allumée, palmiers au garde-à-vous. Le Cygne, costume impeccable, débarque sur le gazon le plus vert du monde. La bombe attend." },
+    { s: "cygne", t: "Alors c'est ici, votre palais. Beaucoup d'or, peu de nuance. Je viens en allié, et en même temps je viens vous rappeler qui paie vraiment pour l'Alliance." },
+    { s: "dorf", t: "Cher Cygne ! On s'aime bien, toi et moi, tout le monde le dit — enfin, moi je le dis. Mais tu me dois de l'argent. Beaucoup d'argent. Pour la défense. La tienne." },
+    { s: "cygne", t: "En même temps allié fidèle, en même temps facture salée. C'est un numéro d'équilibriste que je maîtrise depuis toujours." },
+    { s: "narrator", t: "Ses veines pulsent, l'aura rouge irradie. Le dopage d'État, à ciel ouvert, sur la plus belle pelouse du monde. Le Cygne, pour une fois, joue à cran." },
+    { s: "dorf", t: "Le plus grand match de tous les temps. L'Amérique contre l'élégance. Et je vais gagner. Sans carburant. Juste avec MOI, ma mèche et Le Mur. Servons." }
   ],
   win:  [
-    { s: "dorf", t: "CHAMPION ! À domicile ! Sans dopage ! Le plus grand vainqueur de l'histoire des sommets ! J'ai gelé le glacier ! On construit une tour pour fêter ça !" },
-    { s: "volkoi", t: "Une défaite. Sur ton gazon, sous tes palmiers dorés. Profite, bavard. L'hiver est patient, et il connaît le chemin de ta fontaine." },
-    { s: "narrator", t: "La machine glacée tombe au bout du monde doré. Baron Dorf lève les bras, salue une foule immense — et pour une fois, elle existe vraiment. Générique." }
+    { s: "dorf", t: "CHAMPION ! À domicile ! Sans dopage ! Le plus grand vainqueur de l'histoire des sommets ! J'ai battu l'Europe entière à moi seul ! On construit une tour pour fêter ça !" },
+    { s: "cygne", t: "Une défaite. Sur votre gazon, sous vos palmiers dorés. En même temps, l'Alliance survivra à cette facture-là aussi. Elle survit à tout." },
+    { s: "narrator", t: "L'élégance dopée tombe au bout du monde doré. Baron Dorf lève les bras, salue une foule immense — et pour une fois, elle existe vraiment. Générique." }
   ],
   lose:  [
-    { s: "volkoi", t: "Le froid a éteint la fontaine. Ton or brille encore, mais il ne renvoie pas les bombes. Prévu. Comme toujours." },
-    { s: "dorf", t: "Truqué ! Le plus grand vol de l'histoire ! Sur MON terrain ! Une enquête, la plus grande enquête ! Je reviendrai, plus doré, plus fort. Croyez-moi." }
+    { s: "cygne", t: "La fermeté a éteint la fontaine. Votre or brille encore, mais il ne renvoie pas les bombes. En même temps, c'était prévisible." },
+    { s: "dorf", t: "Truqué ! Le plus grand vol de l'histoire ! Sur MON terrain ! Une enquête, la plus grande enquête ! Et l'addition, Cygne, je te l'envoie en double !" }
   ]
 }
 ```

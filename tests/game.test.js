@@ -1428,6 +1428,16 @@ test("chaque terrain a un événement de map", () => {
   assert.strictEqual(kinds.size, g.TERRAINS.length, "un kind unique par terrain");
 });
 
+test("menu : Solo / Multijoueur puis sous-menus", () => {
+  const g = loadGame();
+  g.setState("menu");
+  assert.deepStrictEqual(g.navOptions().slice(0, 2), ["Digit1", "Digit2"]);
+  g.setState("soloMenu");
+  assert.deepStrictEqual(g.navOptions(), ["Digit1", "Digit2", "Digit3"]);
+  g.setState("multiMenu");
+  assert.deepStrictEqual(g.navOptions(), ["Digit1", "Digit2"]);
+});
+
 test("menu terrain : navOptions couvre tous les terrains (Digit1..N)", () => {
   const g = loadGame();
   assert.ok(typeof g.navOptions === "function", "navOptions exposé");
@@ -2046,6 +2056,80 @@ test("storyOnMatchEnd choisit la bonne branche selon le score", () => {
   g.scores[0] = 9; g.scores[1] = 15; // joueur perd
   g.storyOnMatchEnd();
   assert.strictEqual(g.getStoryScene().phase, "lose");
+});
+
+// ---------- Mode Tournoi ----------
+test("tournoi : bracket 8 persos uniques, joueur présent", () => {
+  const g = loadGame();
+  assert.ok(g.tournamentBuildBracket, "tournamentBuildBracket exposé");
+  g.tournamentBuildBracket(2, 1, 4242);
+  const t = g.getTournament();
+  assert.ok(t, "état tournoi créé");
+  assert.strictEqual(t.playerChar, 2);
+  const chars = new Set();
+  for (let i = 0; i < 4; i++) {
+    chars.add(t.matches[i].a);
+    chars.add(t.matches[i].b);
+  }
+  assert.strictEqual(chars.size, 8, "8 dirigeants distincts");
+  assert.ok(chars.has(2), "joueur dans le tableau");
+  assert.strictEqual(t.matches[0].a, 2, "joueur en slot a du quart 0");
+});
+
+test("tournoi : simu IA vs IA produit un vainqueur", () => {
+  const g = loadGame();
+  g.tournamentBuildBracket(0, 0, 99);
+  const r = g.tournamentSimOne(1, 3);
+  assert.ok(r.winner === 1 || r.winner === 3);
+  assert.ok(r.scoreA === g.TOURNAMENT_WIN_SCORE || r.scoreB === g.TOURNAMENT_WIN_SCORE);
+  g.tournamentSimPendingAi();
+  const t = g.getTournament();
+  // Quarts 1–3 (IA) joués ; quart 0 (joueur) intact
+  assert.strictEqual(t.matches[0].played, false);
+  assert.strictEqual(t.matches[1].played, true);
+  assert.strictEqual(t.matches[2].played, true);
+  assert.strictEqual(t.matches[3].played, true);
+  assert.ok(t.matches[1].winner != null);
+});
+
+test("tournoi : victoire joueur progresse vers le tour suivant", () => {
+  const g = loadGame();
+  g.tournamentBuildBracket(0, 1, 7);
+  g.tournamentSimPendingAi();
+  assert.strictEqual(g.tournamentPlayerMatchIndex(), 0);
+  assert.ok(g.tournamentStartNextMatch());
+  assert.strictEqual(g.getTournamentFlags().inMatch, true);
+  assert.strictEqual(g.getState(), "serve");
+  g.setScores(7, 3);
+  g.tournamentOnMatchEnd();
+  assert.strictEqual(g.getTournamentFlags().inMatch, false);
+  assert.strictEqual(g.getState(), "tournamentBracket");
+  assert.strictEqual(g.getTournament().matches[0].played, true);
+  assert.strictEqual(g.getTournament().matches[0].winner, 0);
+  // Prochain match joueur = demi (index 4)
+  assert.strictEqual(g.tournamentPlayerMatchIndex(), 4);
+});
+
+test("tournoi : matchWinScore = 7", () => {
+  const g = loadGame();
+  assert.strictEqual(g.matchWinScore(), 15);
+  g.tournamentBuildBracket(1, 2, 1);
+  assert.strictEqual(g.matchWinScore(), g.TOURNAMENT_WIN_SCORE);
+  assert.strictEqual(g.matchWinScore(), 7);
+});
+
+test("tournoi : défaite joueur → écran fin (éliminé)", () => {
+  const g = loadGame();
+  g.tournamentBuildBracket(0, 1, 11);
+  g.tournamentSimPendingAi();
+  g.tournamentStartNextMatch();
+  g.setScores(2, 7);
+  g.tournamentOnMatchEnd();
+  assert.strictEqual(g.getState(), "tournamentEnding");
+  assert.strictEqual(g.getTournament()._eliminated, true);
+  assert.notStrictEqual(g.tournamentChampion(), 0);
+  // Pas de match joueur suivant
+  assert.strictEqual(g.tournamentPlayerMatchIndex(), -1);
 });
 
 console.log("\n" + pass + " réussis, " + fail + " échoués");

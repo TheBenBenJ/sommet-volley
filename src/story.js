@@ -45,28 +45,28 @@ function storyCharName(key) {
 const STORY_SOMMET = [
   // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
-    act: 1, title: "La poignée de main à quatre", sub: "Relation transatlantique · double Alliance",
-    left: "cygne", right: "dorf", ally: "safran", right2: "volkoi",
-    terrain: 1, mode: "2v2", ai: 0, doped: null,
+    act: 1, title: "La poignée de main à quatre", sub: "Gallardie–Doria vs Ryonganie–Bourassie · double Alliance",
+    left: "cygne", right: "bebe", ally: "dorf", right2: "volkoi",
+    terrain: 3, mode: "2v2", ai: 0, doped: null,
     pre: [
-      { s: "narrator", t: "Jeux du Sommet — premier tour. Sur la pelouse d'un resort doré, ce n'est plus un duel : c'est un 2v2. Le Cygne amène Safran ; le Baron a recruté le Tsar." },
-      { s: "cygne", t: "Cher Safran, vous diguez avec élégance, je passe en force. Ensemble, en même temps." },
-      { s: "safran", t: "Partenariat mesuré. Tant que ton allié doré ne déchire pas un accord au milieu du set." },
-      { s: "dorf", t: "Deux contre deux ! J'ai le meilleur partenaire… euh… le plus froid. Ça compte." },
-      { s: "volkoi", t: "Je n'aime pas les poignées de main. Je préfère les points. Digue, Baron." },
+      { s: "narrator", t: "Jeux du Sommet — premier tour. Sur l'Esplanade du Défilé, ce n'est plus un duel : c'est un 2v2. Le Cygne amène le Baron ; le Maréchal a recruté le Tsar." },
+      { s: "cygne", t: "Cher Baron, vous bâtissez des murs, je passe en force. Ensemble, en même temps, ça devrait fonctionner." },
+      { s: "dorf", t: "Un partenariat historique ! Le plus grand ! Toi tu parles, moi je construis. On va écraser ce défilé." },
+      { s: "bebe", t: "Deux contre deux ! Le Maréchal a le Tsar comme partenaire, et mon radar couvre les DEUX camps ennemis !" },
+      { s: "volkoi", t: "Je digue, il défile. Un partenaire bruyant reste un partenaire. Servons, petit." },
       { s: "narrator", t: "Mode double : une équipe, un filet, quatre ambitions." }
     ],
     win: [
-      { s: "cygne", t: "Partenariat réussi. Fermeté et protocole, en même temps. Merci, Safran." },
-      { s: "safran", t: "Beau double. La table des négociations reste ouverte — contrairement à leur camp." },
-      { s: "dorf", t: "Truqué. Mon partenaire gelait trop. Ou pas assez. Les deux." },
-      { s: "volkoi", t: "Un set. L'hiver, lui, ne joue jamais en double : il joue seul contre tout le monde." }
+      { s: "cygne", t: "Partenariat réussi. Fermeté et flatterie, en même temps. Merci, Baron." },
+      { s: "dorf", t: "ÉNORME ! Meilleure alliance du monde ! Le Cygne, pas mauvais — pour un partenaire qui parle en même temps." },
+      { s: "bebe", t: "REVANCHE ! Mon partenaire a gelé trop lentement !" },
+      { s: "volkoi", t: "Un set. L'hiver, lui, ne joue jamais vraiment en double : il joue seul contre tout le monde." }
     ],
     lose: [
-      { s: "dorf", t: "GAGNÉ ! Meilleur 2v2 du monde ! Volkoï, t'es… correct. Pour un Tsar." },
-      { s: "volkoi", t: "Le gel a deux visages ce soir. Le vôtre a craqué." },
-      { s: "cygne", t: "Défaite de binôme. On retient la main, on retend la corde. Ensemble." },
-      { s: "safran", t: "Mesure ta prochaine alliance, Cygne. Même les partenaires ont besoin d'accords tenus." }
+      { s: "bebe", t: "VICTOIRE DU BINÔME ! Le Maréchal et le Tsar ! Gravez nos deux noms dans le granit !" },
+      { s: "volkoi", t: "Le gel a deux visages ce soir. Le vôtre a craqué en premier." },
+      { s: "cygne", t: "Défaite de binôme. On retient la main, on retend la corde. Ensemble, toujours." },
+      { s: "dorf", t: "Truqué ! Mon partenaire élégant parlait trop, pas assez de smashs !" }
     ]
   },
   {
@@ -405,7 +405,8 @@ function storyLeave() {
   storyActive = false;
   storyInMatch = false;
   storyScene = null;
-  goMenu();
+  state = "soloMenu";
+  navIdx = 0;
 }
 
 // Sélectionne un chapitre depuis le hub (si débloqué). Premier chapitre d'un
@@ -621,7 +622,22 @@ function storyDopedPortrait(key) {
   return (img && typeof spriteReady === "function" && spriteReady(img)) ? img : null;
 }
 
-// Portrait d'un perso dans une boîte (idle_face si dispo, sinon silhouette).
+// 1ʳᵉ frame prête d'une anim (idle_face → idle → walk…).
+function storyPortraitFrame(key) {
+  if (typeof charPack !== "function" || typeof spriteReady !== "function") return null;
+  const pack = charPack(key);
+  if (!pack || !pack.frames) return null;
+  const order = ["idle_face", "idle", "walk", "jump"];
+  for (const anim of order) {
+    const frames = pack.frames[anim];
+    if (!frames || !frames.length) continue;
+    const img = frames[0];
+    if (spriteReady(img)) return img;
+  }
+  return null;
+}
+
+// Portrait d'un perso dans une boîte (sprite si dispo, sinon pastille).
 function storyDrawPortrait(key, cx, cy, boxW, boxH, opts) {
   opts = opts || {};
   const flip = !!opts.flip;
@@ -644,10 +660,9 @@ function storyDrawPortrait(key, cx, cy, boxW, boxH, opts) {
     }
   }
   try {
-    if (!drawn && typeof charPack === "function" && typeof charAnimReady === "function" &&
-        charAnimReady(key, "idle_face")) {
-      const img = charPack(key).frames.idle_face[0];
-      if (typeof spriteReady === "function" && spriteReady(img)) {
+    if (!drawn) {
+      const img = storyPortraitFrame(key);
+      if (img) {
         const ar = img.naturalWidth / img.naturalHeight;
         let h = boxH, w = h * ar;
         if (w > boxW) { w = boxW; h = w / ar; }
@@ -669,17 +684,23 @@ function storyDrawPortrait(key, cx, cy, boxW, boxH, opts) {
     }
   } catch (e) {}
   if (!drawn) {
-    // silhouette de secours : disque coloré + initiale
+    // silhouette de secours : disque coloré + initiale (taille = pastille, pas 44px fixe)
     const ci = storyCharIdx(key), c = CHARACTERS[ci];
+    const r = Math.min(boxW, boxH) * 0.42;
+    const letterPx = Math.max(9, Math.min(28, Math.floor(r * 1.05)));
     ctx.save();
     ctx.fillStyle = (c && c.color) || "#888";
     ctx.beginPath();
-    ctx.arc(cx, cy, Math.min(boxW, boxH) * 0.4, 0, Math.PI * 2);
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = UI.stroke; ctx.lineWidth = 4; ctx.stroke();
-    ctx.fillStyle = "#fff"; ctx.font = "800 44px " + UI.display;
-    ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText((c ? c.name : key).charAt(0).toUpperCase(), cx, cy + 2);
+    ctx.strokeStyle = UI.stroke;
+    ctx.lineWidth = Math.max(1.5, Math.min(3, r * 0.12));
+    ctx.stroke();
+    ctx.fillStyle = "#fff";
+    ctx.font = "800 " + letterPx + "px " + UI.display;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText((c ? c.name : key).charAt(0).toUpperCase(), cx, cy + 1);
     ctx.textBaseline = "alphabetic";
     ctx.restore();
   }
@@ -808,7 +829,9 @@ function drawStorySelect() {
     const hover = isHover("StorySel" + i);
     ctx.beginPath();
     if (ctx.roundRect) ctx.roundRect(rx, ry, listW, rowH, 9); else ctx.rect(rx, ry, listW, rowH);
-    ctx.fillStyle = (sel || hover) ? "rgba(255,216,74,0.92)" : "rgba(255,246,232,0.10)";
+    // Lignes assez opaques pour masquer le décor derrière, sans voile plein écran
+    // (un fillRect global noircissait les persos du menu).
+    ctx.fillStyle = (sel || hover) ? "rgba(255,216,74,0.92)" : "rgba(12,20,42,0.78)";
     ctx.fill();
     if (sel || hover) { ctx.strokeStyle = UI.stroke; ctx.lineWidth = 2.5; ctx.stroke(); }
 

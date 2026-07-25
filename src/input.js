@@ -195,7 +195,11 @@ function navOptions() {
   switch (state) {
     case "menu":          return tutorialInviteOpen
       ? ["TutPlay", "TutLater", "TutNever"]
-      : ["Digit1", "Digit2", "Digit3", "Digit4", "KeyT", "KeyH", "KeyR", "KeyC"];
+      : ["Digit1", "Digit2", "KeyT", "KeyH", "KeyR", "KeyC"];
+    case "soloMenu":      return ["Digit1", "Digit2", "Digit3"];
+    case "multiMenu":     return ["Digit1", "Digit2"];
+    case "tournamentBracket": return ["TourPlay", "TourBack"];
+    case "tournamentEnding":  return ["TourBack"];
     case "aiDifficulty":  return ["Digit1", "Digit2", "Digit3", "Digit4"];
     case "bombDuration":  return ["Digit1", "Digit2", "Digit3"];
     case "teamFormat":
@@ -292,6 +296,9 @@ function handlePadMenu() {
     if (padEdge("confirm")) handleMenuKeys("Enter", "");
     if (padEdge("back")) handleMenuKeys("Escape", "");
   } else if (state === "storyScene" || state === "storyCharIntro" || state === "storyActIntro" || state === "storyEnding") {
+    if (padEdge("confirm")) handleMenuKeys("Enter", "");
+    if (padEdge("back")) handleMenuKeys("Escape", "");
+  } else if (state === "tournamentBracket" || state === "tournamentEnding") {
     if (padEdge("confirm")) handleMenuKeys("Enter", "");
     if (padEdge("back")) handleMenuKeys("Escape", "");
   } else if (state === "rules" || state === "tutorialHelp" || state === "netError" || state === "credits") {

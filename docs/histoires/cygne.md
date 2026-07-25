@@ -27,27 +27,27 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
 ```js
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 1, title: "La poignée de main à quatre", sub: "Gallardie–Libertaria · double diplomatique",
-  left: "cygne", right: "dorf", ally: "safran", right2: "volkoi", terrain: 1, mode: "2v2", ai: 0, doped: null,
+  act: 1, title: "La poignée de main à quatre", sub: "Gallardie–Doria vs Ryonganie–Bourassie · double diplomatique",
+  left: "cygne", right: "bebe", ally: "dorf", right2: "volkoi", terrain: 3, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Resort doré. Le Cygne a invité Safran comme partenaire de double. En face : le Baron et le Tsar. La poignée de main devient un nœud à quatre mains." },
-    { s: "cygne", t: "Cher Safran, vous diguez avec élégance, je passe en force. Ensemble, en même temps." },
-    { s: "safran", t: "Un partenariat mesuré. Tant que ton allié doré ne déchire pas encore un accord au milieu du set." },
-    { s: "dorf", t: "Deux contre deux ! J'ai le meilleur partenaire… euh… le plus froid. Ça compte." },
-    { s: "volkoi", t: "Je n'aime pas les poignées de main. Je préfère les points. Digue, Baron." },
+    { s: "narrator", t: "Esplanade du Défilé. Le Cygne a invité le Baron comme partenaire de double. En face : le Maréchal et le Tsar. La poignée de main devient un nœud à quatre mains." },
+    { s: "cygne", t: "Cher Baron, vous bâtissez des murs, je passe en force. Ensemble, en même temps, ça devrait fonctionner." },
+    { s: "dorf", t: "Un partenariat historique ! Le plus grand ! Toi tu parles, moi je construis. On va écraser ce défilé." },
+    { s: "bebe", t: "Deux contre deux ! Le Maréchal a le Tsar comme partenaire, et mon radar couvre les DEUX camps ennemis !" },
+    { s: "volkoi", t: "Je digue, il défile. Un partenaire bruyant reste un partenaire. Servons, petit." },
     { s: "narrator", t: "Mode 2v2 : une équipe, un filet, quatre ambitions." },
   ],
   win:  [
-    { s: "cygne", t: "Partenariat réussi. Fermeté et protocole, en même temps. Merci, Safran." },
-    { s: "safran", t: "Beau double. La table des négociations reste ouverte — contrairement à leur camp." },
-    { s: "dorf", t: "Truqué. Mon partenaire gelait trop. Ou pas assez. Les deux." },
-    { s: "volkoi", t: "Un set. L'hiver, lui, ne joue jamais en double : il joue seul contre tout le monde." },
+    { s: "cygne", t: "Partenariat réussi. Fermeté et flatterie, en même temps. Merci, Baron." },
+    { s: "dorf", t: "ÉNORME ! Meilleure alliance du monde ! Le Cygne, pas mauvais — pour un partenaire qui parle en même temps." },
+    { s: "bebe", t: "REVANCHE ! Mon partenaire a gelé trop lentement !" },
+    { s: "volkoi", t: "Un set. L'hiver, lui, ne joue jamais vraiment en double : il joue seul contre tout le monde." },
   ],
   lose:  [
-    { s: "dorf", t: "GAGNÉ ! Meilleur 2v2 du monde ! Volkoï, t'es… correct. Pour un Tsar." },
-    { s: "volkoi", t: "Le gel a deux visages ce soir. Le vôtre a craqué." },
-    { s: "cygne", t: "Défaite de binôme. On retient la main, on retend la corde. Ensemble." },
-    { s: "safran", t: "Mesure ta prochaine alliance, Cygne. Même les partenaires ont besoin d'accords tenus." },
+    { s: "bebe", t: "VICTOIRE DU BINÔME ! Le Maréchal et le Tsar ! Gravez nos deux noms dans le granit !" },
+    { s: "volkoi", t: "Le gel a deux visages ce soir. Le vôtre a craqué en premier." },
+    { s: "cygne", t: "Défaite de binôme. On retient la main, on retend la corde. Ensemble, toujours." },
+    { s: "dorf", t: "Truqué ! Mon partenaire élégant parlait trop, pas assez de smashs !" },
   ]
 },
 {
@@ -159,24 +159,24 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
 
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 3, title: "Le petit maréchal et la ligne rouge", sub: "Gallardie–Ryonganie · la mèche et le radar",
-  left: "cygne", right: "bebe", terrain: 3, mode: "bomb", ai: 3, doped: null,
+  act: 3, title: "Tarifs entre alliés", sub: "Gallardie–Doria · quand le protecteur présente la facture",
+  left: "cygne", right: "dorf", terrain: 1, mode: "bomb", ai: 3, doped: null,
   pre:  [
-    { s: "narrator", t: "Esplanade du Défilé. Gradins de granit, arc abstrait, un radar militaire qui s'allume et s'éteint. Le ballon-bombe grésille déjà." },
-    { s: "bebe", t: "Regarde mon radar clignoter, Cygne ! Le plus grand radar ! J'ai des bombes plus grosses que ton obélisque, et elles saluent au défilé !" },
-    { s: "cygne", t: "Je vous propose la porte de sortie diplomatique. La main tendue, et en même temps, une ligne rouge très ferme. Ne franchissez pas la ligne." },
-    { s: "bebe", t: "Une ligne rouge ! Ha ! Chez moi, les lignes rouges, on marche dessus au pas cadencé ! Un-deux, un-deux, boum !" },
-    { s: "cygne", t: "L'isolement vous étouffe, Maréchal. Renvoyez la bombe, asseyons-nous, parlons. Je peux être votre interlocuteur. Le seul, peut-être." },
-    { s: "bebe", t: "Parler ? Je préfère parader ! Éteins le radar si tu peux, technocrate. Sinon, il te verra exploser en direct." }
+    { s: "narrator", t: "Country Club Doré. Fontaine allumée, palmiers en pot. L'allié le plus bruyant du monde reçoit le partenaire qui ose lui présenter une facture." },
+    { s: "dorf", t: "Cher Cygne ! Toujours allié, toujours ami — mais tes vins, tes fromages, tes avions, je les taxe. Beaucoup. Énormément." },
+    { s: "cygne", t: "En même temps allié fidèle, en même temps client mécontent. Nous avons nos tarifs aussi, cher Baron. Et notre ligne rouge." },
+    { s: "dorf", t: "Une ligne rouge ? J'ai un Mur d'or ! Le tien est en pierre, le mien est en or massif. Devine lequel tient le mieux la pression." },
+    { s: "cygne", t: "Le dialogue, toujours. Et en même temps la fermeté : nous ne cédons pas un pouce sur nos tarifs douaniers. Renvoyez la bombe, Baron, avant l'escalade." },
+    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd. Entre alliés aussi, la facture peut exploser." }
   ],
   win:  [
-    { s: "cygne", t: "Vous voyez : la fermeté paie mieux que la parade. Ma porte reste ouverte. En même temps, ma ligne rouge reste tracée." },
-    { s: "bebe", t: "Rejouons ! REJOUONS ! Mon radar exige une revanche ! Ce n'est pas une défaite, c'est un défilé interrompu !" },
+    { s: "cygne", t: "Vous voyez : la fermeté commerciale paie mieux que le klaxon. Ma porte reste ouverte. En même temps, mes tarifs restent en place." },
+    { s: "dorf", t: "Truqué ! Un allié qui gagne, c'est déjà suspect ! On renégocie l'accord, cher Cygne. Un accord plus grand. Le plus grand." },
     { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
   ],
   lose:  [
-    { s: "bebe", t: "BOUM ! Le plus beau boum du défilé ! Mon radar l'a vu venir ! Salut, Cygne en miettes !" },
-    { s: "cygne", t: "Une escalade regrettable. Je maintiens le canal de discussion. On ne referme jamais tout à fait une porte. Même soufflée par une bombe." }
+    { s: "dorf", t: "BOUM ! Chez l'élégant ! Même mes meilleurs amis explosent quand je décide de gagner ! Rien de personnel, cher Cygne — enfin, un peu." },
+    { s: "cygne", t: "Une escalade regrettable, entre partenaires. En même temps, je maintiens le canal de discussion — et mes tarifs, eux aussi." }
   ]
 },
 {

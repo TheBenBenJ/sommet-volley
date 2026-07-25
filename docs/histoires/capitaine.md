@@ -27,27 +27,27 @@ Sous la vanne, il y a un joueur redoutable. Rustre, oui. Imprévisible, oui. Mai
 ```js
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 1, title: "Casquettes en double", sub: "Tropicalia–Libertaria · binôme de canopée",
-  left: "capitaine", right: "dorf", ally: "gourou", right2: "faucon", terrain: 1, mode: "2v2", ai: 0, doped: null,
+  act: 1, title: "Casquettes en double", sub: "Tropicalia–Doria vs Bourassie–Panguo · binôme populiste sous la neige",
+  left: "capitaine", right: "volkoi", ally: "dorf", right2: "timonier", terrain: 0, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Grande Forêt. Le Capitaine tire le Gourou comme partenaire contre le Baron et le Faucon. 2v2 sous la canopée." },
-    { s: "capitaine", t: "Toi, calme, tu digues avec MOI. Ma forêt, ton souffle. On leur casse leur alliance dorée." },
-    { s: "gourou", t: "Namasté, Capitaine. Je ralentis le tempo ; tu frappes les troncs. Partenariat clair." },
-    { s: "dorf", t: "J'ai le Faucon ! Le plus dur partenaire ! On va déforester… euh… gagner !" },
-    { s: "faucon", t: "Moins de métaphores. Plus de digues. Allez." },
-    { s: "narrator", t: "Deux équipes. Une forêt. Quatre casquettes d'ego." },
+    { s: "narrator", t: "Place Écarlate, sous la neige. Le Capitaine tire le Baron comme partenaire contre le Tsar et le Grand Timonier. 2v2 sur la banquise." },
+    { s: "capitaine", t: "Toi, casquette, tu digues avec MOI. Ma tronçonneuse, ton mur d'or. On leur défonce leur axe glacial." },
+    { s: "dorf", t: "J'ai le Capitaine ! Le plus bruyant partenaire ! Deux légendes, un seul filet, on va ÉCRASER !" },
+    { s: "volkoi", t: "Deux fanfarons contre l'hiver et le tempo. Amusant. Digue, camarade — ou tais-toi." },
+    { s: "timonier", t: "Deux contre deux. L'harmonie aime les symétries. Le bruit, lui, n'aime jamais durer." },
+    { s: "narrator", t: "Deux équipes. Une banquise. Quatre casquettes d'ego." },
   ],
   win:  [
-    { s: "capitaine", t: "Voilà ! Binôme de jungle ! Merci, zen — t'es pas mauvais pour un moine." },
-    { s: "gourou", t: "Beau double. La canopée a respiré plus fort qu'eux." },
-    { s: "dorf", t: "Truqué ! Mon partenaire était trop sérieux !" },
-    { s: "faucon", t: "On recommence. Sans casquette de cirque." },
+    { s: "capitaine", t: "Voilà ! Binôme de bûcherons dorés ! Merci, Baron — t'es pas mauvais pour un magnat." },
+    { s: "dorf", t: "ÉNORME ! Meilleure alliance du monde, moi et le bûcheron ! On l'avait dit !" },
+    { s: "volkoi", t: "Un set. Temporaire. L'hiver n'a pas dit son dernier partenaire." },
+    { s: "timonier", t: "L'harmonie corrige aussi les doubles. On reprend, ensemble." },
   ],
   lose:  [
-    { s: "dorf", t: "GAGNÉ LE 2v2 ! Meilleure équipe !" },
-    { s: "faucon", t: "Ligne propre. Vous pouvez replanter." },
-    { s: "capitaine", t: "Tsss. Mon partenaire a trop médité. Revanche — et plus d'ara." },
-    { s: "gourou", t: "On revient. La montagne et la forêt ne boudent pas longtemps." },
+    { s: "volkoi", t: "Le gel à deux a suffi. Vos casquettes ont pris froid." },
+    { s: "timonier", t: "Tempo tenu. Partenaire fiable. Le siècle continue, à deux." },
+    { s: "capitaine", t: "Tsss. Mon partenaire doré a trop klaxonné. Revanche — et plus d'ara." },
+    { s: "dorf", t: "Truqué ! Mon partenaire bûcheron a trop coupé, pas assez smashé !" },
   ]
 },
 {
@@ -91,23 +91,24 @@ Sous la vanne, il y a un joueur redoutable. Rustre, oui. Imprévisible, oui. Mai
 
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 2, title: "L'engrais et l'ours", sub: "Tropicalia–Bourassie · le fournisseur qu'on admire",
-  left: "capitaine", right: "volkoi", terrain: 0, mode: "flame", ai: 2, doped: null,
+  act: 2, title: "Le fan numéro un", sub: "Tropicalia–Doria · admiration mutuelle et casquettes assorties",
+  left: "capitaine", right: "dorf", terrain: 1, mode: "flame", ai: 2, doped: null,
   pre:  [
-    { s: "narrator", t: "Place Écarlate, neige et briques cramoisies. Sans les sacs d'engrais du Tsar, la Grande Forêt ne pousse plus. Le Capitaine est venu payer sa dette — sans jamais le dire. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
-    { s: "volkoi", t: "Tu ne jures que par ta liberté, Capitaine, mais c'est mon engrais qui fait pousser ton soja. L'hiver travaille pour moi ; ta terre aussi." },
-    { s: "capitaine", t: "T'es un dur, Tsar, ça je respecte. Deux vrais mâles alpha sur un terrain gelé. Mais mes bûches, elles gèlent pas, elles ÉCRASENT." },
-    { s: "volkoi", t: "Le respect ne renvoie pas le ballon. Je vais geler ton camp, planter du givre entre tes troncs. Sers, et compte tes doigts." },
-    { s: "capitaine", t: "Geler la forêt tropicale ? Bonne chance mon frère. Ici on transpire même sous ton blizzard. On y va !" }
+    { s: "narrator", t: "Country Club Doré. Fontaine allumée, palmiers en pot. Le Capitaine vient rendre hommage à son modèle — et lui vendre un peu de bœuf au passage. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+    { s: "capitaine", t: "Baron ! Mon modèle ! J'ai copié ta casquette, tes majuscules, ta haine des journalistes. On est pareils, toi et moi !" },
+    { s: "dorf", t: "Le Capitaine ! Un type fort. Très fort. On s'admire beaucoup, tout le monde le dit — enfin, moi je le dis, mais c'est pareil." },
+    { s: "capitaine", t: "Sauf que moi j'ai une tronçonneuse et un ara. Toi t'as un mur d'or. Chacun sa jungle, chacun son bazar." },
+    { s: "dorf", t: "Mon mur d'or bat ta tronçonneuse n'importe quel jour. Mais on reste potes. Les meilleurs. Sers, mon frère de casquette." },
+    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu. Entre fans, ça pique quand même un peu." }
   ],
   win:  [
-    { s: "capitaine", t: "Fait tomber l'ours dans sa propre neige ! Et t'inquiète, je reprends une palette d'engrais la semaine pro. Entre durs, ça se paie." },
-    { s: "volkoi", t: "Une défaite. Le froid n'a pas de rancune, il a de la mémoire. Tu reviendras acheter — tu reviens toujours." },
+    { s: "capitaine", t: "Battu mon idole ! Sur SON gazon ! Désolé, Baron — enfin, pas vraiment. Selfie ?" },
+    { s: "dorf", t: "Truqué ! Mais élégamment truqué, par mon plus grand fan. On refait ça, entre légendes. Les plus grandes !" },
     { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ],
   lose:  [
-    { s: "volkoi", t: "L'Hiver Général ne négocie pas, Capitaine. Ta jungle bruyante s'est figée d'un coup. Rentre te réchauffer." },
-    { s: "capitaine", t: "Gelé par le Tsar sur sa banquise ! Bon… au moins j'ai perdu contre un vrai dur. Ça compte, ça, non ?" },
+    { s: "dorf", t: "GAGNÉ ! Même mon plus grand fan, je le bats ! Ça prouve qui est le vrai modèle ici !" },
+    { s: "capitaine", t: "Battu par mon idole, chez lui, sous son mur d'or ! Bon… au moins j'ai perdu contre un vrai frère de casquette." },
     { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ]
 },

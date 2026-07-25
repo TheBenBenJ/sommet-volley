@@ -1214,7 +1214,7 @@ function netScreenBase(title, kicker, subtitle) {
 }
 
 function drawOnlineMenu() {
-  netScreenBase("Jouer en ligne", "En ligne · Créer ou rejoindre",
+  netScreenBase("En ligne", "Multijoueur · Créer ou rejoindre",
                 "Connexion directe entre navigateurs (WebRTC)");
   // "Créer une partie" amène au même écran de format que le solo (1v1/en
   // équipes/Bombe, voir drawGameModeSelect) — plus de doublons à plat ici.

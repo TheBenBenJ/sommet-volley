@@ -46,6 +46,7 @@ const HIT_SPEED = 9.2;
 const MAX_BALL_SPEED = 14;     // tête de smash ; les cloches restent ~HOLD_LOB_SPD
 const WIN_SCORE = 15;
 const TUTORIAL_WIN_SCORE = 3; // premier à 3 en tutoriel (sans écart obligatoire)
+const TOURNAMENT_WIN_SCORE = 7; // premier à 7 en tournoi (écart 2 conservé)
 const MAX_TOUCHES = 3;
 const STEP = 1000 / 60; // tick fixe 60 Hz (indispensable pour le futur mode en ligne)
 const TOUCH_COOLDOWN = 12;   // ticks mini entre deux touches comptées (anti double-comptage)

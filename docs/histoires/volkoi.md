@@ -29,27 +29,27 @@ Le Tsar rejoue sa géopolitique givrée en neuf manches, camp gauche. Trois acte
 ```js
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 1, title: "Le double gelé", sub: "Bourassie–Panguo · alliance à quatre au filet",
-  left: "volkoi", right: "timonier", ally: "bebe", right2: "dorf", terrain: 4, mode: "2v2", ai: 0, doped: null,
+  act: 1, title: "L'axe sans limites", sub: "Bourassie–Panguo vs Doria–Gallardie · double au Country Club Doré",
+  left: "volkoi", right: "dorf", ally: "timonier", right2: "cygne", terrain: 1, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Cité du Matin. Pour une fois, ce n'est plus un duel : c'est un 2 contre 2. Le Tsar amène le Maréchal ; le Timonier a recruté le Baron doré." },
-    { s: "bebe", t: "Grand voisin ! Le Maréchal est TON partenaire ! On défile en double, et mon radar couvre les deux camps !" },
-    { s: "volkoi", t: "Reste dans ton couloir, petit. Tu digues, je gèle. C'est ça, une alliance moderne." },
-    { s: "timonier", t: "Deux contre deux. L'harmonie aime les symétries. Toi, Baron, tu joues derrière moi — et tu te tais." },
-    { s: "dorf", t: "Je parle quand je veux. J'ai le plus beau filet du monde. Et le plus beau partenaire… euh… panda." },
-    { s: "narrator", t: "Match en double : équipe de gauche contre équipe de droite. Les partenaires comptent autant que les rivaux." },
+    { s: "narrator", t: "Country Club Doré. Pour une fois, ce n'est plus un duel : c'est un 2 contre 2. Le Tsar amène le Grand Timonier ; le Baron a recruté le Cygne." },
+    { s: "dorf", t: "Le Cygne, mon partenaire ! Le plus élégant du monde ! On va écraser cet axe sans limites, tout le monde le dit." },
+    { s: "cygne", t: "En même temps partenaire du Baron, en même temps critique. C'est un exercice d'équilibriste, ce double." },
+    { s: "timonier", t: "Deux contre deux. L'harmonie aime les symétries. Toi, Tsar, tu gèles ; moi, je tiens le tempo." },
+    { s: "volkoi", t: "Reste dans ton couloir, camarade. L'hiver n'a jamais eu besoin d'un partenaire bavard — mais je fais une exception." },
+    { s: "narrator", t: "Match en double : l'alliance sans limites contre le duo occidental. Les partenaires comptent autant que les rivaux." },
   ],
   win:  [
-    { s: "volkoi", t: "Le gel à deux, ça tient mieux. Beau travail, gamin — pour une fois." },
-    { s: "bebe", t: "VICTOIRE DU BINÔME ! Gravez nos deux noms dans le granit ! Côte à côte !" },
-    { s: "timonier", t: "Un set. La patience à quatre se compte autrement. On rejouera." },
-    { s: "dorf", t: "Match truqué. Totalement. Mais j'étais magnifique en partenaire." },
+    { s: "volkoi", t: "Le gel et le tempo, ça tient mieux qu'un mur d'or et un pigeon doré." },
+    { s: "timonier", t: "Deux patiences valent mieux qu'une élégance seule. L'harmonie a gagné le set." },
+    { s: "dorf", t: "Truqué ! Mon partenaire élégant a trop dialogué au lieu de smasher !" },
+    { s: "cygne", t: "Défaite de binôme. En même temps, la fermeté reviendra. Toujours." },
   ],
   lose:  [
-    { s: "timonier", t: "L'harmonie en double bat le gel en solo. Tempo corrigé." },
-    { s: "dorf", t: "ON A GAGNÉ ! Le plus grand 2v2 de l'histoire ! Les gens pleuraient en orc !" },
-    { s: "volkoi", t: "Suspension. Même à deux, parfois l'hiver attend. On reviendra." },
-    { s: "bebe", t: "Ce n'était PAS une défaite ! C'était un entraînement de partenaires !" },
+    { s: "dorf", t: "GAGNÉ ! Le plus grand duo de l'histoire, moi et le Cygne ! On dialogue ET on écrase !" },
+    { s: "cygne", t: "Voilà : fermeté et élégance, en même temps. L'axe sans limites vient de dégeler." },
+    { s: "volkoi", t: "Suspension. Même à deux, l'hiver attend parfois. On reviendra plus froids." },
+    { s: "timonier", t: "Un set. L'harmonie corrige. Le tempo n'appartient à personne pour toujours." },
   ]
 },
 {
@@ -162,24 +162,24 @@ Le Tsar rejoue sa géopolitique givrée en neuf manches, camp gauche. Trois acte
 
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 3, title: "La bromance de glace", sub: "Bourassie–Doria · flatteries croisées",
-  left: "volkoi", right: "dorf", terrain: 1, mode: "bomb", ai: 2, doped: null,
+  act: 3, title: "Sans limites, avec des limites", sub: "Bourassie–Panguo · l'amitié sans limites à l'épreuve du prix",
+  left: "volkoi", right: "timonier", terrain: 4, mode: "bomb", ai: 2, doped: null,
   pre:  [
-    { s: "narrator", t: "Country Club Doré. Resort clinquant, tour à toit plat, fontaine, palmiers en pot. Le magnat déroule le tapis, et personne ne sait qui manipule qui." },
-    { s: "dorf", t: "Le Tsar ! Un type fort. Très fort. Les gens disent qu'il est fort. On s'entend super bien, tout le monde en parle." },
-    { s: "volkoi", t: "Tu bâtis un Mur d'or, je bâtis l'hiver. Deux hommes qui adorent bloquer le camp d'en face. Presque touchant." },
-    { s: "dorf", t: "Ton hiver, ton hiver… moi j'ai le plus beau gazon du monde et un Mur en OR. De l'or ! Ça brille plus que ta neige !" },
-    { s: "volkoi", t: "L'or fond, ami. La neige revient. Devine lequel de nous deux joue la longue partie." },
-    { s: "narrator", t: "Volley de flatteries. Chacun croit tenir l'autre en laisse. Les analystes, eux, ne dorment plus. Le ballon est une bombe : le camp où elle tombe perd." }
+    { s: "narrator", t: "Cité du Matin. Lanternes rouges, lions de pierre. L'axe sans limites revient sur son propre sol — et cette fois, la balle est une bombe." },
+    { s: "timonier", t: "« Sans limites », disions-nous. Belle formule. Depuis, c'est toi qui vends le gaz au rabais, et moi qui fixe le prix. Les limites, on les a juste déplacées." },
+    { s: "volkoi", t: "Un partenaire junior qui se prend pour un senior. L'hiver n'aime pas qu'on lui dicte le tarif." },
+    { s: "timonier", t: "Junior, senior… L'harmonie n'a pas de rang, seulement un tempo. Et le tempo, ces temps-ci, ralentit surtout de ton côté." },
+    { s: "volkoi", t: "Ralentis tant que tu veux. Je suis toujours l'hiver. Toi, tu es encore l'atelier. Devine qui a le plus besoin de l'autre, ce soir." },
+    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd. Même une amitié sans limites a ses lignes rouges." }
   ],
   win:  [
-    { s: "volkoi", t: "Bon match, associé. Continue de te vanter ; ça me laisse le temps de préparer l'hiver." },
-    { s: "dorf", t: "Truqué ! Mais élégamment truqué. On refait ça au sommet, entre gars forts. Les plus forts !" },
+    { s: "volkoi", t: "L'hiver a encore de la force. L'amitié sans limites reste debout — à mes conditions, aujourd'hui." },
+    { s: "timonier", t: "Un revers. Temporaire. Le siècle appartient à celui qui patiente le plus longtemps, et ce n'est toujours pas toi." },
     { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
   ],
   lose:  [
-    { s: "dorf", t: "GAGNÉ ! Le plus grand match de tous les temps ! J'ai battu le Tsar ! Personne n'avait jamais fait ça, personne !" },
-    { s: "volkoi", t: "Savoure, associé. Je préfère te laisser la coupe et garder la partie. C'est plus chaud pour toi, plus utile pour moi." },
+    { s: "timonier", t: "« Sans limites », disais-tu. Regarde où sont les limites, maintenant : de mon côté du filet." },
+    { s: "volkoi", t: "Une manche pour l'atelier. L'hiver, contrairement à ton usine, ne ferme jamais. Je reviendrai vendre moins cher." },
     { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
   ]
 },

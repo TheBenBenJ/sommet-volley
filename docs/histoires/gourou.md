@@ -32,27 +32,27 @@ Voix du personnage : **serein-piquant**. Il ouvre chaque phrase par un « Namast
 const STORY = [
   // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
-  act: 1, title: "L'ami du désert en double", sub: "Bharatie–Levantie · partenaires de crête",
-  left: "gourou", right: "faucon", ally: "safran", right2: "volkoi", terrain: 8, mode: "2v2", ai: 0, doped: null,
+  act: 1, title: "L'ami du désert en double", sub: "Bharatie–Levantie vs Bourassie–Panguo · partenaires de crête et de désert",
+  left: "gourou", right: "volkoi", ally: "faucon", right2: "timonier", terrain: 0, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Stade Ashram. Le Gourou invite Safran en partenaire contre le Faucon et le Tsar. Un 2v2 pour tester la sérénité à quatre." },
-    { s: "gourou", t: "Namasté, Safran. Tu ralentis, je dure. Ensemble, on respire plus longtemps qu'eux." },
-    { s: "safran", t: "Partenariat zen et mesuré. Leur intransigeance va s'ennuyer avant nous." },
-    { s: "faucon", t: "Je n'aime pas les doubles. Trop de bavardage. Digue, Tsar — ou je digue pour deux." },
-    { s: "volkoi", t: "Je gèle. Tu sécurises. On verra si le calme tient sous la neige." },
-    { s: "narrator", t: "Alliance de patience contre alliance de froid. Le filet tranche." },
+    { s: "narrator", t: "Place Écarlate, sous la neige. Le Gourou invite le Faucon en partenaire contre le Tsar et le Grand Timonier. Un 2v2 pour tester la sérénité sous zéro." },
+    { s: "gourou", t: "Namasté, Faucon. Tu sécurises, je dure. Ensemble, on respire plus longtemps qu'eux." },
+    { s: "faucon", t: "Partenariat de sécurité et de patience. Leur froid et leur tempo vont s'épuiser avant nous." },
+    { s: "volkoi", t: "Je gèle. Il tient le tempo. On verra si le calme tient sous la neige, sage." },
+    { s: "timonier", t: "Deux contre deux. L'harmonie aime les symétries. Le désert et l'ashram devront patienter plus que moi." },
+    { s: "narrator", t: "Alliance de patience contre alliance de froid et d'harmonie. Le filet tranche." },
   ],
   win:  [
-    { s: "gourou", t: "Le calme en double a tenu. Merci, ami de la rose." },
-    { s: "safran", t: "Beau 2v2. Leur ligne a tremblé avant notre souffle." },
-    { s: "faucon", t: "Un set. On resserre. Moins de mots, plus de digues." },
-    { s: "volkoi", t: "Temporaire. L'hiver n'a pas dit son dernier partenaire." },
+    { s: "gourou", t: "Le calme en double a tenu. Merci, ami du désert." },
+    { s: "faucon", t: "Beau 2v2. Leur ligne a gelé avant notre souffle." },
+    { s: "volkoi", t: "Un set. Temporaire. L'hiver n'a pas dit son dernier partenaire." },
+    { s: "timonier", t: "L'harmonie corrige aussi les doubles. On reprend, ensemble." },
   ],
   lose:  [
-    { s: "faucon", t: "Ligne tenue. Double gagné. Rentrez méditer." },
-    { s: "volkoi", t: "Le gel à deux a suffi. Votre zen a pris froid." },
+    { s: "volkoi", t: "Le gel à deux a suffi. Votre zen a pris froid, sage." },
+    { s: "timonier", t: "Tempo tenu. Partenaire fiable. Le siècle continue, à deux." },
     { s: "gourou", t: "On respire, on s'incline, on revient — partenaires inclus." },
-    { s: "safran", t: "Mesure pour la revanche. La table reste là." },
+    { s: "faucon", t: "Mesure pour la revanche. La ligne, elle, reste tracée." },
   ]
 },
   {
@@ -120,24 +120,24 @@ const STORY = [
     ]
   },
   {
-    act: 2, title: "Le pétrole tiède", sub: "Bharatie–Bourassie · brut à prix d'ami, froid contre froid",
-    left: "gourou", right: "volkoi", terrain: 0, mode: "flame", ai: 2, doped: null,
+    act: 2, title: "Le marché des armes tièdes", sub: "Bharatie–Levantie · fournisseurs, drones et rivalité amicale",
+    left: "gourou", right: "faucon", terrain: 8, mode: "flame", ai: 2, doped: null,
     pre:  [
-      { s: "narrator", t: "Place Écarlate, sous la neige. Deux geleurs se rencontrent : l'un par l'hiver, l'autre par le zen. Le thermomètre panique. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
-      { s: "volkoi", t: "Tu m'achètes mon pétrole quand les autres me boudent. Sage. Le froid récompense les patients." },
-      { s: "gourou", t: "Namasté, Tsar. Je fais mes courses partout, sans choisir de camp. Ton brut, mon marché : bon échange." },
-      { s: "volkoi", t: "Deux hommes qui gèlent leurs rivaux. Curieux duel. Mon hiver contre ton silence." },
-      { s: "gourou", t: "Ton hiver vient du dehors. Mon froid vient du dedans. Devine lequel dure plus longtemps." },
-      { s: "volkoi", t: "Assez de philosophie. Sers. On verra quelle glace craque la première." }
+      { s: "narrator", t: "Citadelle du Levant, grès sur colline désertique. Deux partenaires d'affaires qui ne se font jamais vraiment la guerre — juste des contrats, et un peu de fierté. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+      { s: "faucon", t: "Tu m'achètes mes drones, je t'achète ton marché. Une amitié transactionnelle, sans grand discours. Ça me va." },
+      { s: "gourou", t: "Namasté, Faucon. Nos accords se signent en silence, sans sermon sur mes libertés. Un client rare, apprécié." },
+      { s: "faucon", t: "Je ne sermonne jamais mes clients, Gourou. Je les équipe. Et parfois, entre alliés d'affaires, on s'amuse un peu au filet." },
+      { s: "gourou", t: "Un peu ? Ton Raid Éclair n'a rien d'amusant. Mais mon souffle, lui, a toute la patience du monde." },
+      { s: "narrator", t: "Une rivalité amicale, sous le grès chaud. Ni ennemis, ni tout à fait alliés. Juste deux bons clients qui aiment gagner." }
     ],
     win:  [
-      { s: "gourou", t: "Le lac immobile gèle plus profond que le fleuve de Bourassie. Bel échange froid, Tsar. Restons en affaires. Namasté." },
-      { s: "volkoi", t: "Un revers. Rare. Ton calme est une arme d'hiver. Je m'en souviendrai — et je patiente." },
+      { s: "gourou", t: "Le calme tient même sous le grès brûlant. Bel échange, Faucon. Continuons nos affaires. Namasté." },
+      { s: "faucon", t: "Un revers commercial, sans conséquence stratégique. Je reviendrai vendre, et je reviendrai gagner." },
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ],
     lose:  [
-      { s: "volkoi", t: "Mon hiver gagne toujours à l'usure. Médite là-dessus, gourou. Le froid ne négocie pas." },
-      { s: "gourou", t: "Deux glaces, une craque. J'apprends. Namasté. Le pétrole coule, la revanche mûrit." },
+      { s: "faucon", t: "Le Raid Éclair gagne, même entre partenaires. Rien de personnel, Gourou : juste ma doctrine." },
+      { s: "gourou", t: "Une défaite amicale. J'apprends, je respire, je reviens acheter. Namasté, fournisseur intransigeant." },
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ]
   },

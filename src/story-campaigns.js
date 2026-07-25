@@ -7,76 +7,76 @@ const STORY_BY_CHAR = {
   "volkoi": [
     {
       "act": 1,
-      "title": "Le double gelé",
-      "sub": "Bourassie–Panguo · alliance à quatre au filet",
+      "title": "L'axe sans limites",
+      "sub": "Bourassie–Panguo vs Doria–Gallardie · double au Country Club Doré",
       "left": "volkoi",
-      "right": "timonier",
-      "ally": "bebe",
-      "right2": "dorf",
-      "terrain": 4,
+      "right": "dorf",
+      "ally": "timonier",
+      "right2": "cygne",
+      "terrain": 1,
       "mode": "2v2",
       "ai": 0,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Cité du Matin. Pour une fois, ce n'est plus un duel : c'est un 2 contre 2. Le Tsar amène le Maréchal ; le Timonier a recruté le Baron doré."
-        },
-        {
-          "s": "bebe",
-          "t": "Grand voisin ! Le Maréchal est TON partenaire ! On défile en double, et mon radar couvre les deux camps !"
-        },
-        {
-          "s": "volkoi",
-          "t": "Reste dans ton couloir, petit. Tu digues, je gèle. C'est ça, une alliance moderne."
-        },
-        {
-          "s": "timonier",
-          "t": "Deux contre deux. L'harmonie aime les symétries. Toi, Baron, tu joues derrière moi — et tu te tais."
+          "t": "Country Club Doré. Pour une fois, ce n'est plus un duel : c'est un 2 contre 2. Le Tsar amène le Grand Timonier ; le Baron a recruté le Cygne."
         },
         {
           "s": "dorf",
-          "t": "Je parle quand je veux. J'ai le plus beau filet du monde. Et le plus beau partenaire… euh… panda."
+          "t": "Le Cygne, mon partenaire ! Le plus élégant du monde ! On va écraser cet axe sans limites, tout le monde le dit."
+        },
+        {
+          "s": "cygne",
+          "t": "En même temps partenaire du Baron, en même temps critique. C'est un exercice d'équilibriste, ce double."
+        },
+        {
+          "s": "timonier",
+          "t": "Deux contre deux. L'harmonie aime les symétries. Toi, Tsar, tu gèles ; moi, je tiens le tempo."
+        },
+        {
+          "s": "volkoi",
+          "t": "Reste dans ton couloir, camarade. L'hiver n'a jamais eu besoin d'un partenaire bavard — mais je fais une exception."
         },
         {
           "s": "narrator",
-          "t": "Match en double : équipe de gauche contre équipe de droite. Les partenaires comptent autant que les rivaux."
+          "t": "Match en double : l'alliance sans limites contre le duo occidental. Les partenaires comptent autant que les rivaux."
         }
       ],
       "win": [
         {
           "s": "volkoi",
-          "t": "Le gel à deux, ça tient mieux. Beau travail, gamin — pour une fois."
-        },
-        {
-          "s": "bebe",
-          "t": "VICTOIRE DU BINÔME ! Gravez nos deux noms dans le granit ! Côte à côte !"
+          "t": "Le gel et le tempo, ça tient mieux qu'un mur d'or et un pigeon doré."
         },
         {
           "s": "timonier",
-          "t": "Un set. La patience à quatre se compte autrement. On rejouera."
+          "t": "Deux patiences valent mieux qu'une élégance seule. L'harmonie a gagné le set."
         },
         {
           "s": "dorf",
-          "t": "Match truqué. Totalement. Mais j'étais magnifique en partenaire."
+          "t": "Truqué ! Mon partenaire élégant a trop dialogué au lieu de smasher !"
+        },
+        {
+          "s": "cygne",
+          "t": "Défaite de binôme. En même temps, la fermeté reviendra. Toujours."
         }
       ],
       "lose": [
         {
-          "s": "timonier",
-          "t": "L'harmonie en double bat le gel en solo. Tempo corrigé."
+          "s": "dorf",
+          "t": "GAGNÉ ! Le plus grand duo de l'histoire, moi et le Cygne ! On dialogue ET on écrase !"
         },
         {
-          "s": "dorf",
-          "t": "ON A GAGNÉ ! Le plus grand 2v2 de l'histoire ! Les gens pleuraient en orc !"
+          "s": "cygne",
+          "t": "Voilà : fermeté et élégance, en même temps. L'axe sans limites vient de dégeler."
         },
         {
           "s": "volkoi",
-          "t": "Suspension. Même à deux, parfois l'hiver attend. On reviendra."
+          "t": "Suspension. Même à deux, l'hiver attend parfois. On reviendra plus froids."
         },
         {
-          "s": "bebe",
-          "t": "Ce n'était PAS une défaite ! C'était un entraînement de partenaires !"
+          "s": "timonier",
+          "t": "Un set. L'harmonie corrige. Le tempo n'appartient à personne pour toujours."
         }
       ]
     },
@@ -387,48 +387,48 @@ const STORY_BY_CHAR = {
     },
     {
       "act": 3,
-      "title": "La bromance de glace",
-      "sub": "Bourassie–Doria · flatteries croisées",
+      "title": "Sans limites, avec des limites",
+      "sub": "Bourassie–Panguo · l'amitié sans limites à l'épreuve du prix",
       "left": "volkoi",
-      "right": "dorf",
-      "terrain": 1,
+      "right": "timonier",
+      "terrain": 4,
       "mode": "bomb",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Country Club Doré. Resort clinquant, tour à toit plat, fontaine, palmiers en pot. Le magnat déroule le tapis, et personne ne sait qui manipule qui."
+          "t": "Cité du Matin. Lanternes rouges, lions de pierre. L'axe sans limites revient sur son propre sol — et cette fois, la balle est une bombe."
         },
         {
-          "s": "dorf",
-          "t": "Le Tsar ! Un type fort. Très fort. Les gens disent qu'il est fort. On s'entend super bien, tout le monde en parle."
-        },
-        {
-          "s": "volkoi",
-          "t": "Tu bâtis un Mur d'or, je bâtis l'hiver. Deux hommes qui adorent bloquer le camp d'en face. Presque touchant."
-        },
-        {
-          "s": "dorf",
-          "t": "Ton hiver, ton hiver… moi j'ai le plus beau gazon du monde et un Mur en OR. De l'or ! Ça brille plus que ta neige !"
+          "s": "timonier",
+          "t": "« Sans limites », disions-nous. Belle formule. Depuis, c'est toi qui vends le gaz au rabais, et moi qui fixe le prix. Les limites, on les a juste déplacées."
         },
         {
           "s": "volkoi",
-          "t": "L'or fond, ami. La neige revient. Devine lequel de nous deux joue la longue partie."
+          "t": "Un partenaire junior qui se prend pour un senior. L'hiver n'aime pas qu'on lui dicte le tarif."
+        },
+        {
+          "s": "timonier",
+          "t": "Junior, senior… L'harmonie n'a pas de rang, seulement un tempo. Et le tempo, ces temps-ci, ralentit surtout de ton côté."
+        },
+        {
+          "s": "volkoi",
+          "t": "Ralentis tant que tu veux. Je suis toujours l'hiver. Toi, tu es encore l'atelier. Devine qui a le plus besoin de l'autre, ce soir."
         },
         {
           "s": "narrator",
-          "t": "Volley de flatteries. Chacun croit tenir l'autre en laisse. Les analystes, eux, ne dorment plus. Le ballon est une bombe : le camp où elle tombe perd."
+          "t": "Le ballon est une bombe : le camp où elle tombe perd. Même une amitié sans limites a ses lignes rouges."
         }
       ],
       "win": [
         {
           "s": "volkoi",
-          "t": "Bon match, associé. Continue de te vanter ; ça me laisse le temps de préparer l'hiver."
+          "t": "L'hiver a encore de la force. L'amitié sans limites reste debout — à mes conditions, aujourd'hui."
         },
         {
-          "s": "dorf",
-          "t": "Truqué ! Mais élégamment truqué. On refait ça au sommet, entre gars forts. Les plus forts !"
+          "s": "timonier",
+          "t": "Un revers. Temporaire. Le siècle appartient à celui qui patiente le plus longtemps, et ce n'est toujours pas toi."
         },
         {
           "s": "narrator",
@@ -437,12 +437,12 @@ const STORY_BY_CHAR = {
       ],
       "lose": [
         {
-          "s": "dorf",
-          "t": "GAGNÉ ! Le plus grand match de tous les temps ! J'ai battu le Tsar ! Personne n'avait jamais fait ça, personne !"
+          "s": "timonier",
+          "t": "« Sans limites », disais-tu. Regarde où sont les limites, maintenant : de mon côté du filet."
         },
         {
           "s": "volkoi",
-          "t": "Savoure, associé. Je préfère te laisser la coupe et garder la partie. C'est plus chaud pour toi, plus utile pour moi."
+          "t": "Une manche pour l'atelier. L'hiver, contrairement à ton usine, ne ferme jamais. Je reviendrai vendre moins cher."
         },
         {
           "s": "narrator",
@@ -593,19 +593,19 @@ const STORY_BY_CHAR = {
     {
       "act": 1,
       "title": "L'Alliance qui coûte cher",
-      "sub": "Alliance élargie · double contre le Cygne",
+      "sub": "Doria–Levantie vs Bourassie–Ramenie · double sous haute tension",
       "left": "dorf",
-      "right": "cygne",
+      "right": "volkoi",
       "ally": "faucon",
-      "right2": "volkoi",
-      "terrain": 1,
+      "right2": "safran",
+      "terrain": 0,
       "mode": "2v2",
       "ai": 0,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Resort doré. Aujourd'hui l'Alliance joue en double : le Baron et le Faucon d'un côté, le Cygne et le Tsar de l'autre. Personne n'avait prévu ce tableau."
+          "t": "Place Écarlate, sous la neige. Aujourd'hui l'Alliance joue en double : le Baron et le Faucon d'un côté, le Tsar et Safran de l'autre. Personne n'avait prévu ce tableau."
         },
         {
           "s": "dorf",
@@ -616,12 +616,12 @@ const STORY_BY_CHAR = {
           "t": "Je ne paie rien. Je sécurise. Toi, tu parles ; moi, je digue. Deal."
         },
         {
-          "s": "cygne",
-          "t": "En même temps alliés, en même temps adversaires… et en même temps en 2v2. C'est dense."
+          "s": "volkoi",
+          "t": "Tu m'as mis avec le paria du désert. Parfait. Je gèle, il ralentit, vous perdez à deux vitesses."
         },
         {
-          "s": "volkoi",
-          "t": "Tu m'as mis avec l'oiseau bavard. Parfait. Je gèle, il parle, vous perdez."
+          "s": "safran",
+          "t": "Alliance de circonstance, mais alliance quand même. L'Ouest se réunit contre nous ; nous, on patiente, ensemble."
         },
         {
           "s": "narrator",
@@ -638,22 +638,22 @@ const STORY_BY_CHAR = {
           "t": "On a tenu la ligne. Le reste est du bruit de sommet."
         },
         {
-          "s": "cygne",
-          "t": "Défaite instructive. Mon partenaire gelé et moi, on retiendra la leçon. En même temps."
-        },
-        {
           "s": "volkoi",
           "t": "Un revers. Temporaire. Même en double, l'hiver revient."
+        },
+        {
+          "s": "safran",
+          "t": "Défaite mesurée. Le voile retombera, patient, sur ton mur d'or trop pressé."
         }
       ],
       "lose": [
         {
-          "s": "cygne",
-          "t": "Voilà : un partenariat exigeant, et un point décisif. En même temps ferme, en même temps élégant."
-        },
-        {
           "s": "volkoi",
           "t": "Le gel à deux, ça marche. Tu peux garder ton Alliance, Baron — elle vient de geler."
+        },
+        {
+          "s": "safran",
+          "t": "Un partenariat de patience contre un partenariat de bruit. Devinez lequel a tenu plus longtemps ce soir."
         },
         {
           "s": "dorf",
@@ -1039,9 +1039,9 @@ const STORY_BY_CHAR = {
     {
       "act": 3,
       "title": "Le sommet à domicile",
-      "sub": "Doria–Bourassie · flatterie, bombe et mèche courte",
+      "sub": "Doria–Gallardie · friction transatlantique, bombe et mèche courte",
       "left": "dorf",
-      "right": "volkoi",
+      "right": "cygne",
       "terrain": 1,
       "mode": "bomb",
       "ai": 3,
@@ -1049,51 +1049,51 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Finale. Retour au Country Club Doré, fontaine allumée, palmiers au garde-à-vous. Le Tsar glacial débarque sur le gazon le plus vert du monde. La bombe attend."
+          "t": "Finale. Retour au Country Club Doré, fontaine allumée, palmiers au garde-à-vous. Le Cygne, costume impeccable, débarque sur le gazon le plus vert du monde. La bombe attend."
         },
         {
-          "s": "volkoi",
-          "t": "Alors c'est ici ton palais. Beaucoup d'or. Beaucoup de bruit. J'apporte le froid. Ton gazon va geler pendant que tu klaxonnes."
+          "s": "cygne",
+          "t": "Alors c'est ici, votre palais. Beaucoup d'or, peu de nuance. Je viens en allié, et en même temps je viens vous rappeler qui paie vraiment pour l'Alliance."
         },
         {
           "s": "dorf",
-          "t": "Grand Tsar ! On s'aime bien, toi et moi, tout le monde le dit — enfin, personne le dit, mais moi je le dis. Sur MON terrain, c'est MOI qui gagne."
+          "t": "Cher Cygne ! On s'aime bien, toi et moi, tout le monde le dit — enfin, moi je le dis. Mais tu me dois de l'argent. Beaucoup d'argent. Pour la défense. La tienne."
         },
         {
-          "s": "volkoi",
-          "t": "T'aimer ? Je te tolère tant que tu m'es utile. Ce soir tu ne l'es plus. Le froid ne négocie pas. La mèche fait le travail."
+          "s": "cygne",
+          "t": "En même temps allié fidèle, en même temps facture salée. C'est un numéro d'équilibriste que je maîtrise depuis toujours."
         },
         {
           "s": "narrator",
-          "t": "Ses veines pulsent, l'aura rouge irradie. Le dopage d'État, à ciel ouvert, sur la plus belle pelouse du monde. Baron Dorf, pour une fois, joue pour lui seul."
+          "t": "Ses veines pulsent, l'aura rouge irradie. Le dopage d'État, à ciel ouvert, sur la plus belle pelouse du monde. Le Cygne, pour une fois, joue à cran."
         },
         {
           "s": "dorf",
-          "t": "Le plus grand match de tous les temps. Le froid contre l'or. Et je vais gagner. Sans carburant. Juste avec MOI, ma mèche et Le Mur. Servons."
+          "t": "Le plus grand match de tous les temps. L'Amérique contre l'élégance. Et je vais gagner. Sans carburant. Juste avec MOI, ma mèche et Le Mur. Servons."
         }
       ],
       "win": [
         {
           "s": "dorf",
-          "t": "CHAMPION ! À domicile ! Sans dopage ! Le plus grand vainqueur de l'histoire des sommets ! J'ai gelé le glacier ! On construit une tour pour fêter ça !"
+          "t": "CHAMPION ! À domicile ! Sans dopage ! Le plus grand vainqueur de l'histoire des sommets ! J'ai battu l'Europe entière à moi seul ! On construit une tour pour fêter ça !"
         },
         {
-          "s": "volkoi",
-          "t": "Une défaite. Sur ton gazon, sous tes palmiers dorés. Profite, bavard. L'hiver est patient, et il connaît le chemin de ta fontaine."
+          "s": "cygne",
+          "t": "Une défaite. Sur votre gazon, sous vos palmiers dorés. En même temps, l'Alliance survivra à cette facture-là aussi. Elle survit à tout."
         },
         {
           "s": "narrator",
-          "t": "La machine glacée tombe au bout du monde doré. Baron Dorf lève les bras, salue une foule immense — et pour une fois, elle existe vraiment. Générique."
+          "t": "L'élégance dopée tombe au bout du monde doré. Baron Dorf lève les bras, salue une foule immense — et pour une fois, elle existe vraiment. Générique."
         }
       ],
       "lose": [
         {
-          "s": "volkoi",
-          "t": "Le froid a éteint la fontaine. Ton or brille encore, mais il ne renvoie pas les bombes. Prévu. Comme toujours."
+          "s": "cygne",
+          "t": "La fermeté a éteint la fontaine. Votre or brille encore, mais il ne renvoie pas les bombes. En même temps, c'était prévisible."
         },
         {
           "s": "dorf",
-          "t": "Truqué ! Le plus grand vol de l'histoire ! Sur MON terrain ! Une enquête, la plus grande enquête ! Je reviendrai, plus doré, plus fort. Croyez-moi."
+          "t": "Truqué ! Le plus grand vol de l'histoire ! Sur MON terrain ! Une enquête, la plus grande enquête ! Et l'addition, Cygne, je te l'envoie en double !"
         }
       ]
     }
@@ -1102,35 +1102,35 @@ const STORY_BY_CHAR = {
     {
       "act": 1,
       "title": "La poignée de main à quatre",
-      "sub": "Gallardie–Libertaria · double diplomatique",
+      "sub": "Gallardie–Doria vs Ryonganie–Bourassie · double diplomatique",
       "left": "cygne",
-      "right": "dorf",
-      "ally": "safran",
+      "right": "bebe",
+      "ally": "dorf",
       "right2": "volkoi",
-      "terrain": 1,
+      "terrain": 3,
       "mode": "2v2",
       "ai": 0,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Resort doré. Le Cygne a invité Safran comme partenaire de double. En face : le Baron et le Tsar. La poignée de main devient un nœud à quatre mains."
+          "t": "Esplanade du Défilé. Le Cygne a invité le Baron comme partenaire de double. En face : le Maréchal et le Tsar. La poignée de main devient un nœud à quatre mains."
         },
         {
           "s": "cygne",
-          "t": "Cher Safran, vous diguez avec élégance, je passe en force. Ensemble, en même temps."
-        },
-        {
-          "s": "safran",
-          "t": "Un partenariat mesuré. Tant que ton allié doré ne déchire pas encore un accord au milieu du set."
+          "t": "Cher Baron, vous bâtissez des murs, je passe en force. Ensemble, en même temps, ça devrait fonctionner."
         },
         {
           "s": "dorf",
-          "t": "Deux contre deux ! J'ai le meilleur partenaire… euh… le plus froid. Ça compte."
+          "t": "Un partenariat historique ! Le plus grand ! Toi tu parles, moi je construis. On va écraser ce défilé."
+        },
+        {
+          "s": "bebe",
+          "t": "Deux contre deux ! Le Maréchal a le Tsar comme partenaire, et mon radar couvre les DEUX camps ennemis !"
         },
         {
           "s": "volkoi",
-          "t": "Je n'aime pas les poignées de main. Je préfère les points. Digue, Baron."
+          "t": "Je digue, il défile. Un partenaire bruyant reste un partenaire. Servons, petit."
         },
         {
           "s": "narrator",
@@ -1140,37 +1140,37 @@ const STORY_BY_CHAR = {
       "win": [
         {
           "s": "cygne",
-          "t": "Partenariat réussi. Fermeté et protocole, en même temps. Merci, Safran."
-        },
-        {
-          "s": "safran",
-          "t": "Beau double. La table des négociations reste ouverte — contrairement à leur camp."
+          "t": "Partenariat réussi. Fermeté et flatterie, en même temps. Merci, Baron."
         },
         {
           "s": "dorf",
-          "t": "Truqué. Mon partenaire gelait trop. Ou pas assez. Les deux."
+          "t": "ÉNORME ! Meilleure alliance du monde ! Le Cygne, pas mauvais — pour un partenaire qui parle en même temps."
+        },
+        {
+          "s": "bebe",
+          "t": "REVANCHE ! Mon partenaire a gelé trop lentement !"
         },
         {
           "s": "volkoi",
-          "t": "Un set. L'hiver, lui, ne joue jamais en double : il joue seul contre tout le monde."
+          "t": "Un set. L'hiver, lui, ne joue jamais vraiment en double : il joue seul contre tout le monde."
         }
       ],
       "lose": [
         {
-          "s": "dorf",
-          "t": "GAGNÉ ! Meilleur 2v2 du monde ! Volkoï, t'es… correct. Pour un Tsar."
+          "s": "bebe",
+          "t": "VICTOIRE DU BINÔME ! Le Maréchal et le Tsar ! Gravez nos deux noms dans le granit !"
         },
         {
           "s": "volkoi",
-          "t": "Le gel a deux visages ce soir. Le vôtre a craqué."
+          "t": "Le gel a deux visages ce soir. Le vôtre a craqué en premier."
         },
         {
           "s": "cygne",
-          "t": "Défaite de binôme. On retient la main, on retend la corde. Ensemble."
+          "t": "Défaite de binôme. On retient la main, on retend la corde. Ensemble, toujours."
         },
         {
-          "s": "safran",
-          "t": "Mesure ta prochaine alliance, Cygne. Même les partenaires ont besoin d'accords tenus."
+          "s": "dorf",
+          "t": "Truqué ! Mon partenaire élégant parlait trop, pas assez de smashs !"
         }
       ]
     },
@@ -1477,48 +1477,48 @@ const STORY_BY_CHAR = {
     },
     {
       "act": 3,
-      "title": "Le petit maréchal et la ligne rouge",
-      "sub": "Gallardie–Ryonganie · la mèche et le radar",
+      "title": "Tarifs entre alliés",
+      "sub": "Gallardie–Doria · quand le protecteur présente la facture",
       "left": "cygne",
-      "right": "bebe",
-      "terrain": 3,
+      "right": "dorf",
+      "terrain": 1,
       "mode": "bomb",
       "ai": 3,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Esplanade du Défilé. Gradins de granit, arc abstrait, un radar militaire qui s'allume et s'éteint. Le ballon-bombe grésille déjà."
+          "t": "Country Club Doré. Fontaine allumée, palmiers en pot. L'allié le plus bruyant du monde reçoit le partenaire qui ose lui présenter une facture."
         },
         {
-          "s": "bebe",
-          "t": "Regarde mon radar clignoter, Cygne ! Le plus grand radar ! J'ai des bombes plus grosses que ton obélisque, et elles saluent au défilé !"
-        },
-        {
-          "s": "cygne",
-          "t": "Je vous propose la porte de sortie diplomatique. La main tendue, et en même temps, une ligne rouge très ferme. Ne franchissez pas la ligne."
-        },
-        {
-          "s": "bebe",
-          "t": "Une ligne rouge ! Ha ! Chez moi, les lignes rouges, on marche dessus au pas cadencé ! Un-deux, un-deux, boum !"
+          "s": "dorf",
+          "t": "Cher Cygne ! Toujours allié, toujours ami — mais tes vins, tes fromages, tes avions, je les taxe. Beaucoup. Énormément."
         },
         {
           "s": "cygne",
-          "t": "L'isolement vous étouffe, Maréchal. Renvoyez la bombe, asseyons-nous, parlons. Je peux être votre interlocuteur. Le seul, peut-être."
+          "t": "En même temps allié fidèle, en même temps client mécontent. Nous avons nos tarifs aussi, cher Baron. Et notre ligne rouge."
         },
         {
-          "s": "bebe",
-          "t": "Parler ? Je préfère parader ! Éteins le radar si tu peux, technocrate. Sinon, il te verra exploser en direct."
+          "s": "dorf",
+          "t": "Une ligne rouge ? J'ai un Mur d'or ! Le tien est en pierre, le mien est en or massif. Devine lequel tient le mieux la pression."
+        },
+        {
+          "s": "cygne",
+          "t": "Le dialogue, toujours. Et en même temps la fermeté : nous ne cédons pas un pouce sur nos tarifs douaniers. Renvoyez la bombe, Baron, avant l'escalade."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd. Entre alliés aussi, la facture peut exploser."
         }
       ],
       "win": [
         {
           "s": "cygne",
-          "t": "Vous voyez : la fermeté paie mieux que la parade. Ma porte reste ouverte. En même temps, ma ligne rouge reste tracée."
+          "t": "Vous voyez : la fermeté commerciale paie mieux que le klaxon. Ma porte reste ouverte. En même temps, mes tarifs restent en place."
         },
         {
-          "s": "bebe",
-          "t": "Rejouons ! REJOUONS ! Mon radar exige une revanche ! Ce n'est pas une défaite, c'est un défilé interrompu !"
+          "s": "dorf",
+          "t": "Truqué ! Un allié qui gagne, c'est déjà suspect ! On renégocie l'accord, cher Cygne. Un accord plus grand. Le plus grand."
         },
         {
           "s": "narrator",
@@ -1527,12 +1527,12 @@ const STORY_BY_CHAR = {
       ],
       "lose": [
         {
-          "s": "bebe",
-          "t": "BOUM ! Le plus beau boum du défilé ! Mon radar l'a vu venir ! Salut, Cygne en miettes !"
+          "s": "dorf",
+          "t": "BOUM ! Chez l'élégant ! Même mes meilleurs amis explosent quand je décide de gagner ! Rien de personnel, cher Cygne — enfin, un peu."
         },
         {
           "s": "cygne",
-          "t": "Une escalade regrettable. Je maintiens le canal de discussion. On ne referme jamais tout à fait une porte. Même soufflée par une bombe."
+          "t": "Une escalade regrettable, entre partenaires. En même temps, je maintiens le canal de discussion — et mes tarifs, eux aussi."
         }
       ]
     },
@@ -1671,35 +1671,35 @@ const STORY_BY_CHAR = {
     {
       "act": 1,
       "title": "Le grand frère en double",
-      "sub": "Ryonganie–Panguo · binôme sous tutelle",
+      "sub": "Ryonganie–Panguo vs Doria–Gallardie · binôme sous tutelle",
       "left": "bebe",
-      "right": "timonier",
-      "ally": "volkoi",
-      "right2": "dorf",
-      "terrain": 4,
+      "right": "dorf",
+      "ally": "timonier",
+      "right2": "cygne",
+      "terrain": 1,
       "mode": "2v2",
       "ai": 0,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Esplanade du Défilé. Le Maréchal a exigé un 2v2 : il veut le Tsar comme partenaire contre le Timonier et le Baron."
+          "t": "Country Club Doré. Le Maréchal a exigé un 2v2 : il veut le Grand Timonier comme partenaire contre le Baron et le Cygne."
         },
         {
           "s": "bebe",
           "t": "Grand frère ! Tu digues avec MOI ! Mon radar couvre tout le terrain ! Les deux camps !"
         },
         {
-          "s": "volkoi",
+          "s": "timonier",
           "t": "Je suis ton partenaire, pas ton fan. Digue quand je te le dis. Silence ensuite."
         },
         {
-          "s": "timonier",
-          "t": "Deux enfants turbulents contre l'harmonie et… le bruit doré. Tempo."
+          "s": "dorf",
+          "t": "Deux enfants turbulents contre le bruit doré et… l'élégance. Moi je klaxonne, mon partenaire dialogue. Ça devrait suffire."
         },
         {
-          "s": "dorf",
-          "t": "Je suis le bruit doré, oui. Et le meilleur partenaire de panda du monde."
+          "s": "cygne",
+          "t": "En même temps partenaire du Baron, en même temps critique de son mur. Un exercice, comme toujours."
         },
         {
           "s": "narrator",
@@ -1709,37 +1709,37 @@ const STORY_BY_CHAR = {
       "win": [
         {
           "s": "bebe",
-          "t": "BINÔME GLORIEUX ! Le Maréchal et le Tsar ! Gravez-nous en GRANIT DOUBLE !"
-        },
-        {
-          "s": "volkoi",
-          "t": "Correct, petit. Une fois. N'en fais pas une parade de douze mille pas."
+          "t": "BINÔME GLORIEUX ! Le Maréchal et le Grand Timonier ! Gravez-nous en GRANIT DOUBLE !"
         },
         {
           "s": "timonier",
-          "t": "Un revers. L'harmonie corrige aussi les doubles."
+          "t": "Correct, petit. Une fois. N'en fais pas une parade de douze mille pas."
         },
         {
           "s": "dorf",
-          "t": "Mon partenaire a trop médité. Moi j'étais parfait."
+          "t": "Mon partenaire élégant a trop dialogué. Moi j'étais parfait, comme toujours."
+        },
+        {
+          "s": "cygne",
+          "t": "Défaite de binôme. En même temps, la fermeté reviendra."
         }
       ],
       "lose": [
         {
-          "s": "timonier",
-          "t": "Le tempo à quatre a tranché. Rentrez défiler moins fort."
+          "s": "dorf",
+          "t": "ON A GAGNÉ LE 2v2 ! Le plus beau ! Le Cygne, pas mauvais — pour un partenaire qui parle en même temps."
         },
         {
-          "s": "dorf",
-          "t": "ON A GAGNÉ LE 2v2 ! Le plus beau !"
+          "s": "cygne",
+          "t": "Partenariat efficace, même improbable. En même temps, méritée."
         },
         {
           "s": "bebe",
           "t": "CE N'EST PAS UNE DÉFAITE DE PARTENAIRES ! C'est un entraînement !"
         },
         {
-          "s": "volkoi",
-          "t": "Gamin… la prochaine fois, tu digues vraiment. L'alliance, ça se mérite."
+          "s": "timonier",
+          "t": "Le tempo à quatre a tranché. Rentrez défiler moins fort."
         }
       ]
     },
@@ -1802,58 +1802,58 @@ const STORY_BY_CHAR = {
     },
     {
       "act": 1,
-      "title": "Cher ennemi bien-aimé",
-      "sub": "Ryonganie–Doria · les lettres magnifiques",
+      "title": "Le grand frère qui gronde",
+      "sub": "Ryonganie–Panguo · le patron n'aime pas les tests surprises",
       "left": "bebe",
-      "right": "dorf",
-      "terrain": 3,
+      "right": "timonier",
+      "terrain": 4,
       "mode": "volley",
       "ai": 1,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Sommet historique sur l'Esplanade. Deux hommes qui se sont menacés d'anéantissement se sourient devant les caméras. Personne ne comprend rien. C'est parfait."
+          "t": "Cité du Matin. Lanternes rouges, lions de pierre. Le petit frère vient réclamer du carburant ; le grand frère, lui, veut surtout du calme."
         },
         {
-          "s": "dorf",
-          "t": "On s'est écrit des lettres. Les plus belles lettres. On est tombés amoureux, tout le monde le dit. Enfin, moi je le dis."
-        },
-        {
-          "s": "bebe",
-          "t": "Cher Baron ! Ta lettre était magnifique. La mienne était plus magnifique. J'ai le plus gros bouton, tu te souviens ?"
-        },
-        {
-          "s": "dorf",
-          "t": "Le plus gros bouton c'est le mien, et il marche. Mais on est potes. Un match entre potes qui pourraient finir le monde."
+          "s": "timonier",
+          "t": "Je paie le charbon, je paie le pétrole, je paie presque tout. En échange, une seule chose : pas de vagues. Et tu en fais, petit."
         },
         {
           "s": "bebe",
-          "t": "Chez moi, on ne saute pas le filet, sinon flak. Mais pour toi, mon ami, je laisse le radar tourner tout doucement."
+          "t": "Un test, c'est une fête ! Une fusée, c'est un feu d'artifice ! Le peuple adore, le radar adore, tout le monde adore !"
         },
         {
-          "s": "dorf",
-          "t": "Adorable. Vraiment. Sers, gamin, et souris à la caméra : ce sommet va faire un audimat historique."
+          "s": "timonier",
+          "t": "Le peuple adore. Mes voisins, non. Mes marchés, non. L'harmonie n'aime pas les surprises bruyantes, Maréchal."
+        },
+        {
+          "s": "bebe",
+          "t": "Chez moi, on ne saute pas le filet, sinon flak ! Mais pour toi, grand frère, je laisse le radar tourner tout doucement. Un peu."
+        },
+        {
+          "s": "timonier",
+          "t": "Tourne-le comme tu veux. Range tes fusées le temps du match, et je continuerai de fermer les yeux le reste du temps."
         }
       ],
       "win": [
         {
           "s": "bebe",
-          "t": "J'ai battu mon meilleur ennemi ! Écris-moi une lettre de félicitations. Une belle. Très belle."
+          "t": "J'ai battu mon grand frère ! Ce n'est pas un affront, c'est un HOMMAGE ! Envoie plus de charbon quand même !"
         },
         {
-          "s": "dorf",
-          "t": "Match truqué, mais quel show ! On remet ça au prochain sommet, mon petit Maréchal terrible."
+          "s": "timonier",
+          "t": "Un revers sans conséquence. L'harmonie patiente, même avec un petit frère indiscipliné."
         }
       ],
       "lose": [
         {
-          "s": "dorf",
-          "t": "Gagné ! Le plus beau sommet de l'histoire ! Les gens pleuraient, il paraît. Moi aussi presque."
+          "s": "timonier",
+          "t": "Le tempo discipline même les plus turbulents. Range tes fusées, petit frère, et laisse le grand frère négocier pour toi."
         },
         {
           "s": "bebe",
-          "t": "Tu gagnes le match, pas mon cœur. Enfin si, un peu mon cœur. Mais je garde mes fusées, hein."
+          "t": "Tu gagnes le match, pas mon armement. Mais je garde mes fusées, hein. Et un peu de charbon, s'il te plaît."
         }
       ]
     },
@@ -2239,36 +2239,36 @@ const STORY_BY_CHAR = {
   "timonier": [
     {
       "act": 1,
-      "title": "Le petit frère en face",
-      "sub": "Panguo–Ryonganie · double de l'harmonie",
+      "title": "L'axe sans limites",
+      "sub": "Panguo–Bourassie vs Doria–Gallardie · double de l'harmonie",
       "left": "timonier",
-      "right": "bebe",
-      "ally": "safran",
-      "right2": "dorf",
-      "terrain": 3,
+      "right": "dorf",
+      "ally": "volkoi",
+      "right2": "cygne",
+      "terrain": 1,
       "mode": "2v2",
       "ai": 0,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Cité du Matin. Le Timonier choisit Safran comme partenaire. En face : le Maréchal et le Baron. Un 2v2 pour enseigner le tempo."
+          "t": "Country Club Doré. Le Timonier choisit le Tsar comme partenaire. En face : le Baron et le Cygne. Un 2v2 pour enseigner le tempo à l'Occident réuni."
         },
         {
           "s": "timonier",
-          "t": "Toi, rose, tu joues avec moi. Peu de mots. Beaucoup de digues. L'harmonie en double."
+          "t": "Toi, l'hiver, tu joues avec moi. Peu de mots. Beaucoup de gel. L'harmonie sans limites, en double."
         },
         {
-          "s": "safran",
-          "t": "Partenariat élégant. Je ralentis leur camp ; tu imposes le tempo. Marché conclu."
-        },
-        {
-          "s": "bebe",
-          "t": "Le Maréchal a le Baron comme partenaire ! On va gagner EN DÉFILANT !"
+          "s": "volkoi",
+          "t": "Partenariat solide. Je gèle leur camp ; tu imposes le tempo. Marché conclu, camarade."
         },
         {
           "s": "dorf",
-          "t": "Je défile pas. Je gagne. Digue, petit, et regarde le maître."
+          "t": "Le Baron a le Cygne comme partenaire ! Le plus élégant du monde ! On va écraser l'axe sans limites !"
+        },
+        {
+          "s": "cygne",
+          "t": "En même temps partenaire du Baron, en même temps critique. Un exercice, comme toujours."
         },
         {
           "s": "narrator",
@@ -2278,37 +2278,37 @@ const STORY_BY_CHAR = {
       "win": [
         {
           "s": "timonier",
-          "t": "Tempo tenu. Partenaire fiable. Le siècle continue."
+          "t": "Tempo tenu. Partenaire fiable. Le siècle continue, à deux."
         },
         {
-          "s": "safran",
-          "t": "Beau double. La lenteur a usé la parade."
-        },
-        {
-          "s": "bebe",
-          "t": "REVANCHE ! Mon partenaire a trop parlé !"
+          "s": "volkoi",
+          "t": "Beau double. Le gel a usé leur élégance."
         },
         {
           "s": "dorf",
-          "t": "Truqué. Évidemment. Mais magnifique quand même."
+          "t": "Truqué ! Mon partenaire élégant parlait trop, pas assez de smashs !"
+        },
+        {
+          "s": "cygne",
+          "t": "Défaite de binôme. En même temps, la fermeté reviendra."
         }
       ],
       "lose": [
         {
-          "s": "bebe",
-          "t": "VICTOIRE DU BINÔME ! Radar + or = imbattable !"
+          "s": "dorf",
+          "t": "ÉNORME ! Le plus grand 2v2 ! Le Cygne, pas mauvais — pour un partenaire qui parle en même temps !"
         },
         {
-          "s": "dorf",
-          "t": "Le plus grand 2v2 ! Dis-le, panda !"
+          "s": "cygne",
+          "t": "Partenariat efficace, même improbable. En même temps, méritée."
         },
         {
           "s": "timonier",
-          "t": "Un set perdu. L'harmonie digère. On reprend."
+          "t": "Un set perdu. L'harmonie digère. On reprend, ensemble."
         },
         {
-          "s": "safran",
-          "t": "Mesure pour la revanche. Les partenaires, ça se recalibre."
+          "s": "volkoi",
+          "t": "Mesure pour la revanche. Même à deux, l'hiver attend parfois."
         }
       ]
     },
@@ -2688,10 +2688,10 @@ const STORY_BY_CHAR = {
     },
     {
       "act": 3,
-      "title": "La guerre froide des tarifs",
-      "sub": "Panguo–Doria · rempart d'or contre rempart rouge",
+      "title": "Le protégé qui teste trop",
+      "sub": "Panguo–Ryonganie · sanctions, patience et petit frère nucléaire",
       "left": "timonier",
-      "right": "dorf",
+      "right": "bebe",
       "terrain": 4,
       "mode": "bomb",
       "ai": 3,
@@ -2699,37 +2699,37 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Cité du Matin. Les lanternes rouges se balancent. Face à l'empereur, le Baron dresse un mur d'or contre un mur cramoisi. La bombe compte les points."
+          "t": "Cité du Matin. Les lanternes rouges se balancent. L'empereur reçoit son protégé le plus explosif — littéralement. La bombe compte les points."
         },
         {
-          "s": "dorf",
-          "t": "Des tarifs ! Des tarifs colossaux ! Cent pour cent sur tes ballons, deux cents sur ton filet, mille pour cent sur ton rempart !"
-        },
-        {
-          "s": "timonier",
-          "t": "Taxe tout. Tes usines, tes jouets, tes drapeaux « fabriqués chez toi »… c'est encore ma Cité qui les assemble."
-        },
-        {
-          "s": "dorf",
-          "t": "Je bâtis LE plus beau mur du monde, un mur d'or, et je te ferme mon marché ! On se découple, empereur !"
+          "s": "bebe",
+          "t": "Grand frère ! J'ai testé une NOUVELLE fusée ! La plus grosse ! Le radar en tremble encore !"
         },
         {
           "s": "timonier",
-          "t": "Tu bâtis un mur devant toi ; moi j'en bâtis un au milieu de ton camp. Le tien te protège. Le mien t'enferme."
+          "t": "Je le sais. Toute la région le sait. Mes marchés aussi. L'harmonie n'apprécie pas les explosions surprises, petit."
         },
         {
-          "s": "dorf",
-          "t": "Guerre commerciale ! La plus grande guerre commerciale de l'histoire ! Et je vais la GAGNER, comme toujours !"
+          "s": "bebe",
+          "t": "Les sanctions me font pas peur ! J'ai mon radar, ma Batterie AA, et un grand frère qui paie toujours, au fond !"
+        },
+        {
+          "s": "timonier",
+          "t": "Je paie parce que ta chute coûterait plus cher que ta bombe. Ce n'est pas de l'amour, Maréchal. C'est de l'arithmétique."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd. Même la patience impériale a une limite de bruit."
         }
       ],
       "win": [
         {
           "s": "timonier",
-          "t": "Deux murs, deux empires. Le tien brille ; le mien dure. Reviens quand tes rayons seront vides."
+          "t": "Le tempo discipline même les plus bruyants. Range tes fusées. Le siècle n'a pas besoin de ton feu d'artifice."
         },
         {
-          "s": "dorf",
-          "t": "Truqué ! Subventionné ! Manipulation de monnaie ! … Bon. Combien pour rouvrir tes chaînes, au fait ?"
+          "s": "bebe",
+          "t": "Rejouons ! REJOUONS ! Ce n'est pas une défaite, c'est un exercice de tir supervisé par le grand frère !"
         },
         {
           "s": "narrator",
@@ -2738,12 +2738,12 @@ const STORY_BY_CHAR = {
       ],
       "lose": [
         {
-          "s": "dorf",
-          "t": "Boum ! Chez toi ! On gagne la guerre des tarifs ! On gagne tellement que la Cité en pleure !"
+          "s": "bebe",
+          "t": "BOUM ! Chez le grand frère ! Le petit a battu l'empereur ! Défilé triple ce soir !"
         },
         {
           "s": "timonier",
-          "t": "Une manche pour l'or. Le temps, lui, joue en rouge. J'attends. J'ai des siècles d'entraînement."
+          "t": "Une manche pour le bruit. L'harmonie, elle, continuera de payer ta facture — et de fermer les yeux. Pour l'instant."
         }
       ]
     },
@@ -2817,11 +2817,11 @@ const STORY_BY_CHAR = {
     {
       "act": 1,
       "title": "Le marché à quatre",
-      "sub": "Bosforie–Libertaria · double contre l'or",
+      "sub": "Bosforie–Bourassie vs Doria–Levantie · double contre l'Ouest et l'or",
       "left": "sultan",
       "right": "dorf",
-      "ally": "safran",
-      "right2": "cygne",
+      "ally": "volkoi",
+      "right2": "faucon",
       "terrain": 1,
       "mode": "2v2",
       "ai": 0,
@@ -2829,63 +2829,63 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Pont des Deux Mondes. Le Sultan s'allie à Safran pour un 2v2 contre le Baron et le Cygne — commerce, détroit, et filet."
+          "t": "Country Club Doré. Le Sultan s'allie au Tsar pour un 2v2 contre le Baron et le Faucon — S-400, détroit, et défi à l'Ouest."
         },
         {
           "s": "sultan",
-          "t": "Toi, Safran, tu es mon partenaire. On vend, on digue, on ouvre les portes — les leurs."
+          "t": "Toi, Tsar, tu es mon partenaire. Je t'achète tes défenses, tu me couvres au filet. Le meilleur des deals."
         },
         {
-          "s": "safran",
-          "t": "Alliance de mesure. Tant que ton marché de missiles ne devient pas mon problème au milieu du set."
+          "s": "volkoi",
+          "t": "Alliance de circonstance. Tant que ton détroit ne bloque pas mon gaz au milieu du set."
         },
         {
           "s": "dorf",
-          "t": "J'ai le Cygne en partenaire ! Le plus cher ! Il paie enfin sa part — en points !"
+          "t": "J'ai le Faucon en partenaire ! Le plus dur ! On va sécuriser cette alliance de bric et de broc !"
         },
         {
-          "s": "cygne",
-          "t": "En même temps partenaire, en même temps critique. C'est ça, une alliance exigeante."
+          "s": "faucon",
+          "t": "Je ne sécurise pas les alliances de circonstance. Je sécurise les points. Digue, Baron."
         },
         {
           "s": "narrator",
-          "t": "Mode double : le détroit se joue à quatre mains."
+          "t": "Mode double : le détroit et le désert se jouent à quatre mains."
         }
       ],
       "win": [
         {
           "s": "sultan",
-          "t": "Le marché est conclu : notre camp marque. Merci, partenaire."
+          "t": "Le marché est conclu : notre camp marque. Merci, partenaire du froid."
         },
         {
-          "s": "safran",
-          "t": "Élégant. Leur or a moins bien digué que notre patience."
+          "s": "volkoi",
+          "t": "Élégant. Leur sécurité a moins digué que notre patience."
         },
         {
           "s": "dorf",
-          "t": "Truqué ! Mon partenaire parlait trop !"
+          "t": "Truqué ! Mon partenaire sécuritaire parlait de raids, pas assez de smashs !"
         },
         {
-          "s": "cygne",
-          "t": "Défaite de binôme. On renégocie les critères. En même temps."
+          "s": "faucon",
+          "t": "Un set. On resserre. Moins de mots, plus de digues."
         }
       ],
       "lose": [
         {
           "s": "dorf",
-          "t": "GAGNÉ ! Meilleure alliance payante du monde !"
+          "t": "GAGNÉ ! Meilleure alliance sécuritaire du monde !"
         },
         {
-          "s": "cygne",
-          "t": "Partenariat efficace. Même avec un Baron. Surtout avec un Baron."
+          "s": "faucon",
+          "t": "Ligne tenue. Double gagné. Rentrez négocier vos S-400."
         },
         {
           "s": "sultan",
           "t": "La porte a tenu… contre nous. On reviendra plus nombreux — enfin, à deux."
         },
         {
-          "s": "safran",
-          "t": "Recalons la table. Les doubles, ça se renégocie."
+          "s": "volkoi",
+          "t": "Recalons la table. Les doubles, ça se renégocie, camarade."
         }
       ]
     },
@@ -3386,75 +3386,75 @@ const STORY_BY_CHAR = {
     {
       "act": 1,
       "title": "L'ami du désert en double",
-      "sub": "Bharatie–Levantie · partenaires de crête",
+      "sub": "Bharatie–Levantie vs Bourassie–Panguo · partenaires de crête et de désert",
       "left": "gourou",
-      "right": "faucon",
-      "ally": "safran",
-      "right2": "volkoi",
-      "terrain": 8,
+      "right": "volkoi",
+      "ally": "faucon",
+      "right2": "timonier",
+      "terrain": 0,
       "mode": "2v2",
       "ai": 0,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Stade Ashram. Le Gourou invite Safran en partenaire contre le Faucon et le Tsar. Un 2v2 pour tester la sérénité à quatre."
+          "t": "Place Écarlate, sous la neige. Le Gourou invite le Faucon en partenaire contre le Tsar et le Grand Timonier. Un 2v2 pour tester la sérénité sous zéro."
         },
         {
           "s": "gourou",
-          "t": "Namasté, Safran. Tu ralentis, je dure. Ensemble, on respire plus longtemps qu'eux."
-        },
-        {
-          "s": "safran",
-          "t": "Partenariat zen et mesuré. Leur intransigeance va s'ennuyer avant nous."
+          "t": "Namasté, Faucon. Tu sécurises, je dure. Ensemble, on respire plus longtemps qu'eux."
         },
         {
           "s": "faucon",
-          "t": "Je n'aime pas les doubles. Trop de bavardage. Digue, Tsar — ou je digue pour deux."
+          "t": "Partenariat de sécurité et de patience. Leur froid et leur tempo vont s'épuiser avant nous."
         },
         {
           "s": "volkoi",
-          "t": "Je gèle. Tu sécurises. On verra si le calme tient sous la neige."
+          "t": "Je gèle. Il tient le tempo. On verra si le calme tient sous la neige, sage."
+        },
+        {
+          "s": "timonier",
+          "t": "Deux contre deux. L'harmonie aime les symétries. Le désert et l'ashram devront patienter plus que moi."
         },
         {
           "s": "narrator",
-          "t": "Alliance de patience contre alliance de froid. Le filet tranche."
+          "t": "Alliance de patience contre alliance de froid et d'harmonie. Le filet tranche."
         }
       ],
       "win": [
         {
           "s": "gourou",
-          "t": "Le calme en double a tenu. Merci, ami de la rose."
-        },
-        {
-          "s": "safran",
-          "t": "Beau 2v2. Leur ligne a tremblé avant notre souffle."
+          "t": "Le calme en double a tenu. Merci, ami du désert."
         },
         {
           "s": "faucon",
-          "t": "Un set. On resserre. Moins de mots, plus de digues."
+          "t": "Beau 2v2. Leur ligne a gelé avant notre souffle."
         },
         {
           "s": "volkoi",
-          "t": "Temporaire. L'hiver n'a pas dit son dernier partenaire."
+          "t": "Un set. Temporaire. L'hiver n'a pas dit son dernier partenaire."
+        },
+        {
+          "s": "timonier",
+          "t": "L'harmonie corrige aussi les doubles. On reprend, ensemble."
         }
       ],
       "lose": [
         {
-          "s": "faucon",
-          "t": "Ligne tenue. Double gagné. Rentrez méditer."
+          "s": "volkoi",
+          "t": "Le gel à deux a suffi. Votre zen a pris froid, sage."
         },
         {
-          "s": "volkoi",
-          "t": "Le gel à deux a suffi. Votre zen a pris froid."
+          "s": "timonier",
+          "t": "Tempo tenu. Partenaire fiable. Le siècle continue, à deux."
         },
         {
           "s": "gourou",
           "t": "On respire, on s'incline, on revient — partenaires inclus."
         },
         {
-          "s": "safran",
-          "t": "Mesure pour la revanche. La table reste là."
+          "s": "faucon",
+          "t": "Mesure pour la revanche. La ligne, elle, reste tracée."
         }
       ]
     },
@@ -3639,48 +3639,48 @@ const STORY_BY_CHAR = {
     },
     {
       "act": 2,
-      "title": "Le pétrole tiède",
-      "sub": "Bharatie–Bourassie · brut à prix d'ami, froid contre froid",
+      "title": "Le marché des armes tièdes",
+      "sub": "Bharatie–Levantie · fournisseurs, drones et rivalité amicale",
       "left": "gourou",
-      "right": "volkoi",
-      "terrain": 0,
+      "right": "faucon",
+      "terrain": 8,
       "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Place Écarlate, sous la neige. Deux geleurs se rencontrent : l'un par l'hiver, l'autre par le zen. Le thermomètre panique. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
+          "t": "Citadelle du Levant, grès sur colline désertique. Deux partenaires d'affaires qui ne se font jamais vraiment la guerre — juste des contrats, et un peu de fierté. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
-          "s": "volkoi",
-          "t": "Tu m'achètes mon pétrole quand les autres me boudent. Sage. Le froid récompense les patients."
-        },
-        {
-          "s": "gourou",
-          "t": "Namasté, Tsar. Je fais mes courses partout, sans choisir de camp. Ton brut, mon marché : bon échange."
-        },
-        {
-          "s": "volkoi",
-          "t": "Deux hommes qui gèlent leurs rivaux. Curieux duel. Mon hiver contre ton silence."
+          "s": "faucon",
+          "t": "Tu m'achètes mes drones, je t'achète ton marché. Une amitié transactionnelle, sans grand discours. Ça me va."
         },
         {
           "s": "gourou",
-          "t": "Ton hiver vient du dehors. Mon froid vient du dedans. Devine lequel dure plus longtemps."
+          "t": "Namasté, Faucon. Nos accords se signent en silence, sans sermon sur mes libertés. Un client rare, apprécié."
         },
         {
-          "s": "volkoi",
-          "t": "Assez de philosophie. Sers. On verra quelle glace craque la première."
+          "s": "faucon",
+          "t": "Je ne sermonne jamais mes clients, Gourou. Je les équipe. Et parfois, entre alliés d'affaires, on s'amuse un peu au filet."
+        },
+        {
+          "s": "gourou",
+          "t": "Un peu ? Ton Raid Éclair n'a rien d'amusant. Mais mon souffle, lui, a toute la patience du monde."
+        },
+        {
+          "s": "narrator",
+          "t": "Une rivalité amicale, sous le grès chaud. Ni ennemis, ni tout à fait alliés. Juste deux bons clients qui aiment gagner."
         }
       ],
       "win": [
         {
           "s": "gourou",
-          "t": "Le lac immobile gèle plus profond que le fleuve de Bourassie. Bel échange froid, Tsar. Restons en affaires. Namasté."
+          "t": "Le calme tient même sous le grès brûlant. Bel échange, Faucon. Continuons nos affaires. Namasté."
         },
         {
-          "s": "volkoi",
-          "t": "Un revers. Rare. Ton calme est une arme d'hiver. Je m'en souviendrai — et je patiente."
+          "s": "faucon",
+          "t": "Un revers commercial, sans conséquence stratégique. Je reviendrai vendre, et je reviendrai gagner."
         },
         {
           "s": "narrator",
@@ -3689,12 +3689,12 @@ const STORY_BY_CHAR = {
       ],
       "lose": [
         {
-          "s": "volkoi",
-          "t": "Mon hiver gagne toujours à l'usure. Médite là-dessus, gourou. Le froid ne négocie pas."
+          "s": "faucon",
+          "t": "Le Raid Éclair gagne, même entre partenaires. Rien de personnel, Gourou : juste ma doctrine."
         },
         {
           "s": "gourou",
-          "t": "Deux glaces, une craque. J'apprends. Namasté. Le pétrole coule, la revanche mûrit."
+          "t": "Une défaite amicale. J'apprends, je respire, je reviens acheter. Namasté, fournisseur intransigeant."
         },
         {
           "s": "narrator",
@@ -3975,75 +3975,75 @@ const STORY_BY_CHAR = {
     {
       "act": 1,
       "title": "Casquettes en double",
-      "sub": "Tropicalia–Libertaria · binôme de canopée",
+      "sub": "Tropicalia–Doria vs Bourassie–Panguo · binôme populiste sous la neige",
       "left": "capitaine",
-      "right": "dorf",
-      "ally": "gourou",
-      "right2": "faucon",
-      "terrain": 1,
+      "right": "volkoi",
+      "ally": "dorf",
+      "right2": "timonier",
+      "terrain": 0,
       "mode": "2v2",
       "ai": 0,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Grande Forêt. Le Capitaine tire le Gourou comme partenaire contre le Baron et le Faucon. 2v2 sous la canopée."
+          "t": "Place Écarlate, sous la neige. Le Capitaine tire le Baron comme partenaire contre le Tsar et le Grand Timonier. 2v2 sur la banquise."
         },
         {
           "s": "capitaine",
-          "t": "Toi, calme, tu digues avec MOI. Ma forêt, ton souffle. On leur casse leur alliance dorée."
-        },
-        {
-          "s": "gourou",
-          "t": "Namasté, Capitaine. Je ralentis le tempo ; tu frappes les troncs. Partenariat clair."
+          "t": "Toi, casquette, tu digues avec MOI. Ma tronçonneuse, ton mur d'or. On leur défonce leur axe glacial."
         },
         {
           "s": "dorf",
-          "t": "J'ai le Faucon ! Le plus dur partenaire ! On va déforester… euh… gagner !"
+          "t": "J'ai le Capitaine ! Le plus bruyant partenaire ! Deux légendes, un seul filet, on va ÉCRASER !"
         },
         {
-          "s": "faucon",
-          "t": "Moins de métaphores. Plus de digues. Allez."
+          "s": "volkoi",
+          "t": "Deux fanfarons contre l'hiver et le tempo. Amusant. Digue, camarade — ou tais-toi."
+        },
+        {
+          "s": "timonier",
+          "t": "Deux contre deux. L'harmonie aime les symétries. Le bruit, lui, n'aime jamais durer."
         },
         {
           "s": "narrator",
-          "t": "Deux équipes. Une forêt. Quatre casquettes d'ego."
+          "t": "Deux équipes. Une banquise. Quatre casquettes d'ego."
         }
       ],
       "win": [
         {
           "s": "capitaine",
-          "t": "Voilà ! Binôme de jungle ! Merci, zen — t'es pas mauvais pour un moine."
-        },
-        {
-          "s": "gourou",
-          "t": "Beau double. La canopée a respiré plus fort qu'eux."
+          "t": "Voilà ! Binôme de bûcherons dorés ! Merci, Baron — t'es pas mauvais pour un magnat."
         },
         {
           "s": "dorf",
-          "t": "Truqué ! Mon partenaire était trop sérieux !"
+          "t": "ÉNORME ! Meilleure alliance du monde, moi et le bûcheron ! On l'avait dit !"
         },
         {
-          "s": "faucon",
-          "t": "On recommence. Sans casquette de cirque."
+          "s": "volkoi",
+          "t": "Un set. Temporaire. L'hiver n'a pas dit son dernier partenaire."
+        },
+        {
+          "s": "timonier",
+          "t": "L'harmonie corrige aussi les doubles. On reprend, ensemble."
         }
       ],
       "lose": [
         {
-          "s": "dorf",
-          "t": "GAGNÉ LE 2v2 ! Meilleure équipe !"
+          "s": "volkoi",
+          "t": "Le gel à deux a suffi. Vos casquettes ont pris froid."
         },
         {
-          "s": "faucon",
-          "t": "Ligne propre. Vous pouvez replanter."
+          "s": "timonier",
+          "t": "Tempo tenu. Partenaire fiable. Le siècle continue, à deux."
         },
         {
           "s": "capitaine",
-          "t": "Tsss. Mon partenaire a trop médité. Revanche — et plus d'ara."
+          "t": "Tsss. Mon partenaire doré a trop klaxonné. Revanche — et plus d'ara."
         },
         {
-          "s": "gourou",
-          "t": "On revient. La montagne et la forêt ne boudent pas longtemps."
+          "s": "dorf",
+          "t": "Truqué ! Mon partenaire bûcheron a trop coupé, pas assez smashé !"
         }
       ]
     },
@@ -4155,44 +4155,48 @@ const STORY_BY_CHAR = {
     },
     {
       "act": 2,
-      "title": "L'engrais et l'ours",
-      "sub": "Tropicalia–Bourassie · le fournisseur qu'on admire",
+      "title": "Le fan numéro un",
+      "sub": "Tropicalia–Doria · admiration mutuelle et casquettes assorties",
       "left": "capitaine",
-      "right": "volkoi",
-      "terrain": 0,
+      "right": "dorf",
+      "terrain": 1,
       "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Place Écarlate, neige et briques cramoisies. Sans les sacs d'engrais du Tsar, la Grande Forêt ne pousse plus. Le Capitaine est venu payer sa dette — sans jamais le dire. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
-        },
-        {
-          "s": "volkoi",
-          "t": "Tu ne jures que par ta liberté, Capitaine, mais c'est mon engrais qui fait pousser ton soja. L'hiver travaille pour moi ; ta terre aussi."
+          "t": "Country Club Doré. Fontaine allumée, palmiers en pot. Le Capitaine vient rendre hommage à son modèle — et lui vendre un peu de bœuf au passage. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "capitaine",
-          "t": "T'es un dur, Tsar, ça je respecte. Deux vrais mâles alpha sur un terrain gelé. Mais mes bûches, elles gèlent pas, elles ÉCRASENT."
+          "t": "Baron ! Mon modèle ! J'ai copié ta casquette, tes majuscules, ta haine des journalistes. On est pareils, toi et moi !"
         },
         {
-          "s": "volkoi",
-          "t": "Le respect ne renvoie pas le ballon. Je vais geler ton camp, planter du givre entre tes troncs. Sers, et compte tes doigts."
+          "s": "dorf",
+          "t": "Le Capitaine ! Un type fort. Très fort. On s'admire beaucoup, tout le monde le dit — enfin, moi je le dis, mais c'est pareil."
         },
         {
           "s": "capitaine",
-          "t": "Geler la forêt tropicale ? Bonne chance mon frère. Ici on transpire même sous ton blizzard. On y va !"
+          "t": "Sauf que moi j'ai une tronçonneuse et un ara. Toi t'as un mur d'or. Chacun sa jungle, chacun son bazar."
+        },
+        {
+          "s": "dorf",
+          "t": "Mon mur d'or bat ta tronçonneuse n'importe quel jour. Mais on reste potes. Les meilleurs. Sers, mon frère de casquette."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu. Entre fans, ça pique quand même un peu."
         }
       ],
       "win": [
         {
           "s": "capitaine",
-          "t": "Fait tomber l'ours dans sa propre neige ! Et t'inquiète, je reprends une palette d'engrais la semaine pro. Entre durs, ça se paie."
+          "t": "Battu mon idole ! Sur SON gazon ! Désolé, Baron — enfin, pas vraiment. Selfie ?"
         },
         {
-          "s": "volkoi",
-          "t": "Une défaite. Le froid n'a pas de rancune, il a de la mémoire. Tu reviendras acheter — tu reviens toujours."
+          "s": "dorf",
+          "t": "Truqué ! Mais élégamment truqué, par mon plus grand fan. On refait ça, entre légendes. Les plus grandes !"
         },
         {
           "s": "narrator",
@@ -4201,12 +4205,12 @@ const STORY_BY_CHAR = {
       ],
       "lose": [
         {
-          "s": "volkoi",
-          "t": "L'Hiver Général ne négocie pas, Capitaine. Ta jungle bruyante s'est figée d'un coup. Rentre te réchauffer."
+          "s": "dorf",
+          "t": "GAGNÉ ! Même mon plus grand fan, je le bats ! Ça prouve qui est le vrai modèle ici !"
         },
         {
           "s": "capitaine",
-          "t": "Gelé par le Tsar sur sa banquise ! Bon… au moins j'ai perdu contre un vrai dur. Ça compte, ça, non ?"
+          "t": "Battu par mon idole, chez lui, sous son mur d'or ! Bon… au moins j'ai perdu contre un vrai frère de casquette."
         },
         {
           "s": "narrator",
@@ -4519,20 +4523,20 @@ const STORY_BY_CHAR = {
   "faucon": [
     {
       "act": 1,
-      "title": "L'ami de l'est, le binôme de l'ouest",
-      "sub": "Levantie–Bharatie · double de sécurité",
+      "title": "L'ami de l'ouest, le duo de l'est",
+      "sub": "Levantie–Doria vs Bourassie–Ramenie · double de sécurité sous la neige",
       "left": "faucon",
-      "right": "gourou",
+      "right": "volkoi",
       "ally": "dorf",
-      "right2": "volkoi",
-      "terrain": 6,
+      "right2": "safran",
+      "terrain": 0,
       "mode": "2v2",
       "ai": 0,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Citadelle du Levant. Le Faucon prend le Baron comme partenaire contre le Gourou et le Tsar. Un 2v2 où la sécurité joue à quatre."
+          "t": "Place Écarlate, sous la neige. Le Faucon prend le Baron comme partenaire contre le Tsar et Safran. Un 2v2 où la sécurité joue à quatre, sous zéro."
         },
         {
           "s": "faucon",
@@ -4540,19 +4544,19 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "dorf",
-          "t": "Je digue ET je parle. Meilleur des deux mondes. On va écraser le calme et le gel !"
-        },
-        {
-          "s": "gourou",
-          "t": "Namasté. Mon partenaire hiver et moi, on a le temps. Vous avez le bruit."
+          "t": "Je digue ET je parle. Meilleur des deux mondes. On va écraser le gel et le voile !"
         },
         {
           "s": "volkoi",
-          "t": "Je n'aime pas être partenaire. Je tolère. Digue, moine."
+          "t": "Deux hommes de l'Ouest contre l'hiver et la patience. Amusant. Digue, faucon — ou tais-toi."
+        },
+        {
+          "s": "safran",
+          "t": "Alliance de mesure. Leur bruit va s'épuiser avant notre voile."
         },
         {
           "s": "narrator",
-          "t": "Sécurité contre patience. Le double décide qui tient la ligne."
+          "t": "Sécurité contre patience et gel. Le double décide qui tient la ligne."
         }
       ],
       "win": [
@@ -4565,22 +4569,22 @@ const STORY_BY_CHAR = {
           "t": "ÉNORME alliance ! Je t'avais dit que j'étais le meilleur partenaire !"
         },
         {
-          "s": "gourou",
-          "t": "Un set. On respire, on revient."
+          "s": "volkoi",
+          "t": "Un set. Temporaire. Même en double, le froid revient seul."
         },
         {
-          "s": "volkoi",
-          "t": "Temporaire. Même en double, le froid revient seul."
+          "s": "safran",
+          "t": "Défaite mesurée. Le voile retombera, patient, sur leur sécurité pressée."
         }
       ],
       "lose": [
         {
-          "s": "gourou",
-          "t": "Le calme à deux a suffi. Rentrez sécuriser autre chose."
-        },
-        {
           "s": "volkoi",
           "t": "Le gel partenaire a tranché. Votre alliance a parlé trop fort."
+        },
+        {
+          "s": "safran",
+          "t": "Le voile a ralenti même leur raid. La patience gagne, toujours."
         },
         {
           "s": "faucon",
@@ -4588,7 +4592,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "dorf",
-          "t": "C'était pas moi ! C'était le filet ! Et le zen !"
+          "t": "C'était pas moi ! C'était le filet ! Et le voile !"
         }
       ]
     },
@@ -4838,48 +4842,48 @@ const STORY_BY_CHAR = {
     },
     {
       "act": 2,
-      "title": "La ligne rouge du nord",
-      "sub": "Levantie–Bourassie · déconfliction sous tension",
+      "title": "Le client qui négocie",
+      "sub": "Levantie–Bharatie · vendeur de drones contre acheteur exigeant",
       "left": "faucon",
-      "right": "volkoi",
-      "terrain": 0,
+      "right": "gourou",
+      "terrain": 6,
       "mode": "flame",
       "ai": 2,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Place Écarlate, sous la neige. Le ballon est un ballon enflammé à brûlure : le camp où elle tombe saute. Le Tsar joue à domicile, glacial."
+          "t": "Stade Ashram, grès couleur miel. Une vache traverse le court, indifférente. Le Faucon vient livrer ses derniers drones — et négocier le prix. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
-          "s": "volkoi",
-          "t": "Faucon. Tu voles au-dessus d'un ciel que je surveille aussi. Nous nous croisons souvent. Trop souvent."
-        },
-        {
-          "s": "faucon",
-          "t": "On se croise poliment, Tsar, parce qu'aucun de nous ne veut du chaos de l'autre. Appelons ça une méfiance professionnelle."
-        },
-        {
-          "s": "volkoi",
-          "t": "La méfiance, oui. Tu frappes tes cibles, j'observe. Un jour, ta ballon enflammé tombera trop près de mes intérêts."
+          "s": "gourou",
+          "t": "Namasté, Faucon. Tes drones sont excellents. Ton prix, un peu moins. Négocions, entre partenaires sérieux."
         },
         {
           "s": "faucon",
-          "t": "Alors ne te tiens pas sur ma ligne de tir. Mon Raid Éclair ne demande pas la permission ; il informe après."
+          "t": "Je ne négocie pas la sécurité, Gourou. Je la facture. Mais pour un aussi bon client, un rabais reste possible."
+        },
+        {
+          "s": "gourou",
+          "t": "Un rabais ! Voilà une phrase que je n'attendais pas d'un homme aussi intransigeant. Le commerce adoucit tout, même toi."
+        },
+        {
+          "s": "faucon",
+          "t": "Le commerce n'adoucit rien. Il finance. Sers, et voyons qui négocie le mieux au filet."
         },
         {
           "s": "narrator",
-          "t": "Renvoyez le ballon enflammé. Toujours. Sur cette place, l'hiver ne pardonne pas l'hésitation."
+          "t": "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu. Ici, même les alliés se disputent la facture."
         }
       ],
       "win": [
         {
           "s": "faucon",
-          "t": "La déconfliction tient tant que je gagne. Bien. Reste au chaud, Tsar. Je surveille le ciel pour deux."
+          "t": "La sécurité a un prix, et je viens de le prouver deux fois. Reste client, Gourou. Ça t'arrange autant que moi."
         },
         {
-          "s": "volkoi",
-          "t": "Une manche. L'hiver est patient. Tu voles vite, mais tu dois te poser un jour. Je serai là."
+          "s": "gourou",
+          "t": "Un revers commercial. Je médite, je négocie encore, je reviens acheter. Namasté, vendeur intraitable."
         },
         {
           "s": "narrator",
@@ -4888,12 +4892,12 @@ const STORY_BY_CHAR = {
       ],
       "lose": [
         {
-          "s": "volkoi",
-          "t": "Boum. De ton côté. Le sang-froid bat toujours la précipitation, petit faucon pressé."
+          "s": "gourou",
+          "t": "Le calme a fait baisser le prix, cette fois. Namasté, Faucon. On se revoit au prochain contrat."
         },
         {
           "s": "faucon",
-          "t": "un ballon enflammé mal renvoyée n'efface pas la doctrine. La prochaine fois, je pique avant que tu observes."
+          "t": "Une manche pour le client. La facture, elle, reste la même. Je reviendrai vendre, et je reviendrai gagner."
         }
       ]
     },
@@ -5089,75 +5093,75 @@ const STORY_BY_CHAR = {
     {
       "act": 1,
       "title": "La table à quatre places",
-      "sub": "Ramenie–Gallardie · double de protocole",
+      "sub": "Ramenie–Bourassie vs Doria–Levantie · double face à l'Ouest",
       "left": "safran",
-      "right": "cygne",
-      "ally": "sultan",
-      "right2": "dorf",
-      "terrain": 2,
+      "right": "dorf",
+      "ally": "volkoi",
+      "right2": "faucon",
+      "terrain": 1,
       "mode": "2v2",
       "ai": 0,
       "doped": null,
       "pre": [
         {
           "s": "narrator",
-          "t": "Jardin des Roses. Safran invite le Sultan en partenaire contre le Cygne et le Baron. La table des négociations devient un 2v2."
+          "t": "Country Club Doré. Safran invite le Tsar en partenaire contre le Baron et le Faucon. La table des négociations devient un 2v2, en territoire hostile."
         },
         {
           "s": "safran",
-          "t": "Sultan : tu es mon partenaire. On mesure, on digue, on leur rappelle les accords."
+          "t": "Tsar : tu es mon partenaire. On mesure, on gèle, on leur rappelle qui a la patience."
         },
         {
-          "s": "sultan",
-          "t": "Marché conclu. Je tiens le détroit du filet ; toi, tu ralentis leur orgueil."
-        },
-        {
-          "s": "cygne",
-          "t": "En même temps adversaire, en même temps… partenaire du Baron. C'est un exercice."
+          "s": "volkoi",
+          "t": "Marché conclu. Je gèle leur filet ; toi, tu ralentis leur orgueil."
         },
         {
           "s": "dorf",
-          "t": "Je suis le meilleur partenaire du Cygne ! Il paie enfin — en smashs !"
+          "t": "J'ai le Faucon en partenaire ! Le plus dur ! On va sanctionner cette alliance de parias !"
+        },
+        {
+          "s": "faucon",
+          "t": "Je ne sanctionne pas les alliances de circonstance. Je sécurise les points. Digue, Baron."
         },
         {
           "s": "narrator",
-          "t": "Quatre autour du filet. La table, elle, reste toujours là."
+          "t": "Quatre autour du filet, sur le gazon le plus doré du monde. La table, elle, reste toujours là."
         }
       ],
       "win": [
         {
           "s": "safran",
-          "t": "Beau double. Le protocole a tenu mieux que leur alliance."
+          "t": "Beau double. Le protocole a tenu mieux que leur sécurité."
         },
         {
-          "s": "sultan",
-          "t": "Le marché est bon : notre camp marque. Porte ouverte — pour nous."
-        },
-        {
-          "s": "cygne",
-          "t": "Défaite de binôme. On renégocie. En même temps."
+          "s": "volkoi",
+          "t": "Le marché est bon : notre camp marque. Le froid, lui, ne recule jamais."
         },
         {
           "s": "dorf",
-          "t": "Truqué ! Mon partenaire hésitait entre gauche et droite !"
+          "t": "Truqué ! Mon partenaire sécuritaire hésitait entre le raid et la digue !"
+        },
+        {
+          "s": "faucon",
+          "t": "Un set. On resserre. Moins de mots, plus de digues."
         }
       ],
       "lose": [
         {
-          "s": "cygne",
-          "t": "Partenariat efficace, même improbable. Point pour nous."
+          "s": "dorf",
+          "t": "MEILLEUR 2v2 ! Dis-leur, Faucon !"
         },
         {
-          "s": "dorf",
-          "t": "MEILLEUR 2v2 ! Dis-leur, rose !"
+          "s": "faucon",
+          "t": "Ligne tenue. Double gagné. Rentrez cultiver vos roses."
         },
         {
           "s": "safran",
           "t": "On recalibre. Les partenaires aussi se renégocient."
         },
         {
-          "s": "sultan",
-          "t": "La porte a claqué. On reviendra — ensemble."
+          "s": "volkoi",
+          "t": "La porte a claqué. On reviendra — ensemble, camarade."
         }
       ]
     },
@@ -5513,10 +5517,10 @@ const STORY_BY_CHAR = {
     },
     {
       "act": 3,
-      "title": "Le mur d'or contre la roseraie",
-      "sub": "Ramenie–Doria · la pression maximale",
+      "title": "Le retour à la table",
+      "sub": "Ramenie–Gallardie · l'Accord, les alambics, et une bombe entre les roses",
       "left": "safran",
-      "right": "dorf",
+      "right": "cygne",
       "terrain": 9,
       "mode": "bomb",
       "ai": 3,
@@ -5524,47 +5528,51 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Jardin des Roses. Le Baron Dorf plante sa voiturette de golf dans la roseraie, klaxonne, et pose sur le filet une liasse d'embargos."
+          "t": "Jardin des Roses. Le Cygne revient, des années après l'Accord déchiré, proposer de « revenir à la table ». Safran désigne poliment le jardin — la table est toujours là."
         },
         {
-          "s": "dorf",
-          "t": "Pression maximale ! La plus grande pression de l'histoire ! Tes petits alambics, je les ferme, et ton or safran, je le taxe. Fantastique !"
-        },
-        {
-          "s": "safran",
-          "t": "Vous bâtissez des murs d'or, Baron ; moi je cultive des roses. Devinez lequel de nous deux nourrit ses gens quand vient l'hiver."
-        },
-        {
-          "s": "dorf",
-          "t": "J'ai déchiré ton fameux Accord ! Déchiré ! Le plus beau déchirage jamais vu ! Maintenant paie, ou explose !"
+          "s": "cygne",
+          "t": "Nous avions un accord, Safran. Élégant. Équilibré. En même temps, je viens vous proposer d'y revenir, sincèrement."
         },
         {
           "s": "safran",
-          "t": "Vous déchirez, vous klaxonnez, vous taxez. Beaucoup de bruit pour un homme si pressé. La bombe brûle, Baron. Et vous n'aimez pas attendre."
+          "t": "La table est toujours là, Cygne. Ce sont les convives qui manquent de suite dans les idées. Votre allié doré l'a déchiré ; vous avez regardé."
+        },
+        {
+          "s": "cygne",
+          "t": "J'ai tout fait pour le sauver. En même temps, on ne retient pas un ouragan par la manche. Renvoyez la bombe, discutons — encore."
+        },
+        {
+          "s": "safran",
+          "t": "Discuter, toujours discuter. Pendant ce temps, mes alambics tournent, et mon Voile d'Or épaissit l'air autour de votre élégance."
         },
         {
           "s": "narrator",
-          "t": "L'aura rouge enveloppe le Baron : la pression maximale l'a dopé. Renvoyez la bombe. Le Voile d'Or est votre seule patience."
+          "t": "L'aura rouge enveloppe le Cygne : la fermeté nucléaire, à ciel ouvert, sous les arcades turquoise. Renvoyez la bombe. Le Voile d'Or est votre seule patience."
         }
       ],
       "win": [
         {
           "s": "safran",
-          "t": "Tout ce mur d'or, et vous voilà au ralenti dans ma poussière dorée pendant que la mèche s'éteint chez vous. Le safran survit aux sanctions, Baron. Il les vieillit en bouteille."
+          "t": "Vous revenez toujours à la table, Cygne, et vous repartez toujours les mains vides. Le safran, lui, infuse pendant que vous négociez."
         },
         {
-          "s": "dorf",
-          "t": "Truqué ! Le jardin est truqué, le paon est truqué, TOUT est truqué ! J'ajoute des sanctions ! Le double !"
+          "s": "cygne",
+          "t": "Une défaite mesurée pour un accord mesuré. En même temps déçu et déterminé, je reviendrai. Nous rebâtirons ceci."
+        },
+        {
+          "s": "narrator",
+          "t": "Le ballon est une bombe : le camp où elle tombe perd."
         }
       ],
       "lose": [
         {
-          "s": "dorf",
-          "t": "BOUM chez le fleuriste ! Pression maximale, résultat maximal ! Personne ne fait exploser les roses comme moi !"
+          "s": "cygne",
+          "t": "Voilà : la fermeté et la main tendue, en même temps. L'Accord peut renaître — à mes conditions, cette fois."
         },
         {
           "s": "safran",
-          "t": "Emportez votre cratère et votre klaxon, Baron. Vous fermez mes ateliers ce soir ; ils rouvriront quand vous serez oublié. Le safran a l'éternité pour lui."
+          "t": "Un point pour l'élégance. La table, elle, reste ouverte. Elle l'a toujours été. Ce sont vos alliés qui ferment les portes."
         }
       ]
     },

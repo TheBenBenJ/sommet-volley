@@ -30,27 +30,27 @@ Sur le banc de touche, avant chaque match, le Sultan fait dérouler la **banniè
 const STORY_SULTAN = [
   // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
-  act: 1, title: "Le marché à quatre", sub: "Bosforie–Libertaria · double contre l'or",
-  left: "sultan", right: "dorf", ally: "safran", right2: "cygne", terrain: 1, mode: "2v2", ai: 0, doped: null,
+  act: 1, title: "Le marché à quatre", sub: "Bosforie–Bourassie vs Doria–Levantie · double contre l'Ouest et l'or",
+  left: "sultan", right: "dorf", ally: "volkoi", right2: "faucon", terrain: 1, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Pont des Deux Mondes. Le Sultan s'allie à Safran pour un 2v2 contre le Baron et le Cygne — commerce, détroit, et filet." },
-    { s: "sultan", t: "Toi, Safran, tu es mon partenaire. On vend, on digue, on ouvre les portes — les leurs." },
-    { s: "safran", t: "Alliance de mesure. Tant que ton marché de missiles ne devient pas mon problème au milieu du set." },
-    { s: "dorf", t: "J'ai le Cygne en partenaire ! Le plus cher ! Il paie enfin sa part — en points !" },
-    { s: "cygne", t: "En même temps partenaire, en même temps critique. C'est ça, une alliance exigeante." },
-    { s: "narrator", t: "Mode double : le détroit se joue à quatre mains." },
+    { s: "narrator", t: "Country Club Doré. Le Sultan s'allie au Tsar pour un 2v2 contre le Baron et le Faucon — S-400, détroit, et défi à l'Ouest." },
+    { s: "sultan", t: "Toi, Tsar, tu es mon partenaire. Je t'achète tes défenses, tu me couvres au filet. Le meilleur des deals." },
+    { s: "volkoi", t: "Alliance de circonstance. Tant que ton détroit ne bloque pas mon gaz au milieu du set." },
+    { s: "dorf", t: "J'ai le Faucon en partenaire ! Le plus dur ! On va sécuriser cette alliance de bric et de broc !" },
+    { s: "faucon", t: "Je ne sécurise pas les alliances de circonstance. Je sécurise les points. Digue, Baron." },
+    { s: "narrator", t: "Mode double : le détroit et le désert se jouent à quatre mains." },
   ],
   win:  [
-    { s: "sultan", t: "Le marché est conclu : notre camp marque. Merci, partenaire." },
-    { s: "safran", t: "Élégant. Leur or a moins bien digué que notre patience." },
-    { s: "dorf", t: "Truqué ! Mon partenaire parlait trop !" },
-    { s: "cygne", t: "Défaite de binôme. On renégocie les critères. En même temps." },
+    { s: "sultan", t: "Le marché est conclu : notre camp marque. Merci, partenaire du froid." },
+    { s: "volkoi", t: "Élégant. Leur sécurité a moins digué que notre patience." },
+    { s: "dorf", t: "Truqué ! Mon partenaire sécuritaire parlait de raids, pas assez de smashs !" },
+    { s: "faucon", t: "Un set. On resserre. Moins de mots, plus de digues." },
   ],
   lose:  [
-    { s: "dorf", t: "GAGNÉ ! Meilleure alliance payante du monde !" },
-    { s: "cygne", t: "Partenariat efficace. Même avec un Baron. Surtout avec un Baron." },
+    { s: "dorf", t: "GAGNÉ ! Meilleure alliance sécuritaire du monde !" },
+    { s: "faucon", t: "Ligne tenue. Double gagné. Rentrez négocier vos S-400." },
     { s: "sultan", t: "La porte a tenu… contre nous. On reviendra plus nombreux — enfin, à deux." },
-    { s: "safran", t: "Recalons la table. Les doubles, ça se renégocie." },
+    { s: "volkoi", t: "Recalons la table. Les doubles, ça se renégocie, camarade." },
   ]
 },
   {

@@ -20,6 +20,15 @@ function handleMenuKeys(code, key) {
       typeof code === "string" && code.indexOf("Story") === 0 &&
       storyHandleClickCode(code)) return;
 
+  // Mode Tournoi : bracket / fin absorbent les touches en amont.
+  if ((state === "tournamentBracket" || state === "tournamentEnding") &&
+      typeof tournamentHandleKeys === "function") {
+    if (tournamentHandleKeys(code)) return;
+  }
+  if (typeof tournamentHandleClickCode === "function" &&
+      typeof code === "string" && code.indexOf("Tour") === 0 &&
+      tournamentHandleClickCode(code)) return;
+
   // Navigation grille (persos / terrains) : flèches / WASD
   if (state === "selectCharacter" || state === "selectTerrain") {
     const dir =
@@ -67,19 +76,9 @@ function handleMenuKeys(code, key) {
       }
       return;
     }
-    // Écran d'accueil : 3 grandes catégories, chacune débouche sur ses propres
-    // sous-choix (difficulté, mode de jeu…) au lieu d'un mur de 8 options.
-    if (code === "Digit1") { pendingMode = { vsAI: true }; state = "aiDifficulty"; } // Solo vs IA — pendingMode neuf : évite qu'un ancien "bomb" traîne dans le compteur d'étapes
-    if (code === "Digit2") { pendingMode = { vsAI: false }; state = "gameModeSelect"; } // Multijoueur local
-    if (code === "Digit3") {                                                  // Jouer en ligne
-      if (typeof Peer === "undefined") {
-        netErrorMsg = "PeerJS n'a pas pu être chargé — le mode en ligne nécessite Internet.";
-        state = "netError";
-      } else {
-        state = "onlineMenu";
-      }
-    }
-    if (code === "Digit4" && typeof storyOpen === "function") storyOpen();          // Mode Histoire
+    // Accueil : Solo / Multijoueur, puis sous-menus dédiés.
+    if (code === "Digit1") { state = "soloMenu"; navIdx = 0; }
+    if (code === "Digit2") { state = "multiMenu"; navIdx = 0; }
     if (code === "KeyR") state = "rules";
     if (code === "KeyT") startTutorial();
     if (code === "KeyH") { tutorialReset(); state = "tutorialHelp"; }
@@ -87,6 +86,33 @@ function handleMenuKeys(code, key) {
     if (code === "TutPlay") startTutorial();
     if (code === "TutLater") { tutorialInviteOpen = false; tutorialInviteSessionDismissed = true; }
     if (code === "TutNever") { tutorialInviteOpen = false; markTutorialDone(); }
+
+  } else if (state === "soloMenu") {
+    if (code === "Digit1" && typeof storyOpen === "function") storyOpen();          // Histoire
+    if (code === "Digit2") {                                                       // Amical vs IA
+      pendingMode = { vsAI: true };
+      state = "aiDifficulty";
+      navIdx = 0;
+    }
+    if (code === "Digit3" && typeof tournamentOpen === "function") tournamentOpen(); // Tournoi
+    if (code === "Escape") goMenu();
+
+  } else if (state === "multiMenu") {
+    if (code === "Digit1") {                                                       // Local
+      pendingMode = { vsAI: false };
+      state = "gameModeSelect";
+      navIdx = 0;
+    }
+    if (code === "Digit2") {                                                       // En ligne
+      if (typeof Peer === "undefined") {
+        netErrorMsg = "PeerJS n'a pas pu être chargé — le mode en ligne nécessite Internet.";
+        state = "netError";
+      } else {
+        state = "onlineMenu";
+        navIdx = 0;
+      }
+    }
+    if (code === "Escape") goMenu();
 
   } else if (state === "credits") {
     if (code === "Escape" || code === "Enter" || code === "Space") goMenu();
@@ -107,12 +133,26 @@ function handleMenuKeys(code, key) {
   } else if (state === "aiDifficulty") {
     // Étape 2 (Solo vs IA) : la difficulté choisie amorce pendingMode, complété
     // ensuite par le mode de jeu dans "gameModeSelect".
+    // Tournoi : skip mode/format → sélection perso directe.
     const lvl = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3 }[code];
     if (lvl !== undefined) {
-      pendingMode = { vsAI: true, aiLevel: lvl, mode2v2: false };
-      state = "gameModeSelect";
+      if (pendingMode && pendingMode.tournament) {
+        pendingMode.aiLevel = lvl;
+        pendingMode.mode2v2 = false;
+        pendingMode.bomb = false;
+        pendingMode.flame = false;
+        startCharacterSelect();
+      } else {
+        pendingMode = { vsAI: true, aiLevel: lvl, mode2v2: false };
+        state = "gameModeSelect";
+      }
     }
-    if (code === "Escape") goMenu();
+    if (code === "Escape") {
+      if (pendingMode && pendingMode.tournament) state = "soloMenu";
+      else if (pendingMode && pendingMode.vsAI) state = "soloMenu";
+      else goMenu();
+      navIdx = 0;
+    }
 
   } else if (state === "gameModeSelect") {
     // Solo / en ligne : mode puis TOUJOURS 1v1 ou équipes (teamFormat).
@@ -155,7 +195,7 @@ function handleMenuKeys(code, key) {
     if (code === "Escape") {
       if (pendingMode.online) state = "onlineMenu";
       else if (pendingMode.vsAI) state = "aiDifficulty";
-      else goMenu();
+      else { state = "multiMenu"; navIdx = 0; }
     }
 
   } else if (state === "teamFormat" || state === "bombFormat" || state === "flameFormat") {
@@ -188,7 +228,7 @@ function handleMenuKeys(code, key) {
   } else if (state === "onlineMenu") {
     if (code === "Digit1") { pendingMode = { online: true, o2v2: false }; state = "gameModeSelect"; } // Créer → mode + 1v1/2v2
     if (code === "Digit2") { joinCode = ""; state = "joinEntry"; }                        // Rejoindre avec un code
-    if (code === "Escape") goMenu();
+    if (code === "Escape") { state = "multiMenu"; navIdx = 0; }
 
   } else if (state === "hostLobby") {
     if ((code === "Enter" || code === "Space") && guests.length >= 1) hostStartMatch2v2();
@@ -233,6 +273,8 @@ function handleMenuKeys(code, key) {
           navIdx = 0;
           state = "selectTerrain"; // l'hôte choisit aussi le terrain
         }
+      } else if (pendingMode.tournament && typeof tournamentBeginAfterChar === "function") {
+        tournamentBeginAfterChar();
       } else if (selPlayer === 0 && !pendingMode.vsAI) {
         selPlayer = 1; // au joueur vert de choisir
         navIdx = 0;
@@ -244,6 +286,7 @@ function handleMenuKeys(code, key) {
     }
     if (code === "Escape") {
       if (pendingMode.online && netRole === "guest") quitOnline();
+      else if (pendingMode.tournament) state = "aiDifficulty";
       else state = pendingMode.online ? "onlineMenu" : "gameModeSelect"; // garde le contexte (difficulté/local)
     }
 
@@ -273,7 +316,9 @@ function handleMenuKeys(code, key) {
       }
       if (code === "Escape") quitOnline();
     } else if ((code === "Space" || code === "Enter") && gameoverTimer <= 0) {
-      if (storyActive && storyInMatch && typeof storyOnMatchEnd === "function") storyOnMatchEnd();
+      if (typeof tournamentActive !== "undefined" && tournamentActive && tournamentInMatch &&
+          typeof tournamentOnMatchEnd === "function") tournamentOnMatchEnd();
+      else if (storyActive && storyInMatch && typeof storyOnMatchEnd === "function") storyOnMatchEnd();
       else goMenu();
     }
 
@@ -387,6 +432,7 @@ function goMenu() {
   tutorialStep = 0;
   // sortie complète du flux histoire (ex. Échap pendant un match d'histoire)
   if (typeof storyActive !== "undefined") { storyActive = false; storyInMatch = false; storyScene = null; }
+  if (typeof tournamentReset === "function") tournamentReset();
   state = "menu";
   shuffleMenuBackdrop();
   if (shouldShowTutorialInvite()) tutorialInviteOpen = true;
@@ -911,15 +957,13 @@ function drawMenu() {
 
   const items = [
     "1  —  Solo",
-    "2  —  Multijoueur local",
-    "3  —  Multijoueur en ligne",
-    "4  —  Mode Histoire  ·  Les Jeux du Sommet",
+    "2  —  Multijoueur",
     "T  —  Tutoriel" + (tutorialDone ? "" : "  · Nouveau"),
     "H  —  Aide commandes",
     "R  —  Règles du jeu",
     "C  —  Crédits"
   ];
-  drawOptionList(items, 182, 32);
+  drawOptionList(items, 198, 36);
 
   uiLabel(controlsHint(), UI.mx, H - 52, 12, controlsHintColor(), 0.3);
   uiLabel("Premier à " + WIN_SCORE + " · 2 pts d'écart · " + MAX_TOUCHES + " touches max",
@@ -930,6 +974,31 @@ function drawMenu() {
     menuHitboxes = []; // seule la modal est cliquable
     drawTutorialInvite();
   }
+}
+
+function drawSoloMenu() {
+  menuScreenBase({
+    title: "Solo",
+    kicker: "Contre l'IA",
+    subtitle: "Histoire · match amical · tournoi"
+  });
+  drawOptionList([
+    "1  —  Mode Histoire  ·  Les Jeux du Sommet",
+    "2  —  Amical",
+    "3  —  Tournoi"
+  ], 220, 48);
+}
+
+function drawMultiMenu() {
+  menuScreenBase({
+    title: "Multijoueur",
+    kicker: "À plusieurs",
+    subtitle: "Sur le même écran, ou en ligne"
+  });
+  drawOptionList([
+    "1  —  Local",
+    "2  —  En ligne"
+  ], 238, 52);
 }
 
 function drawTutorialInvite() {
@@ -988,7 +1057,8 @@ function wizardTotal() {
 function wizardStep(idx, label) { return "Étape " + idx + "/" + wizardTotal() + " · " + label; }
 
 function drawAiDifficulty() {
-  menuScreenBase({ title: "Solo", kicker: wizardStep(1, "Difficulté"),
+  const title = (pendingMode && pendingMode.tournament) ? "Tournoi" : "Amical";
+  menuScreenBase({ title: title, kicker: wizardStep(1, "Difficulté"),
                    subtitle: "Choisis la difficulté de l'adversaire" });
   const items = [
     "1  —  Facile",
@@ -1002,7 +1072,7 @@ function drawAiDifficulty() {
 function drawGameModeSelect() {
   const teamChoice = pendingMode.vsAI || pendingMode.online;
   const ctxLabel = pendingMode.online ? "En ligne"
-    : pendingMode.vsAI ? "Solo — " + AI_LEVELS[pendingMode.aiLevel].name
+    : pendingMode.vsAI ? "Amical — " + AI_LEVELS[pendingMode.aiLevel].name
     : "Multijoueur local";
   menuScreenBase({ title: "Mode de jeu", kicker: wizardStep(pendingMode.vsAI ? 2 : 1, "Mode"),
                    subtitle: ctxLabel + " — choisis le mode de jeu" });

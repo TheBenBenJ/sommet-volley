@@ -27,27 +27,27 @@ Car c'est là, au fond, tout Le Safran : un joueur qui a compris que dans un mon
 ```js
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 1, title: "La table à quatre places", sub: "Ramenie–Gallardie · double de protocole",
-  left: "safran", right: "cygne", ally: "sultan", right2: "dorf", terrain: 2, mode: "2v2", ai: 0, doped: null,
+  act: 1, title: "La table à quatre places", sub: "Ramenie–Bourassie vs Doria–Levantie · double face à l'Ouest",
+  left: "safran", right: "dorf", ally: "volkoi", right2: "faucon", terrain: 1, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Jardin des Roses. Safran invite le Sultan en partenaire contre le Cygne et le Baron. La table des négociations devient un 2v2." },
-    { s: "safran", t: "Sultan : tu es mon partenaire. On mesure, on digue, on leur rappelle les accords." },
-    { s: "sultan", t: "Marché conclu. Je tiens le détroit du filet ; toi, tu ralentis leur orgueil." },
-    { s: "cygne", t: "En même temps adversaire, en même temps… partenaire du Baron. C'est un exercice." },
-    { s: "dorf", t: "Je suis le meilleur partenaire du Cygne ! Il paie enfin — en smashs !" },
-    { s: "narrator", t: "Quatre autour du filet. La table, elle, reste toujours là." },
+    { s: "narrator", t: "Country Club Doré. Safran invite le Tsar en partenaire contre le Baron et le Faucon. La table des négociations devient un 2v2, en territoire hostile." },
+    { s: "safran", t: "Tsar : tu es mon partenaire. On mesure, on gèle, on leur rappelle qui a la patience." },
+    { s: "volkoi", t: "Marché conclu. Je gèle leur filet ; toi, tu ralentis leur orgueil." },
+    { s: "dorf", t: "J'ai le Faucon en partenaire ! Le plus dur ! On va sanctionner cette alliance de parias !" },
+    { s: "faucon", t: "Je ne sanctionne pas les alliances de circonstance. Je sécurise les points. Digue, Baron." },
+    { s: "narrator", t: "Quatre autour du filet, sur le gazon le plus doré du monde. La table, elle, reste toujours là." },
   ],
   win:  [
-    { s: "safran", t: "Beau double. Le protocole a tenu mieux que leur alliance." },
-    { s: "sultan", t: "Le marché est bon : notre camp marque. Porte ouverte — pour nous." },
-    { s: "cygne", t: "Défaite de binôme. On renégocie. En même temps." },
-    { s: "dorf", t: "Truqué ! Mon partenaire hésitait entre gauche et droite !" },
+    { s: "safran", t: "Beau double. Le protocole a tenu mieux que leur sécurité." },
+    { s: "volkoi", t: "Le marché est bon : notre camp marque. Le froid, lui, ne recule jamais." },
+    { s: "dorf", t: "Truqué ! Mon partenaire sécuritaire hésitait entre le raid et la digue !" },
+    { s: "faucon", t: "Un set. On resserre. Moins de mots, plus de digues." },
   ],
   lose:  [
-    { s: "cygne", t: "Partenariat efficace, même improbable. Point pour nous." },
-    { s: "dorf", t: "MEILLEUR 2v2 ! Dis-leur, rose !" },
+    { s: "dorf", t: "MEILLEUR 2v2 ! Dis-leur, Faucon !" },
+    { s: "faucon", t: "Ligne tenue. Double gagné. Rentrez cultiver vos roses." },
     { s: "safran", t: "On recalibre. Les partenaires aussi se renégocient." },
-    { s: "sultan", t: "La porte a claqué. On reviendra — ensemble." },
+    { s: "volkoi", t: "La porte a claqué. On reviendra — ensemble, camarade." },
   ]
 },
 {
@@ -177,23 +177,24 @@ Car c'est là, au fond, tout Le Safran : un joueur qui a compris que dans un mon
   ]
 },
 {
-  act: 3, title: "Le mur d'or contre la roseraie", sub: "Ramenie–Doria · la pression maximale",
-  left: "safran", right: "dorf", terrain: 9, mode: "bomb", ai: 3, doped: "R",
+  act: 3, title: "Le retour à la table", sub: "Ramenie–Gallardie · l'Accord, les alambics, et une bombe entre les roses",
+  left: "safran", right: "cygne", terrain: 9, mode: "bomb", ai: 3, doped: "R",
   pre:  [
-    { s: "narrator", t: "Jardin des Roses. Le Baron Dorf plante sa voiturette de golf dans la roseraie, klaxonne, et pose sur le filet une liasse d'embargos." },
-    { s: "dorf", t: "Pression maximale ! La plus grande pression de l'histoire ! Tes petits alambics, je les ferme, et ton or safran, je le taxe. Fantastique !" },
-    { s: "safran", t: "Vous bâtissez des murs d'or, Baron ; moi je cultive des roses. Devinez lequel de nous deux nourrit ses gens quand vient l'hiver." },
-    { s: "dorf", t: "J'ai déchiré ton fameux Accord ! Déchiré ! Le plus beau déchirage jamais vu ! Maintenant paie, ou explose !" },
-    { s: "safran", t: "Vous déchirez, vous klaxonnez, vous taxez. Beaucoup de bruit pour un homme si pressé. La bombe brûle, Baron. Et vous n'aimez pas attendre." },
-    { s: "narrator", t: "L'aura rouge enveloppe le Baron : la pression maximale l'a dopé. Renvoyez la bombe. Le Voile d'Or est votre seule patience." }
+    { s: "narrator", t: "Jardin des Roses. Le Cygne revient, des années après l'Accord déchiré, proposer de « revenir à la table ». Safran désigne poliment le jardin — la table est toujours là." },
+    { s: "cygne", t: "Nous avions un accord, Safran. Élégant. Équilibré. En même temps, je viens vous proposer d'y revenir, sincèrement." },
+    { s: "safran", t: "La table est toujours là, Cygne. Ce sont les convives qui manquent de suite dans les idées. Votre allié doré l'a déchiré ; vous avez regardé." },
+    { s: "cygne", t: "J'ai tout fait pour le sauver. En même temps, on ne retient pas un ouragan par la manche. Renvoyez la bombe, discutons — encore." },
+    { s: "safran", t: "Discuter, toujours discuter. Pendant ce temps, mes alambics tournent, et mon Voile d'Or épaissit l'air autour de votre élégance." },
+    { s: "narrator", t: "L'aura rouge enveloppe le Cygne : la fermeté nucléaire, à ciel ouvert, sous les arcades turquoise. Renvoyez la bombe. Le Voile d'Or est votre seule patience." }
   ],
   win:  [
-    { s: "safran", t: "Tout ce mur d'or, et vous voilà au ralenti dans ma poussière dorée pendant que la mèche s'éteint chez vous. Le safran survit aux sanctions, Baron. Il les vieillit en bouteille." },
-    { s: "dorf", t: "Truqué ! Le jardin est truqué, le paon est truqué, TOUT est truqué ! J'ajoute des sanctions ! Le double !" }
+    { s: "safran", t: "Vous revenez toujours à la table, Cygne, et vous repartez toujours les mains vides. Le safran, lui, infuse pendant que vous négociez." },
+    { s: "cygne", t: "Une défaite mesurée pour un accord mesuré. En même temps déçu et déterminé, je reviendrai. Nous rebâtirons ceci." },
+    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
   ],
   lose:  [
-    { s: "dorf", t: "BOUM chez le fleuriste ! Pression maximale, résultat maximal ! Personne ne fait exploser les roses comme moi !" },
-    { s: "safran", t: "Emportez votre cratère et votre klaxon, Baron. Vous fermez mes ateliers ce soir ; ils rouvriront quand vous serez oublié. Le safran a l'éternité pour lui." }
+    { s: "cygne", t: "Voilà : la fermeté et la main tendue, en même temps. L'Accord peut renaître — à mes conditions, cette fois." },
+    { s: "safran", t: "Un point pour l'élégance. La table, elle, reste ouverte. Elle l'a toujours été. Ce sont vos alliés qui ferment les portes." }
   ]
 },
 {

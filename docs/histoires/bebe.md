@@ -33,27 +33,27 @@ Physiquement, le Maréchal est un **chibi à très grosse tête**, sanglé dans 
 
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 1, title: "Le grand frère en double", sub: "Ryonganie–Panguo · binôme sous tutelle",
-  left: "bebe", right: "timonier", ally: "volkoi", right2: "dorf", terrain: 4, mode: "2v2", ai: 0, doped: null,
+  act: 1, title: "Le grand frère en double", sub: "Ryonganie–Panguo vs Doria–Gallardie · binôme sous tutelle",
+  left: "bebe", right: "dorf", ally: "timonier", right2: "cygne", terrain: 1, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Esplanade du Défilé. Le Maréchal a exigé un 2v2 : il veut le Tsar comme partenaire contre le Timonier et le Baron." },
+    { s: "narrator", t: "Country Club Doré. Le Maréchal a exigé un 2v2 : il veut le Grand Timonier comme partenaire contre le Baron et le Cygne." },
     { s: "bebe", t: "Grand frère ! Tu digues avec MOI ! Mon radar couvre tout le terrain ! Les deux camps !" },
-    { s: "volkoi", t: "Je suis ton partenaire, pas ton fan. Digue quand je te le dis. Silence ensuite." },
-    { s: "timonier", t: "Deux enfants turbulents contre l'harmonie et… le bruit doré. Tempo." },
-    { s: "dorf", t: "Je suis le bruit doré, oui. Et le meilleur partenaire de panda du monde." },
+    { s: "timonier", t: "Je suis ton partenaire, pas ton fan. Digue quand je te le dis. Silence ensuite." },
+    { s: "dorf", t: "Deux enfants turbulents contre le bruit doré et… l'élégance. Moi je klaxonne, mon partenaire dialogue. Ça devrait suffire." },
+    { s: "cygne", t: "En même temps partenaire du Baron, en même temps critique de son mur. Un exercice, comme toujours." },
     { s: "narrator", t: "Double sous tutelle : l'alliance tient — ou le radar explose." },
   ],
   win:  [
-    { s: "bebe", t: "BINÔME GLORIEUX ! Le Maréchal et le Tsar ! Gravez-nous en GRANIT DOUBLE !" },
-    { s: "volkoi", t: "Correct, petit. Une fois. N'en fais pas une parade de douze mille pas." },
-    { s: "timonier", t: "Un revers. L'harmonie corrige aussi les doubles." },
-    { s: "dorf", t: "Mon partenaire a trop médité. Moi j'étais parfait." },
+    { s: "bebe", t: "BINÔME GLORIEUX ! Le Maréchal et le Grand Timonier ! Gravez-nous en GRANIT DOUBLE !" },
+    { s: "timonier", t: "Correct, petit. Une fois. N'en fais pas une parade de douze mille pas." },
+    { s: "dorf", t: "Mon partenaire élégant a trop dialogué. Moi j'étais parfait, comme toujours." },
+    { s: "cygne", t: "Défaite de binôme. En même temps, la fermeté reviendra." },
   ],
   lose:  [
-    { s: "timonier", t: "Le tempo à quatre a tranché. Rentrez défiler moins fort." },
-    { s: "dorf", t: "ON A GAGNÉ LE 2v2 ! Le plus beau !" },
+    { s: "dorf", t: "ON A GAGNÉ LE 2v2 ! Le plus beau ! Le Cygne, pas mauvais — pour un partenaire qui parle en même temps." },
+    { s: "cygne", t: "Partenariat efficace, même improbable. En même temps, méritée." },
     { s: "bebe", t: "CE N'EST PAS UNE DÉFAITE DE PARTENAIRES ! C'est un entraînement !" },
-    { s: "volkoi", t: "Gamin… la prochaine fois, tu digues vraiment. L'alliance, ça se mérite." },
+    { s: "timonier", t: "Le tempo à quatre a tranché. Rentrez défiler moins fort." },
   ]
 },
 {
@@ -77,23 +77,23 @@ Physiquement, le Maréchal est un **chibi à très grosse tête**, sanglé dans 
   ]
 },
 {
-  act: 1, title: "Cher ennemi bien-aimé", sub: "Ryonganie–Doria · les lettres magnifiques",
-  left: "bebe", right: "dorf", terrain: 3, mode: "volley", ai: 1, doped: null,
+  act: 1, title: "Le grand frère qui gronde", sub: "Ryonganie–Panguo · le patron n'aime pas les tests surprises",
+  left: "bebe", right: "timonier", terrain: 4, mode: "volley", ai: 1, doped: null,
   pre:  [
-    { s: "narrator", t: "Sommet historique sur l'Esplanade. Deux hommes qui se sont menacés d'anéantissement se sourient devant les caméras. Personne ne comprend rien. C'est parfait." },
-    { s: "dorf", t: "On s'est écrit des lettres. Les plus belles lettres. On est tombés amoureux, tout le monde le dit. Enfin, moi je le dis." },
-    { s: "bebe", t: "Cher Baron ! Ta lettre était magnifique. La mienne était plus magnifique. J'ai le plus gros bouton, tu te souviens ?" },
-    { s: "dorf", t: "Le plus gros bouton c'est le mien, et il marche. Mais on est potes. Un match entre potes qui pourraient finir le monde." },
-    { s: "bebe", t: "Chez moi, on ne saute pas le filet, sinon flak. Mais pour toi, mon ami, je laisse le radar tourner tout doucement." },
-    { s: "dorf", t: "Adorable. Vraiment. Sers, gamin, et souris à la caméra : ce sommet va faire un audimat historique." }
+    { s: "narrator", t: "Cité du Matin. Lanternes rouges, lions de pierre. Le petit frère vient réclamer du carburant ; le grand frère, lui, veut surtout du calme." },
+    { s: "timonier", t: "Je paie le charbon, je paie le pétrole, je paie presque tout. En échange, une seule chose : pas de vagues. Et tu en fais, petit." },
+    { s: "bebe", t: "Un test, c'est une fête ! Une fusée, c'est un feu d'artifice ! Le peuple adore, le radar adore, tout le monde adore !" },
+    { s: "timonier", t: "Le peuple adore. Mes voisins, non. Mes marchés, non. L'harmonie n'aime pas les surprises bruyantes, Maréchal." },
+    { s: "bebe", t: "Chez moi, on ne saute pas le filet, sinon flak ! Mais pour toi, grand frère, je laisse le radar tourner tout doucement. Un peu." },
+    { s: "timonier", t: "Tourne-le comme tu veux. Range tes fusées le temps du match, et je continuerai de fermer les yeux le reste du temps." }
   ],
   win:  [
-    { s: "bebe", t: "J'ai battu mon meilleur ennemi ! Écris-moi une lettre de félicitations. Une belle. Très belle." },
-    { s: "dorf", t: "Match truqué, mais quel show ! On remet ça au prochain sommet, mon petit Maréchal terrible." }
+    { s: "bebe", t: "J'ai battu mon grand frère ! Ce n'est pas un affront, c'est un HOMMAGE ! Envoie plus de charbon quand même !" },
+    { s: "timonier", t: "Un revers sans conséquence. L'harmonie patiente, même avec un petit frère indiscipliné." }
   ],
   lose:  [
-    { s: "dorf", t: "Gagné ! Le plus beau sommet de l'histoire ! Les gens pleuraient, il paraît. Moi aussi presque." },
-    { s: "bebe", t: "Tu gagnes le match, pas mon cœur. Enfin si, un peu mon cœur. Mais je garde mes fusées, hein." }
+    { s: "timonier", t: "Le tempo discipline même les plus turbulents. Range tes fusées, petit frère, et laisse le grand frère négocier pour toi." },
+    { s: "bebe", t: "Tu gagnes le match, pas mon armement. Mais je garde mes fusées, hein. Et un peu de charbon, s'il te plaît." }
   ]
 },
 

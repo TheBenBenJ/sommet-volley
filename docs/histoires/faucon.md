@@ -38,27 +38,27 @@ Car c'est peut-être là toute sa tragédie de personnage : Le Faucon a passé s
 const STORY_FAUCON = [
   // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
-  act: 1, title: "L'ami de l'est, le binôme de l'ouest", sub: "Levantie–Bharatie · double de sécurité",
-  left: "faucon", right: "gourou", ally: "dorf", right2: "volkoi", terrain: 6, mode: "2v2", ai: 0, doped: null,
+  act: 1, title: "L'ami de l'ouest, le duo de l'est", sub: "Levantie–Doria vs Bourassie–Ramenie · double de sécurité sous la neige",
+  left: "faucon", right: "volkoi", ally: "dorf", right2: "safran", terrain: 0, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Citadelle du Levant. Le Faucon prend le Baron comme partenaire contre le Gourou et le Tsar. Un 2v2 où la sécurité joue à quatre." },
+    { s: "narrator", t: "Place Écarlate, sous la neige. Le Faucon prend le Baron comme partenaire contre le Tsar et Safran. Un 2v2 où la sécurité joue à quatre, sous zéro." },
     { s: "faucon", t: "Baron : tu es mon partenaire. Tu parles moins, tu digues plus. C'est l'alliance." },
-    { s: "dorf", t: "Je digue ET je parle. Meilleur des deux mondes. On va écraser le calme et le gel !" },
-    { s: "gourou", t: "Namasté. Mon partenaire hiver et moi, on a le temps. Vous avez le bruit." },
-    { s: "volkoi", t: "Je n'aime pas être partenaire. Je tolère. Digue, moine." },
-    { s: "narrator", t: "Sécurité contre patience. Le double décide qui tient la ligne." },
+    { s: "dorf", t: "Je digue ET je parle. Meilleur des deux mondes. On va écraser le gel et le voile !" },
+    { s: "volkoi", t: "Deux hommes de l'Ouest contre l'hiver et la patience. Amusant. Digue, faucon — ou tais-toi." },
+    { s: "safran", t: "Alliance de mesure. Leur bruit va s'épuiser avant notre voile." },
+    { s: "narrator", t: "Sécurité contre patience et gel. Le double décide qui tient la ligne." },
   ],
   win:  [
     { s: "faucon", t: "Ligne tenue. Partenaire bruyant, résultat propre." },
     { s: "dorf", t: "ÉNORME alliance ! Je t'avais dit que j'étais le meilleur partenaire !" },
-    { s: "gourou", t: "Un set. On respire, on revient." },
-    { s: "volkoi", t: "Temporaire. Même en double, le froid revient seul." },
+    { s: "volkoi", t: "Un set. Temporaire. Même en double, le froid revient seul." },
+    { s: "safran", t: "Défaite mesurée. Le voile retombera, patient, sur leur sécurité pressée." },
   ],
   lose:  [
-    { s: "gourou", t: "Le calme à deux a suffi. Rentrez sécuriser autre chose." },
     { s: "volkoi", t: "Le gel partenaire a tranché. Votre alliance a parlé trop fort." },
+    { s: "safran", t: "Le voile a ralenti même leur raid. La patience gagne, toujours." },
     { s: "faucon", t: "Revanche. Moins de slogans, Baron." },
-    { s: "dorf", t: "C'était pas moi ! C'était le filet ! Et le zen !" },
+    { s: "dorf", t: "C'était pas moi ! C'était le filet ! Et le voile !" },
   ]
 },
   {
@@ -148,24 +148,24 @@ const STORY_FAUCON = [
     ]
   },
   {
-    act: 2, title: "La ligne rouge du nord", sub: "Levantie–Bourassie · déconfliction sous tension",
-    left: "faucon", right: "volkoi", terrain: 0, mode: "flame", ai: 2, doped: null,
+    act: 2, title: "Le client qui négocie", sub: "Levantie–Bharatie · vendeur de drones contre acheteur exigeant",
+    left: "faucon", right: "gourou", terrain: 6, mode: "flame", ai: 2, doped: null,
     pre:  [
-      { s: "narrator", t: "Place Écarlate, sous la neige. Le ballon est un ballon enflammé à brûlure : le camp où elle tombe saute. Le Tsar joue à domicile, glacial." },
-      { s: "volkoi", t: "Faucon. Tu voles au-dessus d'un ciel que je surveille aussi. Nous nous croisons souvent. Trop souvent." },
-      { s: "faucon", t: "On se croise poliment, Tsar, parce qu'aucun de nous ne veut du chaos de l'autre. Appelons ça une méfiance professionnelle." },
-      { s: "volkoi", t: "La méfiance, oui. Tu frappes tes cibles, j'observe. Un jour, ta ballon enflammé tombera trop près de mes intérêts." },
-      { s: "faucon", t: "Alors ne te tiens pas sur ma ligne de tir. Mon Raid Éclair ne demande pas la permission ; il informe après." },
-      { s: "narrator", t: "Renvoyez le ballon enflammé. Toujours. Sur cette place, l'hiver ne pardonne pas l'hésitation." }
+      { s: "narrator", t: "Stade Ashram, grès couleur miel. Une vache traverse le court, indifférente. Le Faucon vient livrer ses derniers drones — et négocier le prix. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+      { s: "gourou", t: "Namasté, Faucon. Tes drones sont excellents. Ton prix, un peu moins. Négocions, entre partenaires sérieux." },
+      { s: "faucon", t: "Je ne négocie pas la sécurité, Gourou. Je la facture. Mais pour un aussi bon client, un rabais reste possible." },
+      { s: "gourou", t: "Un rabais ! Voilà une phrase que je n'attendais pas d'un homme aussi intransigeant. Le commerce adoucit tout, même toi." },
+      { s: "faucon", t: "Le commerce n'adoucit rien. Il finance. Sers, et voyons qui négocie le mieux au filet." },
+      { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu. Ici, même les alliés se disputent la facture." }
     ],
     win:  [
-      { s: "faucon", t: "La déconfliction tient tant que je gagne. Bien. Reste au chaud, Tsar. Je surveille le ciel pour deux." },
-      { s: "volkoi", t: "Une manche. L'hiver est patient. Tu voles vite, mais tu dois te poser un jour. Je serai là." },
+      { s: "faucon", t: "La sécurité a un prix, et je viens de le prouver deux fois. Reste client, Gourou. Ça t'arrange autant que moi." },
+      { s: "gourou", t: "Un revers commercial. Je médite, je négocie encore, je reviens acheter. Namasté, vendeur intraitable." },
       { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ],
     lose:  [
-      { s: "volkoi", t: "Boum. De ton côté. Le sang-froid bat toujours la précipitation, petit faucon pressé." },
-      { s: "faucon", t: "un ballon enflammé mal renvoyée n'efface pas la doctrine. La prochaine fois, je pique avant que tu observes." }
+      { s: "gourou", t: "Le calme a fait baisser le prix, cette fois. Namasté, Faucon. On se revoit au prochain contrat." },
+      { s: "faucon", t: "Une manche pour le client. La facture, elle, reste la même. Je reviendrai vendre, et je reviendrai gagner." }
     ]
   },
 

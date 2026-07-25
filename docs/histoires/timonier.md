@@ -30,27 +30,27 @@ Son drapeau ne claque pas au vent ; il ondule. Rouge, comme les murs, comme les 
 const STORY_TIMONIER = [
   // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
-  act: 1, title: "Le petit frère en face", sub: "Panguo–Ryonganie · double de l'harmonie",
-  left: "timonier", right: "bebe", ally: "safran", right2: "dorf", terrain: 3, mode: "2v2", ai: 0, doped: null,
+  act: 1, title: "L'axe sans limites", sub: "Panguo–Bourassie vs Doria–Gallardie · double de l'harmonie",
+  left: "timonier", right: "dorf", ally: "volkoi", right2: "cygne", terrain: 1, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Cité du Matin. Le Timonier choisit Safran comme partenaire. En face : le Maréchal et le Baron. Un 2v2 pour enseigner le tempo." },
-    { s: "timonier", t: "Toi, rose, tu joues avec moi. Peu de mots. Beaucoup de digues. L'harmonie en double." },
-    { s: "safran", t: "Partenariat élégant. Je ralentis leur camp ; tu imposes le tempo. Marché conclu." },
-    { s: "bebe", t: "Le Maréchal a le Baron comme partenaire ! On va gagner EN DÉFILANT !" },
-    { s: "dorf", t: "Je défile pas. Je gagne. Digue, petit, et regarde le maître." },
+    { s: "narrator", t: "Country Club Doré. Le Timonier choisit le Tsar comme partenaire. En face : le Baron et le Cygne. Un 2v2 pour enseigner le tempo à l'Occident réuni." },
+    { s: "timonier", t: "Toi, l'hiver, tu joues avec moi. Peu de mots. Beaucoup de gel. L'harmonie sans limites, en double." },
+    { s: "volkoi", t: "Partenariat solide. Je gèle leur camp ; tu imposes le tempo. Marché conclu, camarade." },
+    { s: "dorf", t: "Le Baron a le Cygne comme partenaire ! Le plus élégant du monde ! On va écraser l'axe sans limites !" },
+    { s: "cygne", t: "En même temps partenaire du Baron, en même temps critique. Un exercice, comme toujours." },
     { s: "narrator", t: "Quatre sur le terrain. L'harmonie n'aime pas le bruit — elle va le corriger." },
   ],
   win:  [
-    { s: "timonier", t: "Tempo tenu. Partenaire fiable. Le siècle continue." },
-    { s: "safran", t: "Beau double. La lenteur a usé la parade." },
-    { s: "bebe", t: "REVANCHE ! Mon partenaire a trop parlé !" },
-    { s: "dorf", t: "Truqué. Évidemment. Mais magnifique quand même." },
+    { s: "timonier", t: "Tempo tenu. Partenaire fiable. Le siècle continue, à deux." },
+    { s: "volkoi", t: "Beau double. Le gel a usé leur élégance." },
+    { s: "dorf", t: "Truqué ! Mon partenaire élégant parlait trop, pas assez de smashs !" },
+    { s: "cygne", t: "Défaite de binôme. En même temps, la fermeté reviendra." },
   ],
   lose:  [
-    { s: "bebe", t: "VICTOIRE DU BINÔME ! Radar + or = imbattable !" },
-    { s: "dorf", t: "Le plus grand 2v2 ! Dis-le, panda !" },
-    { s: "timonier", t: "Un set perdu. L'harmonie digère. On reprend." },
-    { s: "safran", t: "Mesure pour la revanche. Les partenaires, ça se recalibre." },
+    { s: "dorf", t: "ÉNORME ! Le plus grand 2v2 ! Le Cygne, pas mauvais — pour un partenaire qui parle en même temps !" },
+    { s: "cygne", t: "Partenariat efficace, même improbable. En même temps, méritée." },
+    { s: "timonier", t: "Un set perdu. L'harmonie digère. On reprend, ensemble." },
+    { s: "volkoi", t: "Mesure pour la revanche. Même à deux, l'hiver attend parfois." },
   ]
 },
   {
@@ -186,24 +186,24 @@ const STORY_TIMONIER = [
     ]
   },
   {
-    act: 3, title: "La guerre froide des tarifs", sub: "Panguo–Doria · rempart d'or contre rempart rouge",
-    left: "timonier", right: "dorf", terrain: 4, mode: "bomb", ai: 3, doped: null,
+    act: 3, title: "Le protégé qui teste trop", sub: "Panguo–Ryonganie · sanctions, patience et petit frère nucléaire",
+    left: "timonier", right: "bebe", terrain: 4, mode: "bomb", ai: 3, doped: null,
     pre:  [
-      { s: "narrator", t: "Cité du Matin. Les lanternes rouges se balancent. Face à l'empereur, le Baron dresse un mur d'or contre un mur cramoisi. La bombe compte les points." },
-      { s: "dorf", t: "Des tarifs ! Des tarifs colossaux ! Cent pour cent sur tes ballons, deux cents sur ton filet, mille pour cent sur ton rempart !" },
-      { s: "timonier", t: "Taxe tout. Tes usines, tes jouets, tes drapeaux « fabriqués chez toi »… c'est encore ma Cité qui les assemble." },
-      { s: "dorf", t: "Je bâtis LE plus beau mur du monde, un mur d'or, et je te ferme mon marché ! On se découple, empereur !" },
-      { s: "timonier", t: "Tu bâtis un mur devant toi ; moi j'en bâtis un au milieu de ton camp. Le tien te protège. Le mien t'enferme." },
-      { s: "dorf", t: "Guerre commerciale ! La plus grande guerre commerciale de l'histoire ! Et je vais la GAGNER, comme toujours !" }
+      { s: "narrator", t: "Cité du Matin. Les lanternes rouges se balancent. L'empereur reçoit son protégé le plus explosif — littéralement. La bombe compte les points." },
+      { s: "bebe", t: "Grand frère ! J'ai testé une NOUVELLE fusée ! La plus grosse ! Le radar en tremble encore !" },
+      { s: "timonier", t: "Je le sais. Toute la région le sait. Mes marchés aussi. L'harmonie n'apprécie pas les explosions surprises, petit." },
+      { s: "bebe", t: "Les sanctions me font pas peur ! J'ai mon radar, ma Batterie AA, et un grand frère qui paie toujours, au fond !" },
+      { s: "timonier", t: "Je paie parce que ta chute coûterait plus cher que ta bombe. Ce n'est pas de l'amour, Maréchal. C'est de l'arithmétique." },
+      { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd. Même la patience impériale a une limite de bruit." }
     ],
     win:  [
-      { s: "timonier", t: "Deux murs, deux empires. Le tien brille ; le mien dure. Reviens quand tes rayons seront vides." },
-      { s: "dorf", t: "Truqué ! Subventionné ! Manipulation de monnaie ! … Bon. Combien pour rouvrir tes chaînes, au fait ?" },
+      { s: "timonier", t: "Le tempo discipline même les plus bruyants. Range tes fusées. Le siècle n'a pas besoin de ton feu d'artifice." },
+      { s: "bebe", t: "Rejouons ! REJOUONS ! Ce n'est pas une défaite, c'est un exercice de tir supervisé par le grand frère !" },
       { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ],
     lose:  [
-      { s: "dorf", t: "Boum ! Chez toi ! On gagne la guerre des tarifs ! On gagne tellement que la Cité en pleure !" },
-      { s: "timonier", t: "Une manche pour l'or. Le temps, lui, joue en rouge. J'attends. J'ai des siècles d'entraînement." }
+      { s: "bebe", t: "BOUM ! Chez le grand frère ! Le petit a battu l'empereur ! Défilé triple ce soir !" },
+      { s: "timonier", t: "Une manche pour le bruit. L'harmonie, elle, continuera de payer ta facture — et de fermer les yeux. Pour l'instant." }
     ]
   },
   {

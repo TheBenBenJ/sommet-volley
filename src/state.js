@@ -181,10 +181,11 @@ function sideColor(side) {
 //        | "selectCharacter" | "selectTerrain" | "serve" | "play" | "point" | "gameover"
 //        | états du mode en ligne : "onlineMenu" | "joinEntry" | "hostWait"
 //          | "connecting" | "netWait" | "netError"
-// Flux du menu : menu → (Solo IA : aiDifficulty → gameModeSelect → teamFormat)
-//                     | (Local : gameModeSelect direct, 1v1)
-//                     | (En ligne hôte : gameModeSelect → teamFormat → …)
-//                     → selectCharacter → selectTerrain → partie
+// Flux du menu : menu → soloMenu (Histoire | Amical | Tournoi)
+//                     | multiMenu (Local | En ligne → onlineMenu)
+//              Amical : aiDifficulty → gameModeSelect → teamFormat → …
+//              Local  : gameModeSelect (1v1) → …
+//              → selectCharacter → selectTerrain → partie
 //                     | Tutoriel (partie guidée) / Aide commandes / Règles / Crédits
 let state = "menu";
 let vsAI = true;
@@ -225,7 +226,9 @@ function shouldShowTutorialInvite() {
   return state === "menu" && !tutorialDone && !tutorialInviteSessionDismissed;
 }
 function matchWinScore() {
-  return tutorialMode ? TUTORIAL_WIN_SCORE : WIN_SCORE;
+  if (tutorialMode) return TUTORIAL_WIN_SCORE;
+  if (typeof tournamentActive !== "undefined" && tournamentActive) return TOURNAMENT_WIN_SCORE;
+  return WIN_SCORE;
 }
 
 let pendingMode = null;        // mode choisi au menu, en attente des sélections

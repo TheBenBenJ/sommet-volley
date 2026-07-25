@@ -98,6 +98,8 @@ function render() {
   if (crowdHype > 0) crowdHype -= 1;
   for (const e of emotes) if (e && e.t > 0) e.t--;
   if (state === "menu") { drawMenu(); return; }
+  if (state === "soloMenu") { drawSoloMenu(); return; }
+  if (state === "multiMenu") { drawMultiMenu(); return; }
   if (state === "aiDifficulty") { drawAiDifficulty(); return; }
   if (state === "gameModeSelect") { drawGameModeSelect(); return; }
   if (state === "teamFormat" || state === "bombFormat" || state === "flameFormat") {
@@ -122,6 +124,8 @@ function render() {
   if (state === "storyActIntro") { drawStoryActIntro(); return; }
   if (state === "storyScene") { drawStoryScene(); return; }
   if (state === "storyEnding") { drawStoryEnding(); return; }
+  if (state === "tournamentBracket") { drawTournamentBracket(); return; }
+  if (state === "tournamentEnding") { drawTournamentEnding(); return; }
 
   // invité : le monde affiché vient de l'interpolation des instantanés
   if (online && netRole === "guest") guestApplyView();
