@@ -272,6 +272,11 @@ function localInputs(side) {
   // Clavier : Q/D · Z/Espace · F (action) · E — visée géométrique (pas souris).
   // Manette : inchangée (stick = visée, X/Y = frappe).
   // ↑ réservé au joueur droit en 1v1 local 2 humains.
+  const kbdL = !!(keys["KeyA"] || keys["KeyD"] || keys["KeyW"] || keys["Space"] ||
+    keys["KeyF"] || keys["KeyE"] || (!twoHumans && keys["ArrowUp"]));
+  const kbdR = !!(keys["ArrowLeft"] || keys["ArrowRight"] || keys["ArrowUp"] ||
+    keys["ArrowDown"] || keys["Slash"] || keys["ShiftRight"]);
+  // Clavier actif sur ce côté → ignore stick (dérive manette branchée).
   const raw = side === 0 ? {
     left:  !!keys["KeyA"] || pad.left,
     right: !!keys["KeyD"] || pad.right,
@@ -279,10 +284,10 @@ function localInputs(side) {
     kbdJump: !!(keys["KeyW"] || keys["Space"] || (!twoHumans && keys["ArrowUp"])),
     smash: !!keys["KeyF"] || !!pad.smash,
     super: !!keys["KeyE"] || pad.super,
-    up:    !!pad.up,
-    down:  !!pad.down,
-    ax:    pad.ax || 0,
-    ay:    pad.ay || 0
+    up:    kbdL ? false : !!pad.up,
+    down:  kbdL ? false : !!pad.down,
+    ax:    kbdL ? 0 : (pad.ax || 0),
+    ay:    kbdL ? 0 : (pad.ay || 0)
   } : {
     left:  !!keys["ArrowLeft"] || pad.left,
     right: !!keys["ArrowRight"] || pad.right,
@@ -290,10 +295,10 @@ function localInputs(side) {
     kbdJump: !!keys["ArrowUp"],
     smash: !!(keys["ArrowDown"] || keys["Slash"]) || !!pad.smash,
     super: !!keys["ShiftRight"] || pad.super,
-    up:    !!pad.up,
-    down:  !!pad.down,
-    ax:    pad.ax || 0,
-    ay:    pad.ay || 0
+    up:    kbdR ? false : !!pad.up,
+    down:  kbdR ? false : !!pad.down,
+    ax:    kbdR ? 0 : (pad.ax || 0),
+    ay:    kbdR ? 0 : (pad.ay || 0)
   };
   return xInput(side, activeBlobs[side], raw);
 }

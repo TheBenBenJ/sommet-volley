@@ -449,14 +449,13 @@ function aiInput2v2(me, lvlOverride) {
 
   const opp = activeBlobs.find(b => b.side !== side) || (side === 0 ? blobR : blobL);
 
-  // Service « balle en mains » : ne pas dépendre du chaser. En 2v2 local,
-  // serverBlob() = 1er du camp (= humain à gauche) — si l'allié IA s'efface
-  // derrière lui, personne ne lance et le match reste figé (Histoire ch.1).
+  // Service « balle en mains » : le porteur IA (serverBlob) doit pouvoir lancer
+  // même s'il n'est pas « chaser ». Pas l'allié à la place de l'humain — la
+  // balle reste en mains jusqu'à F / Espace (service clavier 1 appui).
   const servingInHands = !!(GAMEPLAY_V2 && ball.inHands && ball.frozen &&
     servingSide === side && (state === "serve" || state === "play"));
   const server = servingInHands && typeof serverBlob === "function" ? serverBlob() : null;
-  const allyTossForHuman = !!(server && vsAI && !online && server === blobL && me.side === 0);
-  const iServeToss = servingInHands && (me === server || allyTossForHuman);
+  const iServeToss = !!(servingInHands && server && me === server);
 
   if (!GAMEPLAY_V2) {
     const overMySide = side === 0 ? ball.x < NET_X - BALL_R : ball.x > NET_X + BALL_R;

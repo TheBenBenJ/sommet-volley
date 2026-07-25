@@ -282,6 +282,8 @@ function clampAimToCone(blob, ang, center) {
 /** Visée « digitale » (clavier / tactile / croix sans stick) : pas d'analogique. */
 function isKeyboardStyleAim(input) {
   if (!input) return true;
+  // Saut clavier explicite → assist clavier même si une manette dérive au repos
+  if (input.kbdJump) return true;
   const ax = Number(input.ax) || 0;
   const ay = Number(input.ay) || 0;
   if (Math.hypot(ax, ay) >= 0.18) return false;
@@ -684,6 +686,17 @@ function tryTossServe(blob) {
   return tossServeBall(blob);
 }
 
+/** Clavier : Espace / Z avec balle en mains → service en un appui (cloche). */
+function tryKeyboardJumpServe(blob) {
+  if (!GAMEPLAY_V2 || !ball.inHands || !ball.frozen || ball.popped) return false;
+  if (blob.side !== servingSide) return false;
+  if (!blob._kbdJumpEdge) return false;
+  if (!isKeyboardStyleAim(blob._input)) return false;
+  // Uniquement le porteur (1er du camp) — pas l'allié 2v2
+  if (typeof serverBlob === "function" && blob !== serverBlob()) return false;
+  return keyboardJumpServe(blob);
+}
+
 /** CLAVIER uniquement : le SAUT sert directement (cloche par-dessus le filet)
  *  en un seul appui. La manette garde le service en 2 temps (X lancer + X frapper). */
 function keyboardJumpServe(blob) {
@@ -700,8 +713,13 @@ function keyboardJumpServe(blob) {
   const ang = dir > 0 ? -1.12 : Math.PI + 1.12;   // cloche haute vers l'adversaire
   ball.vx = Math.cos(ang) * HOLD_LOB_SPD;
   ball.vy = Math.sin(ang) * HOLD_LOB_SPD;
+  ball.aimAngle = ang;
+  if (ball.serveAimLock) {
+    ball.serveAimLock = false;
+    ball.serveFlight = true;
+  }
   forceServeClearsNet(blob);                        // garantit le passage du filet
-  ball.lastTouchSide = blob.side;
+  registerTouch(blob);
   markActiveHit(blob);
   blob._serveAwaitRelease = false;
   if (typeof setCharPose === "function") setCharPose(blob, "aim", 30);
@@ -929,8 +947,9 @@ function ballBlobCollision(blob) {
   // - Service (après lancer) : toujours un appui explicite (pas d'auto)
   if (GAMEPLAY_V2) {
     if (ball.inHands && ball.frozen) {
-      if (tryTossServe(blob)) return; // F = lancer la balle
-      return; // collée aux mains : saut OK (Espace), pas de frappe sans lancer
+      if (tryTossServe(blob)) return; // F/X = lancer vertical
+      if (tryKeyboardJumpServe(blob)) return; // Espace = service clavier 1 appui
+      return; // collée aux mains tant qu'on n'a pas lancé / servi
     }
     // Grace post-lancer : pas de cloche accidentelle sur le serveur
     if (ball.tossGrace > 0 && blob.side === servingSide) return;

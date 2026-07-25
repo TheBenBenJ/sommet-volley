@@ -810,7 +810,7 @@ test("V2 : service — balle dans les mains, lancer vertical (smash/X)", () => {
   assert.ok(g.ball.y < y0, "la balle a quitté les mains vers le haut");
 });
 
-test("V2 : au service, le SAUT seul ne sert pas — il faut F pour lancer", () => {
+test("V2 : au service, Espace clavier sert en un appui ; manette A ne sert pas", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(1);
   g.newGame(51);
@@ -819,12 +819,27 @@ test("V2 : au service, le SAUT seul ne sert pas — il faut F pour lancer", () =
   g.ball.reset(0);
   g.stepGame(N0, N0); // pose
   assert.ok(g.ball.inHands, "balle en mains");
-  // Saut (Espace) seul : la balle reste en mains (on ne sert pas au saut)
+  // Manette : A (jump sans kbdJump) + stick → pas de service one-shot
+  g.stepGame({ ...N0, jump:true, ax:0.5 }, N0);
+  assert.ok(g.ball.inHands && g.ball.frozen, "saut manette ≠ service direct");
+  // Clavier : Espace (kbdJump) → cloche directe
   g.stepGame({ ...N0, jump:true, kbdJump:true }, N0);
-  assert.ok(g.ball.inHands && g.ball.frozen, "le saut seul ne lance pas");
-  // F lance la balle (toss vertical)
+  assert.strictEqual(g.ball.inHands, false, "Espace sert en un appui");
+  assert.ok(!g.ball.frozen, "balle en jeu");
+  assert.ok(g.ball.vx > 0, "vers l'adversaire");
+});
+
+test("V2 : au service, F lance encore verticalement (2 temps)", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(52);
+  g.setState("serve"); g.setServeCountdown(0);
+  g.setServingSide(0);
+  g.ball.reset(0);
+  g.stepGame(N0, N0);
   g.stepGame({ ...N0, smash:true }, N0);
   assert.strictEqual(g.ball.inHands, false, "F lance la balle");
+  assert.ok(g.ball.vy < 0, "lancer vertical");
 });
 
 test("V2 : service — se retourner déplace la balle avec les mains", () => {
@@ -1887,7 +1902,7 @@ test("story : le premier chapitre est débloqué, les suivants verrouillés", ()
   assert.strictEqual(g.getState(), "storyMenu", "chapitre verrouillé non jouable");
 });
 
-test("story 2v2 : l'allié IA lance le service si l'humain ne le fait pas", () => {
+test("story 2v2 : balle reste en mains ; Espace clavier sert ; IA adverse sert aussi", () => {
   const g = loadGame();
   const idx = g.STORY.findIndex(c => c.mode === "2v2");
   assert.ok(idx >= 0, "au moins un chapitre 2v2");
@@ -1897,14 +1912,49 @@ test("story 2v2 : l'allié IA lance le service si l'humain ne le fait pas", () =
   g.storyStartMatch();
   assert.strictEqual(g.getMode(), "2v2");
   const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
-  let tossed = false;
-  for (let i = 0; i < 500; i++) {
+  // Pendant le décompte + après : sans input humain, balle reste en mains (pas d'allié qui vole le service)
+  for (let i = 0; i < 250; i++) {
     const ins = g.getActiveBlobs().map((b, j) => (j === 0 ? { ...N } : g.aiInput2v2(b)));
     g.stepGame(null, null, ins);
-    if (!g.ball.inHands) { tossed = true; break; }
   }
-  assert.ok(tossed, "balle lancée malgré joueur inactif (allié IA)");
-  assert.ok(!g.ball.frozen, "balle plus gelée après le lancer");
+  assert.ok(g.ball.inHands && g.ball.frozen, "balle toujours en mains du joueur");
+  // Espace = service clavier
+  {
+    const ins = g.getActiveBlobs().map((b, j) => (
+      j === 0 ? { ...N, jump:true, kbdJump:true } : g.aiInput2v2(b)
+    ));
+    g.stepGame(null, null, ins);
+  }
+  assert.strictEqual(g.ball.inHands, false, "Espace envoie la balle");
+
+  // Service camp IA : le porteur adverse lance malgré le chaser
+  g.setServingSide(1);
+  g.startRally();
+  g.setServeCountdown(0);
+  let aiTossed = false;
+  for (let i = 0; i < 80; i++) {
+    const ins = g.getActiveBlobs().map((b, j) => (j === 0 ? { ...N } : g.aiInput2v2(b)));
+    g.stepGame(null, null, ins);
+    if (!g.ball.inHands) { aiTossed = true; break; }
+  }
+  assert.ok(aiTossed, "IA adverse lance son service en 2v2");
+});
+
+test("V2 : smash auto clavier malgré dérive manette (ax)", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(56);
+  g.setState("play"); g.setServeCountdown(0);
+  g.blobL.x = 280; g.blobL.y = g.consts.GROUND_Y - 80; g.blobL.onGround = false;
+  g.blobL.vy = -2; g.blobL.lastActiveHitTick = -999;
+  g.ball.x = 285; g.ball.y = g.blobL.y - 50; g.ball.vx = 0; g.ball.vy = 2;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+  g.ball.serveAimLock = false;
+  g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
+  // kbdJump prioritaire sur ax dérivé (manette branchée au repos)
+  g.stepGame({ ...N0, jump:true, kbdJump:true, ax:0.25, ay:0.1 }, N0);
+  assert.ok(g.ball.vx > 2 || Math.hypot(g.ball.vx, g.ball.vy) > 4,
+    "smash auto clavier malgré dérive stick");
 });
 
 test("storyStartMatch configure persos / terrain / mode / dopage", () => {

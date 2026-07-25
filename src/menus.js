@@ -1530,7 +1530,7 @@ function drawRules() {
   y += 4;
   h("Gameplay");
   p("Au sol, balle sur toi = cloche auto. En l'air = smash auto au contact.");
-  p("Service : F pour lancer, puis F à nouveau pour servir. Double saut en l'air.");
+  p("Service clavier : Espace = envoi direct · ou F pour lancer puis sauter dans la balle / F. Manette : X lancer + X frapper. Double saut en l'air.");
   y += 4;
   h("★ SUPER", "#ffd93d");
   p("3 points d'affilée chargent la jauge or. E / B lance la technique : un bandeau explique l'effet ~4 s.");

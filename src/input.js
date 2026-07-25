@@ -106,15 +106,19 @@ let navIdx = 0; // option surlignée à la manette dans les menus
 function readPad(gp) {
   if (!gp || !gp.connected) return null;
   const b = i => !!(gp.buttons[i] && gp.buttons[i].pressed);
-  const ax = gp.axes[0] || 0, ay = gp.axes[1] || 0;
+  const rawAx = gp.axes[0] || 0, rawAy = gp.axes[1] || 0;
+  // Deadzone aussi sur la visée : un stick au repos (dérive ~0.2) cassait
+  // isKeyboardStyleAim (≥0.18) → plus de smash/cloche auto au clavier.
+  const ax = Math.abs(rawAx) < PAD_DEADZONE ? 0 : rawAx;
+  const ay = Math.abs(rawAy) < PAD_DEADZONE ? 0 : rawAy;
   return {
-    left:    ax < -PAD_DEADZONE || b(14),
-    right:   ax >  PAD_DEADZONE || b(15),
+    left:    rawAx < -PAD_DEADZONE || b(14),
+    right:   rawAx >  PAD_DEADZONE || b(15),
     jump:    b(0) || b(12),                             // A / croix-haut
     smash:   b(2) || b(3),                              // X ou Y → smash
     superT:  b(1) || b(4) || b(5) || b(6) || b(7),      // B / gâchettes → SUPER
-    up:      ay < -0.5 || b(12),
-    down:    ay >  0.5 || b(13),
+    up:      rawAy < -0.5 || b(12),
+    down:    rawAy >  0.5 || b(13),
     ax, ay,                 // stick analog (visée à l'appui)
     confirm: b(0),          // A / Croix
     back:    b(1) || b(8)   // B / Rond, ou Select
