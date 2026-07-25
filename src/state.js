@@ -238,11 +238,11 @@ const AI_LEVELS = [
   // attack : décalage derrière la balle pour viser franchement le camp adverse
   // react : anticipation (0=lent, 1=parfait) · dbl : utilise le double saut
   // aim : 1 = place ses frappes LOIN de l'adversaire (drive profond / amorti court)
-  // Grille baissée d’un cran : l’ancien Facile = Normale actuelle (IA trop dure).
-  { name: "Facile",      err: 58, rush: 0.05, attack: 3,  react: 0.28, dbl: false, aim: 0 },
-  { name: "Normale",     err: 40, rush: 0.10, attack: 6,  react: 0.42, dbl: false, aim: 0 },
-  { name: "Difficile",   err: 20, rush: 0.32, attack: 12, react: 0.68, dbl: true,  aim: 0 },
-  { name: "Impitoyable", err: 6,  rush: 0.70, attack: 20, react: 0.90, dbl: true,  aim: 1 }
+  // Grille encore baissée : chaque cran ≈ l’ancien cran inférieur (IA trop dure).
+  { name: "Facile",      err: 75, rush: 0.02, attack: 2,  react: 0.18, dbl: false, aim: 0 },
+  { name: "Normale",     err: 58, rush: 0.05, attack: 3,  react: 0.28, dbl: false, aim: 0 },
+  { name: "Difficile",   err: 40, rush: 0.10, attack: 6,  react: 0.42, dbl: false, aim: 0 },
+  { name: "Impitoyable", err: 20, rush: 0.32, attack: 12, react: 0.68, dbl: true,  aim: 0 }
 ];
 let aiLevel = 1;
 let aiErr = 0, aiErrTimer = 0;  // erreur de placement volontaire de l'IA
