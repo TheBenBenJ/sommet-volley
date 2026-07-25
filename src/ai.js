@@ -449,6 +449,15 @@ function aiInput2v2(me, lvlOverride) {
 
   const opp = activeBlobs.find(b => b.side !== side) || (side === 0 ? blobR : blobL);
 
+  // Service « balle en mains » : ne pas dépendre du chaser. En 2v2 local,
+  // serverBlob() = 1er du camp (= humain à gauche) — si l'allié IA s'efface
+  // derrière lui, personne ne lance et le match reste figé (Histoire ch.1).
+  const servingInHands = !!(GAMEPLAY_V2 && ball.inHands && ball.frozen &&
+    servingSide === side && (state === "serve" || state === "play"));
+  const server = servingInHands && typeof serverBlob === "function" ? serverBlob() : null;
+  const allyTossForHuman = !!(server && vsAI && !online && server === blobL && me.side === 0);
+  const iServeToss = servingInHands && (me === server || allyTossForHuman);
+
   if (!GAMEPLAY_V2) {
     const overMySide = side === 0 ? ball.x < NET_X - BALL_R : ball.x > NET_X + BALL_R;
     const closeX = Math.abs(ball.x - me.x) < 42 + lvl.attack;
@@ -458,11 +467,11 @@ function aiInput2v2(me, lvlOverride) {
       if (me.onGround) input.jump = true;
       else if (lvl.dbl && me.jumpsUsed === 1 && me.vy > -1.5 && ball.y < me.y - 130) input.jump = true;
     }
-    if (iChase && ball.frozen && servingSide === side &&
+    if ((iChase || iServeToss) && ball.frozen && servingSide === side &&
         Math.abs(ball.x - me.x) < 20 && me.onGround) {
       input.jump = true;
     }
-  } else if (iChase) {
+  } else if (iChase || iServeToss) {
     aiGameplayV2(side, lvl, me, opp, input);
   }
 

@@ -1887,6 +1887,26 @@ test("story : le premier chapitre est débloqué, les suivants verrouillés", ()
   assert.strictEqual(g.getState(), "storyMenu", "chapitre verrouillé non jouable");
 });
 
+test("story 2v2 : l'allié IA lance le service si l'humain ne le fait pas", () => {
+  const g = loadGame();
+  const idx = g.STORY.findIndex(c => c.mode === "2v2");
+  assert.ok(idx >= 0, "au moins un chapitre 2v2");
+  g.storySelectCampaign(0);
+  if (g.storyConfirmIntro) g.storyConfirmIntro();
+  g.setStoryChapter(idx);
+  g.storyStartMatch();
+  assert.strictEqual(g.getMode(), "2v2");
+  const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  let tossed = false;
+  for (let i = 0; i < 500; i++) {
+    const ins = g.getActiveBlobs().map((b, j) => (j === 0 ? { ...N } : g.aiInput2v2(b)));
+    g.stepGame(null, null, ins);
+    if (!g.ball.inHands) { tossed = true; break; }
+  }
+  assert.ok(tossed, "balle lancée malgré joueur inactif (allié IA)");
+  assert.ok(!g.ball.frozen, "balle plus gelée après le lancer");
+});
+
 test("storyStartMatch configure persos / terrain / mode / dopage", () => {
   const g = loadGame();
   // trouve un chapitre Bombe avec adversaire dopé

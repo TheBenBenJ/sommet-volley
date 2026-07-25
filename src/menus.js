@@ -1626,9 +1626,7 @@ function drawCredits() {
   const m = (txt) => { ctx.textAlign = "left"; ctx.fillStyle = UI.muted; ctx.font = "13px " + UI.mono; ctx.fillText(txt, lx, y); y += 20; };
 
   h("Créé par");
-  {
-    y += 24;
-  }
+  p("Benjamin Mille");
   y += 10;
 
   h("Technique");
