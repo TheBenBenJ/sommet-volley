@@ -135,8 +135,8 @@ const EPILOGUE = `
   SUPER_DUR: typeof SUPER_DUR !== "undefined" ? SUPER_DUR : {},
   SUPER_NEED: typeof SUPER_NEED !== "undefined" ? SUPER_NEED : 3,
   SUPER_SLOW_MUL: typeof SUPER_SLOW_MUL !== "undefined" ? SUPER_SLOW_MUL : 0.55,
-  POWER_GAUGE_MAX: typeof POWER_GAUGE_MAX !== "undefined" ? POWER_GAUGE_MAX : 520,
-  POWER_GAUGE_TOUCH: typeof POWER_GAUGE_TOUCH !== "undefined" ? POWER_GAUGE_TOUCH : 70,
+  POWER_GAUGE_MAX: typeof POWER_GAUGE_MAX !== "undefined" ? POWER_GAUGE_MAX : 840,
+  POWER_GAUGE_TOUCH: typeof POWER_GAUGE_TOUCH !== "undefined" ? POWER_GAUGE_TOUCH : 36,
   getPowerGauge: () => [powerGauge[0]|0, powerGauge[1]|0],
   setPowerGauge: (a, b) => {
     powerGauge[0] = a | 0;

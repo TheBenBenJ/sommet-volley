@@ -36,9 +36,9 @@ propres sous-choix plutôt qu'un mur d'options :
 
 | Accueil | Puis... |
 |---------|---------|
-| **1 — Solo** | choix de la difficulté (Facile/Normale/Difficile/Impitoyable), puis du format : Classique, En équipes (toi + IA vs 2 IA), ou Bombe (qui demande ensuite 1v1 ou en équipes) |
-| **2 — Multijoueur local** | même écran/clavier (ou 2 manettes) : Classique ou Bombe (1v1 uniquement, pas d'équipes en local) |
-| **3 — Multijoueur en ligne** | *Créer une partie* → même écran de format que le solo (Classique/En équipes/Bombe), puis partage le code ; ou *Rejoindre avec un code* |
+| **1 — Solo** | difficulté, puis mode (Classique / Bombe / Ballon enflammé), puis **1v1 ou équipes 2v2** (toi + IA vs 2 IA) pour chaque mode |
+| **2 — Multijoueur local** | Classique / Bombe / Flamme en 1v1 uniquement (pas d'équipes en local) |
+| **3 — Multijoueur en ligne** | *Créer une partie* → même flux que le solo (mode puis 1v1/2v2), puis partage le code ; ou *Rejoindre avec un code* |
 | **R — Règles** | rappel des commandes, techniques SUPER et fiche de chaque personnage |
 
 > **Mode Bombe** — La balle devient une bombe à mèche (durée réglable, 3

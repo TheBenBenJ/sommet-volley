@@ -27,22 +27,27 @@ Sous la vanne, il y a un joueur redoutable. Rustre, oui. Imprévisible, oui. Mai
 ```js
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 1, title: "Casquette contre casquette", sub: "Tropicalia–Doria · les cousins populistes",
-  left: "capitaine", right: "dorf", terrain: 1, mode: "volley", ai: 0, doped: null,
+  act: 1, title: "Casquettes en double", sub: "Tropicalia–Libertaria · binôme de canopée",
+  left: "capitaine", right: "dorf", ally: "gourou", right2: "faucon", terrain: 1, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Premier tour des Jeux du Sommet. Sur le gazon trop vert d'un resort doré, deux hommes en casquette se reconnaissent de loin — même démarche, même mépris pour l'arbitre." },
-    { s: "dorf", t: "Regarde-moi ce type. Grande énergie. Une TRÈS grande énergie tropicale. J'adore. On est pareils, toi et moi." },
-    { s: "capitaine", t: "Pareils ? Toi t'as des murs en or, mon frère. Moi mes murs, ils sont en bois. Et ils repoussent." },
-    { s: "dorf", t: "Le bois, c'est bien. Mais l'or, c'est mieux. Le plus beau mur du monde, c'est le mien. Demande à n'importe qui." },
-    { s: "capitaine", t: "Demande à l'ara, il est au-dessus de nos deux têtes. Il vote pour personne et il chie sur tout le monde. Sers." }
+    { s: "narrator", t: "Grande Forêt. Le Capitaine tire le Gourou comme partenaire contre le Baron et le Faucon. 2v2 sous la canopée." },
+    { s: "capitaine", t: "Toi, calme, tu digues avec MOI. Ma forêt, ton souffle. On leur casse leur alliance dorée." },
+    { s: "gourou", t: "Namasté, Capitaine. Je ralentis le tempo ; tu frappes les troncs. Partenariat clair." },
+    { s: "dorf", t: "J'ai le Faucon ! Le plus dur partenaire ! On va déforester… euh… gagner !" },
+    { s: "faucon", t: "Moins de métaphores. Plus de digues. Allez." },
+    { s: "narrator", t: "Deux équipes. Une forêt. Quatre casquettes d'ego." },
   ],
   win:  [
-    { s: "capitaine", t: "Battu le roi de l'or avec des bûches ! Rentre chez toi, cousin, et garde-moi une casquette." },
-    { s: "dorf", t: "Match truqué. Le plus grand truquage forestier de l'histoire. Mais… j'aime ce gars. On remet ça." }
+    { s: "capitaine", t: "Voilà ! Binôme de jungle ! Merci, zen — t'es pas mauvais pour un moine." },
+    { s: "gourou", t: "Beau double. La canopée a respiré plus fort qu'eux." },
+    { s: "dorf", t: "Truqué ! Mon partenaire était trop sérieux !" },
+    { s: "faucon", t: "On recommence. Sans casquette de cirque." },
   ],
   lose:  [
-    { s: "dorf", t: "GAGNÉ ! Le plus beau match jamais joué contre un homme des bois. Les gens pleuraient. De vraies larmes." },
-    { s: "capitaine", t: "Ouais, ouais. La revanche sera en terre rouge, chez moi. On verra qui klaxonne encore." }
+    { s: "dorf", t: "GAGNÉ LE 2v2 ! Meilleure équipe !" },
+    { s: "faucon", t: "Ligne propre. Vous pouvez replanter." },
+    { s: "capitaine", t: "Tsss. Mon partenaire a trop médité. Revanche — et plus d'ara." },
+    { s: "gourou", t: "On revient. La montagne et la forêt ne boudent pas longtemps." },
   ]
 },
 {

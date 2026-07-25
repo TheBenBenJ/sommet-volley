@@ -30,25 +30,29 @@ Sur le banc de touche, avant chaque match, le Sultan fait dérouler la **banniè
 const STORY_SULTAN = [
   // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
-    act: 1, title: "Le marchand de missiles", sub: "Bosforie–Doria · systèmes de défense & sanctions",
-    left: "sultan", right: "dorf", terrain: 1, mode: "volley", ai: 0, doped: null,
-    pre:  [
-      { s: "narrator", t: "Country Club Doré. Sous les palmiers en plastique, deux hommes qui se croient chacun le plus grand se serrent la main un peu trop fort." },
-      { s: "dorf", t: "Le Sultan ! J'adore le Sultan. Grand type. Mais tu m'as acheté tes défenses au Tsar. Pas bien. Très pas bien. Sanctions !" },
-      { s: "sultan", t: "J'achète où je veux, à qui je veux. Je suis un empire, pas un client fidèle de ta boutique." },
-      { s: "dorf", t: "Un empire ! Il dit un empire. Moi j'ai le plus beau resort du monde. Toi t'as un pont. Un pont !" },
-      { s: "sultan", t: "Un pont entre deux mondes, Baron. Toi tu as un mur qui n'arrête que le regard. Sers, et écoute trembler ton gazon." },
-      { s: "dorf", t: "Ça tremble pas, c'est le meilleur gazon du monde. Balle au centre, mon ami-ennemi." }
-    ],
-    win:  [
-      { s: "sultan", t: "Le talon frappe, la terre tremble, ton golf s'effondre. On se refait un sommet quand tu veux, marchand." },
-      { s: "dorf", t: "Match truqué ! Le tapis volant m'a distrait ! Enquête ! … mais beau smash, je l'avoue. Rare que je l'avoue." }
-    ],
-    lose:  [
-      { s: "dorf", t: "Gagné ! Le plus grand match du monde ! Les gens dansaient sur le green, ils pleuraient de joie !" },
-      { s: "sultan", t: "Tu gagnes un set, pas le détroit. Reviens, apporte tes sanctions, j'apporte mon Séisme." }
-    ]
-  },
+  act: 1, title: "Le marché à quatre", sub: "Bosforie–Libertaria · double contre l'or",
+  left: "sultan", right: "dorf", ally: "safran", right2: "cygne", terrain: 1, mode: "2v2", ai: 0, doped: null,
+  pre:  [
+    { s: "narrator", t: "Pont des Deux Mondes. Le Sultan s'allie à Safran pour un 2v2 contre le Baron et le Cygne — commerce, détroit, et filet." },
+    { s: "sultan", t: "Toi, Safran, tu es mon partenaire. On vend, on digue, on ouvre les portes — les leurs." },
+    { s: "safran", t: "Alliance de mesure. Tant que ton marché de missiles ne devient pas mon problème au milieu du set." },
+    { s: "dorf", t: "J'ai le Cygne en partenaire ! Le plus cher ! Il paie enfin sa part — en points !" },
+    { s: "cygne", t: "En même temps partenaire, en même temps critique. C'est ça, une alliance exigeante." },
+    { s: "narrator", t: "Mode double : le détroit se joue à quatre mains." },
+  ],
+  win:  [
+    { s: "sultan", t: "Le marché est conclu : notre camp marque. Merci, partenaire." },
+    { s: "safran", t: "Élégant. Leur or a moins bien digué que notre patience." },
+    { s: "dorf", t: "Truqué ! Mon partenaire parlait trop !" },
+    { s: "cygne", t: "Défaite de binôme. On renégocie les critères. En même temps." },
+  ],
+  lose:  [
+    { s: "dorf", t: "GAGNÉ ! Meilleure alliance payante du monde !" },
+    { s: "cygne", t: "Partenariat efficace. Même avec un Baron. Surtout avec un Baron." },
+    { s: "sultan", t: "La porte a tenu… contre nous. On reviendra plus nombreux — enfin, à deux." },
+    { s: "safran", t: "Recalons la table. Les doubles, ça se renégocie." },
+  ]
+},
   {
     act: 1, title: "Deux fiertés sur l'esplanade", sub: "Bosforie–Ryonganie · deux orgueils de granit",
     left: "sultan", right: "bebe", terrain: 3, mode: "volley", ai: 0, doped: null,

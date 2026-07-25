@@ -32,25 +32,29 @@ Voix du personnage : **serein-piquant**. Il ouvre chaque phrase par un « Namast
 const STORY = [
   // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
-    act: 1, title: "L'ami du désert", sub: "Bharatie–Levantie · partenariat technologie & sécurité",
-    left: "gourou", right: "faucon", terrain: 8, mode: "volley", ai: 0, doped: null,
-    pre:  [
-      { s: "narrator", t: "Citadelle du Levant, grès contre grès. Deux partenaires discrets ouvrent la tournée : sourires devant, dossiers derrière." },
-      { s: "gourou", t: "Namasté, mon ami. On nous dit proches. C'est vrai : tes drones et mon souffle font bon ménage." },
-      { s: "faucon", t: "Proches, oui. Mais au filet, je ne fais pas de sentiment. Le Raid Éclair ne prévient jamais." },
-      { s: "gourou", t: "Frappe donc. Chez moi, on encaisse un million d'orages par mousson. Un faucon, ça se laisse fatiguer." },
-      { s: "faucon", t: "Je ne me fatigue pas. Je frappe, je repars, je reviens." },
-      { s: "gourou", t: "Et moi je respire, je dure, je souris. On verra qui tient au troisième set." }
-    ],
-    win:  [
-      { s: "gourou", t: "L'éclair brille, puis passe. Le lac immobile reste. Bel échange, ami. Reste sécurité, reste voisin." },
-      { s: "faucon", t: "Concédé. Ta patience est une arme. Rare, chez un politique. On reste alliés." }
-    ],
-    lose:  [
-      { s: "faucon", t: "Frappé, reparti, gagné. La vitesse mange la sagesse quand la sagesse regarde le ciel." },
-      { s: "gourou", t: "Une leçon. Je la médite. Namasté — la revanche mûrit dans le calme." }
-    ]
-  },
+  act: 1, title: "L'ami du désert en double", sub: "Bharatie–Levantie · partenaires de crête",
+  left: "gourou", right: "faucon", ally: "safran", right2: "volkoi", terrain: 8, mode: "2v2", ai: 0, doped: null,
+  pre:  [
+    { s: "narrator", t: "Stade Ashram. Le Gourou invite Safran en partenaire contre le Faucon et le Tsar. Un 2v2 pour tester la sérénité à quatre." },
+    { s: "gourou", t: "Namasté, Safran. Tu ralentis, je dure. Ensemble, on respire plus longtemps qu'eux." },
+    { s: "safran", t: "Partenariat zen et mesuré. Leur intransigeance va s'ennuyer avant nous." },
+    { s: "faucon", t: "Je n'aime pas les doubles. Trop de bavardage. Digue, Tsar — ou je digue pour deux." },
+    { s: "volkoi", t: "Je gèle. Tu sécurises. On verra si le calme tient sous la neige." },
+    { s: "narrator", t: "Alliance de patience contre alliance de froid. Le filet tranche." },
+  ],
+  win:  [
+    { s: "gourou", t: "Le calme en double a tenu. Merci, ami de la rose." },
+    { s: "safran", t: "Beau 2v2. Leur ligne a tremblé avant notre souffle." },
+    { s: "faucon", t: "Un set. On resserre. Moins de mots, plus de digues." },
+    { s: "volkoi", t: "Temporaire. L'hiver n'a pas dit son dernier partenaire." },
+  ],
+  lose:  [
+    { s: "faucon", t: "Ligne tenue. Double gagné. Rentrez méditer." },
+    { s: "volkoi", t: "Le gel à deux a suffi. Votre zen a pris froid." },
+    { s: "gourou", t: "On respire, on s'incline, on revient — partenaires inclus." },
+    { s: "safran", t: "Mesure pour la revanche. La table reste là." },
+  ]
+},
   {
     act: 1, title: "Le club des affamés", sub: "Bharatie–Tropicalia · viande, soja et vaches sacrées",
     left: "gourou", right: "capitaine", terrain: 7, mode: "volley", ai: 0, doped: null,

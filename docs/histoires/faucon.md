@@ -38,25 +38,29 @@ Car c'est peut-être là toute sa tragédie de personnage : Le Faucon a passé s
 const STORY_FAUCON = [
   // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
-    act: 1, title: "L'ami de l'est lointain", sub: "Levantie–Bharatie · axe technologique",
-    left: "faucon", right: "gourou", terrain: 6, mode: "volley", ai: 0, doped: null,
-    pre:  [
-      { s: "narrator", t: "Stade Ashram, guirlandes de soucis et grès couleur miel. Le premier tour oppose deux alliés qui s'aiment autant qu'ils se surveillent." },
-      { s: "gourou", t: "Namasté, mon ami du Levant. On m'a vendu tes drones, tes capteurs, tes belles caméras. Excellent service après-vente." },
-      { s: "faucon", t: "La sécurité s'exporte, Gourou. Ce que je te vends, je l'ai d'abord testé sur mes propres remparts." },
-      { s: "gourou", t: "Testé, éprouvé, facturé. Chez toi, même l'amitié a un bon de garantie." },
-      { s: "faucon", t: "Un allié sans garantie est un ennemi en sursis. Sers. Je note tes points de faiblesse, comme un ami le doit." },
-      { s: "gourou", t: "Alors médite entre deux échanges. Ici, c'est moi qui donne le tempo de la respiration." }
-    ],
-    win:  [
-      { s: "faucon", t: "Bon partenaire. Réflexes lents, mais loyal. Je te garde une place dans le carnet." },
-      { s: "gourou", t: "Le faucon fond, la vache traverse, la vie continue. On se revend des radars la semaine prochaine ?" }
-    ],
-    lose:  [
-      { s: "gourou", t: "La patience du grès use la serre du faucon. Respire, ami. Tu reviendras me vendre quelque chose." },
-      { s: "faucon", t: "Une défaite chez un allié n'est pas une défaite. C'est une démonstration commerciale ratée. Ça se rembourse." }
-    ]
-  },
+  act: 1, title: "L'ami de l'est, le binôme de l'ouest", sub: "Levantie–Bharatie · double de sécurité",
+  left: "faucon", right: "gourou", ally: "dorf", right2: "volkoi", terrain: 6, mode: "2v2", ai: 0, doped: null,
+  pre:  [
+    { s: "narrator", t: "Citadelle du Levant. Le Faucon prend le Baron comme partenaire contre le Gourou et le Tsar. Un 2v2 où la sécurité joue à quatre." },
+    { s: "faucon", t: "Baron : tu es mon partenaire. Tu parles moins, tu digues plus. C'est l'alliance." },
+    { s: "dorf", t: "Je digue ET je parle. Meilleur des deux mondes. On va écraser le calme et le gel !" },
+    { s: "gourou", t: "Namasté. Mon partenaire hiver et moi, on a le temps. Vous avez le bruit." },
+    { s: "volkoi", t: "Je n'aime pas être partenaire. Je tolère. Digue, moine." },
+    { s: "narrator", t: "Sécurité contre patience. Le double décide qui tient la ligne." },
+  ],
+  win:  [
+    { s: "faucon", t: "Ligne tenue. Partenaire bruyant, résultat propre." },
+    { s: "dorf", t: "ÉNORME alliance ! Je t'avais dit que j'étais le meilleur partenaire !" },
+    { s: "gourou", t: "Un set. On respire, on revient." },
+    { s: "volkoi", t: "Temporaire. Même en double, le froid revient seul." },
+  ],
+  lose:  [
+    { s: "gourou", t: "Le calme à deux a suffi. Rentrez sécuriser autre chose." },
+    { s: "volkoi", t: "Le gel partenaire a tranché. Votre alliance a parlé trop fort." },
+    { s: "faucon", t: "Revanche. Moins de slogans, Baron." },
+    { s: "dorf", t: "C'était pas moi ! C'était le filet ! Et le zen !" },
+  ]
+},
   {
     act: 1, title: "Le capitaine et le rempart", sub: "Levantie–Tropicalia · fraternité des durs",
     left: "faucon", right: "capitaine", terrain: 7, mode: "volley", ai: 1, doped: null,

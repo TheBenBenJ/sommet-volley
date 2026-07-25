@@ -181,7 +181,9 @@ function sideColor(side) {
 //        | "selectCharacter" | "selectTerrain" | "serve" | "play" | "point" | "gameover"
 //        | états du mode en ligne : "onlineMenu" | "joinEntry" | "hostWait"
 //          | "connecting" | "netWait" | "netError"
-// Flux du menu : menu → (Solo IA : aiDifficulty → gameModeSelect) | (Local : gameModeSelect direct)
+// Flux du menu : menu → (Solo IA : aiDifficulty → gameModeSelect → teamFormat)
+//                     | (Local : gameModeSelect direct, 1v1)
+//                     | (En ligne hôte : gameModeSelect → teamFormat → …)
 //                     → selectCharacter → selectTerrain → partie
 //                     | Tutoriel (partie guidée) / Aide commandes / Règles / Crédits
 let state = "menu";

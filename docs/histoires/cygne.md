@@ -27,23 +27,27 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
 ```js
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 1, title: "La poignée de main qui n'en finit pas", sub: "Relation transatlantique · l'allié encombrant",
-  left: "cygne", right: "dorf", terrain: 1, mode: "volley", ai: 0, doped: null,
+  act: 1, title: "La poignée de main à quatre", sub: "Gallardie–Libertaria · double diplomatique",
+  left: "cygne", right: "dorf", ally: "safran", right2: "volkoi", terrain: 1, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Jeux du Sommet, premier tour. Sur le gazon d'un resort doré, deux alliés se serrent la main. Cela dure. Cela dure vraiment très longtemps." },
-    { s: "dorf", t: "Le plus beau gazon du monde. Le plus belle poignée de main du monde. Tout le monde le dit. Lâche pas, gamin, ça fait une super photo." },
-    { s: "cygne", t: "Cher ami, je vous tiens la main, et en même temps je vous tiens à l'œil. C'est ça, une alliance : de l'affection, et une pince de crabe." },
-    { s: "dorf", t: "Vous payez jamais votre part de la note. Jamais ! Sers, et on verra qui protège qui sur ce filet." },
-    { s: "cygne", t: "La Gallardie a des principes, des valeurs, et un excellent poignet. Vous allez découvrir ma passe décisive. À la française." },
-    { s: "dorf", t: "Une passe française ? C'est quand tu recules en disant que t'avances, c'est ça ?" }
+    { s: "narrator", t: "Resort doré. Le Cygne a invité Safran comme partenaire de double. En face : le Baron et le Tsar. La poignée de main devient un nœud à quatre mains." },
+    { s: "cygne", t: "Cher Safran, vous diguez avec élégance, je passe en force. Ensemble, en même temps." },
+    { s: "safran", t: "Un partenariat mesuré. Tant que ton allié doré ne déchire pas encore un accord au milieu du set." },
+    { s: "dorf", t: "Deux contre deux ! J'ai le meilleur partenaire… euh… le plus froid. Ça compte." },
+    { s: "volkoi", t: "Je n'aime pas les poignées de main. Je préfère les points. Digue, Baron." },
+    { s: "narrator", t: "Mode 2v2 : une équipe, un filet, quatre ambitions." },
   ],
   win:  [
-    { s: "cygne", t: "Voilà. Entre alliés, on se dispute au filet et on dîne ensuite. En même temps rivaux, en même temps amis." },
-    { s: "dorf", t: "Match truqué. Totalement truqué. Mais joli service, gamin. On remet ça au prochain sommet." }
+    { s: "cygne", t: "Partenariat réussi. Fermeté et protocole, en même temps. Merci, Safran." },
+    { s: "safran", t: "Beau double. La table des négociations reste ouverte — contrairement à leur camp." },
+    { s: "dorf", t: "Truqué. Mon partenaire gelait trop. Ou pas assez. Les deux." },
+    { s: "volkoi", t: "Un set. L'hiver, lui, ne joue jamais en double : il joue seul contre tout le monde." },
   ],
   lose:  [
-    { s: "dorf", t: "Gagné ! Énorme ! Le plus grand match de volley de tous les temps. Les pigeons pleuraient." },
-    { s: "cygne", t: "Ce n'est qu'un tour de chauffe. La diplomatie, cher ami, est un sport d'endurance. Et je suis très endurant." }
+    { s: "dorf", t: "GAGNÉ ! Meilleur 2v2 du monde ! Volkoï, t'es… correct. Pour un Tsar." },
+    { s: "volkoi", t: "Le gel a deux visages ce soir. Le vôtre a craqué." },
+    { s: "cygne", t: "Défaite de binôme. On retient la main, on retend la corde. Ensemble." },
+    { s: "safran", t: "Mesure ta prochaine alliance, Cygne. Même les partenaires ont besoin d'accords tenus." },
   ]
 },
 {

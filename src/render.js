@@ -100,8 +100,9 @@ function render() {
   if (state === "menu") { drawMenu(); return; }
   if (state === "aiDifficulty") { drawAiDifficulty(); return; }
   if (state === "gameModeSelect") { drawGameModeSelect(); return; }
-  if (state === "bombFormat") { drawBombFormat(); return; }
-  if (state === "flameFormat") { drawFlameFormat(); return; }
+  if (state === "teamFormat" || state === "bombFormat" || state === "flameFormat") {
+    drawTeamFormat(); return;
+  }
   if (state === "bombDuration") { drawBombDuration(); return; }
   if (state === "rules") { drawRules(); return; }
   if (state === "tutorialHelp") { drawTutorial(); return; }

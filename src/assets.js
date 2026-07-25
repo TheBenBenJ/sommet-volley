@@ -21,7 +21,10 @@ const SPRITES = {
 
 function loadSprite(path) {
   const img = new Image();
-  img.src = path;
+  // Anti-cache navigateur / CDN : les PNG ne passent pas par le ?v= des <script>.
+  // GAME_VERSION change à chaque deploy → les nouvelles poses remplacent bien les anciennes.
+  const v = (typeof GAME_VERSION === "string" && GAME_VERSION) ? GAME_VERSION : "dev";
+  img.src = path + (path.indexOf("?") >= 0 ? "&" : "?") + "v=" + encodeURIComponent(v);
   return img;
 }
 

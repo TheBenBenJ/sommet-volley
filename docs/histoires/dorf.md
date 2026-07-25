@@ -38,23 +38,27 @@ Au fond — mais il ne l'avouera jamais, et si vous le citez il dira que c'est *
 
 ```js
 {
-  act: 1, title: "L'Alliance qui coûte cher", sub: "Doria–Gallardie · addition transatlantique",
-  left: "dorf", right: "cygne", terrain: 1, mode: "volley", ai: 0, doped: null,
+  act: 1, title: "L'Alliance qui coûte cher", sub: "OTAN élargie · double contre le Cygne",
+  left: "dorf", right: "cygne", ally: "faucon", right2: "volkoi", terrain: 1, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Country Club Doré. Baron Dorf arrive au filet en voiturette de golf, klaxonne trois fois, et descend saluer un allié qu'il a bien l'intention de facturer." },
-    { s: "dorf", t: "Bienvenue chez moi. Le plus beau gazon du monde. La plus belle fontaine du monde. Et une addition, aussi. La plus belle addition du monde." },
-    { s: "cygne", t: "Cher ami, nous sommes alliés. En même temps, un allié qui facture son gazon, ce n'est plus tout à fait un allié." },
-    { s: "dorf", t: "L'Alliance, l'Alliance… Vous jouez sur MON terrain, avec MON air, sous MES palmiers. Deux pour cent du PIB, ou je monte Le Mur." },
-    { s: "cygne", t: "Vous ne monterez rien du tout. Je vais vous montrer une passe décisive. À la française, avec un peu de méthode." },
-    { s: "dorf", t: "La méthode ! J'adore quand ils disent la méthode. Sers, le jeune. Et regarde qui protège qui." }
+    { s: "narrator", t: "Resort doré. Aujourd'hui l'Alliance joue en double : le Baron et le Faucon d'un côté, le Cygne et le Tsar de l'autre. Personne n'avait prévu ce tableau." },
+    { s: "dorf", t: "Toi, Faucon, tu es mon partenaire. Le meilleur. Le plus dur. On paie l'Alliance… en smashs." },
+    { s: "faucon", t: "Je ne paie rien. Je sécurise. Toi, tu parles ; moi, je digue. Deal." },
+    { s: "cygne", t: "En même temps alliés, en même temps adversaires… et en même temps en 2v2. C'est dense." },
+    { s: "volkoi", t: "Tu m'as mis avec l'oiseau bavard. Parfait. Je gèle, il parle, vous perdez." },
+    { s: "narrator", t: "Deux équipes, quatre egos. L'alliance se joue aussi entre partenaires de filet." },
   ],
   win:  [
-    { s: "dorf", t: "Gagné ! Énorme ! Le plus grand premier tour de l'histoire du volley. Les gens pleuraient. Envoie la facture au vestiaire." },
-    { s: "cygne", t: "Une rivalité entre amis, ça se règle en trois sets. Gardez la facture : je paierai en conseils que vous ne suivrez pas." }
+    { s: "dorf", t: "ÉNORME ! Meilleure alliance du monde ! Faucon, t'es pas mauvais — pour un allié." },
+    { s: "faucon", t: "On a tenu la ligne. Le reste est du bruit de sommet." },
+    { s: "cygne", t: "Défaite instructive. Mon partenaire gelé et moi, on retiendra la leçon. En même temps." },
+    { s: "volkoi", t: "Un revers. Temporaire. Même en double, l'hiver revient." },
   ],
   lose:  [
-    { s: "cygne", t: "Voilà. En même temps qu'on encaisse votre gazon, on encaisse le match. Merci pour l'hospitalité, cher Baron." },
-    { s: "dorf", t: "Match truqué. Totalement truqué. Le filet penchait vers moi. Une enquête. Une très grande enquête. On remet ça." }
+    { s: "cygne", t: "Voilà : un partenariat exigeant, et un point décisif. En même temps ferme, en même temps élégant." },
+    { s: "volkoi", t: "Le gel à deux, ça marche. Tu peux garder ton Alliance, Baron — elle vient de geler." },
+    { s: "dorf", t: "Truqué ! Mon partenaire a… enfin, LE filet était de travers !" },
+    { s: "faucon", t: "On recommence. Sans discours. Avec plus de digues." },
   ]
 },
 {

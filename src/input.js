@@ -194,12 +194,12 @@ function navOptions() {
       : ["Digit1", "Digit2", "Digit3", "Digit4", "KeyT", "KeyH", "KeyR", "KeyC"];
     case "aiDifficulty":  return ["Digit1", "Digit2", "Digit3", "Digit4"];
     case "bombDuration":  return ["Digit1", "Digit2", "Digit3"];
-    case "bombFormat":    return ["Digit1", "Digit2"];
+    case "teamFormat":
+    case "bombFormat":
     case "flameFormat":   return ["Digit1", "Digit2"];
-    // le nombre d'options dépend du contexte : 1v1/équipes/Bombe/Flamme possibles
-    // (solo vs IA ou en ligne), sinon 1v1/Bombe/Flamme (multijoueur local)
-    case "gameModeSelect": return pendingMode && (pendingMode.vsAI || pendingMode.online)
-      ? ["Digit1", "Digit2", "Digit3", "Digit4"] : ["Digit1", "Digit2", "Digit3"];
+    // Solo / en ligne : Classique / Bombe / Flamme (puis teamFormat).
+    // Multijoueur local : mêmes 3 modes, 1v1 seulement.
+    case "gameModeSelect": return ["Digit1", "Digit2", "Digit3"];
     case "onlineMenu":    return ["Digit1", "Digit2"];
     case "selectCharacter": {
       const vis = characterIndices();

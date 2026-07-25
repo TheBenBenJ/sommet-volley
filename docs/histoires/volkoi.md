@@ -29,23 +29,27 @@ Le Tsar rejoue sa géopolitique givrée en neuf manches, camp gauche. Trois acte
 ```js
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 1, title: "Deux empires patients", sub: "Bourassie–Panguo · axe de la patience",
-  left: "volkoi", right: "timonier", terrain: 4, mode: "volley", ai: 0, doped: null,
+  act: 1, title: "Le double gelé", sub: "Bourassie–Panguo · alliance à quatre au filet",
+  left: "volkoi", right: "timonier", ally: "bebe", right2: "dorf", terrain: 4, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Cité du Matin. Murs cramoisis, toits d'or, lanternes rouges. Deux empires qui n'aiment pas le mot 'empire' se saluent sous les lions de pierre." },
-    { s: "timonier", t: "Bienvenue, voisin du Nord. Ici, l'harmonie a un tempo. Le tien est un peu… glacé." },
-    { s: "volkoi", t: "Le froid ne discute pas, il attend. Comme toi. Nous nous ressemblons plus que nos drapeaux ne l'admettent." },
-    { s: "timonier", t: "Un partenariat 'sans limites', disent nos communiqués. Sans limites, sauf celles que je décide." },
-    { s: "volkoi", t: "Joli. Tu bâtis des murailles, je gèle les fronts. Servons, et voyons quelle patience craque la première." },
-    { s: "narrator", t: "Match d'apparat entre alliés qui se surveillent. Sourires longs, comptes précis." }
+    { s: "narrator", t: "Cité du Matin. Pour une fois, ce n'est plus un duel : c'est un 2 contre 2. Le Tsar amène le Maréchal ; le Timonier a recruté le Baron doré." },
+    { s: "bebe", t: "Grand voisin ! Le Maréchal est TON partenaire ! On défile en double, et mon radar couvre les deux camps !" },
+    { s: "volkoi", t: "Reste dans ton couloir, petit. Tu digues, je gèle. C'est ça, une alliance moderne." },
+    { s: "timonier", t: "Deux contre deux. L'harmonie aime les symétries. Toi, Baron, tu joues derrière moi — et tu te tais." },
+    { s: "dorf", t: "Je parle quand je veux. J'ai le plus beau filet du monde. Et le plus beau partenaire… euh… panda." },
+    { s: "narrator", t: "Match en double : équipe de gauche contre équipe de droite. Les partenaires comptent autant que les rivaux." },
   ],
   win:  [
-    { s: "volkoi", t: "Le gel prend même l'harmonie, à la longue. Beau match, camarade de circonstance." },
-    { s: "timonier", t: "Un set. Le tempo est long. Je te laisse le Nord ; je prends le siècle." }
+    { s: "volkoi", t: "Le gel à deux, ça tient mieux. Beau travail, gamin — pour une fois." },
+    { s: "bebe", t: "VICTOIRE DU BINÔME ! Gravez nos deux noms dans le granit ! Côte à côte !" },
+    { s: "timonier", t: "Un set. La patience à quatre se compte autrement. On rejouera." },
+    { s: "dorf", t: "Match truqué. Totalement. Mais j'étais magnifique en partenaire." },
   ],
   lose:  [
-    { s: "timonier", t: "La patience du panda gèle plus fort que ton hiver. L'harmonie corrige toujours." },
-    { s: "volkoi", t: "Suspension temporaire. Rien n'est perdu quand on a des fuseaux horaires en réserve." }
+    { s: "timonier", t: "L'harmonie en double bat le gel en solo. Tempo corrigé." },
+    { s: "dorf", t: "ON A GAGNÉ ! Le plus grand 2v2 de l'histoire ! Les gens pleuraient en orc !" },
+    { s: "volkoi", t: "Suspension. Même à deux, parfois l'hiver attend. On reviendra." },
+    { s: "bebe", t: "Ce n'était PAS une défaite ! C'était un entraînement de partenaires !" },
   ]
 },
 {

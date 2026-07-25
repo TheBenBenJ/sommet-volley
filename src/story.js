@@ -29,9 +29,10 @@ function storyCharName(key) {
 //   act        : numéro d'acte (séparateurs du hub)
 //   title      : titre du chapitre
 //   sub        : sous-titre / thème historique
-//   left,right : clés perso (left = joueur, right = adversaire IA)
+//   left,right : clés perso (left = joueur, right = adversaire IA principal)
+//   ally,right2: (mode "2v2") partenaire IA (blob2L) + 2ᵉ adversaire (blob2R)
 //   terrain    : index TERRAINS
-//   mode       : "volley" (rivalité) | "flame" (ballon enflammé) | "bomb" (conflit)
+//   mode       : "volley" | "flame" | "bomb" | "2v2" (double / alliance)
 //   ai         : niveau IA 0..3 (Facile..Impitoyable)
 //   doped      : null | "R" (adversaire dopé → impitoyable + aura rouge)
 //   pre        : dialogue d'avant-match [{s:cléPerso|"narrator", t:"texte"}]
@@ -44,22 +45,28 @@ function storyCharName(key) {
 const STORY_SOMMET = [
   // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
-    act: 1, title: "La poignée de main", sub: "Relation transatlantique · OTAN",
-    left: "cygne", right: "dorf", terrain: 1, mode: "volley", ai: 0, doped: null,
+    act: 1, title: "La poignée de main à quatre", sub: "Relation transatlantique · double OTAN",
+    left: "cygne", right: "dorf", ally: "safran", right2: "volkoi",
+    terrain: 1, mode: "2v2", ai: 0, doped: null,
     pre: [
-      { s: "narrator", t: "Jeux du Sommet — premier tour. Sur la pelouse d'un resort doré, deux alliés se jaugent au filet." },
-      { s: "dorf", t: "Tu vois ce gazon ? Le plus beau gazon du monde. On dit que c'est le mien. C'est vrai." },
-      { s: "cygne", t: "Cher ami, nous sommes alliés. En même temps, un allié, ça se bat aussi. Sur le terrain, s'entend." },
-      { s: "dorf", t: "L'Alliance, l'Alliance… Vous payez jamais votre part. Sers, et on verra qui protège qui." },
-      { s: "cygne", t: "Je vais vous montrer ce qu'est une passe décisive. À la gallarde." }
+      { s: "narrator", t: "Jeux du Sommet — premier tour. Sur la pelouse d'un resort doré, ce n'est plus un duel : c'est un 2v2. Le Cygne amène Safran ; le Baron a recruté le Tsar." },
+      { s: "cygne", t: "Cher Safran, vous diguez avec élégance, je passe en force. Ensemble, en même temps." },
+      { s: "safran", t: "Partenariat mesuré. Tant que ton allié doré ne déchire pas un accord au milieu du set." },
+      { s: "dorf", t: "Deux contre deux ! J'ai le meilleur partenaire… euh… le plus froid. Ça compte." },
+      { s: "volkoi", t: "Je n'aime pas les poignées de main. Je préfère les points. Digue, Baron." },
+      { s: "narrator", t: "Mode double : une équipe, un filet, quatre ambitions." }
     ],
     win: [
-      { s: "cygne", t: "Voilà. Une rivalité entre amis, ça se règle en trois sets et un sourire." },
-      { s: "dorf", t: "Match truqué. Totalement truqué. Mais… beau jeu, gamin. On remet ça." }
+      { s: "cygne", t: "Partenariat réussi. Fermeté et protocole, en même temps. Merci, Safran." },
+      { s: "safran", t: "Beau double. La table des négociations reste ouverte — contrairement à leur camp." },
+      { s: "dorf", t: "Truqué. Mon partenaire gelait trop. Ou pas assez. Les deux." },
+      { s: "volkoi", t: "Un set. L'hiver, lui, ne joue jamais en double : il joue seul contre tout le monde." }
     ],
     lose: [
-      { s: "dorf", t: "Gagné ! Énorme ! Le plus grand match de l'histoire du volley. Les gens pleuraient." },
-      { s: "cygne", t: "Ce n'est que le premier tour. La diplomatie est un sport d'endurance." }
+      { s: "dorf", t: "GAGNÉ ! Meilleur 2v2 du monde ! Volkoï, t'es… correct. Pour un Tsar." },
+      { s: "volkoi", t: "Le gel a deux visages ce soir. Le vôtre a craqué." },
+      { s: "cygne", t: "Défaite de binôme. On retient la main, on retend la corde. Ensemble." },
+      { s: "safran", t: "Mesure ta prochaine alliance, Cygne. Même les partenaires ont besoin d'accords tenus." }
     ]
   },
   {
@@ -446,7 +453,8 @@ function storyStartMatch() {
   bombMode = ch.mode === "bomb";
   bombTime = BOMB_TIME;
   flameMode = ch.mode === "flame";
-  setMode("1v1");
+  const duo = ch.mode === "2v2";
+  setMode(duo ? "2v2" : "1v1");
   terrain = ch.terrain;
   ballSkin = 0;
   // dopage → IA impitoyable ; sinon niveau du chapitre
@@ -455,6 +463,13 @@ function storyStartMatch() {
   blobR.charId = storyCharIdx(ch.right);
   blobL.doped = false;
   blobR.doped = false;
+  if (duo) {
+    blob2L.charId = storyCharIdx(ch.ally);
+    blob2R.charId = storyCharIdx(ch.right2);
+    blob2L.doped = false;
+    blob2R.doped = false;
+    blob2L._aiT = blobR._aiT = blob2R._aiT = 0;
+  }
   newGame();                       // seed, scores — speedMul reste 1 (stats perso)
   if (ch.doped === "R") {
     blobR.doped = true;
@@ -494,6 +509,8 @@ function storyOpenHub() {
 function storyOnMatchEnd() {
   const win = scores[0] > scores[1]; // le joueur est TOUJOURS à gauche
   blobL.doped = false; blobR.doped = false;
+  if (typeof blob2L !== "undefined") blob2L.doped = false;
+  if (typeof blob2R !== "undefined") blob2R.doped = false;
   storyBeginScene(win ? "win" : "lose");
 }
 
@@ -800,7 +817,7 @@ function drawStoryHub() {
   });
   const mx = UI.mx;
   const doneN = storyProgress.completed.filter(Boolean).length;
-  uiLabel("Progression : " + doneN + "/" + STORY.length + " · petites rivalités = Volley · vrais conflits = Bombe",
+  uiLabel("Progression : " + doneN + "/" + STORY.length + " · Volley/2v2 · Flamme · Bombe",
           mx, 172, 13, UI.muted, 0.3);
 
   const listX = mx, listW = W - mx * 2;
@@ -841,6 +858,7 @@ function drawStoryHub() {
     const icon = !unlocked ? "🔒"
       : ch.mode === "bomb" ? "💣"
       : ch.mode === "flame" ? "🔥"
+      : ch.mode === "2v2" ? "🤝"
       : "🏐";
     ctx.font = "13px " + UI.sans;
     ctx.fillText(icon, rx + 32, baseY);
@@ -854,7 +872,10 @@ function drawStoryHub() {
     if (unlocked) {
       ctx.font = "600 11px " + UI.sans;
       ctx.fillStyle = (sel || hover) ? "rgba(27,23,48,0.75)" : UI.muted;
-      const vs = storyCharName(ch.left) + "  vs  " + storyCharName(ch.right);
+      const vs = ch.mode === "2v2"
+        ? storyCharName(ch.left) + "+" + storyCharName(ch.ally)
+          + "  vs  " + storyCharName(ch.right) + "+" + storyCharName(ch.right2)
+        : storyCharName(ch.left) + "  vs  " + storyCharName(ch.right);
       ctx.textAlign = "right";
       ctx.fillText((done ? "✓  " : "") + vs, rx + listW - 12, baseY);
     }
@@ -901,29 +922,50 @@ function drawStoryScene() {
   uiLabel(ch.sub, mx, 108, 12, UI.muted, 0.4);
   if (ch.mode === "bomb") uiLabel("💣  Conflit — mode Bombe", W - mx, 84, 13, UI.accent, 0.4, "right");
   else if (ch.mode === "flame") uiLabel("🔥  Tension — Ballon enflammé", W - mx, 84, 13, "#ff6a20", 0.4, "right");
+  else if (ch.mode === "2v2") uiLabel("🤝  Alliance — mode 2v2", W - mx, 84, 13, "#5ad4a0", 0.4, "right");
   else uiLabel("🏐  Rivalité — mode Volley", W - mx, 84, 13, UI.sky, 0.4, "right");
   if (ch.doped) uiLabel("☠️  Aura rouge — adversaire impitoyable", W - mx, 108, 12, "#ff6b6b", 0.4, "right");
 
   // boîte de dialogue (dimensions calculées avant les portraits pour placer les noms)
   const bx = mx, bw = W - mx * 2, bh = 108, by = H - bh - 30;
 
-  // portraits : gauche (protagoniste) / droite (adversaire)
-  const py = 224, pw = 220, ph = 188;
+  // portraits : 1v1 = duo ; 2v2 = quatre (équipe G / équipe D)
+  const duo = ch.mode === "2v2";
+  const py = duo ? 210 : 224, pw = duo ? 150 : 220, ph = duo ? 140 : 188;
   const line = scene ? scene.lines[scene.idx] : null;
   const speaker = line ? line.s : null;
   const leftActive = speaker === ch.left;
   const rightActive = speaker === ch.right;
+  const allyActive = duo && speaker === ch.ally;
+  const right2Active = duo && speaker === ch.right2;
   const leftDoped = ch.doped === "L";
   const rightDoped = ch.doped === "R";
-  storyDrawPortrait(ch.left, W * 0.24, py, pw, ph, { flip: false, doped: leftDoped, dim: leftActive || !speaker ? 0 : 0.45 });
-  storyDrawPortrait(ch.right, W * 0.76, py, pw, ph, { flip: true, doped: rightDoped, dim: rightActive || !speaker ? 0 : 0.45 });
-  // noms sous les portraits, juste au-dessus de la boîte de dialogue
-  ctx.textAlign = "center";
-  ctx.font = "800 15px " + UI.display;
-  ctx.fillStyle = leftActive ? UI.gold : UI.muted;
-  ctx.fillText(storyCharName(ch.left), W * 0.24, by - 10);
-  ctx.fillStyle = rightActive ? UI.gold : UI.muted;
-  ctx.fillText(storyCharName(ch.right), W * 0.76, by - 10);
+  if (duo) {
+    const dimOf = (active) => (active || !speaker ? 0 : 0.45);
+    storyDrawPortrait(ch.left, W * 0.18, py, pw, ph, { flip: false, doped: leftDoped, dim: dimOf(leftActive) });
+    storyDrawPortrait(ch.ally, W * 0.38, py, pw, ph, { flip: false, doped: false, dim: dimOf(allyActive) });
+    storyDrawPortrait(ch.right, W * 0.62, py, pw, ph, { flip: true, doped: rightDoped, dim: dimOf(rightActive) });
+    storyDrawPortrait(ch.right2, W * 0.82, py, pw, ph, { flip: true, doped: false, dim: dimOf(right2Active) });
+    ctx.textAlign = "center";
+    ctx.font = "800 13px " + UI.display;
+    ctx.fillStyle = leftActive ? UI.gold : UI.muted;
+    ctx.fillText(storyCharName(ch.left), W * 0.18, by - 10);
+    ctx.fillStyle = allyActive ? UI.gold : UI.muted;
+    ctx.fillText(storyCharName(ch.ally), W * 0.38, by - 10);
+    ctx.fillStyle = rightActive ? UI.gold : UI.muted;
+    ctx.fillText(storyCharName(ch.right), W * 0.62, by - 10);
+    ctx.fillStyle = right2Active ? UI.gold : UI.muted;
+    ctx.fillText(storyCharName(ch.right2), W * 0.82, by - 10);
+  } else {
+    storyDrawPortrait(ch.left, W * 0.24, py, pw, ph, { flip: false, doped: leftDoped, dim: leftActive || !speaker ? 0 : 0.45 });
+    storyDrawPortrait(ch.right, W * 0.76, py, pw, ph, { flip: true, doped: rightDoped, dim: rightActive || !speaker ? 0 : 0.45 });
+    ctx.textAlign = "center";
+    ctx.font = "800 15px " + UI.display;
+    ctx.fillStyle = leftActive ? UI.gold : UI.muted;
+    ctx.fillText(storyCharName(ch.left), W * 0.24, by - 10);
+    ctx.fillStyle = rightActive ? UI.gold : UI.muted;
+    ctx.fillText(storyCharName(ch.right), W * 0.76, by - 10);
+  }
   ctx.textAlign = "left";
   ctx.fillStyle = "rgba(255,246,232,0.97)";
   ctx.beginPath();
@@ -942,7 +984,13 @@ function drawStoryScene() {
     const shown = line.t.slice(0, Math.floor(scene.reveal));
     // nom du locuteur
     const spName = speaker === "narrator" ? "Narrateur" : storyCharName(speaker);
-    ctx.fillStyle = speaker === "narrator" ? "#7a6cff" : (leftActive ? CHARACTERS[storyCharIdx(ch.left)].color : rightActive ? CHARACTERS[storyCharIdx(ch.right)].color : UI.accent);
+    let spColor = UI.accent;
+    if (speaker === "narrator") spColor = "#7a6cff";
+    else if (leftActive) spColor = CHARACTERS[storyCharIdx(ch.left)].color;
+    else if (rightActive) spColor = CHARACTERS[storyCharIdx(ch.right)].color;
+    else if (allyActive) spColor = CHARACTERS[storyCharIdx(ch.ally)].color;
+    else if (right2Active) spColor = CHARACTERS[storyCharIdx(ch.right2)].color;
+    ctx.fillStyle = spColor;
     ctx.font = "800 15px " + UI.display;
     ctx.fillText(spName, bx + 22, by + 30);
     // texte (wrap)

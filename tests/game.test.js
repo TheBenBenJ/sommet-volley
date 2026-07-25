@@ -1524,6 +1524,8 @@ test("SUPER Safran : active slow (pas ice)", () => {
 
 test("Super Smash : jauge se remplit en échange + bonus contact", () => {
   const g = freshRally(21);
+  assert.ok(g.POWER_GAUGE_MAX >= 800, "jauge assez longue (moins fréquent)");
+  assert.ok(g.POWER_GAUGE_TOUCH <= 45, "bonus contact modéré");
   const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
   g.setPowerGauge(0, 0);
   const before = g.getPowerGauge()[0];
@@ -1541,6 +1543,30 @@ test("Super Smash : jauge se remplit en échange + bonus contact", () => {
             g.getPowerGauge()[0] > 100, "contact peut booster la jauge");
 });
 
+test("Manette : stick bien orienté digue un smash adverse", () => {
+  const g = freshRally(33);
+  const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  g.setMapEventsQuiet(true);
+  const { NET_X, GROUND_Y } = g.consts;
+  // Smash adverse qui arrive sur le joueur gauche au sol
+  g.blobL.x = 220; g.blobL.y = GROUND_Y; g.blobL.onGround = true;
+  g.blobL.vy = 0; g.blobL.lastActiveHitTick = -999;
+  g.ball.x = 260; g.ball.y = GROUND_Y - 70;
+  g.ball.vx = -11; g.ball.vy = 3;
+  g.ball.smash = 50; g.ball.frozen = false; g.ball.inHands = false;
+  g.ball.heldBy = -1; g.ball.lastTouchSide = 1;
+  // Stick vers la balle (droite-bas relatif) sans appuyer X
+  const pad = { ...N, ax: 0.55, ay: -0.45 };
+  let dug = false;
+  for (let i = 0; i < 18; i++) {
+    g.stepGame(pad, N);
+    if (g.ball.lastTouchSide === 0) { dug = true; break; }
+    if (g.getState() === "point") break;
+  }
+  assert.ok(dug, "dig manette au stick sans X");
+  assert.ok(g.ball.vy < -2, "cloche de dig vers le haut");
+});
+
 test("Super Smash : freeze dosage puis frappe lourde + ralenti", () => {
   const g = freshRally(22);
   const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
@@ -1556,7 +1582,7 @@ test("Super Smash : freeze dosage puis frappe lourde + ralenti", () => {
   g.ball.vx = 1; g.ball.vy = 0;
   g.ball.frozen = false; g.ball.inHands = false; g.ball.heldBy = -1;
   g.ball.serveAimLock = false; g.ball.serveFlight = false;
-  // Appui smash → entre en windup
+  // Maintien smash → entre en windup
   g.stepGame({ ...N, smash:true, ax:0.8, ay:0.2 }, N);
   assert.ok(g.getPowerWindup(), "entre en dosage Super Smash");
   assert.strictEqual(g.getPowerWindup().side, 0);
@@ -1569,6 +1595,58 @@ test("Super Smash : freeze dosage puis frappe lourde + ralenti", () => {
   assert.ok(g.ball.smash > 0, "traînée smash destructeur");
   assert.ok(g.ball.slowMo > 0, "ralenti après Super Smash");
   assert.ok(g.ball.vx > 2, "balle projetée vers l'adversaire");
+});
+
+test("Super Smash : contact auto sans maintien = smash normal (pas forcé)", () => {
+  const g = freshRally(23);
+  const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  g.setMapEventsQuiet(true);
+  g.setPowerGauge(g.POWER_GAUGE_MAX, 0);
+  const { NET_X, GROUND_Y } = g.consts;
+  g.blobL.x = NET_X - 80;
+  g.blobL.y = GROUND_Y - 90;
+  g.blobL.onGround = false;
+  g.blobL.vy = -2;
+  g.ball.x = g.blobL.x + 8;
+  g.ball.y = g.blobL.y - 50;
+  g.ball.vx = 1; g.ball.vy = 0;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.heldBy = -1;
+  g.ball.serveAimLock = false; g.ball.serveFlight = false;
+  // Pas de smash maintenu → même au contact aérien, pas de Super Smash forcé
+  let hit = false;
+  for (let i = 0; i < 12; i++) {
+    g.stepGame({ ...N, smash:false, ax:0.8, ay:0.2 }, N);
+    assert.ok(!g.getPowerWindup(), "pas de dosage sans maintien");
+    if (g.ball.lastTouchSide === 0) { hit = true; break; }
+    if (g.getState() === "point") break;
+  }
+  assert.strictEqual(g.getPowerGauge()[0], g.POWER_GAUGE_MAX, "jauge intacte");
+  assert.ok(!(g.ball.slowMo > 0), "pas de ralenti Super Smash");
+  assert.ok(hit || g.getState() === "play", "échange continue sans Super Smash forcé");
+});
+
+test("Super Smash : relâche trop tôt = smash normal, jauge gardée", () => {
+  const g = freshRally(24);
+  const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  g.setMapEventsQuiet(true);
+  g.setPowerGauge(g.POWER_GAUGE_MAX, 0);
+  const { NET_X, GROUND_Y } = g.consts;
+  g.blobL.x = NET_X - 80;
+  g.blobL.y = GROUND_Y - 90;
+  g.blobL.onGround = false;
+  g.blobL.vy = -2;
+  g.ball.x = g.blobL.x + 8;
+  g.ball.y = g.blobL.y - 50;
+  g.ball.vx = 1; g.ball.vy = 0;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.heldBy = -1;
+  g.ball.serveAimLock = false; g.ball.serveFlight = false;
+  g.stepGame({ ...N, smash:true, ax:0.8, ay:0.2 }, N);
+  assert.ok(g.getPowerWindup(), "entre en dosage");
+  // Relâche immédiatement (avant minT)
+  g.stepGame({ ...N, smash:false, ax:0.8, ay:0.2 }, N);
+  assert.ok(!g.getPowerWindup(), "sortie du dosage");
+  assert.strictEqual(g.getPowerGauge()[0], g.POWER_GAUGE_MAX, "jauge non consommée");
+  assert.ok(!(g.ball.slowMo > 0), "pas de Super Smash");
 });
 
 test("SUPER Cygne : durée 300 + anti-smash retour", () => {
@@ -1686,14 +1764,18 @@ test("campagne : chapitres cohérents (persos, terrain, mode, dopage, dialogues)
   const g = loadGame();
   assert.ok(Array.isArray(g.STORY) && g.STORY.length >= 6, "au moins 6 chapitres");
   const keys = new Set(g.CHARACTERS.map(c => c.key));
-  const modeCount = { volley: 0, flame: 0, bomb: 0 };
+  const modeCount = { volley: 0, flame: 0, bomb: 0, "2v2": 0 };
   g.STORY.forEach((ch, i) => {
     assert.ok(keys.has(ch.left), "ch" + i + " left invalide: " + ch.left);
     assert.ok(keys.has(ch.right), "ch" + i + " right invalide: " + ch.right);
     assert.notStrictEqual(ch.left, ch.right, "ch" + i + " oppose un perso à lui-même");
     assert.ok(ch.terrain >= 0 && ch.terrain < g.TERRAINS.length, "ch" + i + " terrain hors bornes");
-    assert.ok(ch.mode === "volley" || ch.mode === "bomb" || ch.mode === "flame", "ch" + i + " mode invalide");
+    assert.ok(ch.mode === "volley" || ch.mode === "bomb" || ch.mode === "flame" || ch.mode === "2v2", "ch" + i + " mode invalide");
     modeCount[ch.mode]++;
+    if (ch.mode === "2v2") {
+      assert.ok(keys.has(ch.ally) && ch.ally !== ch.left && ch.ally !== ch.right, "ch" + i + " ally invalide");
+      assert.ok(keys.has(ch.right2) && ch.right2 !== ch.left && ch.right2 !== ch.right && ch.right2 !== ch.ally, "ch" + i + " right2 invalide");
+    }
     assert.ok(ch.ai >= 0 && ch.ai <= 3, "ch" + i + " niveau IA hors bornes");
     // design : le joueur (gauche) AFFRONTE des dopés — il ne joue jamais le dopé.
     assert.ok(ch.doped === null || ch.doped === "R", "ch" + i + " : seul l'adversaire (R) peut être dopé");
@@ -1706,9 +1788,9 @@ test("campagne : chapitres cohérents (persos, terrain, mode, dopage, dialogues)
       }
     }
   });
-  // Campagne Sommet (9 ch.) : ⅓ / ⅓ / ⅓
+  // Campagne Sommet (9 ch.) : 1×2v2 + 2 volley / 3 flame / 3 bomb
   if (g.STORY.length === 9) {
-    assert.deepStrictEqual(modeCount, { volley: 3, flame: 3, bomb: 3 }, "Sommet : ⅓ volley/flame/bomb");
+    assert.deepStrictEqual(modeCount, { volley: 2, flame: 3, bomb: 3, "2v2": 1 }, "Sommet : 2v2+volley/flame/bomb");
   }
 });
 
@@ -1726,19 +1808,25 @@ test("campagnes par personnage : 10 campagnes, chacune = les 9 rivaux, format va
     const rivals = camp.map(c => c.right).sort();
     const expected = keys.filter(k => k !== key).sort();
     assert.deepStrictEqual(rivals, expected, key + " : affronte exactement ses 9 rivaux");
-    const modeCount = { volley: 0, flame: 0, bomb: 0 };
+    const modeCount = { volley: 0, flame: 0, bomb: 0, "2v2": 0 };
     camp.forEach((ch, i) => {
       assert.strictEqual(ch.left, key, key + "[" + i + "] left doit être le protagoniste");
       assert.ok(keySet.has(ch.right) && ch.right !== key, key + "[" + i + "] rival valide");
       assert.ok(ch.terrain >= 0 && ch.terrain < g.TERRAINS.length, key + "[" + i + "] terrain hors bornes");
-      assert.ok(ch.mode === "volley" || ch.mode === "bomb" || ch.mode === "flame", key + "[" + i + "] mode invalide");
+      assert.ok(ch.mode === "volley" || ch.mode === "bomb" || ch.mode === "flame" || ch.mode === "2v2", key + "[" + i + "] mode invalide");
       modeCount[ch.mode]++;
-      // Montée en rivalité : 0–2 volley, 3–5 flame, 6–8 bomb
-      const expectMode = i < 3 ? "volley" : i < 6 ? "flame" : "bomb";
-      assert.strictEqual(ch.mode, expectMode, key + "[" + i + "] mode selon rivalité");
+      // Montée en rivalité : 0–2 volley|2v2, 3–5 flame, 6–8 bomb
+      if (i < 3) assert.ok(ch.mode === "volley" || ch.mode === "2v2", key + "[" + i + "] acte I = volley/2v2");
+      else if (i < 6) assert.strictEqual(ch.mode, "flame", key + "[" + i + "] mode selon rivalité");
+      else assert.strictEqual(ch.mode, "bomb", key + "[" + i + "] mode selon rivalité");
       assert.strictEqual(ch.act, i < 3 ? 1 : i < 6 ? 2 : 3, key + "[" + i + "] acte");
       assert.ok(ch.doped === null || ch.doped === "R", key + "[" + i + "] seul l'adversaire (R) est dopé");
       const preTxt = (ch.pre || []).map(l => l.t).join(" ");
+      if (ch.mode === "2v2") {
+        assert.ok(keySet.has(ch.ally) && ch.ally !== key && ch.ally !== ch.right, key + "[" + i + "] ally");
+        assert.ok(keySet.has(ch.right2) && ![key, ch.right, ch.ally].includes(ch.right2), key + "[" + i + "] right2");
+        assert.ok(/2v2|double|partenair|équipe|alliance|binôme|duo/i.test(preTxt), key + "[" + i + "] dialogue 2v2");
+      }
       if (ch.mode === "flame") {
         assert.ok(/enflamm|brûl|flamme|braise|PV/i.test(preTxt), key + "[" + i + "] dialogue flame");
       }
@@ -1753,7 +1841,7 @@ test("campagnes par personnage : 10 campagnes, chacune = les 9 rivaux, format va
         }
       }
     });
-    assert.deepStrictEqual(modeCount, { volley: 3, flame: 3, bomb: 3 }, key + " : ⅓ / ⅓ / ⅓");
+    assert.deepStrictEqual(modeCount, { volley: 2, flame: 3, bomb: 3, "2v2": 1 }, key + " : 2v2+volley / flame / bomb");
   }
 });
 
@@ -1771,6 +1859,11 @@ test("storySelectCampaign : bascule STORY sur la campagne du perso + progression
   g.storyStartMatch();
   assert.strictEqual(g.blobL.charId, g.storyCharIdx(story[0].left), "protagoniste à gauche");
   assert.strictEqual(g.blobR.charId, g.storyCharIdx(story[0].right), "rival à droite");
+  if (story[0].mode === "2v2") {
+    assert.strictEqual(g.getMode(), "2v2", "chapitre alliance → mode 2v2");
+    assert.strictEqual(g.blob2L.charId, g.storyCharIdx(story[0].ally), "partenaire à gauche");
+    assert.strictEqual(g.blob2R.charId, g.storyCharIdx(story[0].right2), "2e adversaire");
+  }
 });
 
 test("story : le premier chapitre est débloqué, les suivants verrouillés", () => {

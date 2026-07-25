@@ -42,8 +42,14 @@ for (const key of KEYS) {
   arr.forEach((c, i) => {
     if (c.left !== key) throw new Error(`${key}[${i}] left=${c.left} ≠ ${key}`);
     if (!VALID.has(c.right)) throw new Error(`${key}[${i}] right invalide: ${c.right}`);
-    if (!["volley", "bomb", "flame"].includes(c.mode)) throw new Error(`${key}[${i}] mode invalide: ${c.mode}`);
+    if (!["volley", "bomb", "flame", "2v2"].includes(c.mode)) throw new Error(`${key}[${i}] mode invalide: ${c.mode}`);
     if (typeof c.terrain !== "number") throw new Error(`${key}[${i}] terrain non numérique`);
+    if (c.mode === "2v2") {
+      if (!VALID.has(c.ally) || c.ally === key || c.ally === c.right)
+        throw new Error(`${key}[${i}] ally invalide: ${c.ally}`);
+      if (!VALID.has(c.right2) || c.right2 === key || c.right2 === c.right || c.right2 === c.ally)
+        throw new Error(`${key}[${i}] right2 invalide: ${c.right2}`);
+    }
     for (const ph of ["pre", "win", "lose"]) {
       if (!Array.isArray(c[ph])) throw new Error(`${key}[${i}] ${ph} absent`);
       c[ph].forEach(l => { if (!VALID.has(l.s)) throw new Error(`${key}[${i}] ${ph} speaker invalide: ${l.s}`); });
@@ -62,7 +68,7 @@ console.log("TOTAL:", totalEnc);
 
 const header = `// sommet-volley · Campagnes du Mode Histoire PAR PERSONNAGE
 // GÉNÉRÉ depuis docs/histoires/<key>.md par tools/extract_campaigns.js — ne pas éditer à la main.
-// Chaque clé = une campagne (le perso affronte ses 9 rivaux, 3 actes, volley/flamme/bombe/dopage).
+// Chaque clé = une campagne (le perso affronte ses 9 rivaux, 3 actes, volley/2v2/flamme/bombe/dopage).
 "use strict";
 
 const STORY_BY_CHAR = ${JSON.stringify(byChar, null, 2)};

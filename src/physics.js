@@ -93,22 +93,26 @@ function canStartPowerSmash(blob) {
   return true;
 }
 
+/** Super Smash : seulement si le joueur MAINTIENT smash (jamais forcé au contact auto). */
+function wantsPowerSmashHold(blob) {
+  return !!(blob._input && blob._input.smash);
+}
+
 function startPowerWindup(blob) {
   if (!canStartPowerSmash(blob)) return false;
+  if (!wantsPowerSmashHold(blob)) return false;
   const ang = aimAngleFromInput(blob, blob._input || { ax: 0, ay: 0 });
   // En ligne : pas de freeze (désync) — tir immédiat à charge moyenne
   if (online) {
     firePowerSmash(blob, 0.72, ang);
     return true;
   }
-  const held = !!(blob._input && blob._input.smash);
   powerWindup = {
     side: blob.side,
     t: 0,
     charge: 0.28,
     ang,
-    // Clavier auto-contact : pas de maintien → dosage auto puis tir
-    auto: !held
+    auto: false // dosage uniquement au maintien ; relâche = tir
   };
   // Fige la balle le temps du dosage
   ball.vx = 0;
@@ -122,14 +126,40 @@ function startPowerWindup(blob) {
   ball.y = h.y - 8;
   if (!noFx) {
     superFlash = "SUPER SMASH — dose !";
-    superFlashSub = held
-      ? "Visée + maintien F/X — relâche pour frapper"
-      : "Dosage auto — vise avec le stick / direction";
+    superFlashSub = "Maintiens F/X — vise — relâche pour frapper";
     superFlashT = Math.max(superFlashT, 90);
     shake = Math.max(shake, 5);
     beep(660, 0.06, "square", 0.12, 0, 900);
   }
   return true;
+}
+
+/** Relâche trop tôt : smash normal, jauge non consommée. */
+function abortPowerWindupToNormalSmash(blob) {
+  const ang = (powerWindup && powerWindup.ang != null)
+    ? powerWindup.ang
+    : aimAngleFromInput(blob, blob._input || { ax: 0, ay: 0 });
+  powerWindup = null;
+  const serving = isServeHit(blob);
+  const pow = blob.kitPower != null ? blob.kitPower : charOf(blob).power;
+  const aerialServe = serving && !blob.onGround && ball.y <= NET_TOP + 40;
+  const useAng = aerialServe || !serving
+    ? ang
+    : aimLobAngleFromInput(blob, blob._input || { ax: 0, ay: 0 });
+  const spd = (serving && !aerialServe)
+    ? HOLD_LOB_SPD * 1.05
+    : HIT_SPEED * pow * SMASH_MUL;
+  applyDirectedHit(blob, useAng, spd, 0);
+  if (serving) forceServeClearsNet(blob);
+  else ensureSmashClearsNet(blob);
+  markActiveHit(blob);
+  shake = Math.max(shake, 4);
+  if (typeof setCharPose === "function") setCharPose(blob, "smash", 28);
+  if (!noFx) {
+    superFlash = "";
+    superFlashSub = "";
+    superFlashT = 0;
+  }
 }
 
 function firePowerSmash(blob, charge, ang) {
@@ -207,10 +237,12 @@ function stepPowerWindup(inL, inR, ins) {
   ball.y = h.y - 8;
   ball.vx = 0;
   ball.vy = 0;
-  const autoFire = powerWindup.auto && powerWindup.t >= Math.floor(maxT * 0.55);
-  const released = !powerWindup.auto && !input.smash && powerWindup.t >= minT;
-  const timedOut = powerWindup.t >= maxT;
-  if (autoFire || released || timedOut) {
+  // Tir = relâche après minT ; maintien jusqu'au max = tir max charge.
+  // Relâche trop tôt = smash normal (jauge gardée) — jamais forcé.
+  if (!input.smash) {
+    if (powerWindup.t >= minT) firePowerSmash(blob, powerWindup.charge, powerWindup.ang);
+    else abortPowerWindupToNormalSmash(blob);
+  } else if (powerWindup.t >= maxT) {
     firePowerSmash(blob, powerWindup.charge, powerWindup.ang);
   }
 }
@@ -557,6 +589,40 @@ function ballLandsOnPlayer(blob) {
   return ballPathDistToBlob(blob) <= AUTO_LOB_R;
 }
 
+/** Rayon de dig : un peu plus large contre smash / balle très rapide. */
+function receiveHitRadius() {
+  const spd = Math.hypot(ball.vx, ball.vy);
+  if (ball.smash > 0 || spd > 11.2) return RECEIVE_R + 18;
+  if (spd > 9.2) return RECEIVE_R + 8;
+  return RECEIVE_R;
+}
+
+/**
+ * Manette : intention de dig via le stick (vers la balle ou vers le haut)
+ * face à un smash / une balle menaçante — permet de rattraper sans X parfait.
+ */
+function padStickDigIntent(blob) {
+  const input = blob._input;
+  if (!input || isKeyboardStyleAim(input)) return false;
+  if (!blob.onGround) return false;
+  const ax = Number(input.ax) || 0;
+  const ay = Number(input.ay) || 0;
+  const mag = Math.hypot(ax, ay);
+  if (mag < 0.32) return false;
+  const h = blob.headCircle;
+  const dx = ball.x - h.x, dy = ball.y - h.y;
+  const dist = Math.hypot(dx, dy);
+  const digUp = ay < -0.4;
+  let towardBall = dist < 8;
+  if (!towardBall && dist > 0.001) {
+    towardBall = (ax * dx + ay * dy) / (mag * dist) > 0.35;
+  }
+  if (!towardBall && !digUp) return false;
+  const spd = Math.hypot(ball.vx, ball.vy);
+  const incoming = blob.side === 0 ? ball.vx < -0.8 : ball.vx > 0.8;
+  return ball.smash > 0 || spd > 9.5 || (incoming && ball.y < GROUND_Y - 40);
+}
+
 function serverBlob() {
   for (const b of activeBlobs) if (b.side === servingSide) return b;
   return servingSide === 0 ? blobL : blobR;
@@ -660,7 +726,7 @@ function wantSmash(blob) {
 function tryLobBall(blob) {
   if (ball.inHands && ball.frozen) return false;
   if (ball.tossGrace > 0 && blob.side === servingSide) return false;
-  if (ballPathDistToBlob(blob) > RECEIVE_R) return false;
+  if (ballPathDistToBlob(blob) > receiveHitRadius()) return false;
   if (!canActiveHit(blob)) return false;
   const a = charOf(blob);
   const serving = isServeHit(blob);
@@ -690,8 +756,8 @@ function trySmashBall(blob) {
   if (ball.y > blob.y - 36) return false;
   if (ballPathDistToBlob(blob) > RECEIVE_R) return false;
   if (!canActiveHit(blob)) return false;
-  // Super Smash : jauge pleine → freeze + dosage (ou tir instant en ligne)
-  if (canStartPowerSmash(blob)) {
+  // Super Smash : jauge pleine + maintien smash uniquement (pas le contact auto)
+  if (canStartPowerSmash(blob) && wantsPowerSmashHold(blob)) {
     if (startPowerWindup(blob)) return true;
   }
   const serving = isServeHit(blob);
@@ -871,6 +937,7 @@ function ballBlobCollision(blob) {
 
     const aiBlob = !online && vsAI && blob !== blobL;
     const kbHuman = !aiBlob && isKeyboardStyleAim(blob._input);
+    const padHuman = !aiBlob && !kbHuman;
     const servingNow = isServeHit(blob);
 
     // Service : après le lancer (F), on saute (Espace) DANS la balle → smash auto
@@ -909,12 +976,18 @@ function ballBlobCollision(blob) {
 
     // Manette (ou appui S clavier) : frappe explicite
     if (wantSmash(blob)) {
-      const near = ballPathDistToBlob(blob) <= RECEIVE_R;
+      const near = ballPathDistToBlob(blob) <= receiveHitRadius();
       if (near && trySmashBall(blob)) {
         if (!powerWindup) applyHitExtras(blob, a);
         return;
       }
       if (near && tryLobBall(blob)) applyHitExtras(blob, a);
+      return;
+    }
+
+    // Manette : stick bien orienté → dig même sans X (smashs / balles rapides)
+    if (padHuman && padStickDigIntent(blob) && tryLobBall(blob)) {
+      applyHitExtras(blob, a);
       return;
     }
 

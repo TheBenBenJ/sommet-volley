@@ -102,29 +102,45 @@ function handleMenuKeys(code, key) {
     // Étape 2 (Solo vs IA) : la difficulté choisie amorce pendingMode, complété
     // ensuite par le mode de jeu dans "gameModeSelect".
     const lvl = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3 }[code];
-    if (lvl !== undefined) { pendingMode = { vsAI: true, aiLevel: lvl }; state = "gameModeSelect"; }
+    if (lvl !== undefined) {
+      pendingMode = { vsAI: true, aiLevel: lvl, mode2v2: false };
+      state = "gameModeSelect";
+    }
     if (code === "Escape") goMenu();
 
   } else if (state === "gameModeSelect") {
-    // Étape finale avant le choix de perso : type de partie. Le choix d'équipe
-    // (2v2 : toi + IA coéquipière vs 2 IA, en solo ; ou 2v2 hébergé, en ligne)
-    // n'a de sens QUE là où deux formats existent réellement — pas en
-    // multijoueur local, qui ne prend en charge que le 1v1 (voir
-    // update()/aiInput2v2 dans ai.js/simulation.js, et hostStartMatch2v2
-    // dans net.js). La Bombe est un MODIFICATEUR, pas un format à part :
-    // elle pose sa propre sous-question 1v1/équipes quand celle-ci a un sens
-    // (voir "bombFormat"), sinon (local) va direct à la durée de mèche.
+    // Solo / en ligne : mode puis TOUJOURS 1v1 ou équipes (teamFormat).
+    // Multijoueur local : 1v1 seulement.
     const teamChoice = pendingMode.vsAI || pendingMode.online;
     if (teamChoice) {
-      if (code === "Digit1") { pendingMode.bomb = false; pendingMode.flame = false; startCharacterSelect(); }
-      if (code === "Digit2") { pendingMode.bomb = false; pendingMode.flame = false; setTeamMode(true); startCharacterSelect(); }
-      if (code === "Digit3") { pendingMode.bomb = true; pendingMode.flame = false; state = "bombFormat"; }
-      if (code === "Digit4") { pendingMode.flame = true; pendingMode.bomb = false; state = "flameFormat"; }
+      if (code === "Digit1") { // Classique
+        pendingMode.bomb = false; pendingMode.flame = false;
+        state = "teamFormat";
+      }
+      if (code === "Digit2") { // Bombe
+        pendingMode.bomb = true; pendingMode.flame = false;
+        state = "teamFormat";
+      }
+      if (code === "Digit3") { // Ballon enflammé
+        pendingMode.flame = true; pendingMode.bomb = false;
+        state = "teamFormat";
+      }
     } else {
-      if (code === "Digit1") { pendingMode.bomb = false; pendingMode.flame = false; startCharacterSelect(); }
-      if (code === "Digit2") { pendingMode.bomb = true; pendingMode.flame = false; state = "bombDuration"; }
-      if (code === "Digit3") { pendingMode.flame = true; pendingMode.bomb = false; startCharacterSelect(); }
-      // clavier VS manette : bascule le côté piloté par la manette unique
+      if (code === "Digit1") {
+        pendingMode.bomb = false; pendingMode.flame = false;
+        setTeamMode(false);
+        startCharacterSelect();
+      }
+      if (code === "Digit2") {
+        pendingMode.bomb = true; pendingMode.flame = false;
+        setTeamMode(false);
+        state = "bombDuration";
+      }
+      if (code === "Digit3") {
+        pendingMode.flame = true; pendingMode.bomb = false;
+        setTeamMode(false);
+        startCharacterSelect();
+      }
       if (code === "KeyG" && padConnected) {
         setPadSideLocal(padSideLocal === 1 ? 0 : 1);
         beep(padSideLocal === 1 ? 620 : 440, 0.06, "square", 0.08);
@@ -136,30 +152,35 @@ function handleMenuKeys(code, key) {
       else goMenu();
     }
 
-  } else if (state === "bombFormat") {
-    // sous-question de la Bombe (uniquement quand le 1v1 ET les équipes sont
-    // tous deux possibles — solo vs IA ou hébergement en ligne)
-    if (code === "Digit1") { state = "bombDuration"; }                      // Bombe 1v1
-    if (code === "Digit2") { setTeamMode(true); state = "bombDuration"; }   // Bombe en équipes
-    if (code === "Escape") { pendingMode.bomb = false; state = "gameModeSelect"; }
-
-  } else if (state === "flameFormat") {
-    // Ballon enflammé : 1v1 ou équipes (pas de sous-option durée)
-    if (code === "Digit1") { startCharacterSelect(); }
-    if (code === "Digit2") { setTeamMode(true); startCharacterSelect(); }
-    if (code === "Escape") { pendingMode.flame = false; state = "gameModeSelect"; }
+  } else if (state === "teamFormat" || state === "bombFormat" || state === "flameFormat") {
+    // 1v1 ou 2v2 — commun à Classique / Bombe / Flamme (solo + hébergement)
+    if (code === "Digit1") {
+      setTeamMode(false);
+      if (pendingMode.bomb) state = "bombDuration";
+      else startCharacterSelect();
+    }
+    if (code === "Digit2") {
+      setTeamMode(true);
+      if (pendingMode.bomb) state = "bombDuration";
+      else startCharacterSelect();
+    }
+    if (code === "Escape") {
+      pendingMode.bomb = false;
+      pendingMode.flame = false;
+      setTeamMode(false);
+      state = "gameModeSelect";
+    }
 
   } else if (state === "bombDuration") {
-    // durée de la mèche, commune à tous les modes (offline & hôte online)
     const d = { Digit1: 0, Digit2: 1, Digit3: 2 }[code];
     if (d !== undefined) { pendingMode.bombTime = BOMB_DURATIONS[d].ticks; startCharacterSelect(); }
-    if (code === "Escape") state = (pendingMode.vsAI || pendingMode.online) ? "bombFormat" : "gameModeSelect";
+    if (code === "Escape") state = (pendingMode.vsAI || pendingMode.online) ? "teamFormat" : "gameModeSelect";
 
   } else if (state === "rules") {
     if (code === "Escape" || code === "Enter" || code === "Space" || code === "KeyR") goMenu();
 
   } else if (state === "onlineMenu") {
-    if (code === "Digit1") { pendingMode = { online: true }; state = "gameModeSelect"; } // Créer une partie -> format
+    if (code === "Digit1") { pendingMode = { online: true, o2v2: false }; state = "gameModeSelect"; } // Créer → mode + 1v1/2v2
     if (code === "Digit2") { joinCode = ""; state = "joinEntry"; }                        // Rejoindre avec un code
     if (code === "Escape") goMenu();
 
@@ -305,9 +326,10 @@ function newGame(seed) {
   // Stats physiques = celles du perso (speedMul 1). L'IA ne court pas plus vite.
   blobL.speedMul = 1;
   blobR.speedMul = 1;
-  if (mode === "2v2" && !online) {
+  if (mode === "2v2" && !online && !(typeof storyActive !== "undefined" && storyActive)) {
     // HORS-LIGNE : coéquipier + adversaires IA — même vitesse qu'un humain.
     // (En ligne, l'hôte fixe persos — voir hostStartMatch2v2.)
+    // Mode Histoire : les 4 slots sont déjà posés par storyStartMatch — ne pas écraser.
     blob2L.speedMul = 1; blobR.speedMul = 1; blob2R.speedMul = 1;
     const used = new Set([blobL.charId]);
     for (const b of [blob2L, blobR, blob2R]) {
@@ -315,6 +337,9 @@ function newGame(seed) {
       used.add(b.charId);
     }
     blob2L._aiT = blobR._aiT = blob2R._aiT = 0; // timers IA neutres
+  } else if (mode === "2v2" && !online) {
+    blob2L.speedMul = 1; blobR.speedMul = 1; blob2R.speedMul = 1;
+    blob2L._aiT = blobR._aiT = blob2R._aiT = 0;
   }
   particles.length = 0;
   aiErr = 0; aiErrTimer = 0; aiRush = false; // repart d'un état IA neutre (déterminisme)
@@ -414,12 +439,17 @@ const TUTORIAL_STEPS = [
   },
   {
     title: "SUPER",
-    body: "Gagne des points d'affilée pour remplir la jauge, puis E.",
+    body: "Jauge or sous le score : 3 points d'affilée → E pour ta technique (bandeau d'effet).",
     keys: ["E"]
   },
   {
+    title: "Super Smash",
+    body: "Jauge orange pleine → MAINTIENS F en smash aérien : freeze, dose, relâche. Sans maintien = smash normal.",
+    keys: ["F", "Espace"]
+  },
+  {
     title: "Objectif",
-    body: "Valide toutes les étapes, puis marque " + TUTORIAL_WIN_SCORE + " points.",
+    body: "Marque " + TUTORIAL_WIN_SCORE + " points. Astuce : au filet à deux en l'air = Smash Battle.",
     keys: ["Q", "D", "F"]
   }
 ];
@@ -444,6 +474,12 @@ function tutorialStepConditionMet(me) {
   if (tutorialStep === 4) return me.poseAnim === "smash";
   // SUPER : uniquement l'activation (pas la jauge déjà pleine d'avant)
   if (tutorialStep === 5) return me.superT > 0;
+  // Super Smash : dosage (freeze) ou frappe lourde déjà tirée
+  if (tutorialStep === 6) {
+    if (powerWindup && powerWindup.side === 0) return true;
+    if (ball.smash > 40 && ball.lastTouchSide === 0) return true;
+    return false;
+  }
   return false;
 }
 
@@ -455,6 +491,14 @@ function advanceTutorialStep() {
     // Tant que la condition est déjà vraie (ex. encore en l'air après un saut
     // anticipé), on n'arme pas : il faudra la relâcher puis la refaire.
     tutorialStepArmed = false;
+    // Offrir les jauges pour les étapes techniques (sinon trop long à charger)
+    if (tutorialStep === 5 && typeof superCharge !== "undefined") {
+      superCharge[0] = 1;
+    }
+    if (tutorialStep === 6 && typeof powerGauge !== "undefined" &&
+        typeof POWER_GAUGE_MAX === "number") {
+      powerGauge[0] = POWER_GAUGE_MAX;
+    }
     beep(520, 0.04, "square", 0.06);
     // Si le score est déjà bon et qu'on arrive à l'objectif → terminer
     if (typeof maybeFinishTutorialMatch === "function") maybeFinishTutorialMatch();
@@ -899,8 +943,8 @@ function drawTutorialInvite() {
   ctx.fillText("Première fois ?", W / 2, py + 42);
   ctx.font = "600 14px " + UI.sans;
   ctx.fillStyle = "rgba(27,23,48,0.75)";
-  ctx.fillText("Un match court guidé pour apprendre", W / 2, py + 72);
-  ctx.fillText("les commandes (3 points, IA Facile).", W / 2, py + 92);
+  ctx.fillText("Match guidé : cloche, smash, SUPER,", W / 2, py + 72);
+  ctx.fillText("Super Smash — 3 points, IA Facile.", W / 2, py + 92);
 
   drawTutorialTab("Jouer le tutoriel", "TutPlay", W / 2, py + 130, 220, true);
   drawTutorialTab("Plus tard", "TutLater", W / 2 - 70, py + 168, 120, false);
@@ -913,8 +957,8 @@ function drawTutorialInvite() {
 // raccourcis clavier, jamais mis à jour selon son matériel réel.
 function controlsHint() {
   if (padConnected) return "🎮 Manette — stick/croix choisir · A valider · B retour";
-  if (hasTouch) return "📱 Tactile — pavé + SAUT / SMASH / SUPER à l'écran";
-  return "Solo  Q/D + Z/Espace · F action · E SUPER";
+  if (hasTouch) return "📱 Tactile — pavé + SAUT / SMASH / SUPER / Super Smash";
+  return "Solo  Q/D · Z/Espace · F action · E SUPER · jauge orange = Super Smash";
 }
 function controlsHintColor() { return (padConnected || hasTouch) ? "#7ed957" : UI.muted; }
 
@@ -925,16 +969,14 @@ function controlsHintColor() { return (padConnected || hasTouch) ? "#7ed957" : U
 // pendingMode.bomb est encore absent : le total affiché suppose alors "pas
 // de Bombe" (le cas le plus courant) — pendingMode est réinitialisé à chaque
 // entrée dans l'assistant pour ne jamais laisser un vieux total traîner.
-// La sous-question "bombFormat" (1v1 ou équipes pour la Bombe) n'existe QUE
-// là où les deux formats sont possibles (solo vs IA, ou hébergement en
-// ligne) — pas en multijoueur local, qui ne connaît que le 1v1.
+// Solo / en ligne : après le mode de jeu, toujours "1v1 ou équipes".
+// Multijoueur local : pas d'étape équipes (1v1 seulement).
 function wizardTotal() {
   const hasTeamChoice = pendingMode.vsAI || pendingMode.online;
   return (pendingMode.vsAI ? 1 : 0)                                  /* Difficulté (solo uniquement) */
-       + 1                                                            /* Format */
-       + (pendingMode.bomb && hasTeamChoice ? 1 : 0)                  /* Bombe : 1v1 ou équipes ? */
+       + 1                                                            /* Mode de jeu */
+       + (hasTeamChoice ? 1 : 0)                                      /* 1v1 ou équipes (2v2) */
        + (pendingMode.bomb ? 1 : 0)                                   /* Durée de mèche */
-       + (pendingMode.flame && hasTeamChoice ? 1 : 0)                 /* Flamme : 1v1 ou équipes ? */
        + 2;                                                            /* Personnage + Terrain */
 }
 function wizardStep(idx, label) { return "Étape " + idx + "/" + wizardTotal() + " · " + label; }
@@ -956,46 +998,53 @@ function drawGameModeSelect() {
   const ctxLabel = pendingMode.online ? "En ligne"
     : pendingMode.vsAI ? "Solo — " + AI_LEVELS[pendingMode.aiLevel].name
     : "Multijoueur local";
-  menuScreenBase({ title: "Mode de jeu", kicker: wizardStep(pendingMode.vsAI ? 2 : 1, "Format"),
+  menuScreenBase({ title: "Mode de jeu", kicker: wizardStep(pendingMode.vsAI ? 2 : 1, "Mode"),
                    subtitle: ctxLabel + " — choisis le mode de jeu" });
 
-  const items = teamChoice ? [
-    "1  —  Classique",
-    "2  —  En équipes",
-    "3  —  Bombe",
-    "4  —  Ballon enflammé"
-  ] : [
+  // Solo / en ligne : le 2v2 se choisit à l'étape suivante (teamFormat).
+  const items = [
     "1  —  Classique",
     "2  —  Bombe",
     "3  —  Ballon enflammé"
   ];
   drawOptionList(items, 236, 44);
 
-  // clavier VS manette (1v1 local uniquement) : qui prend la manette ?
-  if (!teamChoice) {
-    if (padConnected) {
-      const twoP = padsNow.length >= 2;
-      const label = twoP
-        ? "🎮 Deux manettes : une chacun (1 → Gauche, 2 → Droite)"
-        : "🎮 G — Manette : joueur " + (padSideLocal === 1 ? "Droite" : "Gauche") +
-          "   ·   clavier : joueur " + (padSideLocal === 1 ? "Gauche (Q/D/Z/S)" : "Droite (flèches)");
-      if (!twoP) hit(W / 2, 372, 560, 26, "KeyG"); // clic = bascule, comme G
-      uiLabel(label, UI.mx, 376, 10, "#7ed957", 1);
-    } else {
-      uiLabel("Branche une manette pour jouer clavier vs manette", UI.mx, 376, 10, UI.muted, 1);
-    }
+  if (teamChoice) {
+    uiLabel("Ensuite : 1v1 ou en équipes (2v2) pour chaque mode", UI.mx, 376, 11, UI.muted, 1);
+  } else if (padConnected) {
+    // clavier VS manette (1v1 local uniquement)
+    const twoP = padsNow.length >= 2;
+    const label = twoP
+      ? "🎮 Deux manettes : une chacun (1 → Gauche, 2 → Droite)"
+      : "🎮 G — Manette : joueur " + (padSideLocal === 1 ? "Droite" : "Gauche") +
+        "   ·   clavier : joueur " + (padSideLocal === 1 ? "Gauche (Q/D/Z/S)" : "Droite (flèches)");
+    if (!twoP) hit(W / 2, 372, 560, 26, "KeyG"); // clic = bascule, comme G
+    uiLabel(label, UI.mx, 376, 10, "#7ed957", 1);
+  } else {
+    uiLabel("Branche une manette pour jouer clavier vs manette", UI.mx, 376, 10, UI.muted, 1);
   }
 }
 
-function drawBombFormat() {
-  menuScreenBase({ title: "Mode Bombe", kicker: wizardStep(wizardTotal() - 3, "Format"),
-                   subtitle: "1v1, ou en équipes ?" });
-  const items = [
+function drawTeamFormat() {
+  const modeTitle = pendingMode.bomb ? "Mode Bombe"
+    : pendingMode.flame ? "Ballon enflammé"
+    : "Classique";
+  const sub = pendingMode.flame
+    ? "Chaque touche brûle — 1v1, ou en équipes (2v2) ?"
+    : pendingMode.bomb
+      ? "1v1, ou en équipes (2v2) ?"
+      : "1v1, ou en équipes (toi + IA vs 2 IA) ?";
+  const stepIdx = (pendingMode.vsAI ? 2 : 1) + 1; // après Mode de jeu
+  menuScreenBase({ title: modeTitle, kicker: wizardStep(stepIdx, "Équipes"),
+                   subtitle: sub });
+  drawOptionList([
     "1  —  1v1",
-    "2  —  En équipes"
-  ];
-  drawOptionList(items, 238, 50);
+    "2  —  En équipes (2v2)"
+  ], 238, 50);
 }
+// rétro-compat noms d'état / appels éventuels
+function drawBombFormat() { drawTeamFormat(); }
+function drawFlameFormat() { drawTeamFormat(); }
 
 function drawBombDuration() {
   menuScreenBase({ title: "Mode Bombe", kicker: wizardStep(wizardTotal() - 2, "Durée de mèche"),
@@ -1006,16 +1055,6 @@ function drawBombDuration() {
     "3  —  Posé"
   ];
   drawOptionList(items, 240, 52);
-}
-
-function drawFlameFormat() {
-  menuScreenBase({ title: "Ballon enflammé", kicker: wizardStep(wizardTotal() - 2, "Format"),
-                   subtitle: "Chaque touche brûle — 1v1, ou en équipes ?" });
-  const items = [
-    "1  —  1v1",
-    "2  —  En équipes"
-  ];
-  drawOptionList(items, 238, 50);
 }
 
 // ---------- Tutoriel : commandes + démo de visée ----------
@@ -1100,34 +1139,39 @@ function drawTutorialTab(label, code, x, y, w, active) {
 function drawTutorialControls(dev, x, y, maxW) {
   const rows = {
     keyboard: [
-      ["Bouger / sauter", "Q / D  bouger   ·   Z / Espace / ↑  sauter"],
+      ["Bouger / sauter", "Q / D  bouger   ·   Z / Espace / ↑  sauter (double saut en l'air)"],
       ["Cloche (au sol)", "Place-toi sous la balle — cloche auto (angle = ta position)"],
       ["Smash (en l'air)", "Saute au contact : smash automatique selon ta position"],
       ["Service / action", "F pour lancer, puis F pour servir (pas d'auto)"],
-      ["SUPER", "E  (jauge remplie par des points d'affilée)"],
+      ["SUPER (jauge or)", "3 points d'affilée → E  (technique du perso)"],
+      ["Super Smash (jauge orange)", "Plein → MAINTIENS F en l'air : dose, relâche (sinon smash normal)"],
+      ["Smash Battle", "Les deux au filet en l'air + balle proche → duel de sauts"],
       ["Camp droite (local 1v1)", "← →  ·  ↑ saut  ·  ↓ ou / frappe  ·  Shift dr. SUPER"],
       ["Pause / son", "P pause · M son · N musique · Échap menu"]
     ],
     pad: [
       ["Déplacement", "Stick gauche ou croix directionnelle"],
-      ["Saut", "Bouton A (ou croix haut)"],
-      ["Cloche / smash", "Boutons X ou Y  —  sol = cloche · air = smash"],
-      ["SUPER", "Bouton B ou gâchettes"],
+      ["Saut", "Bouton A (ou croix haut) — double saut en l'air"],
+      ["Cloche / smash", "X/Y  —  sol = cloche · air = smash"],
+      ["Dig d'un smash", "Stick vers la balle (ou haut) au sol : tu peux encore rattraper"],
+      ["SUPER (jauge or)", "Bouton B — technique du perso"],
+      ["Super Smash (jauge orange)", "Maintiens X/Y en l'air jauge pleine : dose puis relâche"],
       ["Visée", "Oriente le stick : flèche + trajectoire suivent l'angle"],
       ["Menus", "Stick/croix choisir · A valider · B retour"]
     ],
     touch: [
       ["Déplacement", "Pavé ◀ ▶ en bas à gauche"],
-      ["Saut", "Bouton ⤒"],
+      ["Saut", "Bouton ⤒  (double saut en l'air)"],
       ["Cloche / smash", "Bouton ⚡  —  sol = cloche · air = smash"],
-      ["SUPER", "Bouton ★"],
+      ["SUPER (jauge or)", "Bouton ★ — technique du perso"],
+      ["Super Smash (jauge orange)", "Maintiens ⚡ en l'air jauge pleine : dose puis relâche"],
       ["Visée", "Assistée comme au clavier ; manette = stick plus précis"],
       ["Note", "Pavé visible en partie (solo / en ligne)"]
     ],
     mouse: [
       ["En match", "La souris ne vise plus — menus uniquement"],
-      ["Pour jouer", "Clavier : Q D bouger · Z/Espace saut · F action"],
-      ["Smash", "Saute au contact de la balle (auto)"],
+      ["Pour jouer", "Clavier : Q D bouger · Z/Espace saut · F action · E SUPER"],
+      ["Smash / Super Smash", "Saute au contact ; jauge orange → maintiens F pour doser"],
       ["Cloche", "Au sol, place-toi sous la balle"]
     ]
   };
@@ -1360,7 +1404,7 @@ function drawTutorial() {
   ctx.restore();
 
   uiLabel(
-    "Clavier : place-toi pour viser · Sol = cloche · Air = smash auto · Manette = stick",
+    "Clavier : sol = cloche · air = smash · jauge orange = Super Smash · E = SUPER",
     W * 0.50, H - 78, 10, UI.muted, 0.15
   );
 
@@ -1486,12 +1530,14 @@ function drawRules() {
   p("3 points d'affilée chargent la jauge or. E / B lance la technique : un bandeau explique l'effet ~4 s.");
   y += 4;
   h("⚡ SUPER SMASH", "#ff6a2a");
-  p("Jauge orange : se remplit en échange. Plein → smash aérien (F/X) : freeze, dose, relâche. Plus fort + ralenti.");
+  p("Jauge orange : se remplit lentement en échange. Plein → MAINTIENS smash aérien (F/X) pour doser ; sans maintien = smash normal. Relâche pour frapper (plus fort + ralenti).");
+  y += 4;
+  h("Smash Battle", "#ff8a65");
+  p("Les deux joueurs en l'air près du filet + balle proche = duel de sauts. Le gagnant smash mortel, le perdant est stun.");
   y += 4;
   h("Météo & événements", "#4db3ff");
-  p("Météo sur toutes les maps : pluie/orage (éclairs), neige/blizzard (Place Écarlate), tempête de sable (Country Club). Sol glissant, balle plus lourde.");
-  p("Place Écarlate : canon. Country Club Doré : voiturette. Palais du Coq : cortège. Esplanade : radar. Cité du Matin : lanternes. Pont des Deux Mondes : tapis. Ashram : vache. Grande Forêt : aras.");
-  p("Deux joueurs au filet + balle proche = Smash Battle (le gagnant smash mortel, le perdant est stun).");
+  p("Météo sur toutes les maps : pluie/orage, neige/blizzard (Place Écarlate), tempête de sable (Country Club). Sol glissant, balle plus lourde.");
+  p("Chaque terrain a un événement (canon, voiturette, cortège, radar, lanternes, tapis, vache, aras, faucon, paon…).");
   ctx.restore();
 
   // --- Colonne droite (clip) : persos en liste ---

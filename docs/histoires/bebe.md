@@ -33,23 +33,27 @@ Physiquement, le Maréchal est un **chibi à très grosse tête**, sanglé dans 
 
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 1, title: "Le grand frère", sub: "Ryonganie–Panguo · le parrain du continent",
-  left: "bebe", right: "timonier", terrain: 4, mode: "volley", ai: 0, doped: null,
+  act: 1, title: "Le grand frère en double", sub: "Ryonganie–Panguo · binôme sous tutelle",
+  left: "bebe", right: "timonier", ally: "volkoi", right2: "dorf", terrain: 4, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Cité du Matin. Sous les toits d'or et les lanternes rouges, le petit voisin bruyant vient rendre visite au très patient géant." },
-    { s: "bebe", t: "Grand frère ! J'ai fait un nouveau défilé hier. Douze mille cuivres. Tu m'as regardé à la télé, dis ?" },
-    { s: "timonier", t: "J'ai regardé. J'ai surtout regardé la facture de charbon que tu me laisses payer. Sers, petit." },
-    { s: "bebe", t: "Le charbon, le charbon… Entre frères, on ne compte pas. Toi tu construis des murs, moi je construis des fusées : on se complète." },
-    { s: "timonier", t: "Je construis des murs pour ne pas entendre les fusées. Nuance. Balle au centre." },
-    { s: "bebe", t: "Un jour tu seras fier de moi, grand frère. Aujourd'hui, contente-toi d'avoir peur comme les autres." }
+    { s: "narrator", t: "Esplanade du Défilé. Le Maréchal a exigé un 2v2 : il veut le Tsar comme partenaire contre le Timonier et le Baron." },
+    { s: "bebe", t: "Grand frère ! Tu digues avec MOI ! Mon radar couvre tout le terrain ! Les deux camps !" },
+    { s: "volkoi", t: "Je suis ton partenaire, pas ton fan. Digue quand je te le dis. Silence ensuite." },
+    { s: "timonier", t: "Deux enfants turbulents contre l'harmonie et… le bruit doré. Tempo." },
+    { s: "dorf", t: "Je suis le bruit doré, oui. Et le meilleur partenaire de panda du monde." },
+    { s: "narrator", t: "Double sous tutelle : l'alliance tient — ou le radar explose." },
   ],
   win:  [
-    { s: "bebe", t: "J'ai battu le géant ! Notez ça dans les archives : cent pour cent de victoires, toujours." },
-    { s: "timonier", t: "Je t'ai laissé gagner. C'est ce que fait un grand frère. Ne le crie pas trop fort." }
+    { s: "bebe", t: "BINÔME GLORIEUX ! Le Maréchal et le Tsar ! Gravez-nous en GRANIT DOUBLE !" },
+    { s: "volkoi", t: "Correct, petit. Une fois. N'en fais pas une parade de douze mille pas." },
+    { s: "timonier", t: "Un revers. L'harmonie corrige aussi les doubles." },
+    { s: "dorf", t: "Mon partenaire a trop médité. Moi j'étais parfait." },
   ],
   lose:  [
-    { s: "timonier", t: "Le tempo, petit. Toujours le tempo. Tu tires trop vite et tu vises trop haut." },
-    { s: "bebe", t: "Match d'entraînement ! Ça ne compte pas ! Je gardais mes vraies fusées pour plus tard." }
+    { s: "timonier", t: "Le tempo à quatre a tranché. Rentrez défiler moins fort." },
+    { s: "dorf", t: "ON A GAGNÉ LE 2v2 ! Le plus beau !" },
+    { s: "bebe", t: "CE N'EST PAS UNE DÉFAITE DE PARTENAIRES ! C'est un entraînement !" },
+    { s: "volkoi", t: "Gamin… la prochaine fois, tu digues vraiment. L'alliance, ça se mérite." },
   ]
 },
 {

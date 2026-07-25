@@ -27,23 +27,27 @@ Car c'est là, au fond, tout Le Safran : un joueur qui a compris que dans un mon
 ```js
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 1, title: "La table est toujours là", sub: "Ramenie–Gallardie · retour à l'Accord",
-  left: "safran", right: "cygne", terrain: 2, mode: "volley", ai: 0, doped: null,
+  act: 1, title: "La table à quatre places", sub: "Ramenie–Gallardie · double de protocole",
+  left: "safran", right: "cygne", ally: "sultan", right2: "dorf", terrain: 2, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Palais du Coq. Le Cygne accueille Le Safran pour « relancer le dialogue ». Sur la table : du thé, et une très vieille feuille déchirée." },
-    { s: "cygne", t: "Cher ami, revenons à la table. En même temps que la fermeté, un peu de confiance. Rouvrons vos ateliers, refermons vos alambics." },
-    { s: "safran", t: "Nous avons déjà pesé des grammes ensemble, Le Cygne. Des nuits entières. Puis quelqu'un a déchiré la feuille. Ce n'était pas moi." },
-    { s: "cygne", t: "Le passé, le passé… Regardons devant. J'ai une nouvelle proposition. Équilibrée. Ambitieuse." },
-    { s: "safran", t: "Vous avez toujours une nouvelle proposition. C'est votre charme. Servez donc : on verra si votre équilibre tient trois échanges." },
-    { s: "narrator", t: "Balle au centre. Le premier voile doré se lève déjà sur le camp du Coq." }
+    { s: "narrator", t: "Jardin des Roses. Safran invite le Sultan en partenaire contre le Cygne et le Baron. La table des négociations devient un 2v2." },
+    { s: "safran", t: "Sultan : tu es mon partenaire. On mesure, on digue, on leur rappelle les accords." },
+    { s: "sultan", t: "Marché conclu. Je tiens le détroit du filet ; toi, tu ralentis leur orgueil." },
+    { s: "cygne", t: "En même temps adversaire, en même temps… partenaire du Baron. C'est un exercice." },
+    { s: "dorf", t: "Je suis le meilleur partenaire du Cygne ! Il paie enfin — en smashs !" },
+    { s: "narrator", t: "Quatre autour du filet. La table, elle, reste toujours là." },
   ],
   win:  [
-    { s: "safran", t: "Vous couriez si vite vers l'accord que vous avez raté la balle. La précipitation, Le Cygne. Toujours." },
-    { s: "cygne", t: "Un revers technique. En même temps, le dialogue continue. Je reviens avec une feuille neuve." }
+    { s: "safran", t: "Beau double. Le protocole a tenu mieux que leur alliance." },
+    { s: "sultan", t: "Le marché est bon : notre camp marque. Porte ouverte — pour nous." },
+    { s: "cygne", t: "Défaite de binôme. On renégocie. En même temps." },
+    { s: "dorf", t: "Truqué ! Mon partenaire hésitait entre gauche et droite !" },
   ],
   lose:  [
-    { s: "cygne", t: "Voilà ! De la fermeté ET de la main tendue. C'est ça, la doctrine du Cygne." },
-    { s: "safran", t: "Joli point. Gardez la feuille au chaud. À mon avis, quelqu'un la déchirera encore." }
+    { s: "cygne", t: "Partenariat efficace, même improbable. Point pour nous." },
+    { s: "dorf", t: "MEILLEUR 2v2 ! Dis-leur, rose !" },
+    { s: "safran", t: "On recalibre. Les partenaires aussi se renégocient." },
+    { s: "sultan", t: "La porte a claqué. On reviendra — ensemble." },
   ]
 },
 {

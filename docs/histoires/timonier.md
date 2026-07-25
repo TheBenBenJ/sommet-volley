@@ -30,25 +30,29 @@ Son drapeau ne claque pas au vent ; il ondule. Rouge, comme les murs, comme les 
 const STORY_TIMONIER = [
   // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
-    act: 1, title: "Le petit frère", sub: "Panguo–Ryonganie · parrainage & défilés",
-    left: "timonier", right: "bebe", terrain: 3, mode: "volley", ai: 0, doped: null,
-    pre:  [
-      { s: "narrator", t: "Esplanade du Défilé. Sous le radar qui tourne, le plus jeune des dirigeants reçoit le plus patient. On sait déjà qui paie l'électricité." },
-      { s: "bebe", t: "Grand voisin ! Tu as vu mon défilé ? Mille pas à la seconde, tous parfaitement synchrones. J'ai même un nouveau radar !" },
-      { s: "timonier", t: "Beau défilé. Belle énergie. Le charbon qui l'alimente, il vient de chez moi. Comme le riz. Comme le reste." },
-      { s: "bebe", t: "Détail ! Ce soir je saute au filet, j'interdis à ta muraille de bouger, et je fanfaronne devant les caméras !" },
-      { s: "timonier", t: "Saute autant que tu veux, petit frère. Je contrôle le tempo. Et j'éteins l'électricité quand tu dépasses la mesure." },
-      { s: "narrator", t: "Volley d'entraînement entre patron et protégé." }
-    ],
-    win:  [
-      { s: "timonier", t: "Voilà. On te laisse fanfaronner, on te laisse défiler. Tant que tu sers dans mon tempo." },
-      { s: "bebe", t: "J'ai perdu MAIS c'était magnifique ! Je remets ça dès que tu rallumes le courant, d'accord ?" }
-    ],
-    lose:  [
-      { s: "bebe", t: "Battu le grand voisin ! Nouveau bulletin spécial ! Défilé de la victoire à l'aube !" },
-      { s: "timonier", t: "Amuse-toi. Le carburant de ta joie passe par mes gazoducs. L'harmonie revient toujours à moi." }
-    ]
-  },
+  act: 1, title: "Le petit frère en face", sub: "Panguo–Ryonganie · double de l'harmonie",
+  left: "timonier", right: "bebe", ally: "safran", right2: "dorf", terrain: 3, mode: "2v2", ai: 0, doped: null,
+  pre:  [
+    { s: "narrator", t: "Cité du Matin. Le Timonier choisit Safran comme partenaire. En face : le Maréchal et le Baron. Un 2v2 pour enseigner le tempo." },
+    { s: "timonier", t: "Toi, rose, tu joues avec moi. Peu de mots. Beaucoup de digues. L'harmonie en double." },
+    { s: "safran", t: "Partenariat élégant. Je ralentis leur camp ; tu imposes le tempo. Marché conclu." },
+    { s: "bebe", t: "Le Maréchal a le Baron comme partenaire ! On va gagner EN DÉFILANT !" },
+    { s: "dorf", t: "Je défile pas. Je gagne. Digue, petit, et regarde le maître." },
+    { s: "narrator", t: "Quatre sur le terrain. L'harmonie n'aime pas le bruit — elle va le corriger." },
+  ],
+  win:  [
+    { s: "timonier", t: "Tempo tenu. Partenaire fiable. Le siècle continue." },
+    { s: "safran", t: "Beau double. La lenteur a usé la parade." },
+    { s: "bebe", t: "REVANCHE ! Mon partenaire a trop parlé !" },
+    { s: "dorf", t: "Truqué. Évidemment. Mais magnifique quand même." },
+  ],
+  lose:  [
+    { s: "bebe", t: "VICTOIRE DU BINÔME ! Radar + or = imbattable !" },
+    { s: "dorf", t: "Le plus grand 2v2 ! Dis-le, panda !" },
+    { s: "timonier", t: "Un set perdu. L'harmonie digère. On reprend." },
+    { s: "safran", t: "Mesure pour la revanche. Les partenaires, ça se recalibre." },
+  ]
+},
   {
     act: 1, title: "L'amitié sans limites", sub: "Panguo–Bourassie · axe de revers",
     left: "timonier", right: "volkoi", terrain: 0, mode: "volley", ai: 1, doped: null,

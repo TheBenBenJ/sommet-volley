@@ -92,8 +92,8 @@ const BATTLE_STUN_T = 52;    // perdant du duel : stun ~0,85 s (ne digue pas)
 const SMASH_VX = 14.5, SMASH_VY = 9.5;
 
 // --- Super Smash (tous persos) — jauge d'échange, freeze + dosage, frappe lourde ---
-const POWER_GAUGE_MAX = 520;     // ~8,5 s d'échange à +1/tick (touches accélèrent)
-const POWER_GAUGE_TOUCH = 70;    // bonus par nouveau contact balle
+const POWER_GAUGE_MAX = 840;     // ~14 s d'échange à +1/tick (moins fréquent)
+const POWER_GAUGE_TOUCH = 36;    // petit bonus par contact (ne remplit pas tout seul)
 const POWER_WINDUP_MAX = 48;     // ~0,8 s pour viser / doser (hors-ligne)
 const POWER_WINDUP_MIN = 6;      // ticks mini avant relâche possible
 const POWER_SMASH_MUL = 1.28;    // multiplicateur vs smash normal (après SMASH_MUL)
