@@ -506,7 +506,7 @@ function trySmashBall(blob) {
   if (ball.inHands && ball.frozen) return false;
   if (ball.tossGrace > 0 && blob.side === servingSide) return false;
   if (blob.onGround) return false;
-  // Passage en Force (Cygne / micron) : frappes immunisées au smash adverse
+  // Passage en Force (Cygne / cygne) : frappes immunisées au smash adverse
   if (ball.lastTouchSide !== blob.side && ball.lastTouchSide >= 0) {
     for (const o of activeBlobs) {
       if (o.side === ball.lastTouchSide && o.superKind === "cygne" && o.superT > 0) return false;

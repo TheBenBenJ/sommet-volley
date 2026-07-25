@@ -1,4 +1,4 @@
-# Le Gourou — yogi (Bharatie)
+# Le Gourou — gourou (Bharatie)
 
 ## Biographie
 

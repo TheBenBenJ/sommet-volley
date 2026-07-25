@@ -1,4 +1,4 @@
-# Le Capitaine — jair · Tropicalia
+# Le Capitaine — capitaine · Tropicalia
 
 ## Biographie
 

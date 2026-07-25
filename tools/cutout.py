@@ -2,7 +2,7 @@
 """Détourage anti-aliasé + ancrage pieds — pipeline Sommet Volley (Phase 2).
 
 Usage:
-  python3 tools/cutout.py raw/volkoi assets/vladou
+  python3 tools/cutout.py raw/volkoi assets/volkoi
 
 Entrée : PNG fond blanc (raw/<key>/*.png)
 Sortie : PNG détourés + _contact.png (planche de contrôle)

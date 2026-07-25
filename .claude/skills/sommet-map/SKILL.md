@@ -50,15 +50,15 @@ Anti-landmarks à injecter selon l'archétype (exemples, pas exhaustif) :
 
 | Archétype / nation | Interdits NOMBRÉS (à écrire dans prompt + theme) |
 |--------------------|--------------------------------------------------|
-| Bourassie / neige | Saint-Basile, Kremlin, Place Rouge, coupoles rayées/spiralées multicolores |
-| Gallardie / prairie | Tour Eiffel, Arc de Triomphe, Notre-Dame |
-| Doria / plage | Maison Blanche, Capitol, Statue de la Liberté |
-| Ryonganie / parade | portraits géants de dirigeants, sceaux d'État |
-| Panguo / matin | Cité Interdite réelle, Muraille identifiable |
-| Bosforie / bosphore | Sainte-Sophie, Mosquée Bleue, croissants religieux |
-| Bharatie / ashram | Taj Mahal, temples + symboles religieux |
-| Tropicalia / amazon | Christ du Corcovado, drapeaux BR |
-| Levantie / colline | dômes + croissants, Kaaba, drapeaux nationaux |
+| Bourassie / place-ecarlate | Saint-Basile, Kremlin, Place Rouge, coupoles rayées/spiralées multicolores |
+| Gallardie / palais-du-coq | Tour Eiffel, Arc de Triomphe, Notre-Dame |
+| Doria / country-club-dore | Maison Blanche, Capitol, Statue de la Liberté |
+| Ryonganie / esplanade-du-defile | portraits géants de dirigeants, sceaux d'État |
+| Panguo / cite-du-matin | Cité Interdite réelle, Muraille identifiable |
+| Bosforie / pont-des-deux-mondes | Sainte-Sophie, Mosquée Bleue, croissants religieux |
+| Bharatie / stade-ashram | Taj Mahal, temples + symboles religieux |
+| Tropicalia / grande-foret | Christ du Corcovado, drapeaux BR |
+| Levantie / citadelle-du-levant | dômes + croissants, Kaaba, drapeaux nationaux |
 
 ---
 
@@ -87,7 +87,7 @@ code** avant l'image — c'est ce qui alimente le prompt et l'intégration :
    snow-covered roofs and square towers (cream trim), ONE distant plain
    dark-red bulb silhouette solid single color — NO cathedral, NO Saint Basil,
    NO candy-stripe/spiral domes, NO Kremlin ; crenellated walls, plain blue/green
-   parade banners, frosted lamp posts, bare snowy trees, packed white snow
+   esplanade-du-defile banners, frosted lamp posts, bare snowy trees, packed white snow
    volleyball court, pale grey overcast sky`
 
 3. **Manifest** `assets/maps/<key>/manifest.json` : déclarer dès maintenant

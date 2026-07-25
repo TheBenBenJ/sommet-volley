@@ -35,14 +35,14 @@ assets/, packs sprites) — on ne touche qu'au **nom affiché** + textes.
 
 | Clé | Archétype | Nation fictive | Nom proposé | Kit / Super (inchangé) |
 |-----|-----------|----------------|-------------|------------------------|
-| vladou | L'autocrate glacial, torse bombé, ours & parades | **Bourassie** | Tsar Volkoï | Sang froid · Hiver Général |
-| trompette | Le magnat doré, mèche, cravate rouge, golf | **Doria** | Le Doré / Baron Dorf | Ego en béton · Le Mur |
-| micron | Le technocrate « en même temps », énarque | **Gallardie** | Le Cygne / Manu-Ordinateur | En même temps · Passage en Force |
+| volkoi | L'autocrate glacial, torse bombé, ours & parades | **Bourassie** | Tsar Volkoï | Sang froid · Hiver Général |
+| dorf | Le magnat doré, mèche, cravate rouge, golf | **Doria** | Le Doré / Baron Dorf | Ego en béton · Le Mur |
+| cygne | Le technocrate « en même temps », énarque | **Gallardie** | Le Cygne / Manu-Ordinateur | En même temps · Passage en Force |
 | bebe | L'héritier dynastique, uniforme, défilés | **Ryonganie** | Maréchal Bébé | Applaudissements · Batterie AA |
-| panda | L'empereur du contrôle, parti unique, muraille | **Panguo** | Le Grand Timonier | Mur invisible · Grande Muraille |
+| timonier | L'empereur du contrôle, parti unique, muraille | **Panguo** | Le Grand Timonier | Mur invisible · Grande Muraille |
 | sultan | Le néo-sultan, deux continents, ambitions | **Bosforie** | Le Sultan (titre, OK) | Séisme · Séisme |
-| yogi | L'ascète-manager, méditation, démographie | **Bharatie** | Le Gourou / Swami | Ashram · Méditation |
-| jair | Le capitaine populiste, forêt, tronçonneuse | **Tropicalia** | Le Capitaine / Général Tronço | Tronçonneuse · Déforestation |
+| gourou | L'ascète-manager, méditation, démographie | **Bharatie** | Le Gourou / Swami | Ashram · Méditation |
+| capitaine | Le capitaine populiste, forêt, tronçonneuse | **Tropicalia** | Le Capitaine / Général Tronço | Tronçonneuse · Déforestation |
 | faucon | Le faucon sécuritaire, citadelle méditerranéenne | **Levantie** | Le Faucon | Ego · Raid Éclair |
 
 Maps (renommer le `name` du terrain, l'archétype reste) : Place Grand-Rouge →

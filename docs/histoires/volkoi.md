@@ -216,4 +216,4 @@ Le Tsar rejoue sa géopolitique givrée en neuf manches, camp gauche. Trois acte
 }
 ```
 
-**Répartition :** 9 rencontres — 6 volley (panda, bebe, safran, yogi, jair, trompette) · 3 bombe (sultan, faucon, micron). Deux adversaires dopés en Acte III (faucon, micron). Finale à domicile sur la Place Écarlate, canon d'apparat à l'appui.
+**Répartition :** 9 rencontres — 6 volley (timonier, bebe, safran, gourou, capitaine, dorf) · 3 bombe (sultan, faucon, cygne). Deux adversaires dopés en Acte III (faucon, cygne). Finale à domicile sur la Place Écarlate, canon d'apparat à l'appui.

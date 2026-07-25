@@ -1,4 +1,4 @@
-# Le Cygne — micron · Gallardie
+# Le Cygne — cygne · Gallardie
 
 ## Biographie
 

@@ -133,7 +133,7 @@ function mapStadeAshramReady() {
   return !!(p && spriteReady(p.skyline));
 }
 
-/** Pack fond / props Place Écarlate (terrain Volkoï / clé vladou). */
+/** Pack fond / props Place Écarlate (terrain Volkoï / clé volkoi). */
 function initMapPlaceEcarlate() {
   SPRITES.mapPlaceEcarlate = loadMapPack("place-ecarlate", {
     skyline: "skyline.png", band: "band.png", far: "far.png",

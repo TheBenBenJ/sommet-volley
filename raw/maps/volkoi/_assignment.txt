@@ -1,4 +1,0 @@
-skyline.png <- Gemini_Generated_Image_4vh1il4vh1il4vh1.png (2752×1536, ratio ~1.79)
-far.png     <- même source (pas de far dédié)
-# Props legacy conservés (canon / snowman / net_post) — regen via sommet-decor
-# Thumb legacy — regen local via sommet-decor

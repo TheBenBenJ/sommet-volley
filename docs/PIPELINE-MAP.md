@@ -32,14 +32,14 @@ corrigée ICI (et dans les prompts `raw/maps/`), pas contournée au cas par cas.
 ## Étape 0 — Fiche map (AVANT tout pixel)
 
 ```yaml
-key: bosphore                 # dossier assets/maps/<key>/  (= pack)
-terrainKey: bosphore          # TERRAINS[].key (parfois ≠ : neige→vladou, plage→trompette…)
+key: pont-des-deux-mondes                 # dossier assets/maps/<key>/  (= pack)
+terrainKey: pont-des-deux-mondes          # TERRAINS[].key (= dossier assets/maps/)
 name: "Palais du Bosphore"    # nom affiché (parodie)
 character: sultan             # perso attitré (roster)
 palette: ["#…", "#…", "#…"]   # 3 tons max
 mood: "jour clair / crépuscule / neige…"
 weather: clear                # clear | dynamic — si clear, le code force le ciel calme
-bgFullHeight: false           # true si le décor doit descendre sous GROUND_Y (matin, parade)
+bgFullHeight: false           # true si le décor doit descendre sous GROUND_Y (cite-du-matin, esplanade-du-defile)
 event:
   id: carpet
   prop: carpet.png
@@ -54,11 +54,16 @@ Mapping **terrainKey → dossier pack** actuel :
 
 | `TERRAINS.key` | Dossier `assets/maps/` |
 |----------------|------------------------|
-| neige | vladou |
-| plage | trompette |
-| prairie | micron |
-| parade | bebe |
-| matin / bosphore / ashram / amazon | même nom |
+| place-ecarlate | place-ecarlate |
+| country-club-dore | country-club-dore |
+| palais-du-coq | palais-du-coq |
+| esplanade-du-defile | esplanade-du-defile |
+| cite-du-matin | cite-du-matin |
+| pont-des-deux-mondes | pont-des-deux-mondes |
+| stade-ashram | stade-ashram |
+| grande-foret | grande-foret |
+| citadelle-du-levant | citadelle-du-levant |
+| jardin-des-roses | jardin-des-roses |
 
 ---
 
@@ -127,7 +132,7 @@ la **ligne de fond du court**, puis renseigne `MAP_LAYOUT[<terrainKey>]` dans
 `src/terrains.js`.
 
 - Maps classiques : `drawImgCoverBottom` + `baselineFromBottom`.
-- Maps plein cadre (`matin`, `parade`) : `bgFullHeight: true` +
+- Maps plein cadre (`cite-du-matin`, `esplanade-du-defile`) : `bgFullHeight: true` +
   `drawImgCoverBaseline` (la ligne de court source tombe sur `GROUND_Y`, le
   pavé peut descendre sous le score).
 
@@ -152,8 +157,8 @@ traite tout PNG non-prop comme un perso (ancrage pieds, etc.).
 
 ### Drapeaux
 
-- Préférer champs **sans blanc pur** (crème, or, couleur unie) pour ashram /
-  bosphore / amazon / matin / bebe.
+- Préférer champs **sans blanc pur** (crème, or, couleur unie) pour stade-ashram /
+  pont-des-deux-mondes / grande-foret / cite-du-matin / bebe.
 - Si blanc intentionnel (rayures US parody, etc.) → ajouter le dossier map dans
   `FLAG_KEEP_WHITE_MAPS` dans `cutout.py`.
 - Prompt flag : *solid color field, NO white triangles, NO white gaps between

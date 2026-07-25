@@ -35,21 +35,21 @@ ci-dessus, puis ajoute la ligne « Prompt » spécifique. Destination finale ent
 - **Prompt** : « Version *dopée* de ce dirigeant slave glacial : même visage, même manteau
   sombre. Yeux bleu pâle devenus rouge luisant, veines saillantes sur le crâne, buée froide,
   rictus mauvais. Aura rouge glacée. Fond magenta `#FF00FF`. »
-- **Destination** : `assets/story/vladou_doped.png`
+- **Destination** : `assets/story/volkoi_doped.png`
 
 ### 2. Baron Dorf — dopé
 - **Référence à joindre** : `assets/dorf/idle_face_0.png`
 - **Prompt** : « Version *dopée* de ce magnat blond bronzé, costume bleu et longue cravate rouge :
   visage cramoisi, yeux injectés rouge vif, veines gonflées au front, sueur, air survolté et furieux.
   Aura rouge. Fond magenta `#FF00FF`. »
-- **Destination** : `assets/story/trompette_doped.png`
+- **Destination** : `assets/story/dorf_doped.png`
 
 ### 3. Le Cygne — dopé
 - **Référence à joindre** : `assets/cygne/idle_face_0.png`
 - **Prompt** : « Version *dopée* de ce jeune technocrate en costume bleu, chemise blanche :
   le sourire diplomate remplacé par un regard fixe et rouge luisant, veines aux tempes, sueur,
   mâchoire crispée. Aura rouge. Fond magenta `#FF00FF`. »
-- **Destination** : `assets/story/micron_doped.png`
+- **Destination** : `assets/story/cygne_doped.png`
 
 ### 4. Maréchal Bébé — dopé
 - **Référence à joindre** : `assets/bebe/idle_face_0.png`
@@ -63,7 +63,7 @@ ci-dessus, puis ajoute la ligne « Prompt » spécifique. Destination finale ent
 - **Prompt** : « Version *dopée* de ce dirigeant impassible aux cheveux noirs peignés, costume sombre :
   le calme impérial vire à la fureur froide, yeux rouge luisant, veines au cou, mâchoire serrée.
   Aura rouge. Fond magenta `#FF00FF`. »
-- **Destination** : `assets/story/panda_doped.png`
+- **Destination** : `assets/story/timonier_doped.png`
 
 ### 6. Le Sultan — dopé
 - **Référence à joindre** : `assets/sultan/idle_face_0.png`
@@ -77,14 +77,14 @@ ci-dessus, puis ajoute la ligne « Prompt » spécifique. Destination finale ent
 - **Prompt** : « Version *dopée* de ce gourou à barbe blanche en tenue safran/orange :
   la sérénité zen remplacée par des yeux rouge luisant grand ouverts, veines au front, sueur,
   rictus. Aura rouge. Fond magenta `#FF00FF`. »
-- **Destination** : `assets/story/yogi_doped.png`
+- **Destination** : `assets/story/gourou_doped.png`
 
 ### 8. Le Capitaine — dopé
 - **Référence à joindre** : `assets/capitaine/idle_face_0.png`
 - **Prompt** : « Version *dopée* de cet ex-militaire populiste au visage rude :
   yeux injectés rouge luisant, veines gonflées aux tempes et au cou, sueur, air brutal et hargneux.
   Aura rouge. Fond magenta `#FF00FF`. »
-- **Destination** : `assets/story/jair_doped.png`
+- **Destination** : `assets/story/capitaine_doped.png`
 
 ### 9. Le Faucon — dopé
 - **Référence à joindre** : `assets/faucon/idle_face_0.png`

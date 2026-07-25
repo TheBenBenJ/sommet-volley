@@ -11,7 +11,7 @@ travers. Ce script :
 
 Usage:
   python3 tools/genassets/fix_net_posts.py
-  python3 tools/genassets/fix_net_posts.py amazon trompette
+  python3 tools/genassets/fix_net_posts.py grande-foret dorf
 """
 from __future__ import annotations
 

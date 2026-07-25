@@ -27,31 +27,31 @@ qu'une clé d'inspiration pour toi — il ne doit PAS apparaître littéralement
 
 | key | Nom | Nation | Inspiration (interne) | Super | Map (terrain idx) | Event de map | Décor/drapeau |
 |---|---|---|---|---|---|---|---|
-| vladou | Tsar Volkoï | Bourassie | autocrate slave | **Hiver Général** (gèle/glace le camp adverse) | Place Écarlate (0) | canon d'apparat (tir) | forteresse de briques cramoisies enneigée, bulbe rouge lointain, bannières bleu/vert, canon sur traîneau, drapeau héraldique |
-| trompette | Baron Dorf | Doria | magnat-président | **Le Mur** (mur d'or bloque le sol adverse) | Country Club Doré (1) | voiturette de golf klaxon | resort doré, tour hôtel dorée à toit plat, fontaine, palmiers, gazon |
-| micron | Le Cygne | Gallardie | jeune technocrate | **Passage en Force** (tes frappes ne peuvent + être smashées) | Palais du Coq (2) | pigeons | palais néoclassique, obélisque abstrait, coq héraldique doré sur bannière bleue |
+| volkoi | Tsar Volkoï | Bourassie | autocrate slave | **Hiver Général** (gèle/glace le camp adverse) | Place Écarlate (0) | canon d'apparat (tir) | forteresse de briques cramoisies enneigée, bulbe rouge lointain, bannières bleu/vert, canon sur traîneau, drapeau héraldique |
+| dorf | Baron Dorf | Doria | magnat-président | **Le Mur** (mur d'or bloque le sol adverse) | Country Club Doré (1) | voiturette de golf klaxon | resort doré, tour hôtel dorée à toit plat, fontaine, palmiers, gazon |
+| cygne | Le Cygne | Gallardie | jeune technocrate | **Passage en Force** (tes frappes ne peuvent + être smashées) | Palais du Coq (2) | pigeons | palais néoclassique, obélisque abstrait, coq héraldique doré sur bannière bleue |
 | bebe | Maréchal Bébé | Ryonganie | héritier dynastique | **Batterie AA** (interdit de sauter au camp adverse) | Esplanade du Défilé (3) | radar (allumé/éteint) | esplanade brutaliste, gradins de granit, arc abstrait, bannières unies, radar militaire |
-| panda | Le Grand Timonier | Panguo | empereur impassible | **Grande Muraille** (mur au milieu du camp adverse) | Cité du Matin (4) | lanternes | palais aux murs cramoisis, toits d'or, lanternes rouges, lions gardiens de pierre |
+| timonier | Le Grand Timonier | Panguo | empereur impassible | **Grande Muraille** (mur au milieu du camp adverse) | Cité du Matin (4) | lanternes | palais aux murs cramoisis, toits d'or, lanternes rouges, lions gardiens de pierre |
 | sultan | Le Sultan | Bosforie | néo-sultan | **Séisme** (interdit de sauter + tremblement) | Pont des Deux Mondes (5) | tapis volant | palais sur détroit entre deux continents, dômes/tours, barques, bannière ottomane violette à liseré doré |
-| yogi | Le Gourou | Bharatie | gourou-manager | **Méditation** (gèle/glace le camp adverse, façon zen) | Stade Ashram (6) | vache qui traverse | stade de grès miel, façade à arches festonnées, guirlandes de soucis orange, palmiers, vache sacrée |
-| jair | Le Capitaine | Tropicalia | ex-militaire populiste | **Déforestation** (mur de troncs bloque le sol) | Grande Forêt (7) | ara (macaw) | clairière de jungle dorée, huttes sur pilotis, canopée, court en terre rouge |
+| gourou | Le Gourou | Bharatie | gourou-manager | **Méditation** (gèle/glace le camp adverse, façon zen) | Stade Ashram (6) | vache qui traverse | stade de grès miel, façade à arches festonnées, guirlandes de soucis orange, palmiers, vache sacrée |
+| capitaine | Le Capitaine | Tropicalia | ex-militaire populiste | **Déforestation** (mur de troncs bloque le sol) | Grande Forêt (7) | ara (macaw) | clairière de jungle dorée, huttes sur pilotis, canopée, court en terre rouge |
 | faucon | Le Faucon | Levantie | faucon composite | **Raid Éclair** (interdit de sauter au camp adverse) | Citadelle du Levant (8) | faucon en vol | citadelle de grès sur colline désertique face à la mer, dômes anciens + tours de verre, remparts, faucon |
 | safran | Le Safran | Ramenie | premier composite des hautes terres | **Voile d'Or** (ralentit le camp adverse) | Jardin des Roses (9) | paon | jardin de roses de palais, arcades à tuiles turquoise, dômes en dôme, roseraie |
 
 ### Inspirations internes (NE PAS écrire dans le jeu — repère pour toi)
-vladou≈Poutine/Russie · trompette≈Trump/USA · micron≈Macron/France · bebe≈Kim/Corée du Nord ·
-panda≈Xi/Chine · sultan≈Erdoğan/Turquie · yogi≈Modi/Inde · jair≈Bolsonaro/Brésil ·
+volkoi≈Poutine/Russie · dorf≈Trump/USA · cygne≈Macron/France · bebe≈Kim/Corée du Nord ·
+timonier≈Xi/Chine · sultan≈Erdoğan/Turquie · gourou≈Modi/Inde · capitaine≈Bolsonaro/Brésil ·
 faucon≈Netanyahou/composite Israël · safran≈composite Iran.
 
 ### Pistes de relations réelles (transposées) pour choisir Volley vs Bombe
-- **Bourassie (vladou)** : conflit ouvert avec l'Ouest (Cygne, Faucon) → *bombe* ; entente froide avec Panguo, Ryonganie, Ramenie → *volley* ; rivalité-flatterie ambiguë avec Baron Dorf → *volley*.
-- **Baron Dorf (trompette)** : bravade/rivalité avec presque tous (*volley*), guerre commerciale avec le Timonier, « bromance » étrange avec Maréchal Bébé, tension d'alliance avec Le Cygne ; duel plus dur avec Le Safran (*bombe* possible).
-- **Le Cygne (micron)** : allié de l'Ouest (*volley*), friction Méditerranée/adhésion avec Le Sultan, clash écolo célèbre avec Le Capitaine (Amazonie !), *bombe* avec le Tsar.
+- **Bourassie (volkoi)** : conflit ouvert avec l'Ouest (Cygne, Faucon) → *bombe* ; entente froide avec Panguo, Ryonganie, Ramenie → *volley* ; rivalité-flatterie ambiguë avec Baron Dorf → *volley*.
+- **Baron Dorf (dorf)** : bravade/rivalité avec presque tous (*volley*), guerre commerciale avec le Timonier, « bromance » étrange avec Maréchal Bébé, tension d'alliance avec Le Cygne ; duel plus dur avec Le Safran (*bombe* possible).
+- **Le Cygne (cygne)** : allié de l'Ouest (*volley*), friction Méditerranée/adhésion avec Le Sultan, clash écolo célèbre avec Le Capitaine (Amazonie !), *bombe* avec le Tsar.
 - **Maréchal Bébé (bebe)** : nucléaire/isolé → beaucoup de *bombe* avec l'Ouest ; entente avec Panguo, Bourassie.
-- **Le Grand Timonier (panda)** : rivalité de frontière avec Le Gourou → *bombe* ; guerre froide commerciale avec Baron Dorf ; alliances Bourassie/Ryonganie.
+- **Le Grand Timonier (timonier)** : rivalité de frontière avec Le Gourou → *bombe* ; guerre froide commerciale avec Baron Dorf ; alliances Bourassie/Ryonganie.
 - **Le Sultan (sultan)** : tensions UE/Cygne, Méditerranée, dossiers régionaux.
-- **Le Gourou (yogi)** : conflit de crête avec Le Timonier (*bombe*), rivalités régionales.
-- **Le Capitaine (jair)** : Amazonie vs Cygne (le fameux clash — *bombe* ou volley musclé), style populiste.
+- **Le Gourou (gourou)** : conflit de crête avec Le Timonier (*bombe*), rivalités régionales.
+- **Le Capitaine (capitaine)** : Amazonie vs Cygne (le fameux clash — *bombe* ou volley musclé), style populiste.
 - **Le Faucon (faucon)** : Moyen-Orient → **grand duel *bombe* avec Le Safran** ; tensions multiples.
 - **Le Safran (safran)** : conflit avec Le Faucon (*bombe*) et Baron Dorf (*bombe*) ; ententes Bourassie/Panguo.
 

@@ -24,10 +24,10 @@ Son drapeau ne claque pas au vent ; il ondule. Rouge, comme les murs, comme les 
 
 ```js
 // =============================================================================
-// MODE HISTOIRE — Le Grand Timonier (panda) · « La Patience de l'Empire »
+// MODE HISTOIRE — Le Grand Timonier (timonier) · « La Patience de l'Empire »
 // left = "timonier" partout. À coller dans le STORY[] de src/story.js.
 // =============================================================================
-const STORY_PANDA = [
+const STORY_TIMONIER = [
   // ===================== ACTE I — L'harmonie des vassaux (Volley) ==============
   {
     act: 1, title: "Le petit frère", sub: "Panguo–Ryonganie · parrainage & défilés",

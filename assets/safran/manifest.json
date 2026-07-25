@@ -1,7 +1,7 @@
 {
   "anims": {
     "idle_face": 1,
-    "idle": 1,
+    "idle": 2,
     "walk": 4,
     "jump": 3,
     "receive": 2,
@@ -19,5 +19,5 @@
     "dx": 19.8,
     "dy": -32.9
   },
-  "notes": "Full 27-frame regen casting look (2026-07-22), walk\u00d74 distinct, Voile d'Or super."
+  "notes": "Full 27-frame Le Safran regen, identity locked to idle_0; walk\u00d74 distinct."
 }

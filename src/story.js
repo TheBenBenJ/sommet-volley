@@ -383,7 +383,12 @@ function storySelectChapter(i) {
     return;
   }
   storyChapter = i;
-  if (storyIsActStart(i)) { storyActActive = STORY[i].act; state = "storyActIntro"; storySceneFrame = 0; }
+  if (storyIsActStart(i)) {
+    storyActActive = STORY[i].act;
+    state = "storyActIntro";
+    storySceneFrame = 0;
+    if (typeof sfxStory === "function") sfxStory("act");
+  }
   else storyBeginScene("pre");
 }
 function storyIsActStart(i) { return i === 0 || STORY[i].act !== STORY[i - 1].act; }
@@ -397,6 +402,10 @@ function storyBeginScene(phase) {
   storySceneFrame = 0;
   storyActive = true;
   state = "storyScene";
+  if (typeof sfxStory === "function") {
+    if (phase === "win") sfxStory("win");
+    else if (phase === "lose") sfxStory("lose");
+  }
 }
 
 // Avance le dialogue : 1er appui = révèle toute la ligne ; 2e = ligne suivante ;
@@ -415,7 +424,8 @@ function storyAdvanceScene() {
     storyScene.idx++;
     storyScene.reveal = 0;
     storyScene.done = false;
-    beep(420, 0.03, "sine", 0.04);
+    if (typeof sfxStory === "function") sfxStory("blip");
+    else beep(420, 0.03, "sine", 0.04);
     return;
   }
   // fin de la scène
@@ -475,6 +485,7 @@ function storyOpenHub() {
   storyScene = null;
   navIdx = storyNavIdx;
   state = "storyMenu";
+  if (typeof sfxStory === "function") sfxStory("hub");
 }
 
 // Appelé par le handler "gameover" (menus.js) quand storyActive.

@@ -34,8 +34,10 @@ détail.
 - Les **fonds plein cadre** (`skyline.png`, `far.png`, `thumb.png`) ne sont PAS
   des props : ils ne se détourent pas (relève de `sommet-map`).
 
-Mapping `TERRAINS.key` → dossier : neige→vladou, plage→trompette, prairie→micron,
-parade→bebe ; matin/bosphore/ashram/amazon = même nom.
+Mapping `TERRAINS.key` → dossier `assets/maps/<key>/` : les clés et dossiers
+sont alignés (`place-ecarlate`, `country-club-dore`, `palais-du-coq`,
+`esplanade-du-defile`, `cite-du-matin`, `pont-des-deux-mondes`, `stade-ashram`,
+`grande-foret`, `citadelle-du-levant`, `jardin-des-roses`).
 
 ## Catalogue COMPLET — tout ce dont une map a besoin en plus de la skyline
 
@@ -56,14 +58,14 @@ Mêmes noms de fichier partout. La colonne « Source » dit qui le fabrique.
   se contente de `skyline` seule. Ne l'ajouter que si on veut vraiment un plan
   arrière distinct.
 
-Props d'événement existants (gabarits) : `carpet` (tapis, bosphore), `falcon`
-(faucon, colline), `pigeon` (micron), `marchers_0/1` (cortège), `cannon` +
+Props d'événement existants (gabarits) : `carpet` (tapis, pont-des-deux-mondes), `falcon`
+(faucon, citadelle-du-levant), `pigeon` (cygne), `marchers_0/1` (cortège), `cannon` +
 `cannon_fire`, `snowman`, `radar_0/1`, `cow`, `macaw`, `lantern`, `whistle`.
 Un nouvel événement = un nouveau nom de prop (à déclarer, cf. étape 4).
 
 ## Étape 0 — AUTO-DÉTECTION (piloter le skill par le seul nom de map)
 
-Invoqué avec une clé de map (`/sommet-decor bosphore`), l'agent déduit **tout seul**
+Invoqué avec une clé de map (`/sommet-decor pont-des-deux-mondes`), l'agent déduit **tout seul**
 quoi générer — ne rien demander à l'utilisateur, tout est dans le repo :
 
 1. **Thème + nom** de la map : entrée `MAPS` dans `tools/genassets/casting.py`

@@ -29,8 +29,8 @@ rencontrée doit être corrigée ICI, pas contournée en douce.
 ## Étape 0 — Fiche personnage (à remplir AVANT tout pixel)
 
 ```yaml
-key: vladou                 # identifiant technique (dossier assets/, roster)
-name: "Tsar Vladou"         # nom affiché (parodique, jamais le vrai nom)
+key: volkoi                 # identifiant technique (dossier assets/, roster)
+name: "Tsar Volkoï"         # nom affiché (parodique, jamais le vrai nom)
 pays_theme: "Russie — hiver, ours, parade"
 silhouette: "petit, massif, torse bombé, chemise ouverte, regard d'acier"
 palette: ["#b43a2e", "#e8d9b0", "#3a3f4a"]   # 3 tons dominants max
