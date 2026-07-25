@@ -195,7 +195,7 @@ test("roster : Le Faucon (Citadelle du Levant) est jouable", () => {
   assert.strictEqual(g.CHARACTERS[i].name, "Le Faucon");
   assert.ok(g.CHARACTERS[i].egoCharge, "egoCharge");
   const col = g.TERRAINS.find(t => t.key === "citadelle-du-levant");
-  assert.ok(col, "terrain colline");
+  assert.ok(col, "terrain citadelle-du-levant");
   assert.strictEqual(col.character, i, "public Citadelle = Faucon");
 });
 
@@ -225,6 +225,28 @@ test("roster : noms fictionnalisés (casting Steam)", () => {
   assert.strictEqual(maps["cite-du-matin"], "Cité du Matin");
   assert.strictEqual(maps["pont-des-deux-mondes"], "Pont des Deux Mondes");
   assert.strictEqual(maps["grande-foret"], "Grande Forêt");
+});
+
+test("audio : musique par terrain + pack SFX sur disque", () => {
+  const fs = require("fs");
+  const path = require("path");
+  const g = loadGame();
+  assert.ok(typeof g.musicForTerrain === "function", "musicForTerrain exposé");
+  for (const t of g.TERRAINS) {
+    const url = g.musicForTerrain(t.key);
+    assert.ok(url.includes(t.key) || url.includes("mayor-parade"), t.key + " → " + url);
+    const rel = url.replace(/^assets\//, "");
+    const abs = path.join(__dirname, "..", "assets", rel);
+    // Convention maps/<key>.mp3 (fallback parade OK si manquant)
+    const mapPath = path.join(__dirname, "..", "assets", "audio", "maps", t.key + ".mp3");
+    assert.ok(fs.existsSync(mapPath) || fs.existsSync(abs), "fichier musique " + t.key);
+  }
+  const man = path.join(__dirname, "..", "assets", "audio", "manifest.json");
+  assert.ok(fs.existsSync(man), "manifest.json");
+  const j = JSON.parse(fs.readFileSync(man, "utf8"));
+  assert.ok(j.maps && Object.keys(j.maps).length >= 10, "10 maps dans manifest");
+  assert.ok(j.sfx && j.sfx.hit && j.sfx.smash, "SFX core");
+  assert.ok(j.story && j.story.hub, "stingers story");
 });
 
 test("sprites : défaut walk = 4 frames (packs walk_0..3)", () => {
@@ -296,7 +318,7 @@ test("météo : flavor snow/sand/rain selon terrain", () => {
   assert.strictEqual(g.weatherFlavor(), "rain");
 });
 
-test("météo : plage et roseraie ne sont plus bloquées au clear", () => {
+test("météo : country-club-dore et jardin-des-roses ne sont plus bloquées au clear", () => {
   const g = loadGame();
   const byKey = Object.fromEntries(g.TERRAINS.map((t, i) => [t.key, i]));
   for (const key of ["country-club-dore", "jardin-des-roses"]) {
@@ -925,19 +947,19 @@ test("V2 : service aérien (smash) — passe aussi le filet", () => {
   assert.strictEqual(g.scores[1], 0, "pas de faute filet en smash de service");
 });
 
-test("V2 : service aérien — plus de punch qu'au sol (Yogi)", () => {
+test("V2 : service aérien — plus de punch qu'au sol (Gourou)", () => {
   const g = loadGame();
   const C = g.consts;
   const N0 = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
-  const yogi = g.CHARACTERS.findIndex(c => c.key === "gourou");
-  assert.ok(yogi >= 0, "Yogi présent");
+  const gourouIdx = g.CHARACTERS.findIndex(c => c.key === "gourou");
+  assert.ok(gourouIdx >= 0, "Gourou présent");
 
   function hit(aerial) {
     g.setVsAI(true); g.setAiLevel(1);
     g.newGame(77);
     g.setServingSide(0);
     g.setState("play"); g.setServeCountdown(0);
-    g.blobL.charId = yogi;
+    g.blobL.charId = gourouIdx;
     g.blobL.x = 280;
     // Assez haut pour le vrai smash de service (balle proche du bandeau)
     g.blobL.y = aerial ? C.GROUND_Y - 120 : C.GROUND_Y;
@@ -961,19 +983,19 @@ test("V2 : service aérien — plus de punch qu'au sol (Yogi)", () => {
   const air = hit(true);
   assert.ok(air.spd > ground.spd + 0.4, "smash aérien plus rapide que cloche sol");
   assert.ok(air.vx > ground.vx + 2, "smash aérien plus de composante avant");
-  assert.ok(g.CHARACTERS[yogi].power >= 1.06, "Yogi n'est plus sous-puissance");
+  assert.ok(g.CHARACTERS[gourouIdx].power >= 1.06, "Gourou n'est plus sous-puissance");
 });
 
-test("V2 : smash sous le bandeau — passe le filet (Yogi milieu de court)", () => {
+test("V2 : smash sous le bandeau — passe le filet (Gourou milieu de court)", () => {
   const g = loadGame();
   const C = g.consts;
   const N0 = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
-  const yogi = g.CHARACTERS.findIndex(c => c.key === "gourou");
+  const gourouIdx = g.CHARACTERS.findIndex(c => c.key === "gourou");
   g.setVsAI(true); g.setAiLevel(0);
   g.newGame(81);
   g.setServingSide(1);
   g.setState("play"); g.setServeCountdown(0);
-  g.blobL.charId = yogi;
+  g.blobL.charId = gourouIdx;
   g.blobL.x = 300; g.blobL.y = C.GROUND_Y - 75; g.blobL.onGround = false;
   g.blobL.lastActiveHitTick = -999;
   g.blobR.x = C.W - 40;
@@ -991,7 +1013,7 @@ test("V2 : smash sous le bandeau — passe le filet (Yogi milieu de court)", () 
     if (g.ball.x > C.NET_X + 20 && g.ball.y < C.NET_TOP) { cleared = true; break; }
     if (g.getState() === "point") break;
   }
-  assert.ok(cleared, "smash Yogi sous le bandeau doit passer le filet");
+  assert.ok(cleared, "smash Gourou sous le bandeau doit passer le filet");
   assert.strictEqual(g.scores[1], 0, "pas de faute filet");
 });
 

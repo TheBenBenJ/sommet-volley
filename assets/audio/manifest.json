@@ -1,0 +1,177 @@
+{
+  "version": 1,
+  "fallbackMusic": "mayor-parade.mp3",
+  "musicGain": 0.32,
+  "maps": {
+    "place-ecarlate": {
+      "file": "maps/place-ecarlate.mp3",
+      "gain": 0.32,
+      "loop": true
+    },
+    "country-club-dore": {
+      "file": "maps/country-club-dore.mp3",
+      "gain": 0.32,
+      "loop": true
+    },
+    "palais-du-coq": {
+      "file": "maps/palais-du-coq.mp3",
+      "gain": 0.32,
+      "loop": true
+    },
+    "esplanade-du-defile": {
+      "file": "maps/esplanade-du-defile.mp3",
+      "gain": 0.32,
+      "loop": true
+    },
+    "cite-du-matin": {
+      "file": "maps/cite-du-matin.mp3",
+      "gain": 0.32,
+      "loop": true
+    },
+    "pont-des-deux-mondes": {
+      "file": "maps/pont-des-deux-mondes.mp3",
+      "gain": 0.32,
+      "loop": true
+    },
+    "stade-ashram": {
+      "file": "maps/stade-ashram.mp3",
+      "gain": 0.32,
+      "loop": true
+    },
+    "grande-foret": {
+      "file": "maps/grande-foret.mp3",
+      "gain": 0.32,
+      "loop": true
+    },
+    "citadelle-du-levant": {
+      "file": "maps/citadelle-du-levant.mp3",
+      "gain": 0.32,
+      "loop": true
+    },
+    "jardin-des-roses": {
+      "file": "maps/jardin-des-roses.mp3",
+      "gain": 0.32,
+      "loop": true
+    }
+  },
+  "sfx": {
+    "hit": {
+      "file": "sfx/hit.mp3",
+      "gain": 1.0
+    },
+    "smash": {
+      "file": "sfx/smash.mp3",
+      "gain": 1.0
+    },
+    "wall": {
+      "file": "sfx/wall.mp3",
+      "gain": 1.0
+    },
+    "net": {
+      "file": "sfx/net.mp3",
+      "gain": 1.0
+    },
+    "point": {
+      "file": "sfx/point.mp3",
+      "gain": 1.0
+    },
+    "match_win": {
+      "file": "sfx/match_win.mp3",
+      "gain": 1.0
+    },
+    "battle_start": {
+      "file": "sfx/battle_start.mp3",
+      "gain": 1.0
+    },
+    "battle_end": {
+      "file": "sfx/battle_end.mp3",
+      "gain": 1.0
+    },
+    "bomb_tick": {
+      "file": "sfx/bomb_tick.mp3",
+      "gain": 1.0
+    },
+    "bomb_blast": {
+      "file": "sfx/bomb_blast.mp3",
+      "gain": 1.0
+    },
+    "jump": {
+      "file": "sfx/jump.mp3",
+      "gain": 1.0
+    },
+    "cannon_warn": {
+      "file": "sfx/cannon_warn.mp3",
+      "gain": 1.0
+    },
+    "cannon_fire": {
+      "file": "sfx/cannon_fire.mp3",
+      "gain": 1.0
+    },
+    "cannon_hit": {
+      "file": "sfx/cannon_hit.mp3",
+      "gain": 1.0
+    },
+    "warn": {
+      "file": "sfx/event_warn.mp3",
+      "gain": 1.0
+    },
+    "cannon_impact": {
+      "file": "sfx/event_cannon_impact.mp3",
+      "gain": 1.0
+    },
+    "cart": {
+      "file": "sfx/event_cart.mp3",
+      "gain": 1.0
+    },
+    "macaw": {
+      "file": "sfx/event_macaw.mp3",
+      "gain": 1.0
+    },
+    "peacock": {
+      "file": "sfx/event_peacock.mp3",
+      "gain": 1.0
+    },
+    "lantern": {
+      "file": "sfx/event_lantern.mp3",
+      "gain": 1.0
+    },
+    "carpet": {
+      "file": "sfx/event_carpet.mp3",
+      "gain": 1.0
+    },
+    "cow": {
+      "file": "sfx/event_cow.mp3",
+      "gain": 1.0
+    },
+    "radar": {
+      "file": "sfx/event_radar.mp3",
+      "gain": 1.0
+    },
+    "march": {
+      "file": "sfx/event_march.mp3",
+      "gain": 1.0
+    }
+  },
+  "story": {
+    "hub": {
+      "file": "story/hub.mp3",
+      "gain": 0.9
+    },
+    "act": {
+      "file": "story/act.mp3",
+      "gain": 0.9
+    },
+    "win": {
+      "file": "story/win.mp3",
+      "gain": 0.9
+    },
+    "lose": {
+      "file": "story/lose.mp3",
+      "gain": 0.9
+    },
+    "blip": {
+      "file": "story/blip.mp3",
+      "gain": 0.9
+    }
+  }
+}

@@ -7,6 +7,8 @@ let audioCtx = null;
 // main.js) : tous les sons/la musique passent par ce gain unique, pour
 // qu'un seul réglage contrôle tout au lieu de recalculer chaque volume.
 let volume = 1;
+/** Volume musique seul (0..1), multiplié au gain piste — indépendant des SFX. */
+let musicVolume = 1;
 let masterGain = null;
 function ensureAudio() {
   if (!audioCtx) {
@@ -23,6 +25,11 @@ function setVolume(v) {
   if (masterGain) masterGain.gain.value = volume;
   saveSettings();
 }
+function setMusicVolume(v) {
+  musicVolume = Math.max(0, Math.min(1, v));
+  applyMusicGain();
+  saveSettings();
+}
 
 // ---------- Réglages persistés (son/musique/volume) ----------
 // Simple confort : sans ça, on repart à zéro (son ON, 100%) à chaque
@@ -34,7 +41,7 @@ const SETTINGS_KEY = "sommetVolleySettings";
 const SETTINGS_KEY_LEGACY = "crabbyVolleySettings";
 function saveSettings() {
   try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ muted, musicOn, volume }));
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ muted, musicOn, volume, musicVolume }));
   } catch (e) { /* navigation privée, quota dépassé… tant pis, pas bloquant */ }
 }
 function loadSettings() {
@@ -45,6 +52,7 @@ function loadSettings() {
     if (typeof s.muted === "boolean") muted = s.muted;
     if (typeof s.musicOn === "boolean") musicOn = s.musicOn;
     if (typeof s.volume === "number") volume = Math.max(0, Math.min(1, s.volume));
+    if (typeof s.musicVolume === "number") musicVolume = Math.max(0, Math.min(1, s.musicVolume));
   } catch (e) { /* réglages corrompus/absents : on garde les valeurs par défaut */ }
 }
 
@@ -90,6 +98,7 @@ function noiseBurst(dur = 0.05, vol = 0.14, freq = 1200, q = 0.9, delay = 0) {
 /** Thump basse + slap peaux — réception / touche. */
 function sfxBallHit() {
   if (muted || noFx) return;
+  if (playSfxBuffer("hit")) return;
   try {
     ensureAudio();
     const t = audioCtx.currentTime;
@@ -108,6 +117,7 @@ function sfxBallHit() {
 /** Smash : crack + corps grave. */
 function sfxBallSmash() {
   if (muted || noFx) return;
+  if (playSfxBuffer("smash")) return;
   try {
     ensureAudio();
     const t = audioCtx.currentTime;
@@ -126,18 +136,21 @@ function sfxBallSmash() {
 
 function sfxBallWall() {
   if (muted || noFx) return;
+  if (playSfxBuffer("wall")) return;
   noiseBurst(0.04, 0.1, 2400, 1.4);
   beep(300, 0.05, "triangle", 0.07);
 }
 
 function sfxBallNet() {
   if (muted || noFx) return;
+  if (playSfxBuffer("net")) return;
   noiseBurst(0.08, 0.09, 900, 2.2);
   beep(200, 0.06, "triangle", 0.06);
 }
 
 function sfxPoint(side) {
   if (muted || noFx) return;
+  if (playSfxBuffer("point")) return;
   const f0 = side === 0 ? 660 : 550;
   beep(f0, 0.12, "sine", 0.14);
   beep(f0 * 1.25, 0.18, "triangle", 0.11, 0.08);
@@ -146,6 +159,7 @@ function sfxPoint(side) {
 
 function sfxMatchWin() {
   if (muted || noFx) return;
+  if (playSfxBuffer("match_win")) return;
   beep(523, 0.12, "triangle", 0.12);
   beep(659, 0.12, "triangle", 0.12, 0.1);
   beep(784, 0.22, "triangle", 0.14, 0.2);
@@ -153,6 +167,7 @@ function sfxMatchWin() {
 
 function sfxBattleStart() {
   if (muted || noFx) return;
+  if (playSfxBuffer("battle_start")) return;
   noiseBurst(0.06, 0.14, 2200, 1.1);
   beep(880, 0.1, "square", 0.12);
   beep(440, 0.22, "sawtooth", 0.08, 0.04);
@@ -160,18 +175,21 @@ function sfxBattleStart() {
 
 function sfxBattleEnd() {
   if (muted || noFx) return;
+  if (playSfxBuffer("battle_end")) return;
   beep(180, 0.35, "sawtooth", 0.18);
   noiseBurst(0.12, 0.12, 400, 0.7);
 }
 
 function sfxBombTick() {
   if (muted || noFx) return;
+  if (playSfxBuffer("bomb_tick")) return;
   noiseBurst(0.03, 0.08, 2800, 2.5);
   beep(880, 0.04, "square", 0.07);
 }
 
 function sfxBombBlast() {
   if (muted || noFx) return;
+  if (playSfxBuffer("bomb_blast")) return;
   try {
     ensureAudio();
     const t = audioCtx.currentTime;
@@ -190,12 +208,14 @@ function sfxBombBlast() {
 
 function sfxCannonWarn() {
   if (muted || noFx) return;
+  if (playSfxBuffer("cannon_warn") || playSfxBuffer("warn")) return;
   beep(220, 0.14, "triangle", 0.11);
   beep(280, 0.2, "triangle", 0.09, 0.14);
 }
 
 function sfxCannonFire() {
   if (muted || noFx) return;
+  if (playSfxBuffer("cannon_fire")) return;
   try {
     ensureAudio();
     const t = audioCtx.currentTime;
@@ -214,9 +234,21 @@ function sfxCannonFire() {
 
 function sfxCannonHit() {
   if (muted || noFx) return;
+  if (playSfxBuffer("cannon_hit") || playSfxBuffer("cannon_impact")) return;
   noiseBurst(0.08, 0.16, 1400, 1.0);
   beep(320, 0.1, "triangle", 0.1);
   beep(180, 0.14, "sine", 0.08, 0.04);
+}
+
+/** Stingers mode Histoire (hub / acte / win / lose / blip). Fallback : silence ou bip léger. */
+function sfxStory(kind) {
+  if (muted || noFx) return;
+  if (playSfxBuffer(kind, "story")) return;
+  if (kind === "blip") beep(420, 0.03, "sine", 0.04);
+  else if (kind === "win") sfxMatchWin();
+  else if (kind === "lose") { beep(220, 0.2, "triangle", 0.1); beep(160, 0.28, "sine", 0.08, 0.12); }
+  else if (kind === "act") { beep(180, 0.12, "sawtooth", 0.1); beep(240, 0.18, "triangle", 0.08, 0.1); }
+  else if (kind === "hub") { beep(330, 0.1, "sine", 0.08); beep(392, 0.12, "sine", 0.07, 0.1); }
 }
 
 // "ola" : foule plus pleine (deux bandes + grave).
@@ -331,18 +363,121 @@ function sfxVladouSuper() {
   } catch (e) { /* audio non dispo */ }
 }
 
-// ---------- Musique de fond (MP3 bouclé) ----------
-// « The Mayor's Morning Parade » — marche / fanfare (Gemini). Toggle N, mute M.
+// ---------- Pack audio (manifest + buffers SFX + musique par map) ----------
+const AUDIO_BASE = "assets/audio/";
+const MUSIC_GAIN = 0.32;
+let audioManifest = null;
+let audioManifestPromise = null;
+const sfxBuffers = Object.create(null); // name → AudioBuffer | null (null = failed)
+const sfxLoading = Object.create(null);
+
+function loadAudioManifest() {
+  if (audioManifestPromise) return audioManifestPromise;
+  if (typeof fetch !== "function") {
+    audioManifestPromise = Promise.resolve(null);
+    return audioManifestPromise;
+  }
+  audioManifestPromise = fetch(AUDIO_BASE + "manifest.json")
+    .then(r => (r.ok ? r.json() : null))
+    .then(j => { audioManifest = j; return j; })
+    .catch(() => { audioManifest = null; return null; });
+  return audioManifestPromise;
+}
+
+/** URL musique pour une clé `TERRAINS.key` (fallback parade historique). */
+function musicForTerrain(key) {
+  const maps = audioManifest && audioManifest.maps;
+  if (key && maps && maps[key] && maps[key].file) {
+    return AUDIO_BASE + maps[key].file;
+  }
+  if (key) return AUDIO_BASE + "maps/" + key + ".mp3";
+  const fb = (audioManifest && audioManifest.fallbackMusic) || "mayor-parade.mp3";
+  return AUDIO_BASE + fb;
+}
+
+function sfxEntry(name, section) {
+  if (!audioManifest) return null;
+  if (section === "story" && audioManifest.story && audioManifest.story[name]) {
+    return audioManifest.story[name];
+  }
+  if (audioManifest.sfx && audioManifest.sfx[name]) return audioManifest.sfx[name];
+  if (audioManifest.story && audioManifest.story[name]) return audioManifest.story[name];
+  return null;
+}
+
+function loadSfx(name, section) {
+  if (sfxBuffers[name] !== undefined) return Promise.resolve(sfxBuffers[name]);
+  if (sfxLoading[name]) return sfxLoading[name];
+  const entry = sfxEntry(name, section);
+  if (!entry || !entry.file || typeof fetch !== "function") {
+    sfxBuffers[name] = null;
+    return Promise.resolve(null);
+  }
+  sfxLoading[name] = fetch(AUDIO_BASE + entry.file)
+    .then(r => {
+      if (!r.ok) throw new Error("sfx " + name);
+      return r.arrayBuffer();
+    })
+    .then(ab => {
+      ensureAudio();
+      return audioCtx.decodeAudioData(ab.slice(0));
+    })
+    .then(buf => {
+      sfxBuffers[name] = buf;
+      delete sfxLoading[name];
+      return buf;
+    })
+    .catch(() => {
+      sfxBuffers[name] = null;
+      delete sfxLoading[name];
+      return null;
+    });
+  return sfxLoading[name];
+}
+
+/** Joue un buffer préchargé ; false → caller doit fallback synth. */
+function playSfxBuffer(name, section) {
+  const buf = sfxBuffers[name];
+  if (!buf) {
+    loadSfx(name, section); // warm cache for next time
+    return false;
+  }
+  try {
+    ensureAudio();
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    const g = audioCtx.createGain();
+    const entry = sfxEntry(name, section);
+    const vol = entry && typeof entry.gain === "number" ? entry.gain : 1;
+    g.gain.value = vol;
+    src.connect(g); g.connect(masterGain);
+    src.start(0);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function preloadAudioPack() {
+  loadAudioManifest().then(m => {
+    if (!m) return;
+    const names = Object.keys(m.sfx || {});
+    for (const n of names) loadSfx(n, "sfx");
+    for (const n of Object.keys(m.story || {})) loadSfx(n, "story");
+  });
+}
+
+// ---------- Musique de fond (MP3 bouclé, une piste par map) ----------
 let musicOn = true;
 let musicEl = null;
 let musicNode = null;
 let musicGain = null;
-const MUSIC_URL = "assets/audio/mayor-parade.mp3";
-const MUSIC_GAIN = 0.32; // sous les SFX, assez présent pour la profondeur du mix
+let musicTerrainKey = null;
+let musicSwitchTimer = null;
 
 function ensureMusicEl() {
   if (musicEl) return musicEl;
-  musicEl = new Audio(MUSIC_URL);
+  musicEl = new Audio();
   musicEl.loop = true;
   musicEl.preload = "auto";
   musicEl.crossOrigin = "anonymous";
@@ -354,25 +489,83 @@ function ensureMusicGraph() {
   ensureMusicEl();
   if (!musicGain) {
     musicGain = audioCtx.createGain();
-    musicGain.gain.value = MUSIC_GAIN;
+    musicGain.gain.value = MUSIC_GAIN * musicVolume;
     musicGain.connect(masterGain);
   }
-  // createMediaElementSource ne peut être appelé qu'une fois par élément
   if (!musicNode) {
     musicNode = audioCtx.createMediaElementSource(musicEl);
     musicNode.connect(musicGain);
   }
 }
 
+function applyMusicGain(mapKey) {
+  if (!musicGain || !audioCtx) return;
+  const maps = audioManifest && audioManifest.maps;
+  let base = (audioManifest && typeof audioManifest.musicGain === "number")
+    ? audioManifest.musicGain
+    : MUSIC_GAIN;
+  if (mapKey && maps && maps[mapKey] && typeof maps[mapKey].gain === "number") {
+    base = maps[mapKey].gain;
+  }
+  musicGain.gain.setTargetAtTime(base * musicVolume, audioCtx.currentTime, 0.05);
+}
+
+function setMusicTerrain(key) {
+  if (!key) return;
+  const url = musicForTerrain(key);
+  ensureMusicGraph();
+  if (musicTerrainKey === key && musicEl.src && musicEl.src.indexOf(key) !== -1) {
+    applyMusicGain(key);
+    return;
+  }
+  musicTerrainKey = key;
+  const doSwap = () => {
+    try {
+      musicEl.loop = true;
+      musicEl.src = url;
+      musicEl.load();
+      applyMusicGain(key);
+      if (musicOn && !muted && audioCtx.state === "running") {
+        musicEl.play().catch(() => { /* geste utilisateur requis */ });
+      }
+    } catch (e) { /* ignore */ }
+  };
+  if (musicSwitchTimer) clearTimeout(musicSwitchTimer);
+  if (musicGain && audioCtx && musicEl.src) {
+    try {
+      musicGain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.04);
+    } catch (e) { /* ignore */ }
+    musicSwitchTimer = setTimeout(doSwap, 120);
+  } else {
+    doSwap();
+  }
+}
+
 function musicTick() {
   try {
     ensureMusicGraph();
+    loadAudioManifest();
   } catch (e) { return; }
+  // Piste selon le terrain courant (menus inclus).
+  try {
+    if (typeof TERRAINS !== "undefined" && typeof terrain === "number" && TERRAINS[terrain]) {
+      setMusicTerrain(TERRAINS[terrain].key);
+    }
+  } catch (e) { /* TERRAINS pas encore prêt */ }
   const want = musicOn && !muted && state !== "netError" && audioCtx.state === "running";
   if (want) {
     if (musicEl.paused) musicEl.play().catch(() => { /* geste utilisateur requis */ });
   } else if (musicEl && !musicEl.paused) {
     musicEl.pause();
+  }
+}
+
+// Précharge dès que possible (navigateur) ; no-op en tests Node.
+if (typeof window !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", preloadAudioPack);
+  } else {
+    preloadAudioPack();
   }
 }
 

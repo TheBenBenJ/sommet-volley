@@ -85,6 +85,8 @@ const EPILOGUE = `
   mapEventsCanStep: typeof mapEventsCanStep === "function" ? mapEventsCanStep : () => false,
   setTerrain: v => { terrain = Math.max(0, Math.min(TERRAINS.length - 1, v | 0)); },
   getTerrain: () => terrain,
+  musicForTerrain: typeof musicForTerrain === "function" ? musicForTerrain : null,
+  loadAudioManifest: typeof loadAudioManifest === "function" ? loadAudioManifest : null,
   weatherFlavor: typeof weatherFlavor === "function" ? weatherFlavor : () => "rain",
   stepWeather: typeof stepWeather === "function" ? stepWeather : () => {},
   resetWeather: typeof resetWeather === "function" ? resetWeather : () => {},
