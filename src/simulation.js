@@ -107,14 +107,17 @@ function maybeActivateSuper(blob, input) {
   crowdHype = Math.max(crowdHype, 45);
   spawnSuperBurst(blob);
   superSound(a.key);
-  if (a.key === "volkoi" || a.key === "gourou" || a.key === "safran") {
-    // Hiver Général / Méditation / Voile d’Or : gèle le camp adverse
+  if (a.key === "volkoi" || a.key === "gourou") {
+    // Hiver Général / Méditation : gèle le camp adverse
     superEffects.push({ kind: "ice", side: 1 - blob.side, t: blob.superT });
+  } else if (a.key === "safran") {
+    // Voile d’Or : ralentit les courses (pas de glisse)
+    superEffects.push({ kind: "slow", side: 1 - blob.side, t: blob.superT });
   } else if (a.key === "dorf" || a.key === "timonier" || a.key === "capitaine") {
     // Le Mur / Grande Muraille / Déforestation
     superEffects.push({ kind: "wall", side: 1 - blob.side, t: blob.superT });
   } else if (a.key === "cygne") {
-    // Passage en Force : frappes immunisées au smash adverse (voir trySmashBall)
+    // Passage en Force : frappes immunisées + punch (voir trySmashBall / applyDirectedHit)
     blob.superSmash = false;
   } else if (a.key === "bebe" || a.key === "sultan" || a.key === "faucon") {
     // Batterie AA / Séisme / Raid Éclair : interdit de sauter au camp adverse
@@ -174,6 +177,16 @@ function tickBomb() {
 // stepGame(inL, inR)                    → 1v1 / online
 // stepGame(null, null, ins)             → 2v2
 // stepGame(inL, inR, null, {skipBall})  → online 1v1 : corps seuls (balle chez l'invité)
+function tickPowerGauge() {
+  if (typeof powerGauge === "undefined" || typeof POWER_GAUGE_MAX === "undefined") return;
+  if (powerWindup || state !== "play" || ball.frozen || ball.popped) return;
+  for (let s = 0; s < 2; s++) {
+    if ((powerGauge[s] | 0) < POWER_GAUGE_MAX) {
+      powerGauge[s] = Math.min(POWER_GAUGE_MAX, (powerGauge[s] | 0) + 1);
+    }
+  }
+}
+
 function stepGame(inL, inR, ins, opts) {
   opts = opts || {};
   const skipBall = !!opts.skipBall;
@@ -182,6 +195,11 @@ function stepGame(inL, inR, ins, opts) {
   if (superFlashT > 0) superFlashT--;
   if (typeof mapEventFlashT !== "undefined" && mapEventFlashT > 0) mapEventFlashT--;
   if (battle.cooldown > 0) battle.cooldown--;
+  // Super Smash : freeze + dosage (comme Smash Battle, hors pipeline balle)
+  if (powerWindup && typeof stepPowerWindup === "function") {
+    stepPowerWindup(inL, inR, ins);
+    return;
+  }
   if (battle.active && !ins) {
     stepBattle(inL, inR);
     return; // le monde est figé pendant le duel (1v1 uniquement)
@@ -241,6 +259,7 @@ function stepGame(inL, inR, ins, opts) {
   if (bombMode) tickBomb();
   if (typeof tickSuperEffects === "function") tickSuperEffects();
   if (typeof stepMapEvent === "function") stepMapEvent();
+  if (!skipBall) tickPowerGauge();
   if (state === "serve" && !ball.frozen) state = "play";
 }
 

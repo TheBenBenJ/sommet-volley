@@ -9,5 +9,5 @@ stats: { vitesse: 3, detente: 2, puissance: 5, controle: 2 }
 trait_passif: "Tronçonneuse — puissance max, SUPER aussi en perdant"
 super:
   nom: "Déforestation"
-  effet: "mur de troncs camp adverse ~5 s"
+  effet: "mur de troncs camp adverse ~5,3 s"
 map: "Grande Forêt"

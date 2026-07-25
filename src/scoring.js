@@ -25,7 +25,7 @@ function awardPoint(side, reason) {
   for (const b of activeBlobs) {
     if (b.side !== 1 - side) continue;
     const a = charOf(b);
-    // Ego en béton (Trompette) : perdre un point charge aussi le SUPER
+    // Ego en béton (Dorf / Capitaine) : perdre un point charge aussi le SUPER
     // (désactivé pour l'adversaire en tutoriel)
     if (a.egoCharge && superCharge[b.side] === 0 && !(tutorialMode && b.side !== 0)) {
       superCharge[b.side] = 1;
@@ -46,9 +46,9 @@ function awardPoint(side, reason) {
     }
   }
 
-  // combo : points d'affilée → charge le SUPER
+  // combo : points d'affilée → charge le SUPER (tous : SUPER_NEED ;
+  // clapDouble réservé si un perso le réactive un jour)
   streak[side]++; streak[1 - side] = 0;
-  // Applaudissements (Bébé) : SUPER en 2 points d'affilée
   let need = SUPER_NEED;
   for (const b of activeBlobs) {
     if (b.side === side && charOf(b).clapDouble) { need = 2; break; }
@@ -112,6 +112,7 @@ function awardPoint(side, reason) {
 function startRally() {
   for (const b of activeBlobs) b.reset();
   if (typeof superEffects !== "undefined") superEffects.length = 0;
+  if (typeof powerWindup !== "undefined") powerWindup = null;
   ball.reset(servingSide);
   battle.active = false;
   battle.t = 0;

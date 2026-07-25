@@ -890,19 +890,20 @@ function drawMapEventCrosser(kind) {
     drawMapProp(pack.cow, 0, onCourt ? GROUND_Y + 8 : GROUND_Y - 98,
       onCourt ? PROP_H.cow : PROP_H.cowIdle);
   } else if (kind === "falcon") {
-    // Faucon en vol horizontal au-dessus du terrain.
+    // Faucon en vol horizontal au-dessus du terrain (PROP_H.falcon ≈ perso).
     if (pack && spriteReady(pack.falcon)) {
-      drawMapProp(pack.falcon, 0, GROUND_Y - 70, PROP_H.falcon);
+      drawMapProp(pack.falcon, 0, GROUND_Y - 48, PROP_H.falcon);
     } else {
       // Fallback canvas tant que falcon.png n'existe pas (sommet-decor) : silhouette d'oiseau.
-      const y = GROUND_Y - 100, wf = Math.sin(t2() * 10) * 6;
+      const y = GROUND_Y - 110, wf = Math.sin(t2() * 10) * 8;
       ctx.strokeStyle = "#2b2b33"; ctx.lineWidth = 5; ctx.lineCap = "round";
       ctx.beginPath();
-      ctx.moveTo(-26, y + wf); ctx.quadraticCurveTo(-8, y - 12, 0, y);
-      ctx.quadraticCurveTo(8, y - 12, 26, y + wf);
+      ctx.lineWidth = 7;
+      ctx.moveTo(-42, y + wf); ctx.quadraticCurveTo(-12, y - 20, 0, y);
+      ctx.quadraticCurveTo(12, y - 20, 42, y + wf);
       ctx.stroke();
       ctx.fillStyle = "#2b2b33";
-      ctx.beginPath(); ctx.ellipse(0, y + 1, 5, 3, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(0, y + 1, 8, 5, 0, 0, Math.PI * 2); ctx.fill();
     }
   } else if (kind === "peacock") {
     // Paon qui traverse la cour.
@@ -1872,10 +1873,24 @@ function drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph) {
   } else if (superFlashT > 0 && superFlash) {
     title = superFlash;
     sub = superFlashSub || "";
-    fill = "#ffd84a";
+    fill = /SUPER SMASH/i.test(superFlash) ? "#ff6a2a" : "#ffd84a";
     alpha = Math.min(1, superFlashT / 36);
+  } else if (powerWindup) {
+    title = "SUPER SMASH";
+    sub = "Dose… " + Math.round((powerWindup.charge || 0) * 100) + "%";
+    fill = "#ff6a2a";
+    alpha = 1;
   } else if ((state === "play" || state === "serve") && serveCountdown <= 0) {
     for (const s of [0, 1]) {
+      if (typeof powerGauge !== "undefined" && typeof POWER_GAUGE_MAX !== "undefined" &&
+          (powerGauge[s] | 0) >= POWER_GAUGE_MAX) {
+        title = "Super Smash prêt — " + sideLabel(s);
+        sub = "Smash aérien (F / X) pour doser";
+        fill = "#ff6a2a";
+        break;
+      }
+    }
+    if (!title) for (const s of [0, 1]) {
       if (scores[s] >= matchWinScore() - 1 && scores[s] - scores[1 - s] >= 1) {
         title = "★ Balle de match — " + sideLabel(s) + " ★";
         fill = sideColor(s);
@@ -2005,7 +2020,7 @@ function drawHUD() {
     }
   }
 
-  // jauges SUPER — clairement sous le chiffre du score
+  // jauges SUPER (or) + Super Smash (orange) — sous le chiffre du score
   for (const s of [0, 1]) {
     const cx = s === 0 ? W * 0.22 : W * 0.78;
     const col = sideColor(s);
@@ -2025,6 +2040,26 @@ function drawHUD() {
       if (ctx.roundRect) ctx.roundRect(bx, by, Math.max(3, bw * frac), 6, 3);
       else ctx.rect(bx, by, bw * frac, 6);
       ctx.fill();
+    }
+    // Super Smash — barre fine au-dessus de la jauge SUPER
+    if (typeof powerGauge !== "undefined" && typeof POWER_GAUGE_MAX !== "undefined") {
+      const pby = by - 8;
+      const pReady = (powerGauge[s] | 0) >= POWER_GAUGE_MAX;
+      const pFrac = pReady ? 1 : (powerGauge[s] | 0) / POWER_GAUGE_MAX;
+      ctx.fillStyle = "rgba(27,23,48,0.18)";
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(bx, pby, bw, 4, 2); else ctx.rect(bx, pby, bw, 4);
+      ctx.fill();
+      if (pFrac > 0) {
+        if (pReady) {
+          const t = performance.now() / 220;
+          ctx.fillStyle = (Math.sin(t * 7) > 0) ? "#ff6a2a" : "#ffb070";
+        } else ctx.fillStyle = "rgba(255,120,50,0.85)";
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(bx, pby, Math.max(2, bw * pFrac), 4, 2);
+        else ctx.rect(bx, pby, bw * pFrac, 4);
+        ctx.fill();
+      }
     }
   }
 

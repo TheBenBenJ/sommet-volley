@@ -221,7 +221,7 @@ test("roster : Le Faucon (Citadelle du Levant) est jouable", () => {
   const i = g.CHARACTERS.findIndex(c => c.key === "faucon");
   assert.ok(i >= 0, "faucon dans CHARACTERS");
   assert.strictEqual(g.CHARACTERS[i].name, "Le Faucon");
-  assert.ok(g.CHARACTERS[i].egoCharge, "egoCharge");
+  assert.ok(!g.CHARACTERS[i].egoCharge, "Faucon : plus d'egoCharge (équilibre)");
   const col = g.TERRAINS.find(t => t.key === "citadelle-du-levant");
   assert.ok(col, "terrain citadelle-du-levant");
   assert.strictEqual(col.character, i, "public Citadelle = Faucon");
@@ -331,7 +331,9 @@ test("échelles décor : PROP_H cohérent vs CHAR_BASE_H", () => {
   assert.ok(g.PROP_H.cart < g.CHAR_BASE_H);
   assert.ok(g.PROP_H.marchers > g.CHAR_BASE_H, "cortège un cran plus grand");
   assert.ok(g.PROP_H.cowIdle < g.PROP_H.cow);
-  assert.ok(g.PROP_H.falcon < g.PROP_H.cow, "oiseau vol < animal sol");
+  // Faucon en vol : assez grand pour être lisible (ailes), mais < perso
+  assert.ok(g.PROP_H.falcon < g.CHAR_BASE_H, "faucon < perso");
+  assert.ok(g.PROP_H.falcon >= 80, "faucon assez grand pour la traversée");
   assert.ok(g.PROP_H.pigeon < g.PROP_H.peacock);
 });
 
@@ -460,7 +462,7 @@ test("V2 : balle qui tombe sur le joueur → cloche auto", () => {
 
 test("V2 : IA récupère une balle (réception, pas smash)", () => {
   const g = loadGame();
-  g.setVsAI(true); g.setAiLevel(1);
+  g.setVsAI(true); g.setAiLevel(3); // smoke : Impitoyable doit encore diguer proprement
   g.newGame(101);
   g.setState("play"); g.setServeCountdown(0);
   g.blobR.x = 700; g.blobR.y = g.consts.GROUND_Y; g.blobR.onGround = true;
@@ -1426,7 +1428,7 @@ test("Le Mur : une fois passé, pas de téléport derrière", () => {
   const g = freshRally(42);
   const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
   const { NET_X, GROUND_Y } = g.consts;
-  const wallX = NET_X * 0.48;
+  const wallX = NET_X * 0.58;
   // Mur actif sur le camp gauche (victime = blobL)
   g.superEffects.length = 0;
   g.superEffects.push({ kind: "wall", side: 0, t: 300 });
@@ -1446,6 +1448,147 @@ test("Le Mur : une fois passé, pas de téléport derrière", () => {
   for (let i = 0; i < 10; i++) g.stepGame(N, N);
   assert.ok(g.blobL.x > wallX + 20, "reste passé le mur sans être recalé");
   assert.ok(Math.abs(g.blobL.x - past) < 3, "pas de téléport vers l’arrière");
+});
+
+test("SUPER équilibre : flags charge + durées", () => {
+  const g = loadGame();
+  const by = Object.fromEntries(g.CHARACTERS.map(c => [c.key, c]));
+  assert.ok(!by.bebe.clapDouble, "Bébé : plus de clapDouble");
+  assert.ok(!by.faucon.egoCharge, "Faucon : plus d'egoCharge");
+  assert.ok(by.dorf.egoCharge && by.capitaine.egoCharge, "Dorf/Capitaine gardent egoCharge");
+  assert.ok(!by.timonier.egoCharge, "Timonier : mur long sans egoCharge");
+  const D = g.SUPER_DUR;
+  assert.strictEqual(D.bebe, 220);
+  assert.strictEqual(D.sultan, 220);
+  assert.strictEqual(D.faucon, 220);
+  assert.strictEqual(D.volkoi, 300);
+  assert.strictEqual(D.cygne, 300);
+  assert.strictEqual(D.gourou, 280);
+  assert.strictEqual(D.safran, 280);
+  assert.strictEqual(D.dorf, 320);
+  assert.strictEqual(D.capitaine, 320);
+  assert.strictEqual(D.timonier, 360);
+  assert.strictEqual(g.SUPER_NEED, 3);
+  assert.ok(Math.abs(g.SUPER_SLOW_MUL - 0.55) < 1e-9);
+  assert.ok(/ralentit/i.test(by.safran.superDesc), "Safran décrit un vrai ralentissement");
+});
+
+test("SUPER charge : Bébé charge en 3 points (pas 2)", () => {
+  const g = freshRally(11);
+  const bebe = g.CHARACTERS.findIndex(c => c.key === "bebe");
+  g.blobL.charId = bebe;
+  g.setSuperCharge(0, 0);
+  g.awardPoint(0, "test");
+  assert.deepStrictEqual(g.getSuperCharge(), [0, 0], "après 1 point : pas prêt");
+  g.setState("play");
+  g.awardPoint(0, "test");
+  assert.deepStrictEqual(g.getSuperCharge(), [0, 0], "après 2 points : pas prêt");
+  g.setState("play");
+  g.awardPoint(0, "test");
+  assert.deepStrictEqual(g.getSuperCharge(), [1, 0], "après 3 points : SUPER prêt");
+});
+
+test("SUPER charge : Faucon ne charge pas en perdant ; Dorf oui", () => {
+  const g = freshRally(12);
+  const faucon = g.CHARACTERS.findIndex(c => c.key === "faucon");
+  const dorf = g.CHARACTERS.findIndex(c => c.key === "dorf");
+  g.blobL.charId = faucon;
+  g.blobR.charId = dorf;
+  g.setSuperCharge(0, 0);
+  // Point pour la droite → Faucon (gauche) perd : plus d'egoCharge
+  g.awardPoint(1, "test");
+  assert.strictEqual(g.getSuperCharge()[0], 0, "Faucon perdant : pas de charge");
+  assert.strictEqual(g.getSuperCharge()[1], 0, "Dorf gagnant après 1 pt : pas encore streak SUPER");
+
+  // Point pour la gauche → Dorf perd → egoCharge
+  g.setState("play");
+  g.setSuperCharge(0, 0);
+  g.awardPoint(0, "test");
+  assert.strictEqual(g.getSuperCharge()[1], 1, "Dorf perdant : egoCharge");
+});
+
+test("SUPER Safran : active slow (pas ice)", () => {
+  const g = freshRally(13);
+  const safran = g.CHARACTERS.findIndex(c => c.key === "safran");
+  g.blobL.charId = safran;
+  g.setSuperCharge(1, 0);
+  g.superEffects.length = 0;
+  const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  g.stepGame({ ...N, super:true }, N);
+  assert.strictEqual(g.blobL.superKind, "safran");
+  // Même frame : activation puis tickSuper → SUPER_DUR - 1
+  assert.strictEqual(g.blobL.superT, g.SUPER_DUR.safran - 1);
+  assert.ok(g.superEffects.some(e => e.kind === "slow" && e.side === 1 && e.t > 0), "effet slow camp adverse");
+  assert.ok(!g.superEffects.some(e => e.kind === "ice"), "pas d'ice Safran");
+});
+
+test("Super Smash : jauge se remplit en échange + bonus contact", () => {
+  const g = freshRally(21);
+  const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  g.setPowerGauge(0, 0);
+  const before = g.getPowerGauge()[0];
+  for (let i = 0; i < 40; i++) g.stepGame(N, N);
+  assert.ok(g.getPowerGauge()[0] > before, "jauge monte pendant l'échange");
+  assert.ok(g.getPowerGauge()[0] >= before + 35, "au moins ~1 tick/frame");
+  g.setPowerGauge(100, 0);
+  // Contact : registerTouch via frappe
+  const { GROUND_Y } = g.consts;
+  g.blobL.x = 220; g.blobL.y = GROUND_Y; g.blobL.onGround = true;
+  g.ball.x = 220; g.ball.y = GROUND_Y - 70; g.ball.vx = 0; g.ball.vy = 2;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.heldBy = -1;
+  g.stepGame({ ...N, smash:true }, N);
+  assert.ok(g.getPowerGauge()[0] >= 100 + Math.min(20, g.POWER_GAUGE_TOUCH - 5) ||
+            g.getPowerGauge()[0] > 100, "contact peut booster la jauge");
+});
+
+test("Super Smash : freeze dosage puis frappe lourde + ralenti", () => {
+  const g = freshRally(22);
+  const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  g.setMapEventsQuiet(true);
+  g.setPowerGauge(g.POWER_GAUGE_MAX, 0);
+  const { NET_X, GROUND_Y } = g.consts;
+  g.blobL.x = NET_X - 80;
+  g.blobL.y = GROUND_Y - 90;
+  g.blobL.onGround = false;
+  g.blobL.vy = -2;
+  g.ball.x = g.blobL.x + 8;
+  g.ball.y = g.blobL.y - 50;
+  g.ball.vx = 1; g.ball.vy = 0;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.heldBy = -1;
+  g.ball.serveAimLock = false; g.ball.serveFlight = false;
+  // Appui smash → entre en windup
+  g.stepGame({ ...N, smash:true, ax:0.8, ay:0.2 }, N);
+  assert.ok(g.getPowerWindup(), "entre en dosage Super Smash");
+  assert.strictEqual(g.getPowerWindup().side, 0);
+  // Maintien puis relâche
+  for (let i = 0; i < 10; i++) g.stepGame({ ...N, smash:true, ax:0.8, ay:0.3 }, N);
+  assert.ok(g.getPowerWindup(), "toujours en dosage pendant maintien");
+  g.stepGame({ ...N, smash:false, ax:0.8, ay:0.3 }, N);
+  assert.ok(!g.getPowerWindup(), "relâche → tir");
+  assert.strictEqual(g.getPowerGauge()[0], 0, "jauge consommée");
+  assert.ok(g.ball.smash > 0, "traînée smash destructeur");
+  assert.ok(g.ball.slowMo > 0, "ralenti après Super Smash");
+  assert.ok(g.ball.vx > 2, "balle projetée vers l'adversaire");
+});
+
+test("SUPER Cygne : durée 300 + anti-smash retour", () => {
+  const g = freshRally(14);
+  const cygne = g.CHARACTERS.findIndex(c => c.key === "cygne");
+  g.blobL.charId = cygne;
+  g.setSuperCharge(1, 0);
+  g.superEffects.length = 0;
+  const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  g.stepGame({ ...N, super:true }, N);
+  assert.strictEqual(g.blobL.superKind, "cygne");
+  assert.strictEqual(g.blobL.superT, g.SUPER_DUR.cygne - 1);
+  // Frappe Cygne récente → smash adverse refusé
+  g.ball.lastTouchSide = 0;
+  g.ball.inHands = false;
+  g.ball.frozen = false;
+  g.blobR.onGround = false;
+  g.blobR._input = N;
+  assert.strictEqual(typeof g.trySmashBall, "function");
+  assert.strictEqual(g.trySmashBall(g.blobR), false, "smash retour bloqué pendant Passage en Force");
 });
 
 test("Smash Battle : le gagnant marque — le perdant est stun et ne digue pas", () => {

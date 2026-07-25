@@ -61,6 +61,11 @@ function registerTouch(blob) {
   if (newContact) {
     if (ball.lastTouchSide !== blob.side) ball.touches[blob.side] = 1;
     else ball.touches[blob.side]++;
+    // Super Smash : chaque contact propre accélère la jauge
+    if (typeof powerGauge !== "undefined" && typeof POWER_GAUGE_MAX !== "undefined") {
+      const bonus = typeof POWER_GAUGE_TOUCH === "number" ? POWER_GAUGE_TOUCH : 70;
+      powerGauge[blob.side] = Math.min(POWER_GAUGE_MAX, (powerGauge[blob.side] | 0) + bonus);
+    }
   }
   ball.lastTouchSide = blob.side;
   ball.lastTouchTick = tick;
@@ -69,6 +74,145 @@ function registerTouch(blob) {
     return;
   }
   if (flameMode && newContact) applyFlameBurn(blob);
+}
+
+function powerGaugeReady(side) {
+  return typeof powerGauge !== "undefined" && typeof POWER_GAUGE_MAX !== "undefined" &&
+    (powerGauge[side] | 0) >= POWER_GAUGE_MAX;
+}
+
+/** Peut déclencher un Super Smash (jauge pleine, échange, pas déjà en dosage). */
+function canStartPowerSmash(blob) {
+  if (!GAMEPLAY_V2) return false;
+  if (powerWindup) return false;
+  if (!powerGaugeReady(blob.side)) return false;
+  if (state !== "play") return false;
+  if (ball.frozen || ball.inHands || ball.popped) return false;
+  if (isServeHit(blob)) return false; // pas au service — trop fort
+  if (blob.onGround) return false;
+  return true;
+}
+
+function startPowerWindup(blob) {
+  if (!canStartPowerSmash(blob)) return false;
+  const ang = aimAngleFromInput(blob, blob._input || { ax: 0, ay: 0 });
+  // En ligne : pas de freeze (désync) — tir immédiat à charge moyenne
+  if (online) {
+    firePowerSmash(blob, 0.72, ang);
+    return true;
+  }
+  const held = !!(blob._input && blob._input.smash);
+  powerWindup = {
+    side: blob.side,
+    t: 0,
+    charge: 0.28,
+    ang,
+    // Clavier auto-contact : pas de maintien → dosage auto puis tir
+    auto: !held
+  };
+  // Fige la balle le temps du dosage
+  ball.vx = 0;
+  ball.vy = 0;
+  ball.frozen = false;
+  clearBallHold();
+  // Colle près de la tête pour la lecture
+  const h = blob.headCircle;
+  const dir = blob.side === 0 ? 1 : -1;
+  ball.x = h.x + dir * 10;
+  ball.y = h.y - 8;
+  if (!noFx) {
+    superFlash = "SUPER SMASH — dose !";
+    superFlashSub = held
+      ? "Visée + maintien F/X — relâche pour frapper"
+      : "Dosage auto — vise avec le stick / direction";
+    superFlashT = Math.max(superFlashT, 90);
+    shake = Math.max(shake, 5);
+    beep(660, 0.06, "square", 0.12, 0, 900);
+  }
+  return true;
+}
+
+function firePowerSmash(blob, charge, ang) {
+  powerWindup = null;
+  charge = Math.max(0.2, Math.min(1, charge || 0.7));
+  if (ang == null) ang = aimAngleFromInput(blob, blob._input || { ax: 0, ay: 0 });
+  const pow = blob.kitPower != null ? blob.kitPower : charOf(blob).power;
+  const mul = (typeof POWER_SMASH_MUL === "number" ? POWER_SMASH_MUL : 1.28) *
+    (1.05 + 0.22 * charge);
+  const spd = HIT_SPEED * pow * SMASH_MUL * mul;
+  const smashT = typeof POWER_SMASH_TICKS === "number" ? POWER_SMASH_TICKS : 78;
+  const prevMax = MAX_BALL_SPEED;
+  applyDirectedHit(blob, ang, spd, smashT);
+  {
+    const cap = typeof POWER_MAX_BALL_SPEED === "number" ? POWER_MAX_BALL_SPEED : prevMax;
+    const sp = Math.hypot(ball.vx, ball.vy);
+    if (sp > prevMax && sp > 0.001) {
+      const target = Math.min(sp, cap);
+      ball.vx = ball.vx / sp * target;
+      ball.vy = ball.vy / sp * target;
+    }
+  }
+  // Consomme la jauge APRÈS le contact (registerTouch aurait rechargé sinon)
+  if (typeof powerGauge !== "undefined") powerGauge[blob.side] = 0;
+  ensureSmashClearsNet(blob);
+  markActiveHit(blob);
+  if (!online && typeof POWER_SLOWMO === "number") ball.slowMo = POWER_SLOWMO;
+  shake = Math.max(shake, 12 + Math.floor(charge * 4));
+  crowdHype = Math.max(crowdHype, 55);
+  if (typeof setCharPose === "function") setCharPose(blob, "smash", 36);
+  if (!noFx) {
+    spawnBoom(ball.x, ball.y);
+    spawnBoom(ball.x + (blob.side === 0 ? 12 : -12), ball.y - 6);
+    sfxBallSmash();
+    superFlash = "SUPER SMASH !";
+    superFlashSub = sideLabel(blob.side) + " — frappe chargée";
+    superFlashT = Math.max(superFlashT, 100);
+    beep(220, 0.1, "sawtooth", 0.16);
+    beep(480, 0.12, "square", 0.14, 0.06, 720);
+  }
+  return true;
+}
+
+function stepPowerWindup(inL, inR, ins) {
+  if (!powerWindup) return;
+  const side = powerWindup.side;
+  let blob = null;
+  for (const b of activeBlobs) {
+    if (b.side === side) { blob = b; break; }
+  }
+  if (!blob) { powerWindup = null; return; }
+  const input = ins
+    ? (ins.find((x, i) => activeBlobs[i] && activeBlobs[i].side === side) || ins[side] || {})
+    : (side === 0 ? inL : inR);
+  // Micro-ajustement latéral pendant le freeze (lecture + skill)
+  const a = charOf(blob);
+  const kitSp = blob.kitSpeed != null ? blob.kitSpeed : a.speed;
+  const sp = BLOB_SPEED * 0.35 * kitSp;
+  if (input.left) blob.x -= sp;
+  if (input.right) blob.x += sp;
+  const half = 34;
+  const minX = side === 0 ? half : NET_X + NET_W / 2 + half - 6;
+  const maxX = side === 0 ? NET_X - NET_W / 2 - half + 6 : W - half;
+  blob.x = Math.max(minX, Math.min(maxX, blob.x));
+  blob._input = input;
+  powerWindup.t++;
+  const maxT = typeof POWER_WINDUP_MAX === "number" ? POWER_WINDUP_MAX : 48;
+  const minT = typeof POWER_WINDUP_MIN === "number" ? POWER_WINDUP_MIN : 6;
+  powerWindup.charge = Math.min(1, 0.28 + (powerWindup.t / maxT) * 0.72);
+  powerWindup.ang = aimAngleFromInput(blob, input);
+  // Balle collée à la tête
+  const h = blob.headCircle;
+  const dir = side === 0 ? 1 : -1;
+  ball.x = h.x + dir * 10;
+  ball.y = h.y - 8;
+  ball.vx = 0;
+  ball.vy = 0;
+  const autoFire = powerWindup.auto && powerWindup.t >= Math.floor(maxT * 0.55);
+  const released = !powerWindup.auto && !input.smash && powerWindup.t >= minT;
+  const timedOut = powerWindup.t >= maxT;
+  if (autoFire || released || timedOut) {
+    firePowerSmash(blob, powerWindup.charge, powerWindup.ang);
+  }
 }
 
 /** Mode flamme : 1 PV par contact. À 0 → embrasement + point pour l'adversaire. */
@@ -347,6 +491,12 @@ function applyDirectedHit(blob, ang, speed, smashTicks) {
     ball.x = h.x + Math.cos(ang) * minSep;
     ball.y = h.y + Math.sin(ang) * minSep;
   }
+  // Passage en Force : punch vers l'adversaire (~10 %)
+  if (blob.superKind === "cygne" && blob.superT > 0) {
+    const dir = blob.side === 0 ? 1 : -1;
+    if (ball.vx * dir > 0) ball.vx *= 1.10;
+    else ball.vx += dir * Math.max(1.2, Math.abs(ball.vx) * 0.08);
+  }
   clampBallSpeed();
   registerTouch(blob);
   if (blob.side === servingSide && ball.serveAimLock) {
@@ -540,6 +690,10 @@ function trySmashBall(blob) {
   if (ball.y > blob.y - 36) return false;
   if (ballPathDistToBlob(blob) > RECEIVE_R) return false;
   if (!canActiveHit(blob)) return false;
+  // Super Smash : jauge pleine → freeze + dosage (ou tir instant en ligne)
+  if (canStartPowerSmash(blob)) {
+    if (startPowerWindup(blob)) return true;
+  }
   const serving = isServeHit(blob);
   // Service aérien « smash » seulement si la balle est assez haute ;
   // un petit hop au sol garde la cloche sûre (évite filet).
@@ -732,7 +886,10 @@ function ballBlobCollision(blob) {
         const d = ballPathDistToBlob(blob);
         const aligned = Math.abs(ball.x - blob.x) < 44;
         if (d <= 40 && aligned) {
-          if (trySmashBall(blob)) { applyHitExtras(blob, a); return; }
+          if (trySmashBall(blob)) {
+            if (!powerWindup) applyHitExtras(blob, a);
+            return;
+          }
           if (tryLobBall(blob)) { applyHitExtras(blob, a); return; }
         }
       }
@@ -741,7 +898,10 @@ function ballBlobCollision(blob) {
       // front, puis le maintien sert tout seul dès que tossGrace tombe à 0.
       if (blob._smashEdge) {
         const near = ballPathDistToBlob(blob) <= RECEIVE_R;
-        if (near && trySmashBall(blob)) { applyHitExtras(blob, a); return; }
+        if (near && trySmashBall(blob)) {
+          if (!powerWindup) applyHitExtras(blob, a);
+          return;
+        }
         if (near && tryLobBall(blob)) applyHitExtras(blob, a);
       }
       return;
@@ -750,7 +910,10 @@ function ballBlobCollision(blob) {
     // Manette (ou appui S clavier) : frappe explicite
     if (wantSmash(blob)) {
       const near = ballPathDistToBlob(blob) <= RECEIVE_R;
-      if (near && trySmashBall(blob)) { applyHitExtras(blob, a); return; }
+      if (near && trySmashBall(blob)) {
+        if (!powerWindup) applyHitExtras(blob, a);
+        return;
+      }
       if (near && tryLobBall(blob)) applyHitExtras(blob, a);
       return;
     }
@@ -759,7 +922,10 @@ function ballBlobCollision(blob) {
     if (kbHuman && !blob.onGround) {
       const d = ballPathDistToBlob(blob);
       const aligned = Math.abs(ball.x - blob.x) < 40;
-      if (d <= 34 && aligned && trySmashBall(blob)) { applyHitExtras(blob, a); return; }
+      if (d <= 34 && aligned && trySmashBall(blob)) {
+        if (!powerWindup) applyHitExtras(blob, a);
+        return;
+      }
     }
 
     // Clavier humain : cloche auto au sol (échange seulement)

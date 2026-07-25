@@ -6,8 +6,8 @@ pays_theme: "Ryonganie — défilés, esplanade"
 silhouette: "jeune héritier potelé, coupe au bol noire brillante à frange, tunique Mao grise col mao SANS poches à rabat, sourire suffisant"
 palette: ["#2d3a2e", "#c62828", "#c9a227"]
 stats: { vitesse: 3, detente: 2, puissance: 4, controle: 3 }
-trait_passif: "Applaudissements — SUPER en 2 points d'affilée"
+trait_passif: "Discipline — puissance solide, jeu au sol"
 super:
   nom: "Batterie AA"
-  effet: "interdit de sauter camp adverse ~5 s"
+  effet: "interdit de sauter camp adverse ~3,7 s"
 map: "Esplanade du Défilé"

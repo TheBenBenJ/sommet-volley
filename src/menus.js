@@ -321,6 +321,8 @@ function newGame(seed) {
   xOn.fill(false);
   for (const b of [blobL, blob2L, blobR, blob2R]) b._xSpd = undefined;
   streak[0] = streak[1] = 0; superCharge[0] = superCharge[1] = 0;
+  if (typeof powerGauge !== "undefined") { powerGauge[0] = powerGauge[1] = 0; }
+  if (typeof powerWindup !== "undefined") powerWindup = null;
   superFlash = ""; superFlashSub = ""; superFlashT = 0;
   mapEventFlash = ""; mapEventFlashSub = ""; mapEventFlashT = 0;
   resetWeather();
@@ -1481,7 +1483,10 @@ function drawRules() {
   p("Service : F pour lancer, puis F à nouveau pour servir. Double saut en l'air.");
   y += 4;
   h("★ SUPER", "#ffd93d");
-  p("3 points d'affilée chargent la jauge (Bébé : 2). E / B lance la technique : un bandeau explique l'effet et le visuel ~4 s.");
+  p("3 points d'affilée chargent la jauge or. E / B lance la technique : un bandeau explique l'effet ~4 s.");
+  y += 4;
+  h("⚡ SUPER SMASH", "#ff6a2a");
+  p("Jauge orange : se remplit en échange. Plein → smash aérien (F/X) : freeze, dose, relâche. Plus fort + ralenti.");
   y += 4;
   h("Météo & événements", "#4db3ff");
   p("Météo sur toutes les maps : pluie/orage (éclairs), neige/blizzard (Place Écarlate), tempête de sable (Country Club). Sol glissant, balle plus lourde.");

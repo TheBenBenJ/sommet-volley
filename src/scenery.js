@@ -615,12 +615,12 @@ function collideMapCrosser(kind) {
   const halfW = kind === "march" ? 110
     : kind === "carpet" ? 58
     : kind === "cow" ? 48
-    : kind === "falcon" ? 48
+    : kind === "falcon" ? 82
     : kind === "peacock" ? 52
     : 55;
   const topY = kind === "carpet" ? GROUND_Y - (PROP_H.carpet + 40)
     : kind === "cow" ? GROUND_Y - (PROP_H.cow - 4)
-    : kind === "falcon" ? GROUND_Y - 130
+    : kind === "falcon" ? GROUND_Y - (PROP_H.falcon + 28)
     : kind === "peacock" ? GROUND_Y - (PROP_H.peacock - 2)
     : GROUND_Y - 95;
   if (ball.x < cx - halfW || ball.x > cx + halfW) return;
@@ -635,7 +635,8 @@ function stepMapCrosserEvent(kind) {
   if (mapEvent.phase !== "fire" && mapEvent.phase !== "flying") return;
   mapEvent.t++;
   mapEvent.cartDir = 1;
-  const spd = kind === "march" ? 2.6 : kind === "carpet" ? 3.4 : kind === "falcon" ? 4.2 : 2.2;
+  // Faucon un cran plus lent : plus lisible une fois agrandi
+  const spd = kind === "march" ? 2.6 : kind === "carpet" ? 3.4 : kind === "falcon" ? 3.4 : 2.2;
   mapEvent.cartX += spd;
   if (mapEvent.phase === "fire" && mapEvent.t === 1) {
     sfxCannonFire();
@@ -869,9 +870,9 @@ function groundGrip(blob) {
   if (weather === "storm") g = 0.78 * (icy < 1 ? 0.92 : 1);
   else if (weather === "rain") g = 0.9 * icy;
   else g = icy;
-  // Hiver Général : glisse extrême sur le camp gelé (sauf Sang froid)
+  // Hiver Général / Méditation : glisse sur le camp gelé (sauf Sang froid)
   if (blob && typeof hasSuperEffect === "function" && hasSuperEffect("ice", blob.side)) {
-    if (!(charOf(blob) && charOf(blob).coldProof)) g *= 0.32;
+    if (!(charOf(blob) && charOf(blob).coldProof)) g *= 0.40;
   }
   return g;
 }

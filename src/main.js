@@ -25,7 +25,8 @@ function loop(now) {
   pollPads();      // l'API Gamepad se sonde à chaque frame
   handlePadMenu(); // navigation des menus à la manette
   musicTick();     // planifie la musique de fond
-  // ralenti dramatique : UNIQUEMENT Smash Battle au filet (hors-ligne)
+  // ralenti dramatique : après Smash Battle / Super Smash (hors-ligne).
+  // Pas pendant powerWindup : le freeze simu suffit pour doser.
   const tScale = (!online && state === "play" && ball.slowMo > 0) ? 0.45 : 1;
   timeScale += (tScale - timeScale) * 0.25;
   advance(now);

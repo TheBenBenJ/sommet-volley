@@ -133,6 +133,26 @@ const EPILOGUE = `
   SPRITES: typeof SPRITES !== "undefined" ? SPRITES : null,
   spriteReady: typeof spriteReady === "function" ? spriteReady : () => false,
   SUPER_DUR: typeof SUPER_DUR !== "undefined" ? SUPER_DUR : {},
+  SUPER_NEED: typeof SUPER_NEED !== "undefined" ? SUPER_NEED : 3,
+  SUPER_SLOW_MUL: typeof SUPER_SLOW_MUL !== "undefined" ? SUPER_SLOW_MUL : 0.55,
+  POWER_GAUGE_MAX: typeof POWER_GAUGE_MAX !== "undefined" ? POWER_GAUGE_MAX : 520,
+  POWER_GAUGE_TOUCH: typeof POWER_GAUGE_TOUCH !== "undefined" ? POWER_GAUGE_TOUCH : 70,
+  getPowerGauge: () => [powerGauge[0]|0, powerGauge[1]|0],
+  setPowerGauge: (a, b) => {
+    powerGauge[0] = a | 0;
+    if (b !== undefined) powerGauge[1] = b | 0;
+  },
+  getPowerWindup: () => powerWindup,
+  firePowerSmash: typeof firePowerSmash === "function" ? firePowerSmash : null,
+  startPowerWindup: typeof startPowerWindup === "function" ? startPowerWindup : null,
+  awardPoint: typeof awardPoint === "function" ? awardPoint : null,
+  trySmashBall: typeof trySmashBall === "function" ? trySmashBall : null,
+  getSuperCharge: () => [superCharge[0], superCharge[1]],
+  setSuperCharge: (a, b) => {
+    superCharge[0] = a | 0;
+    if (b !== undefined) superCharge[1] = b | 0;
+  },
+  getStreak: () => [streak[0], streak[1]],
   CHAR_BASE_H: typeof CHAR_BASE_H !== "undefined" ? CHAR_BASE_H : 110,
   PROP_H: typeof PROP_H !== "undefined" ? PROP_H : null,
   consts: { W, H, NET_X, NET_W, NET_TOP, GROUND_Y, BALL_R, MAX_BALL_SPEED, GUEST_BALL_MARGIN, HOLD_LOB_SPD: typeof HOLD_LOB_SPD !== "undefined" ? HOLD_LOB_SPD : 0 }

@@ -150,15 +150,27 @@ function drawSuperAura(b) {
 
 function drawSuperOverlay(b) {
   if (!isLiveBlob(b)) return;
-  if (b.superSmash && b.superT > 0) {
-    const t = performance.now() / 1000;
+  const t = performance.now() / 1000;
+  const windupHere = powerWindup && powerWindup.side === b.side;
+  const powerReady = typeof powerGaugeReady === "function" && powerGaugeReady(b.side);
+  if ((b.superSmash && b.superT > 0) || windupHere || (powerReady && !powerWindup)) {
     ctx.save();
     ctx.globalAlpha = 0.28 + Math.sin(t * 7) * 0.08;
-    const g = ctx.createRadialGradient(b.x, b.y - 36, 4, b.x, b.y - 36, 38);
-    g.addColorStop(0, "rgba(255,245,160,0.5)");
-    g.addColorStop(1, "rgba(255,220,80,0)");
+    const g = ctx.createRadialGradient(b.x, b.y - 36, 4, b.x, b.y - 36, windupHere ? 48 : 38);
+    g.addColorStop(0, windupHere ? "rgba(255,120,60,0.65)" : "rgba(255,245,160,0.5)");
+    g.addColorStop(1, "rgba(255,120,40,0)");
     ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(b.x, b.y - 36, 38, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(b.x, b.y - 36, windupHere ? 48 : 38, 0, Math.PI * 2); ctx.fill();
+    if (windupHere) {
+      // Anneau de dosage
+      const ch = Math.max(0.05, Math.min(1, powerWindup.charge || 0));
+      ctx.globalAlpha = 0.85;
+      ctx.strokeStyle = "#ff8a3d";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y - 36, 44, -Math.PI / 2, -Math.PI / 2 + ch * Math.PI * 2);
+      ctx.stroke();
+    }
     ctx.restore();
   }
 }
@@ -307,7 +319,8 @@ function drawCharSuperFX(b) {
     }
     ctx.restore();
   } else if (key === "dorf") {
-    const wallX = b.side === 0 ? NET_X + (W - NET_X) * 0.52 : NET_X * 0.48;
+    // Aligné sur Blob.update (mur plus près du filet côté victime)
+    const wallX = b.side === 0 ? NET_X + (W - NET_X) * 0.42 : NET_X * 0.58;
     const top = GROUND_Y - 108;
     ctx.save();
     ctx.globalAlpha = 0.55 * fade;

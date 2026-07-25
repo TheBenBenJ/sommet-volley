@@ -133,7 +133,7 @@ function render() {
   }
   // punch de caméra : uniquement Smash Battle (slowMo) ou point marqué
   let tz = 1;
-  if (state === "play" && ball.slowMo > 0) tz = 1.16;
+  if (state === "play" && (ball.slowMo > 0 || powerWindup)) tz = 1.16;
   else if (state === "point") tz = 1.10;
   camZoom += (tz - camZoom) * 0.12;
   if (camZoom > 1.002) {

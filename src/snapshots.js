@@ -73,6 +73,11 @@ function getSnapshot() {
       }))
     },
     streak: [streak[0], streak[1]], superCharge: [superCharge[0], superCharge[1]],
+    powerGauge: typeof powerGauge !== "undefined" ? [powerGauge[0]|0, powerGauge[1]|0] : [0, 0],
+    powerWindup: powerWindup ? {
+      side: powerWindup.side, t: powerWindup.t|0, charge: +powerWindup.charge || 0,
+      ang: +powerWindup.ang || 0, auto: !!powerWindup.auto
+    } : null,
     battle: { active: battle.active, t: battle.t,
               count: [battle.count[0], battle.count[1]],
               prevJump: [battle.prevJump[0], battle.prevJump[1]],
@@ -109,6 +114,18 @@ function applySnapshot(s) {
   rngSeed = s.rngSeed;
   if (s.streak) { streak[0] = s.streak[0]; streak[1] = s.streak[1]; }
   if (s.superCharge) { superCharge[0] = s.superCharge[0]; superCharge[1] = s.superCharge[1]; }
+  if (s.powerGauge && typeof powerGauge !== "undefined") {
+    powerGauge[0] = s.powerGauge[0] | 0; powerGauge[1] = s.powerGauge[1] | 0;
+  }
+  if (typeof powerWindup !== "undefined") {
+    powerWindup = s.powerWindup ? {
+      side: s.powerWindup.side | 0,
+      t: s.powerWindup.t | 0,
+      charge: +s.powerWindup.charge || 0,
+      ang: +s.powerWindup.ang || 0,
+      auto: !!s.powerWindup.auto
+    } : null;
+  }
   if (s.weather !== undefined) { weather = s.weather; weatherTimer = s.weatherTimer; }
   if (s.bombMode !== undefined) { bombMode = s.bombMode; bombTimer = s.bombTimer || 0; }
   if (s.flameMode !== undefined) flameMode = !!s.flameMode;

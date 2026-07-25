@@ -22,7 +22,7 @@ const PROP_H = {
   cow: 92,           // vache event (~⅔ perso)
   cowIdle: 54,       // vache broute en bord de court
   peacock: 72,       // paon au sol (queue déployée, < perso)
-  falcon: 52,        // faucon en vol
+  falcon: 100,       // faucon en vol — proche taille perso, lisible en traversée
   carpet: 64,        // tapis volant
   marchers: 118,     // cortège : un cran > perso (lisibilité)
   cannon: 72,        // canon d'apparat
@@ -90,6 +90,16 @@ const BATTLE_BALL_DIST = 90; // distance max de la balle au filet
 const BATTLE_STUN_T = 52;    // perdant du duel : stun ~0,85 s (ne digue pas)
 // Smash destructeur post-duel : rapide et plongeant vers le fond de cour
 const SMASH_VX = 14.5, SMASH_VY = 9.5;
+
+// --- Super Smash (tous persos) — jauge d'échange, freeze + dosage, frappe lourde ---
+const POWER_GAUGE_MAX = 520;     // ~8,5 s d'échange à +1/tick (touches accélèrent)
+const POWER_GAUGE_TOUCH = 70;    // bonus par nouveau contact balle
+const POWER_WINDUP_MAX = 48;     // ~0,8 s pour viser / doser (hors-ligne)
+const POWER_WINDUP_MIN = 6;      // ticks mini avant relâche possible
+const POWER_SMASH_MUL = 1.28;    // multiplicateur vs smash normal (après SMASH_MUL)
+const POWER_MAX_BALL_SPEED = 16.2;
+const POWER_SMASH_TICKS = 78;    // traînée feu + message SMASH au sol
+const POWER_SLOWMO = 48;         // ralenti caméra (hors-ligne, comme Smash Battle)
 
 // --- Mode Bombe ---
 const BOMB_TIME = 600;      // 10 s à 60 Hz : durée de la mèche avant explosion

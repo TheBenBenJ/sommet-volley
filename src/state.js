@@ -35,7 +35,7 @@ const CHARACTERS = [
     coldProof: true,
     trait: "Sang froid : insensible au gel / ralentissement.",
     superName: "Hiver Général",
-    superDesc: "Gèle le camp adverse ~6 s : ils glissent comme sur de la glace. Visuel : voile bleu glacial + flocons qui tombent sur leur moitié."
+    superDesc: "Gèle le camp adverse ~5 s : ils glissent sur la glace. Visuel : voile bleu glacial + flocons sur leur moitié."
   },
   {
     key: "dorf", name: "Baron Dorf",
@@ -45,7 +45,7 @@ const CHARACTERS = [
     egoCharge: true, slip: true,
     trait: "Ego en béton : la jauge SUPER monte aussi quand il perd un point.",
     superName: "Le Mur",
-    superDesc: "Mur doré au milieu du camp adverse ~5 s : bloque les courses au sol (sauter par-dessus pour passer). Visuel : colonne d’or lumineuse + halo au pied du mur."
+    superDesc: "Mur doré dans le camp adverse ~5,3 s : bloque les courses au sol (il faut sauter pour passer). Visuel : colonne d’or + halo au pied."
   },
   {
     key: "cygne", name: "Le Cygne",
@@ -55,17 +55,16 @@ const CHARACTERS = [
     swapStats: true,
     trait: "Double jeu : après chaque point, échange vitesse ↔ puissance.",
     superName: "Passage en Force",
-    superDesc: "~4 s : tes frappes ne peuvent plus être smashées en retour. Visuel : aura bleue autour de toi pendant l’effet."
+    superDesc: "~5 s : tes frappes ne peuvent plus être smashées, et partent plus franchement vers l’adversaire. Visuel : aura bleue."
   },
   {
     key: "bebe", name: "Maréchal Bébé",
     color: "#2d3a2e", darkColor: "#1a241c",
     stats: { vitesse: 3, detente: 2, puissance: 4, controle: 3 },
     speed: 1.06, jump: 0.94, power: 1.18, control: 0.82,
-    clapDouble: true,
-    trait: "Applaudissements : SUPER chargé en 2 points d'affilée.",
+    trait: "Discipline : puissance solide, jeu au sol privilégié.",
     superName: "Batterie AA",
-    superDesc: "Interdit de sauter au camp adverse ~5 s — collés au sol. Visuel : bande rouge au sol + pulses d’alerte sur leur camp."
+    superDesc: "Interdit de sauter au camp adverse ~3,7 s — collés au sol. Visuel : bande rouge + pulses d’alerte."
   },
   {
     key: "timonier", name: "Le Grand Timonier",
@@ -74,7 +73,7 @@ const CHARACTERS = [
     speed: 1.06, jump: 1.06, power: 1.06, control: 1.0,
     trait: "Mur invisible : contrôle max, placements précis.",
     superName: "Grande Muraille",
-    superDesc: "Mur au milieu du camp adverse ~5 s : coupe le terrain en deux. Visuel : même muraille dorée lumineuse que Le Mur."
+    superDesc: "Mur dans le camp adverse ~6 s : coupe le terrain (durée longue). Visuel : muraille dorée lumineuse."
   },
   {
     key: "sultan", name: "Le Sultan",
@@ -83,7 +82,7 @@ const CHARACTERS = [
     speed: 1.06, jump: 1.18, power: 1.06, control: 0.82,
     trait: "Séisme : détente élevée, bons smashs aériens.",
     superName: "Séisme",
-    superDesc: "Interdit de sauter au camp adverse ~5 s. Visuel : tremblement d’écran + bande rouge d’alerte au sol (comme Batterie AA)."
+    superDesc: "Interdit de sauter au camp adverse ~3,7 s. Visuel : tremblement d’écran + bande rouge au sol."
   },
   {
     key: "gourou", name: "Le Gourou",
@@ -92,7 +91,7 @@ const CHARACTERS = [
     speed: 1.18, jump: 1.06, power: 1.06, control: 0.91,
     trait: "Ashram : rapide et technique, smashs dans la moyenne.",
     superName: "Méditation",
-    superDesc: "Gèle le camp adverse ~5 s (glisse extrême). Visuel : voile clair + particules, façon Hiver Général zen."
+    superDesc: "Gèle le camp adverse ~4,7 s (glisse). Visuel : voile clair + particules, façon Hiver zen."
   },
   {
     key: "capitaine", name: "Le Capitaine",
@@ -102,17 +101,16 @@ const CHARACTERS = [
     egoCharge: true,
     trait: "Tronçonneuse : puissance max, SUPER aussi en perdant un point.",
     superName: "Déforestation",
-    superDesc: "Mur de troncs au camp adverse ~5 s : bloque les courses. Visuel : mur épais façon forêt + lueur verte."
+    superDesc: "Mur de troncs au camp adverse ~5,3 s : bloque les courses. Visuel : mur forêt + lueur verte."
   },
   {
     key: "faucon", name: "Le Faucon",
     color: "#556270", darkColor: "#333b45",
     stats: { vitesse: 3, detente: 3, puissance: 4, controle: 3 },
     speed: 1.06, jump: 1.06, power: 1.18, control: 0.82,
-    egoCharge: true,
-    trait: "Faucon : SUPER aussi quand il perd un point.",
+    trait: "Raid : puissance correcte, pression aérienne.",
     superName: "Raid Éclair",
-    superDesc: "Interdit de sauter au camp adverse ~5 s — collés au sol. Visuel : bande d’alerte au sol (comme Séisme)."
+    superDesc: "Interdit de sauter au camp adverse ~3,7 s — collés au sol. Visuel : bande d’alerte au sol."
   },
   {
     key: "safran", name: "Le Safran",
@@ -121,7 +119,7 @@ const CHARACTERS = [
     speed: 1.06, jump: 1.06, power: 1.06, control: 0.91,
     trait: "Safran : contrôle élevé, jeu posé.",
     superName: "Voile d’Or",
-    superDesc: "Ralentit le camp adverse ~5 s (glisse extrême). Visuel : voile clair + particules, façon Hiver Général doré."
+    superDesc: "Ralentit fortement le camp adverse ~4,7 s (courses au ralenti, pas de glisse). Visuel : voile doré."
   },
 ];
 function charOf(b) { return CHARACTERS[b.charId]; }
@@ -238,11 +236,11 @@ const AI_LEVELS = [
   // attack : décalage derrière la balle pour viser franchement le camp adverse
   // react : anticipation (0=lent, 1=parfait) · dbl : utilise le double saut
   // aim : 1 = place ses frappes LOIN de l'adversaire (drive profond / amorti court)
-  // Grille encore baissée : chaque cran ≈ l’ancien cran inférieur (IA trop dure).
-  { name: "Facile",      err: 75, rush: 0.02, attack: 2,  react: 0.18, dbl: false, aim: 0 },
-  { name: "Normale",     err: 58, rush: 0.05, attack: 3,  react: 0.28, dbl: false, aim: 0 },
-  { name: "Difficile",   err: 40, rush: 0.10, attack: 6,  react: 0.42, dbl: false, aim: 0 },
-  { name: "Impitoyable", err: 20, rush: 0.32, attack: 12, react: 0.68, dbl: true,  aim: 0 }
+  // Grille volontairement molle : Facile rate beaucoup ; Impitoyable ≈ ancienne Normale+.
+  { name: "Facile",      err: 105, rush: 0.01, attack: 1,  react: 0.08, dbl: false, aim: 0 },
+  { name: "Normale",     err: 80,  rush: 0.02, attack: 2,  react: 0.16, dbl: false, aim: 0 },
+  { name: "Difficile",   err: 55,  rush: 0.05, attack: 3,  react: 0.28, dbl: false, aim: 0 },
+  { name: "Impitoyable", err: 34,  rush: 0.14, attack: 7,  react: 0.45, dbl: true,  aim: 0 }
 ];
 let aiLevel = 1;
 let aiErr = 0, aiErrTimer = 0;  // erreur de placement volontaire de l'IA
@@ -275,18 +273,24 @@ const SUPER_FLASH_T = 240;      // ~4 s pour lire nom + description
 const SUPER_READY_FLASH_T = 180; // ~3 s quand la jauge est prête
 const streak = [0, 0];        // points d'affilée par camp
 const superCharge = [0, 0];   // 0 = vide, 1 = super prête
+// Super Smash (tous persos) : jauge 0..POWER_GAUGE_MAX, indépendante du SUPER perso
+const powerGauge = [0, 0];
+/** Freeze + dosage : { side, t, charge, ang } — null si inactif */
+let powerWindup = null;
 const SUPER_DUR = {
-  volkoi: 360,      // Hiver Général ~6 s
-  dorf: 300,   // Le Mur ~5 s
-  cygne: 240,      // Passage en Force ~4 s
-  bebe: 300,        // Batterie AA ~5 s
-  timonier: 300,       // Grande Muraille ~5 s
-  sultan: 300,      // Séisme ~5 s
-  gourou: 300,        // Méditation ~5 s
-  capitaine: 300,        // Déforestation ~5 s
-  faucon: 300,      // Raid Éclair ~5 s
-  safran: 300       // Voile d’Or ~5 s
+  volkoi: 300,     // Hiver Général ~5 s
+  dorf: 320,       // Le Mur ~5,3 s (+ egoCharge)
+  cygne: 300,      // Passage en Force ~5 s
+  bebe: 220,       // Batterie AA ~3,7 s (noground court)
+  timonier: 360,   // Grande Muraille ~6 s (compense pas d’egoCharge)
+  sultan: 220,     // Séisme ~3,7 s
+  gourou: 280,     // Méditation ~4,7 s
+  capitaine: 320,  // Déforestation ~5,3 s (+ egoCharge)
+  faucon: 220,     // Raid Éclair ~3,7 s
+  safran: 280      // Voile d’Or ~4,7 s (slow)
 };
+/** Multiplicateur de course sous Voile d’Or (kind "slow"). */
+const SUPER_SLOW_MUL = 0.55;
 
 // Effets de zone SUPER (Phase 4 — stubs jouables pour le pilote)
 // { kind, side, t, data } — side = camp qui subit / où est l'effet
@@ -392,7 +396,12 @@ class Blob {
 
     this.vx = 0;
     const kitSp = this.kitSpeed != null ? this.kitSpeed : a.speed;
-    const sp = BLOB_SPEED * this.speedMul * kitSp * grip;
+    let sp = BLOB_SPEED * this.speedMul * kitSp * grip;
+    // Voile d’Or : ralentit les courses (sauf Sang froid)
+    if (typeof hasSuperEffect === "function" && hasSuperEffect("slow", this.side) &&
+        !(a && a.coldProof)) {
+      sp *= (typeof SUPER_SLOW_MUL === "number" ? SUPER_SLOW_MUL : 0.55);
+    }
     if (input.left)  this.vx = -sp;
     if (input.right) this.vx =  sp;
 
@@ -473,11 +482,13 @@ class Blob {
     if (this.onGround && typeof hasSuperEffect === "function") {
       const wall = hasSuperEffect("wall", this.side);
       if (wall) {
-        const wallX = this.side === 0 ? NET_X * 0.48 : NET_X + (W - NET_X) * 0.52;
+        // Plus près du filet + épaisseur : sauter pour passer = vrai engagement
+        const wallX = this.side === 0 ? NET_X * 0.58 : NET_X + (W - NET_X) * 0.42;
+        const thick = 10;
         const prevX = this.x - moveVx;
         if (this.side === 0) {
-          if (prevX <= wallX) maxX = Math.min(maxX, wallX);
-        } else if (prevX >= wallX) {
+          if (prevX <= wallX + thick) maxX = Math.min(maxX, wallX);
+        } else if (prevX >= wallX - thick) {
           minX = Math.max(minX, wallX);
         }
       }
