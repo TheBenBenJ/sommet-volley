@@ -1255,6 +1255,17 @@ test("chaque terrain a un événement de map", () => {
   assert.strictEqual(kinds.size, g.TERRAINS.length, "un kind unique par terrain");
 });
 
+test("menu terrain : navOptions couvre tous les terrains (Digit1..N)", () => {
+  const g = loadGame();
+  assert.ok(typeof g.navOptions === "function", "navOptions exposé");
+  g.setState("selectTerrain");
+  const opts = g.navOptions();
+  const n = g.TERRAINS.length;
+  assert.strictEqual(opts.length, n, "un Digit par terrain (était plafonné à 9)");
+  assert.strictEqual(opts[n - 1], "Digit" + n, "dernier terrain = Digit" + n);
+  assert.ok(g.TERRAINS.some(t => t.key === "jardin-des-roses"), "Jardin des Roses présent");
+});
+
 test("Le Mur : une fois passé, pas de téléport derrière", () => {
   const g = freshRally(42);
   const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };

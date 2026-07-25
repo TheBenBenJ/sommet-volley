@@ -101,6 +101,8 @@ const EPILOGUE = `
   getGameplayV2: () => GAMEPLAY_V2, setGameplayV2: v => { GAMEPLAY_V2 = !!v; },
   HOLD_MAX, RECEIVE_R, CHARGE_MAX, AIM_CONE,
   CHARACTERS, TERRAINS, superEffects,
+  navOptions: typeof navOptions === "function" ? navOptions : null,
+  terrainIndices: typeof terrainIndices === "function" ? terrainIndices : null,
   CHAR_ANIM_DEFAULTS: typeof CHAR_ANIM_DEFAULTS !== "undefined" ? CHAR_ANIM_DEFAULTS : null,
   STORY: typeof STORY !== "undefined" ? STORY : null,
   getSTORY: () => (typeof STORY !== "undefined" ? STORY : null),

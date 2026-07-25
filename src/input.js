@@ -204,7 +204,13 @@ function navOptions() {
       const vis = characterIndices();
       return vis.map((_, slot) => "Digit" + (slot + 1));
     }
-    case "selectTerrain": return ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9"].slice(0, terrainIndices().length);
+    case "selectTerrain": {
+      // Comme selectCharacter : Digit1..N (y compris Digit10+ pour le 10ᵉ terrain).
+      // Avant : liste figée à Digit9 → Jardin des Roses (index 9) inatteignable
+      // aux flèches / Entrée / manette (seul le clic Digit10 passait).
+      const visT = terrainIndices();
+      return visT.map((_, slot) => "Digit" + (slot + 1));
+    }
     default: return null;
   }
 }
