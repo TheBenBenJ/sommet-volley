@@ -10,11 +10,39 @@ node_modules/
 npm-debug.log*
 # Divers
 *.log
+
 # Sources brutes / cutouts (trop volumineux pour git — seuls assets/ sont versionnés)
 # Ignorer le contenu de raw/, mais versionner prompts .md et fiches .txt
 raw/**
 !raw/**/
 !raw/**/*.md
 !raw/**/*.txt
-# Sauvegardes locales des frames walk avant réordonnancement
+# Logs / chantier regen (ne pas versionner) — après les !raw/**/*.md|.txt
+raw/**/_regen*.txt
+raw/**/_regen_monitor.txt
+raw/**/_gen*.txt
+raw/**/*_resume*.md
+raw/**/_spike/
+raw/**/_bak*/
+raw/**/_extra_old/
+raw/**/_pre_*_bak/
+raw/**/_merged_from_*/
+# Sources WIP audio/ball/fx (restent locales)
+raw/ball/
+raw/fx/
+raw/audio/
+
+# Sauvegardes locales / planches QA (hors jeu)
+tmp/
+assets/**/_bak*/
+assets/**/_bak_*.png
+assets/**/_contact.png
+assets/**/_contact_*.png
 assets/*/_walk_bak/
+assets/maps/**/_bak*/
+assets/maps/**/_bak_*.png
+assets/_bak*/
+
+# Outils locaux non prêts / helpers one-shot
+tools/grok_tts_spike.py
+tools/make_*_contact_sheet.py
