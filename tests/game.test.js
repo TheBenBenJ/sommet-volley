@@ -1924,8 +1924,12 @@ test("story 2v2 : balle reste en mains ; Espace clavier sert ; IA adverse sert a
   g.setStoryChapter(idx);
   g.storyStartMatch();
   assert.strictEqual(g.getMode(), "2v2");
+  // Service camp joueur (sinon RNG → camp IA qui lance pendant l'attente)
+  g.setServingSide(0);
+  g.startRally();
+  g.setServeCountdown(0);
   const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
-  // Pendant le décompte + après : sans input humain, balle reste en mains (pas d'allié qui vole le service)
+  // Sans input humain : balle reste en mains (pas d'allié qui vole le service)
   for (let i = 0; i < 250; i++) {
     const ins = g.getActiveBlobs().map((b, j) => (j === 0 ? { ...N } : g.aiInput2v2(b)));
     g.stepGame(null, null, ins);
