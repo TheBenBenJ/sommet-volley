@@ -74,7 +74,7 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   act: 1, title: "La leçon de sérénité", sub: "Gallardie–Bharatie · deux premiers de la classe",
   left: "cygne", right: "gourou", terrain: 6, mode: "volley", ai: 1, doped: null,
   pre:  [
-    { s: "narrator", t: "Stade Ashram, grès couleur miel, guirlandes de soucis orange, une vache qui traverse qui décide de traverser le court quand ça lui chante." },
+    { s: "narrator", t: "Stade Ashram, grès couleur miel, guirlandes de soucis orange, une vache qui décide de traverser le court quand ça lui chante." },
     { s: "gourou", t: "Namasté, Cygne. Tu cours vite à la surface. Mais le mental, en dessous ? Agité comme un étang à pigeons." },
     { s: "cygne", t: "Vous méditez, j'admire ; et en même temps, j'agis. Je suis un contemplatif qui n'a pas le temps de contempler." },
     { s: "gourou", t: "Voilà ton mal, ami. Tu veux tenir les deux bouts de la corde, et la corde te tient." },
@@ -91,7 +91,7 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   ]
 },
 
-// ===================== ACTE I — Petites rivalités (Volley) =====================
+// ===================== ACTE II — Les tensions montent (Ballon enflammé) =====================
 {
   act: 2, title: "La porte du détroit", sub: "Gallardie–Bosforie · l'adhésion sans fin",
   left: "cygne", right: "sultan", terrain: 5, mode: "flame", ai: 2, doped: null,
@@ -106,16 +106,14 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   win:  [
     { s: "cygne", t: "Reconnaissons de la puissance. On reparlera des critères au prochain sommet. En même temps ferme, en même temps ouvert : voilà." },
     { s: "sultan", t: "Tu gagnes le match, pas le détroit. Je reste sur le pas de ta porte. Debout. Immense. Et j'ai la clé." },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ],
   lose:  [
     { s: "sultan", t: "La porte a cédé ! Un jour, c'est ton Union qui frappera chez MOI. Et je délibérerai. Longtemps." },
     { s: "cygne", t: "Puissant, indéniablement. Défaite honorable. Nos critères, eux, restent debout. Comme mon obélisque." },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ]
 },
 {
-  act: 2, title: "Le voile et le protocole", sub: "Gallardie–Ramenie · l'accord introuvable",
+  act: 2, title: "Le voile et le protocole", sub: "Gallardie–Safranie · l'accord introuvable",
   left: "cygne", right: "safran", terrain: 9, mode: "flame", ai: 2, doped: null,
   pre:  [
     { s: "narrator", t: "Jardin des Roses, arcades turquoise, un paon qui fait la roue près du filet. Deux négociateurs se retrouvent après un accord jadis signé, jadis déchiré. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
@@ -128,19 +126,17 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   win:  [
     { s: "cygne", t: "Vous voyez : la fermeté et la main tendue, en même temps. Reprenons les négociations demain, à froid, autour d'un thé." },
     { s: "safran", t: "Joli point, technocrate. Mais tant que ton allié déchire mes accords, ton thé aura un goût de trahison." },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ],
   lose:  [
     { s: "safran", t: "Le Voile d'Or l'a emporté. La lenteur patiente use l'impatience élégante. Reviens quand tu tiendras parole." },
     { s: "cygne", t: "Défaite mesurée pour un adversaire mesuré. Je repars, en même temps déçu et déterminé. Nous rebâtirons cet accord." },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
   ]
 },
 {
   act: 2, title: "L'ami intransigeant", sub: "Gallardie–Levantie · reconnaître ou ne pas reconnaître",
   left: "cygne", right: "faucon", terrain: 8, mode: "flame", ai: 2, doped: null,
   pre:  [
-    { s: "narrator", t: "Citadelle du Levant, remparts de grès sur la mer. Un faucon tournoie. Ce soir, le ballon est un ballon enflammé : chaque contact brûle — à zéro PV, c’est perdu." },
+    { s: "narrator", t: "Citadelle du Levant, remparts de grès sur la mer. Un faucon tournoie. Ce soir, le ballon s’enflamme : chaque contact brûle — à zéro PV, c’est perdu." },
     { s: "faucon", t: "Tu veux « reconnaître », Cygne ? Tu veux « équilibrer » ? Ici, on ne reconnaît que la sécurité. Le reste est du bavardage de salon." },
     { s: "cygne", t: "Je suis votre ami. Un ami exigeant. Je condamne, et en même temps j'appelle à la retenue. On peut tenir les deux : la fermeté et l'humanité." },
     { s: "faucon", t: "« En même temps. » Ton poison préféré. Sur ce terrain, tu choisis, ou le ballon enflammé choisit pour toi. Il n'y a pas de troisième rive." },
@@ -148,7 +144,7 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
     { s: "faucon", t: "Les adultes ne discutent pas avec une brûlure allumée. Ils frappent. Sers, et prie pour que ton « en même temps » n'explose pas dans tes mains." }
   ],
   win:  [
-    { s: "cygne", t: "Vous voyez ? On peut être un allié loyal ET une conscience. le ballon enflammé est repartie. Le dialogue, lui, reste sur la table." },
+    { s: "cygne", t: "Vous voyez ? On peut être un allié loyal ET une conscience. Le ballon enflammé est reparti. Le dialogue, lui, reste sur la table." },
     { s: "faucon", t: "Tu as gagné un point, pas un débat. Je reste intransigeant. C'est la seule position qui ne fait pas de morts." }
   ],
   lose:  [
@@ -157,7 +153,7 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   ]
 },
 
-// ===================== ACTE I — Petites rivalités (Volley) =====================
+// ===================== ACTE III — Conflits ouverts (Bombe) =====================
 {
   act: 3, title: "Tarifs entre alliés", sub: "Gallardie–Doria · quand le protecteur présente la facture",
   left: "cygne", right: "dorf", terrain: 1, mode: "bomb", ai: 3, doped: null,
@@ -172,7 +168,6 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   win:  [
     { s: "cygne", t: "Vous voyez : la fermeté commerciale paie mieux que le klaxon. Ma porte reste ouverte. En même temps, mes tarifs restent en place." },
     { s: "dorf", t: "Truqué ! Un allié qui gagne, c'est déjà suspect ! On renégocie l'accord, cher Cygne. Un accord plus grand. Le plus grand." },
-    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
   ],
   lose:  [
     { s: "dorf", t: "BOUM ! Chez l'élégant ! Même mes meilleurs amis explosent quand je décide de gagner ! Rien de personnel, cher Cygne — enfin, un peu." },
@@ -184,17 +179,16 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   left: "cygne", right: "capitaine", terrain: 7, mode: "bomb", ai: 3, doped: "R",
   pre:  [
     { s: "narrator", t: "Grande Forêt. Canopée dorée, court en terre rouge, un ara qui crie dans la fumée. La forêt brûle à l'horizon. Le ballon est une bombe, et le Capitaine a l'aura rouge des grands soirs." },
-    { s: "capitaine", t: "Alors, le donneur de leçons parisien vient m'expliquer MA forêt ? Elle est chez moi, Cygne. Je fais ce que je veux avec MON jardin." },
+    { s: "capitaine", t: "Alors, le donneur de leçons gallard vient m'expliquer MA forêt ? Elle est chez moi, Cygne. Je fais ce que je veux avec MON jardin." },
     { s: "cygne", t: "Cette forêt n'est pas qu'un jardin, Capitaine. C'est le poumon du monde. Notre maison brûle, et vous regardez ailleurs. Je ne peux pas l'accepter." },
     { s: "capitaine", t: "« Notre maison » ! Toujours le pluriel des riches ! Tu veux internationaliser ma jungle pour mieux la coloniser en costume. J'ai vu ton jeu." },
     { s: "cygne", t: "Je vous propose des fonds, des partenariats, une transition. La fermeté écologique, et en même temps la main tendue. Éteignez les feux, pas le dialogue." },
-    { s: "capitaine", t: "Garde ton argent et tes leçons, l'énarque ! Je vais déforester ton camp au sol, tronc par tronc, et renvoyer ta bombe dans ta belle capitale à pigeons !" },
+    { s: "capitaine", t: "Garde ton argent et tes leçons, le technocrate ! Je vais déforester ton camp au sol, tronc par tronc, et renvoyer ta bombe dans ton beau palais à pigeons !" },
     { s: "narrator", t: "Le Capitaine se dope. L'ara s'envole. La Déforestation gronde. Renvoyez la bombe — ou la forêt vous ensevelit." }
   ],
   win:  [
     { s: "cygne", t: "Voilà. On peut aimer un peuple et condamner ses feux. En même temps ferme sur l'écologie, en même temps ouvert au partenariat. La forêt vous remercie." },
     { s: "capitaine", t: "Tsss. Tu gagnes un match, pas ma forêt. Reviens quand tu voudras, l'oiseau : mes troncs t'attendent, et mon ara aussi." },
-    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
   ],
   lose:  [
     { s: "capitaine", t: "BOUM ! En pleine capitale ! Retourne compter tes pigeons, technocrate ! La forêt est à MOI, et elle vient de te le rappeler à l'explosif !" },
@@ -216,7 +210,7 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   win:  [
     { s: "cygne", t: "Sur mon terrain, sous mon emblème, l'hiver n'a pas passé. Fermeté ET dialogue, en même temps, jusqu'au bout. Voilà la Gallardie. Voilà le Sommet remporté." },
     { s: "volkoi", t: "Un revers. Temporaire. L'hiver est patient, et j'ai de la patience pour deux siècles. On se reverra sur la glace, oiseau." },
-    { s: "narrator", t: "Le Cygne lève les bras. Les pigeons reviennent se poser sur l'obélisque. Le cygne doré, enfin, semble briller. Jeux du Sommet : Le Cygne triomphe. En même temps. Le ballon est une bombe : le camp où elle tombe perd." }
+    { s: "narrator", t: "Le Cygne lève les bras. Les pigeons reviennent se poser sur l'obélisque. Le cygne doré, enfin, semble briller. Jeux du Sommet : Le Cygne triomphe. En même temps." }
   ],
   lose:  [
     { s: "volkoi", t: "Boum. Sous ton propre palais. Ton emblème a gelé les ailes ouvertes. Ton « en même temps » a fini en glaçon. Comme prévu." },

@@ -32,197 +32,223 @@ Au fond — mais il ne l'avouera jamais, et si vous le citez il dira que c'est *
 
 ## Mode Histoire de Baron Dorf
 
-> Le joueur pilote **Baron Dorf** (camp gauche). Il affronte ses neuf rivaux : un allié qu'il rançonne, un maréchal qu'il courtise, un gourou qu'il tente de vendre, un sultan bâtisseur, un faucon négociateur, puis la guerre des tarifs, deux populistes, un duel de haute tension, et une finale au sommet — à domicile, sous les palmiers dorés.
+> Le joueur pilote **Baron Dorf** (camp gauche). Objectif affiché dès la première conférence de presse : signer « le Deal du siècle ». Personne ne sait ce que c'est — lui non plus — mais chaque match en est une « étape décisive » : un double sous la neige, une bromance par courrier, une franchise d'ashram, des guerres de tours, de puces et de forêts, jusqu'à la finale à domicile où le Deal trouve enfin son signataire idéal : lui-même.
 
 ### ACTE I — Petites rivalités (Volley)
 
 ```js
 {
-  act: 1, title: "L'Alliance qui coûte cher", sub: "Doria–Levantie vs Bourassie–Ramenie · double sous haute tension",
+  act: 1, title: "La fusion-acquisition", sub: "Doria–Levantie vs Bourassie–Safranie · double sous la neige",
   left: "dorf", right: "volkoi", ally: "faucon", right2: "safran", terrain: 0, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Place Écarlate, sous la neige. Aujourd'hui l'Alliance joue en double : le Baron et le Faucon d'un côté, le Tsar et Safran de l'autre. Personne n'avait prévu ce tableau." },
-    { s: "dorf", t: "Toi, Faucon, tu es mon partenaire. Le meilleur. Le plus dur. On paie l'Alliance… en smashs." },
-    { s: "faucon", t: "Je ne paie rien. Je sécurise. Toi, tu parles ; moi, je digue. Deal." },
-    { s: "volkoi", t: "Tu m'as mis avec le paria du désert. Parfait. Je gèle, il ralentit, vous perdez à deux vitesses." },
-    { s: "safran", t: "Alliance de circonstance, mais alliance quand même. L'Ouest se réunit contre nous ; nous, on patiente, ensemble." },
-    { s: "narrator", t: "Deux équipes, quatre egos. L'alliance se joue aussi entre partenaires de filet." },
+    { s: "narrator", t: "Place Écarlate, sous la neige. Le Baron a convoqué la presse pour annoncer « le Deal du siècle ». Personne ne sait ce que c'est. Lui non plus. Mais l'étape une est claire : un double, et une victoire." },
+    { s: "dorf", t: "Faucon ! Mon partenaire ! Techniquement, c'est une fusion-acquisition : j'acquiers ta défense, tu fusionnes avec ma grandeur. Les parts ? 70-30. Négociable jusqu'à 80-20." },
+    { s: "faucon", t: "Je ne fusionne pas. Je sécurise le flanc gauche, tu occupes le droit, et personne ne parle pendant les échanges. Ce sont mes conditions. Toutes." },
+    { s: "volkoi", t: "Regarde ça, Safran. Le Consortium nous envoie un vendeur et son garde du corps." },
+    { s: "safran", t: "Laissons-les s'agiter. Le froid et la lenteur forment une équipe très reposante." },
+    { s: "dorf", t: "Vous entendez ? Ils complotent ! En équipe ! Heureusement, j'ai le meilleur partenaire et le meilleur gazon — enfin non, c'est le leur, mais je l'achète après le match !" },
+    { s: "narrator", t: "Quatre puissances, deux camps, un filet gelé. Le Deal du siècle commence par un service." },
   ],
   win:  [
-    { s: "dorf", t: "ÉNORME ! Meilleure alliance du monde ! Faucon, t'es pas mauvais — pour un allié." },
-    { s: "faucon", t: "On a tenu la ligne. Le reste est du bruit de sommet." },
-    { s: "volkoi", t: "Un revers. Temporaire. Même en double, l'hiver revient." },
-    { s: "safran", t: "Défaite mesurée. Le voile retombera, patient, sur ton mur d'or trop pressé." },
+    { s: "volkoi", t: "Un revers. Temporaire. La neige, elle, reste. Elle te regarde célébrer, Baron. Elle prend des notes." },
+    { s: "safran", t: "Défaite mesurée. Le voile retombera sur votre or, patient comme un embargo." },
+    { s: "faucon", t: "Flanc tenu, mission remplie. Je pars avant les discours. Surtout avant les discours." },
+    { s: "dorf", t: "ÉNORME ! Étape une du Deal du siècle : VALIDÉE ! Faucon, tu es officiellement mon deuxième meilleur ami — le premier, c'est moi !" },
   ],
   lose:  [
-    { s: "volkoi", t: "Le gel à deux, ça marche. Tu peux garder ton Alliance, Baron — elle vient de geler." },
-    { s: "safran", t: "Un partenariat de patience contre un partenariat de bruit. Devinez lequel a tenu plus longtemps ce soir." },
-    { s: "dorf", t: "Truqué ! Mon partenaire a… enfin, LE filet était de travers !" },
-    { s: "faucon", t: "On recommence. Sans discours. Avec plus de digues." },
+    { s: "volkoi", t: "Le gel à deux, ça fonctionne. Ton Deal du siècle vient de prendre l'eau. Elle va geler aussi." },
+    { s: "safran", t: "La patience à quatre mains. Revenez quand vous saurez attendre, Baron. Donc jamais." },
+    { s: "faucon", t: "Défaite constatée. Cause : trop de mots côté allié. C'est dans mon rapport. Souligné." },
+    { s: "dorf", t: "Truqué ! La neige est truquée ! Qui a autorisé de la neige en plein match ?! Je taxe la météo ! Enquête !" },
   ]
 },
 {
-  act: 1, title: "Les belles lettres", sub: "Doria–Ryonganie · la bromance improbable",
+  act: 1, title: "Les belles lettres", sub: "Doria–Ryonganie · la bromance en majuscules",
   left: "dorf", right: "bebe", terrain: 3, mode: "volley", ai: 1, doped: null,
   pre:  [
-    { s: "narrator", t: "Esplanade du Défilé. Le radar tourne, les gradins de granit sont pleins. Deux hommes qui s'écrivent des lettres d'amour se retrouvent au filet." },
-    { s: "bebe", t: "Grand Baron. Nous nous étions écrit de si belles lettres, toi et moi. Les plus belles. Presque aussi belles que les miennes." },
-    { s: "dorf", t: "Grand leader ! Très grand ! On est tombés amoureux, tu sais. Par courrier. Le plus beau courrier de tous les temps." },
-    { s: "bebe", t: "Alors joue avec discipline. Ici, on défile au millimètre. Un pas de travers et la Batterie AA t'interdit de sauter." },
-    { s: "dorf", t: "Interdit de sauter ? Moi je saute quand je veux, où je veux. Mais pour toi, mon ami, je resterai au sol. Par amour. Sers." }
+    { s: "narrator", t: "Esplanade du Défilé. Le radar tourne, les gradins de granit débordent — présence obligatoire, enthousiasme noté. Deux hommes qui s'écrivent des lettres d'amour se retrouvent enfin au filet." },
+    { s: "bebe", t: "Grand Baron ! J'ai relu tes lettres : quarante-deux compliments, dont trente-neuf pour toi-même. C'est de l'amour, ça !" },
+    { s: "dorf", t: "Les plus belles lettres de l'histoire postale ! Et j'ai un deal pour toi : une Tour Dorf sur ton esplanade ! Condos de luxe, vue imprenable sur tes défilés !" },
+    { s: "bebe", t: "Personne ne construit plus haut que ma tribune ! Et personne ne saute chez moi : ma Batterie AA verrouille le ciel, l'espace aérien et les compliments !" },
+    { s: "dorf", t: "Pour toi, mon ami, je resterai au sol. Par amour. Et parce que le penthouse, de toute façon, c'est moi." },
+    { s: "narrator", t: "Le radar suit le ballon. Les deux ego, eux, sont trop gros pour l'écran." },
   ],
   win:  [
-    { s: "dorf", t: "Battu le petit maréchal ! Mais gentiment. Entre amoureux. Je t'écrirai ce soir, la plus belle lettre, tu vas pleurer." },
-    { s: "bebe", t: "Une défaite temporaire. Le programme continue, le défilé aussi. Écris-moi quand même. J'aime tes majuscules." }
+    { s: "bebe", t: "Défaite provisoire ! Le comité de vérification des scores rendra son rapport : victoire du Maréchal à titre posthume du match !" },
+    { s: "dorf", t: "Battu le petit Maréchal ! Mais gentiment, avec amour. Le deal tient : ta tribune, mes condos, nos initiales entrelacées en néon doré." },
+    { s: "dorf", t: "Je t'écris ce soir. La plus belle lettre. Tu vas pleurer, et tes larmes seront les plus grandes de l'histoire de ton pays — j'ai vérifié, c'est un petit pays." },
   ],
   lose:  [
-    { s: "bebe", t: "La discipline écrase l'improvisation. Même l'amour a un défilé, Baron. Reste dans le rang." },
-    { s: "dorf", t: "Il triche ! Enfin… il triche merveilleusement bien. Quel talent. On s'aime toujours ? On s'aime toujours." }
+    { s: "bebe", t: "VICTOIRE ! Douze mille spectateurs l'ont vue et treize mille l'applaudissent déjà ! Les chiffres sont formels : c'est moi qui les donne !" },
+    { s: "dorf", t: "Truqué ! Le radar m'a flashé en plein smash ! On ne flashe pas un génie ! …Mais quelle machine, quand même. Tu me la vends ?" },
+    { s: "bebe", t: "Jamais ! …Contre une lettre avec plus de majuscules, on peut discuter." },
   ]
 },
 {
-  act: 1, title: "Le grand show", sub: "Doria–Bharatie · deux vendeurs, une vache",
+  act: 1, title: "Le grand show", sub: "Doria–Bharatie · deux bêtes de stade, une vache",
   left: "dorf", right: "gourou", terrain: 6, mode: "volley", ai: 1, doped: null,
   pre:  [
-    { s: "narrator", t: "Stade Ashram, grès couleur miel, guirlandes de soucis. Une vache qui traverse traverse le court avec la sérénité d'un arbitre neutre." },
-    { s: "dorf", t: "Regarde cette foule ! Immense ! On dit que tu remplis les stades. Moi aussi je remplis les stades. On devrait faire un stade ensemble. Le plus grand." },
-    { s: "gourou", t: "Namasté, Baron. Toi tu vends des tours ; moi je vends du souffle. Devine lequel des deux ne tombe jamais en faillite." },
-    { s: "dorf", t: "La faillite ! Six fois ! Sept ! Et je suis toujours là, plus doré que jamais. C'est ça, un vrai champion." },
-    { s: "gourou", t: "Médite là-dessus pendant que la vache traverse. Ta grande gueule ne renverra pas mes ballons. Servons." }
+    { s: "narrator", t: "Stade Ashram, grès couleur miel, guirlandes de soucis. Cent mille places, deux ego, et une vache qui traverse le court avec la sérénité d'un huissier." },
+    { s: "dorf", t: "Quelle foule ! Presque autant qu'à mes meetings — je dis « presque » par politesse, c'est moins. Gourou, j'ai le deal du siècle : on franchise ton ashram ! Le yoga, c'est de l'immobilier sans murs. On ajoute des murs, on triple le prix !" },
+    { s: "gourou", t: "Namasté, Baron. Ton offre est généreuse comme un filet de pêche : tout ce qui entre t'appartient. Moi, je vends déjà du souffle à des millions de fidèles. Marge : infinie. Stock : l'univers." },
+    { s: "dorf", t: "L'univers ! J'adore ! On met mon nom dessus ?" },
+    { s: "gourou", t: "Ton nom est déjà partout, Baron. C'est d'ailleurs le seul endroit où il reste de la place : partout." },
+    { s: "gourou", t: "Attention à la vache. Elle précède les grands enseignements. Et les grandes réceptions manquées." },
   ],
   win:  [
-    { s: "dorf", t: "Le plus grand show du monde ! Même la vache a applaudi. Enfin, elle m'a regardé. C'est pareil. Beau jeu, le gourou." },
-    { s: "gourou", t: "Tu gagnes le match et tu perds ton calme à chaque point. Étrange économie. Respire un peu, ça se vend aussi." }
+    { s: "gourou", t: "Tu gagnes le match et tu perds ton calme à chaque échange. Étrange bilan. Je t'enverrai ma brochure : « respirer », module payant." },
+    { s: "dorf", t: "Le plus grand show du monde ! Même la vache a applaudi ! Enfin, elle a cligné des yeux. Chez les vaches, c'est une standing ovation." },
+    { s: "dorf", t: "Réfléchis pour la franchise, mon ami. « Dorf Ashram » : détends-toi plus vite, plus fort, plus cher." },
   ],
   lose:  [
-    { s: "gourou", t: "Le calme bat le tapage. Toujours. La vache l'avait compris avant toi. Namasté, Baron." },
-    { s: "dorf", t: "Truqué par un homme en pyjama ! Incroyable. La vache était de son côté. Complot bovin. J'ouvre une enquête." }
+    { s: "gourou", t: "Le calme bat le tapage. La vache le savait avant le premier service — c'est pour cela qu'elle s'était placée de mon côté du karma." },
+    { s: "dorf", t: "Truqué ! La vache ! Elle m'a regardé PENDANT mon service ! Un regard bovin appuyé, tout le monde l'a vu ! J'ouvre une enquête. Bovine. La plus grande." },
+    { s: "gourou", t: "Elle témoignera contre un pré. Bonne chance, Baron : elle a plus de patience que ton avocat." },
   ]
 },
 ```
 
-### ACTE I — Petites rivalités (Volley)
+### ACTE II — Les tensions montent (Ballon enflammé)
 
 ```js
 {
   act: 2, title: "La guerre des tours", sub: "Doria–Bosforie · qui a la plus haute ?",
   left: "dorf", right: "sultan", terrain: 5, mode: "flame", ai: 2, doped: null,
   pre:  [
-    { s: "narrator", t: "Pont des Deux Mondes. Un tapis volant survole le détroit. Deux bâtisseurs de tours se toisent, chacun persuadé d'avoir la plus grande. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
-    { s: "sultan", t: "Je bâtis des dômes, des tours, des ponts entre deux continents ! Ma skyline défie le ciel. Et la tienne ? Un hôtel doré à toit plat." },
-    { s: "dorf", t: "Toit plat, mais or MASSIF ! La plus haute tour du monde, tout le monde le dit. La tienne, elle est jolie. Pour une deuxième place." },
-    { s: "sultan", t: "Deuxième place ? Je contrôle le détroit du monde et tu me parles de classement immobilier ? Je vais te défoncer au smash." },
-    { s: "dorf", t: "Tu smashes, je bâtis Le Mur. Un mur d'or au milieu de ton beau tapis. On verra qui vole encore. Sers, le bâtisseur." }
+    { s: "narrator", t: "Pont des Deux Mondes. Un tapis volant survole le détroit ; deux bâtisseurs se toisent, mètre en main. Le ballon s'enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+    { s: "sultan", t: "Baron ! Je bâtis des ponts entre deux continents, des dômes qui frôlent le ciel ! Toi, tu dores des hôtels à toit plat. Le toit PLAT, Baron. On dirait un aveu." },
+    { s: "dorf", t: "Plat mais en or MASSIF ! Mesurée du sol au sommet de mon nom en capitales, c'est LA plus haute tour du monde ! Ton dôme est joli. Pour un dôme d'appoint." },
+    { s: "sultan", t: "Un dôme d'appoint ?! Je vais te défoncer au smash, promoteur ! Et je t'enverrai la facture du péage : ton ballon vient de survoler MON détroit !" },
+    { s: "dorf", t: "Justement, j'ai un deal : la « Tour des Deux Mondes ». Toi et moi, 50-50. Enfin, 70-30 — les chiffres, c'est mon rayon, ne t'encombre pas." },
+    { s: "sultan", t: "Garde tes pourcentages. Sur mon pont, la colère est théâtrale mais le péage est réel. Sers, qu'on brûle un peu ce qui dépasse." },
   ],
   win:  [
-    { s: "dorf", t: "La plus haute tour, le plus grand mur, le plus beau match ! Ta skyline est jolie, mais la mienne gagne. Négocie ta reddition." },
-    { s: "sultan", t: "Un point pour ta tour. Le détroit reste à moi. On rebâtira, Baron. Plus haut. Toujours plus haut." }
+    { s: "sultan", t: "Un point pour le toit plat ! Bah. Le détroit en a vu d'autres : des empires entiers ont coulé ici, et on leur a facturé le renflouage." },
+    { s: "dorf", t: "La plus haute tour, le plus beau smash, la plus belle brûlure ! Ta skyline est superbe — je l'achète. Pour la vue depuis MA tour." },
+    { s: "dorf", t: "Et le deal tient : 70-30. Vu le score, disons 85-15. Les chiffres bougent, c'est ça, un marché dynamique." },
   ],
   lose:  [
-    { s: "sultan", t: "Grandeur contre grandeur, la mienne a smashé la tienne. Mon dôme salue ton toit plat. De haut." },
-    { s: "dorf", t: "Il a gagné parce que le tapis trichait ! Un tapis étranger ! Je le taxe. Je taxe tous les tapis. Croyez-moi." }
+    { s: "sultan", t: "Grandeur contre grandeur, et c'est mon dôme qui salue ton toit plat. De très, très haut. Le péage de la défaite est payable en or." },
+    { s: "dorf", t: "Truqué ! Le tapis ! Le tapis volant a fait de l'ombre à mon smash au moment EXACT ! Un tapis étranger, en plus ! Je taxe les tapis. Tous. Même les paillassons." },
+    { s: "sultan", t: "Taxe, taxe. Les paillassons passent aussi par mon détroit : à chaque taxe que tu inventes, j'ajoute un péage. Ça s'appelle le commerce, Baron." },
   ]
 },
 {
-  act: 2, title: "Le deal du siècle", sub: "Doria–Levantie · l'art de la négociation",
+  act: 2, title: "Le deal du siècle (version 3.0)", sub: "Doria–Levantie · l'accord historique, clauses mobiles",
   left: "dorf", right: "faucon", terrain: 8, mode: "flame", ai: 2, doped: null,
   pre:  [
-    { s: "narrator", t: "Citadelle du Levant, grès sur colline désertique. Un faucon décrit des cercles. En bas, on prépare non pas un match, mais un « accord historique ». Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
-    { s: "dorf", t: "Mon ami ! On va signer le plus grand accord de tous les temps. La paix, le volley, l'immobilier. Tu me donnes le point, je te donne mon amitié éternelle." },
-    { s: "faucon", t: "Je ne donne pas de points, Baron. Je les sécurise. Un Raid Éclair et tu ne sautes plus. La sécurité d'abord, l'amitié ensuite." },
-    { s: "dorf", t: "La sécurité ! J'adore. Je te vends un mur d'or, clé en main, financé par tes voisins. Le plus beau mur défensif du monde." },
-    { s: "faucon", t: "Garde ton mur. J'ai des remparts, un faucon et zéro état d'âme. On signe sur le terrain. Debout. Sers." }
+    { s: "narrator", t: "Citadelle du Levant. Grès, remparts, un faucon en observation. Sur la table : « l'accord historique », version trois, paragraphe un, en cours de réécriture. Le ballon s'enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+    { s: "dorf", t: "Mon ami ! Mon allié ! Mon ex-partenaire de double ! Voici le Deal du siècle : la paix, le volley, l'immobilier. Tu me donnes le match, je te donne mon amitié éternelle. Valeur estimée : incalculable. Par moi." },
+    { s: "faucon", t: "J'ai lu ta version deux. La clause quatre te donnait mes remparts. La clause cinq te donnait la clause quatre. Refusé." },
+    { s: "dorf", t: "Détails ! On enlève la clause cinq — je la remets après signature. Personne ne lit après signature." },
+    { s: "faucon", t: "Moi, je lis. Avant, pendant, après. C'est mon métier. Un Raid Éclair et tu ne sautes plus : voilà ma clause unique, applicable d'office." },
+    { s: "dorf", t: "J'adore négocier avec toi ! Tu dis non à tout, ça me laisse toute la place pour dire oui à ma place ! Sers, partenaire. Ex-partenaire. Futur partenaire, crois-moi." },
   ],
   win:  [
-    { s: "dorf", t: "Deal conclu ! Le plus grand deal ! Tu as perdu, mais tu as gagné mon respect, ce qui vaut de l'or. Beaucoup d'or. Le mien." },
-    { s: "faucon", t: "Tu gagnes le point, pas la région. Je reste debout, comme toujours. On se reverra, marchand de murs." }
+    { s: "faucon", t: "Défaite au sol, dossier ouvert. Note : le Baron gagne quand on le laisse parler. Recommandation : bouchons d'oreilles. Budget approuvé." },
+    { s: "dorf", t: "Deal conclu ! Tu as perdu, mais tu gagnes mon respect, qui vaut de l'or. Le mien. Que je garde. C'est ça, la beauté du deal." },
+    { s: "dorf", t: "Version 4.0 au prochain sommet : j'ajoute une clause où tu as déjà perdu. Ça fera gagner du temps à tout le monde." },
   ],
   lose:  [
-    { s: "faucon", t: "Raid, contre, sécurisé. Ton grand deal tenait sur du vent doré. La citadelle, elle, tient sur la pierre." },
-    { s: "dorf", t: "Il a rompu l'accord ! Après tout ce que j'ai promis de ne jamais tenir ! Une trahison. La plus belle trahison. Enquête." }
+    { s: "faucon", t: "Raid, contre, brûlure sécurisée. Ton accord historique tenait sur du vent doré. Mes remparts tiennent sur de la pierre et de la méfiance. Surtout de la méfiance." },
+    { s: "dorf", t: "Il a rompu l'accord ! Après tout ce que j'avais promis de ne jamais tenir ! Truqué ! Le vent ! Le vent du désert soufflait UNIQUEMENT sur mon camp !" },
+    { s: "faucon", t: "Le vent est neutre. J'ai vérifié. Deux fois. C'est dans le dossier." },
   ]
 },
 {
-  act: 2, title: "La guerre des puces", sub: "Doria–Panguo · tarifs, silicium & mèche courte",
+  act: 2, title: "La guerre des puces", sub: "Doria–Panguo · tarifs, silicium et mèche courte",
   left: "dorf", right: "timonier", terrain: 4, mode: "flame", ai: 2, doped: null,
   pre:  [
-    { s: "narrator", t: "Cité du Matin, murs cramoisis, toits d'or. Le ballon n'est plus un ballon : c'est un ballon enflammé à brûlure. Enjeu : qui fabrique le monde ?" },
-    { s: "dorf", t: "Des taxes ! Des taxes sur tout ! Sur tes puces, ton filet, tes lanternes, l'air que tu respires ! On gagne tellement, tu vas être fatigué de perdre." },
-    { s: "timonier", t: "Taxe ce que tu veux, Baron. Tes tours, tes voiturettes, tes bombes dorées… c'est encore mon atelier qui les assemble. Patience." },
-    { s: "dorf", t: "On se découple ! On rapatrie tout à Doria ! Enfin… après ce match. J'ai un peu besoin de tes ballons. Beaucoup. Tous, en fait." },
-    { s: "timonier", t: "Le tempo, l'harmonie, la brûlure qui brûle. Tu klaxonnes ; moi je livre à l'heure. Renvoie le ballon enflammé si tu peux." }
+    { s: "narrator", t: "Cité du Matin, murs cramoisis, toits d'or, lions impassibles. Enjeu du soir : qui fabrique le monde. Le ballon s'enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+    { s: "dorf", t: "Des taxes ! Sur tes puces, tes filets, tes lanternes, et l'air que je respire quand il vient de chez toi ! On gagne tellement que mes comptables pleurent de joie — enfin, ils pleurent, c'est déjà ça." },
+    { s: "timonier", t: "Taxe, Baron, taxe. Tes tours, tes voiturettes, ton ballon doré : assemblés dans mon atelier. Tu me fais la guerre avec des munitions que je te vends." },
+    { s: "dorf", t: "Justement : on se découple ! Rapatriement total ! Made in Doria ! …Juste après ce match. Et la prochaine livraison. Et celle d'après. Le découplage, c'est progressif, c'est technique." },
+    { s: "timonier", t: "« Celui qui claque la porte de l'atelier revient par la fenêtre du magasin. » Proverbe. Je viens de le fabriquer aussi — chez moi, tout se fabrique." },
+    { s: "timonier", t: "Renvoie vite ce ballon, Baron. Il brûle. Comme tes marges." },
   ],
   win:  [
-    { s: "dorf", t: "Made in Doria ! On gagne ! On gagne tellement que le monde entier est jaloux ! le ballon enflammé a explosé chez toi, le plus beau boum du monde." },
-    { s: "timonier", t: "Une manche. La chaîne, elle, ne s'arrête jamais. Tu reviendras à l'atelier, l'or à la main. Ils reviennent tous." }
+    { s: "timonier", t: "Une manche perdue. La chaîne, elle, ne s'arrête jamais : pendant que tu célébrais, j'ai produit trois filets et un proverbe." },
+    { s: "dorf", t: "MADE IN DORIA ! Le ballon enflammé a grillé chez toi, et c'était un feu de la plus haute qualité : importé de chez moi !" },
+    { s: "dorf", t: "Le découplage commence MAINTENANT. …C'est quoi ce klaxon ? Ma voiturette ? Assemblée OÙ ?! …On commence demain." },
   ],
   lose:  [
-    { s: "timonier", t: "Le tempo écrase le klaxon. Découple donc ; commande-moi de nouvelles usines pour le faire. Je patiente. Toujours." },
-    { s: "dorf", t: "Subventionné ! Déloyal ! Il fabrique même mes bombes ! … Combien pour le prochain lot ? Je paie. Discrètement." }
+    { s: "timonier", t: "Le tempo écrase le klaxon. Découple-toi, je t'en prie : commande-moi les usines pour le faire, je livre en avance." },
+    { s: "dorf", t: "Truqué à l'échelle industrielle ! Il truque en gros volumes ! Ce n'est même plus de la triche, c'est de la logistique ! J'exige un audit ! Fabriqué ailleurs, l'audit !" },
+    { s: "timonier", t: "L'audit aussi, je peux te le vendre. Résultats garantis conformes. À mes chiffres." },
   ]
 },
 ```
 
-### ACTE I — Petites rivalités (Volley)
+### ACTE III — Conflits ouverts (Bombe)
 
 ```js
 {
-  act: 3, title: "Deux populistes, un selfie", sub: "Doria–Tropicalia · frères d'esbroufe",
+  act: 3, title: "Deux populistes, un selfie", sub: "Doria–Tropicalia · frères d'esbroufe, mèche allumée",
   left: "dorf", right: "capitaine", terrain: 7, mode: "bomb", ai: 3, doped: null,
   pre:  [
-    { s: "narrator", t: "Grande Forêt, clairière de jungle dorée, court en terre rouge. Un ara pousse un cri. Deux fanfarons se reconnaissent — et se méfient d'autant plus. Le ballon est une bombe : le camp où elle tombe perd." },
-    { s: "capitaine", t: "Baron ! Le seul type sur cette planète qui parle plus fort que moi. Ça m'énerve. Ça me plaît. Ma tronçonneuse a soif de ton gazon doré." },
-    { s: "dorf", t: "Le Capitaine ! On est pareils, toi et moi. Les meilleurs. Sauf que moi je suis un peu plus le meilleur. Range ta tronçonneuse près de mon mur." },
-    { s: "capitaine", t: "Ton mur d'or ? Je le débite en bûches. Ici c'est ma forêt, mes règles, mon bazar. Deux brutes, une balle, une clairière." },
-    { s: "dorf", t: "Deux légendes, tu veux dire. On fait le point d'abord, le selfie ensuite. Le plus beau selfie de l'histoire. Sers, mon frère." }
+    { s: "narrator", t: "Grande Forêt, clairière dorée, court en terre rouge. L'ara se perche pour arbitrer — il a le sifflet le plus fort du circuit et aucune notion des règles. Le ballon est une bombe : le camp où elle tombe perd." },
+    { s: "capitaine", t: "Baron ! Le seul homme qui parle plus fort que moi ! Ça m'énerve et ça me plaît. Viens, on fait le selfie avant le match — après, y en a un de nous deux qui sera moins beau." },
+    { s: "dorf", t: "Le selfie du siècle ! Deux légendes, un objectif, mon meilleur profil — les deux sont mes meilleurs profils. Et après, un deal : je t'achète ta forêt, on en fait un golf. Dix-huit trous, zéro arbre, cent pour cent gazon doré." },
+    { s: "capitaine", t: "Ma forêt en golf ?! Ici c'est MA jungle, mes règles, mon barbecue ! La seule chose qu'on coupe ici, c'est moi qui décide de la couper !" },
+    { s: "dorf", t: "D'accord, on garde un arbre. Pour l'ombre du club-house. Je suis un écologiste ÉNORME, tout le monde le dit." },
+    { s: "capitaine", t: "L'ara jugera. Et je te préviens : il est corrompu, mais c'est MOI qui le corromps. Sers, champion, la bombe n'attend pas les discours." },
   ],
   win:  [
-    { s: "dorf", t: "Battu le bûcheron ! Sur SON terrain rouge ! Énorme ! On reste amis, hein ? Les meilleurs restent amis. Souris pour la photo." },
-    { s: "capitaine", t: "Volé chez moi par un marchand de tours ! Bon… c'était du beau bazar. Reviens quand tu veux, j'aurai deux tronçonneuses." }
+    { s: "capitaine", t: "Volé ! Chez moi ! Par un marchand de tours ! …Bon. C'était du beau bazar quand même. Reviens quand tu veux : j'aurai deux tronçonneuses et un meilleur ara." },
+    { s: "dorf", t: "Battu le bûcheron sur SA terre rouge ! Historique ! Le selfie de la victoire — attends, je me mets devant. Voilà. Toi, tu es l'arrière-plan. Le plus beau des arrière-plans." },
+    { s: "dorf", t: "Et le deal du golf tient toujours ! Je t'offre le poste de jardinier en chef. C'est ÉNORME comme promotion, quand on y pense. N'y pense pas trop." },
   ],
   lose:  [
-    { s: "capitaine", t: "La brute a parlé, et c'était moi ! Ton mur d'or fait un joli tas de bois. Ha ! On se refait un selfie, champion ?" },
-    { s: "dorf", t: "Truqué par un homme à la tronçonneuse ! Dans une forêt ! Personne n'était prévenu. Personne. C'est un scandale magnifique." }
+    { s: "capitaine", t: "BOUM ! La bombe a explosé côté doré, l'ara a validé, le barbecue est allumé ! Deux brutes, une clairière, un seul roi de la jungle !" },
+    { s: "dorf", t: "Truqué par la jungle ! Les arbres ont BOUGÉ pendant mon smash ! J'ai des témoins : moi, et mon reflet dans le trophée que j'aurais dû gagner !" },
+    { s: "capitaine", t: "Les arbres bougent, oui. Ça s'appelle le vent, champion. Chez moi, même la forêt joue collectif." },
   ]
 },
 {
-  act: 3, title: "Le duel doré", sub: "Doria–Ramenie · tension sous les roses",
+  act: 3, title: "Le duel doré", sub: "Doria–Safranie · pression maximale sous les roses",
   left: "dorf", right: "safran", terrain: 9, mode: "bomb", ai: 3, doped: "R",
   pre:  [
-    { s: "narrator", t: "Jardin des Roses, arcades turquoise, roseraie de palais. Un paon déploie sa roue. La bombe tourne. L'adversaire arrive… l'œil injecté, l'aura rouge." },
-    { s: "safran", t: "Tu bâtis des murs d'or, Baron. Nous, on tisse des Voiles d'Or. Le tien clinquant, le mien patient. Devine lequel ralentit l'autre." },
-    { s: "dorf", t: "Un voile ? J'ai un MUR ! Le plus grand mur du monde ! Ton voile, c'est du rideau de douche. Je vais te sanctionner. Tarifs. Tout." },
-    { s: "narrator", t: "Regarde ses veines. Il carbure. On murmure que les grands enjeux le « dopent » — et que ce soir, l'enjeu est immense." },
-    { s: "safran", t: "Mesuré, sardonique, et ce soir… concentré. Ton klaxon ne me fera pas sursauter. La cour est patiente. La bombe, non. Sers." }
+    { s: "narrator", t: "Jardin des Roses, arcades turquoise, paon en patrouille. La bombe tourne déjà. Et l'adversaire arrive l'œil ambré, l'aura rouge : les grands enjeux le dopent." },
+    { s: "dorf", t: "Safran ! Mon meilleur ennemi ! J'ai déchiré ton Accord, sanctionné ton thé, taxé tes roses — et tu m'invites quand même. Classe. Suspect, mais classe." },
+    { s: "safran", t: "L'hospitalité est une arme ancienne, Baron. On accueille, on sert le thé, on regarde l'invité se vanter jusqu'à l'épuisement. La roseraie fait le reste." },
+    { s: "dorf", t: "J'ai un deal pour toi ! Tu ouvres tes alambics, je lève une sanction sur deux. Les années paires. Signature aujourd'hui, conditions révisables par moi, à la hausse, rétroactivement." },
+    { s: "safran", t: "Voilà pourquoi la table est toujours là et toujours vide, Baron. Mon Voile d'Or va ralentir votre klaxon — considérez cela comme la lecture des petites lignes que vous n'écrivez jamais." },
+    { s: "narrator", t: "L'aura rouge s'épaissit entre les massifs. La bombe grésille : le camp où elle tombe perd. Le paon, lui, a déjà choisi de survivre." },
   ],
   win:  [
-    { s: "dorf", t: "Battu son truc dopé ! Sous les roses ! Sans carburant, juste avec MOI ! Le plus grand exploit du sport, croyez-moi, les gens pleuraient." },
-    { s: "safran", t: "Un point pour le clinquant. Le voile retombera, patient, sur ton or trop pressé. On se retrouvera, marchand." }
+    { s: "safran", t: "Un point pour le clinquant. Notez l'ironie : vous gagnez dopé à votre propre ego, et c'est parfaitement légal. La nature est mal faite." },
+    { s: "dorf", t: "Battu le voile, le paon, les roses ET le dopage ! Avec rien d'autre que MOI ! Le plus grand exploit antidopage de l'histoire du sport — les gens pleuraient !" },
+    { s: "dorf", t: "Et je lève une sanction pour fêter ça. Une petite. Celle sur les pétales. L'année prochaine. Peut-être." },
   ],
   lose:  [
-    { s: "safran", t: "Le voile a ralenti le klaxon, et la bombe a fait le reste. Mesure-toi à la patience, Baron. Tu n'en as aucune." },
-    { s: "dorf", t: "Il était DOPÉ ! Aura rouge ! Match volé ! La plus grande injustice depuis la dernière ! Enquête, sanctions, tarifs sur les roses !" }
+    { s: "safran", t: "Le voile a ralenti le klaxon, la bombe a fait le reste, et le paon n'a pas ouvert un œil. Voilà ce que pèse votre pression maximale dans un jardin." },
+    { s: "dorf", t: "Il était DOPÉ ! Aura rouge, œil bizarre, roses TRUQUÉES ! Le parfum m'a étourdi en plein service — c'est une arme chimique, ça ! J'exige une enquête olfactive !" },
+    { s: "safran", t: "Faites, Baron, faites. Mes roses ont mille ans de patience et un excellent avocat : le temps." },
   ]
 },
 {
-  act: 3, title: "Le sommet à domicile", sub: "Doria–Gallardie · friction transatlantique, bombe et mèche courte",
+  act: 3, title: "Le Deal du siècle", sub: "Doria–Gallardie · la finale à domicile",
   left: "dorf", right: "cygne", terrain: 1, mode: "bomb", ai: 3, doped: "R",
   pre:  [
-    { s: "narrator", t: "Finale. Retour au Country Club Doré, fontaine allumée, palmiers au garde-à-vous. Le Cygne, costume impeccable, débarque sur le gazon le plus vert du monde. La bombe attend." },
-    { s: "cygne", t: "Alors c'est ici, votre palais. Beaucoup d'or, peu de nuance. Je viens en allié, et en même temps je viens vous rappeler qui paie vraiment pour l'Alliance." },
-    { s: "dorf", t: "Cher Cygne ! On s'aime bien, toi et moi, tout le monde le dit — enfin, moi je le dis. Mais tu me dois de l'argent. Beaucoup d'argent. Pour la défense. La tienne." },
-    { s: "cygne", t: "En même temps allié fidèle, en même temps facture salée. C'est un numéro d'équilibriste que je maîtrise depuis toujours." },
-    { s: "narrator", t: "Ses veines pulsent, l'aura rouge irradie. Le dopage d'État, à ciel ouvert, sur la plus belle pelouse du monde. Le Cygne, pour une fois, joue à cran." },
-    { s: "dorf", t: "Le plus grand match de tous les temps. Doria contre l'élégance. Et je vais gagner. Sans carburant. Juste avec MOI, ma mèche et Le Mur. Servons." }
+    { s: "narrator", t: "Finale. Country Club Doré : fontaine allumée, palmiers au garde-à-vous, gazon tondu au millimètre par décret. Le Cygne débarque, costume impeccable, facture à la main. Le ballon est une bombe : le camp où elle tombe perd." },
+    { s: "cygne", t: "Alors voilà votre palais, Baron. Beaucoup d'or, peu de nuance — et une addition : vous taxez mes vins, mes fromages, mes avions. L'Alliance mérite mieux qu'un péage." },
+    { s: "dorf", t: "Cher Cygne ! On s'aime, tout le monde le dit — je le dis. Mais tu me dois de l'argent pour ta défense. Bonne nouvelle : j'ai LE deal. Le Deal du siècle. Celui que j'annonce depuis le premier match." },
+    { s: "cygne", t: "J'écoute. Avec l'enthousiasme prudent de l'homme qui a lu vos clauses cinq." },
+    { s: "dorf", t: "Tu gagnes : je te pardonne ta dette. Je gagne : tu me la paies double, et tu m'applaudis. C'est équilibré : dans les deux cas, je suis content." },
+    { s: "narrator", t: "Les veines du Cygne pulsent, l'aura rouge irradie jusqu'à la fontaine. Le champion de l'antidopage a des reflets de finale." },
+    { s: "cygne", t: "Ceci ? Des vitamines. Parfaitement légales quelque part. Le champion du sport propre se doit de finir la saison en pleine forme — c'est presque une obligation morale." },
+    { s: "dorf", t: "Et ma mèche est un phénomène capillaire naturel. On a tous nos secrets d'État. SERS, l'élégant : l'histoire m'attend, et elle est en avance." },
   ],
   win:  [
-    { s: "dorf", t: "CHAMPION ! À domicile ! Sans dopage ! Le plus grand vainqueur de l'histoire des sommets ! J'ai battu tous les clubs à moi seul ! On construit une tour pour fêter ça !" },
-    { s: "cygne", t: "Une défaite. Sur votre gazon, sous vos palmiers dorés. En même temps, l'Alliance survivra à cette facture-là aussi. Elle survit à tout." },
-    { s: "narrator", t: "L'élégance dopée tombe au bout du monde doré. Baron Dorf lève les bras, salue une foule immense — et pour une fois, elle existe vraiment. Générique." }
+    { s: "cygne", t: "Une défaite sur le gazon le plus vert du monde — je cite votre service de presse. L'Alliance survivra à cette facture. Elle survit à tout, même à vous." },
+    { s: "dorf", t: "CHAMPION ! À domicile ! Le Deal du siècle est SIGNÉ — avec moi-même ! Meilleur partenaire, meilleures conditions, aucune clause cachée : je les connais toutes, c'est moi qui les cache !" },
+    { s: "narrator", t: "Baron Dorf lève les bras et salue une foule immense. Pour une fois, elle existe vraiment. La fontaine dore. Le klaxon de la voiturette joue l'hymne de Doria." },
+    { s: "dorf", t: "Et vous savez le plus beau ? Ce n'était même pas truqué. Pour une fois. J'ai fait vérifier. Par moi." },
   ],
   lose:  [
-    { s: "cygne", t: "La fermeté a éteint la fontaine. Votre or brille encore, mais il ne renvoie pas les bombes. En même temps, c'était prévisible." },
-    { s: "dorf", t: "Truqué ! Le plus grand vol de l'histoire ! Sur MON terrain ! Une enquête, la plus grande enquête ! Et l'addition, Cygne, je te l'envoie en double !" }
+    { s: "cygne", t: "La fermeté a éteint votre fontaine, Baron. Votre or brille, mais il ne renvoie pas les bombes — en même temps, personne ne vous l'avait promis." },
+    { s: "dorf", t: "TRUQUÉ ! TOUT ! Le gazon, la fontaine, le klaxon, la GRAVITÉ ! La gravité était réglée contre moi ! J'exige la plus grande enquête de l'histoire : sur la physique !" },
+    { s: "cygne", t: "Je transmettrai à la physique. Elle a l'habitude, avec vous : elle ouvre un dossier à chacune de vos défaites, et il ne se referme jamais." },
   ]
 }
 ```

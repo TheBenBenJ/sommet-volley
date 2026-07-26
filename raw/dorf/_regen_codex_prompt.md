@@ -1,78 +1,67 @@
-# Regen Baron Dorf — identité verrouillée sur idle_1
+# Regen Baron Dorf — passe art (ancre idle_1 v3, polish roster)
 
-Tu as l’image de référence jointe : `assets/dorf/idle_1.png` (Baron Dorf / Sommet Volley).
+Tu as l’image de référence jointe : `raw/dorf/idle_1.png` (nouvelle ancre
+Dorf / Sommet Volley). **C’est la vérité d’identité.**
 
 ## Mission
 
-Regénère **toutes les autres frames** du perso (PAS `idle_1` — celle-là reste la vérité).
-Écris les PNG dans `raw/dorf/<anim>_<n>.png` (écrase si besoin).
+Regénère **toutes les autres frames** (PAS `idle_1` — ne l’écrase JAMAIS).
+Écris dans `raw/dorf/<anim>_<n>.png`. Travaille par **LOTS de 3–4**.
+Après chaque lot : confirme les fichiers, puis lot suivant.
 
-## LOCK identité (OBLIGATOIRE — copie l’image, ne réinvente pas)
+## LOCK identité (OBLIGATOIRE)
 
-Même personnage que la référence, pixel-identity :
-- grosse tête chibi, corps trapu
-- cheveux platine/blond volumineux asymétriques (vague d’un côté)
+Même personnage que la référence, **même niveau de polish** (traits nets,
+cel shading pro — PAS style enfant / joues roses / dents cartoon) :
+- chibi-lite grosse tête, corps trapu
+- cheveux platine-crème volumineux, vague ASYMÉTRIQUE d’un côté
 - teint doré chaud (pas spray-tan orange criard)
-- costume marine oversized, boutons or, chemise crème/blanche
-- cravate OR courte OU pochette champagne (comme sur la ref — garder EXACTEMENT la tenue visible sur idle_1)
-- chaussures noires
-- même visage, mêmes proportions, même échelle, même trait (contours noirs, cel shading)
+- costume marine, boutons or, chemise crème/blanche
+- cravate OR courte + pochette blanche (EXACTEMENT comme sur idle_1)
+- chaussures noires, smirk confiant
+- même visage, proportions, échelle, trait
 
-OUTFIT LOCK : tenue IDENTIQUE sur chaque frame.
+OUTFIT LOCK : tenue IDENTIQUE à `idle_1` sur chaque frame.
 
 ## Format technique
 
-- Fond **MAGENTA uni #FF00FF** (chroma key), PAS blanc, PAS de sol/ombre/texte
-- Perso SEUL, mains VIDES, AUCUNE balle, aucun objet
-- Vue de **côté face à DROITE** (sauf `idle_face_0` = buste de FACE)
-- Corps entier tête→pieds, pieds visibles (sauf idle_face)
-- Une image = une pose = un fichier
+- Fond **MAGENTA uni #FF00FF**, PAS blanc, PAS sol/ombre/texte
+- Perso SEUL, mains VIDES, AUCUNE balle
+- Vue **côté face à DROITE** (sauf `idle_face_0` = FACE)
+- Corps entier tête→pieds (sauf idle_face)
 
-## Frames à générer (26)
+## Lots
 
-| fichier | pose |
-|---------|------|
-| `idle_face_0.png` | portrait buste de FACE, grosse tête, expression caractéristique |
-| `idle_0.png` | debout repos, poids sur les deux pieds (variation vs idle_1) |
-| `walk_0.png` | LEFT foot planted flat forward, right leg stretched back, clear stride, right arm forward |
-| `walk_1.png` | jambes rapprochées mid-step, pieds presque ensemble, bras neutres |
-| `walk_2.png` | RIGHT foot planted flat forward, left leg back (miroir walk_0), left arm forward |
-| `walk_3.png` | jambes rapprochées passage, bras opposés à walk_1 |
-| `jump_0.png` | flexion / crouch prêt à sauter |
-| `jump_1.png` | en l’air, montée |
-| `jump_2.png` | sommet / apex du saut |
-| `receive_0.png` | manchette : bras joints bas devant, mains vides |
-| `receive_1.png` | dig / réception contact, bras joints bas, mains vides |
-| `aim_0.png` | mains ouvertes levées au-dessus de la tête, regard haut, sans balle |
-| `aim_1.png` | même geste set/passe variation, sans balle |
-| `smash_0.png` | armé bras haut (en l’air), main ouverte, pas de balle |
-| `smash_1.png` | frappe smash, main ouverte, pas de balle |
-| `smash_2.png` | accompagnement / follow-through |
-| `super_0.png` | pose spéciale — wind-up |
-| `super_1.png` | pose spéciale — montée |
-| `super_2.png` | pose spéciale — pic |
-| `super_3.png` | pose spéciale — finish |
-| `panic_0.png` | surpris, penché en arrière, bras en l’air |
-| `panic_1.png` | panic plus marqué |
-| `victory_0.png` | célébration, bras levés |
-| `victory_1.png` | victory variation |
-| `defeat_0.png` | abattu, épaules basses |
-| `defeat_1.png` | defeat plus marqué |
+### Lot 1 — idle_face + idle_0
+| `idle_face_0.png` | portrait buste FACE, même tête/tenue, smirk |
+| `idle_0.png` | debout repos côté droite, légère variation vs idle_1 |
 
-## Walk QA
+### Lot 2 — walk (CRITIQUE)
+| `walk_0.png` | WIDE stride: LEFT foot FORWARD, RIGHT back, RIGHT arm FORWARD |
+| `walk_1.png` | PASSING: legs CLOSE, feet nearly side-by-side, NOT wide stride |
+| `walk_2.png` | WIDE stride MIRROR: RIGHT foot FORWARD, LEFT back, LEFT arm FORWARD |
+| `walk_3.png` | PASSING: legs CLOSE, arms opposite walk_1 |
 
-- walk_0 et walk_2 = pieds OPPOSÉS
-- walk_1 et walk_3 = passage (jambes rapprochées), PAS debout
-- PAS de thumbs-up, PAS de pose statue
+### Lot 3 — jump
+| `jump_0.png` | flexion / crouch |
+| `jump_1.png` | montée |
+| `jump_2.png` | apex |
 
-## Outils
+### Lot 4 — receive + aim
+| `receive_0.png` / `receive_1.png` | manchette, mains vides |
+| `aim_0.png` / `aim_1.png` | mains ouvertes au-dessus de la tête, sans balle |
 
-Utilise la génération d’images Codex. Pour chaque frame : génère, sauve dans `raw/dorf/`.
-Quand les 26 sont là, lance :
+### Lot 5 — smash
+| `smash_0..2.png` | armé / frappe / follow-through, main ouverte, pas de balle |
 
-```bash
-python3 tools/cutout.py raw/dorf assets/dorf
-```
+### Lot 6 — super (Le Mur)
+| `super_0..3.png` | wind-up → finish |
 
-Puis vérifie que `assets/dorf/manifest.json` a `walk: 4` et les comptes d’anims canoniques.
-Ne touche PAS à `idle_1.png` (ni raw ni assets) — c’est la référence.
+### Lot 7 — panic + victory
+| `panic_0..1.png` | surpris |
+| `victory_0..1.png` | célébration |
+
+### Lot 8 — defeat
+| `defeat_0.png` / `defeat_1.png` | abattu |
+
+Quand les 26 + `idle_1` sont dans `raw/dorf/`, **arrête** (pas de cutout).

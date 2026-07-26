@@ -171,7 +171,7 @@ function mapPlaceEcarlateReady() {
   return !!(p && spriteReady(p.skyline));
 }
 
-/** Pack fond / props Country Club Doré (terrain Trompette). */
+/** Pack fond / props Country Club Doré (terrain Dorf). */
 function initMapCountryClubDore() {
   SPRITES.mapCountryClubDore = loadMapPack("country-club-dore", {
     skyline: "skyline.png", far: "far.png", crowd0: "crowd_0.png",

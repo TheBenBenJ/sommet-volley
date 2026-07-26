@@ -24,7 +24,7 @@ const MAP_BY_KEY = {
 const NATION_FALLBACK = {
   volkoi: "Bourassie", dorf: "Doria", cygne: "Gallardie", bebe: "Ryonganie",
   timonier: "Panguo", sultan: "Bosforie", gourou: "Bharatie", capitaine: "Tropicalia",
-  faucon: "Levantie", safran: "Ramenie"
+  faucon: "Levantie", safran: "Safranie"
 };
 
 function extractJsFences(md) {
@@ -91,7 +91,14 @@ function extractBlurb(md) {
   }).filter(p => p.length > 50);
   let blurb = paras.slice(0, 2).join(" ");
   if (blurb.length > 520) {
-    blurb = blurb.slice(0, 517).replace(/\s+\S*$/, "") + "…";
+    // coupe à la dernière fin de phrase avant 520 caractères (pas de « … » orphelin)
+    const cut = blurb.slice(0, 520);
+    let end = -1;
+    const re = /[.!?…](?:\s»)?(?=\s|$)/g;
+    let m;
+    while ((m = re.exec(cut))) end = m.index + m[0].length;
+    blurb = end > 0 ? cut.slice(0, end).trim()
+                    : cut.replace(/\s+\S*$/, "").trim(); // secours : coupe au dernier mot
   }
   return blurb;
 }

@@ -14,6 +14,7 @@ const ball = {
   slowMo: 0,           // ralenti caméra — uniquement Smash Battle au filet
   lastTouchSide: -1,
   lastTouchTick: -999, // tick du dernier contact (anti double-comptage)
+  lastHitTick: -999,   // tick de la dernière frappe active (anti double-hit 2v2)
   touches: [0, 0], // touches consécutives par équipe
   trail: [],
   // Gameplay V2
@@ -37,6 +38,7 @@ const ball = {
     this.slowMo = 0;
     this.lastTouchSide = -1;
     this.lastTouchTick = -999;
+    this.lastHitTick = -999;
     this.touches = [0, 0];
     this.trail = [];
     this.heldBy = -1;
@@ -109,6 +111,7 @@ function startPowerWindup(blob) {
   }
   powerWindup = {
     side: blob.side,
+    who: activeBlobs.indexOf(blob), // 2v2 : le lanceur, pas le 1er du camp
     t: 0,
     charge: 0.28,
     ang,
@@ -206,13 +209,19 @@ function firePowerSmash(blob, charge, ang) {
 function stepPowerWindup(inL, inR, ins) {
   if (!powerWindup) return;
   const side = powerWindup.side;
-  let blob = null;
-  for (const b of activeBlobs) {
-    if (b.side === side) { blob = b; break; }
+  let who = powerWindup.who | 0;
+  let blob = activeBlobs[who];
+  // Snapshot ancien sans `who`, ou index périmé → 1er du camp
+  if (!blob || blob.side !== side) {
+    blob = null;
+    for (let i = 0; i < activeBlobs.length; i++) {
+      if (activeBlobs[i].side === side) { blob = activeBlobs[i]; who = i; break; }
+    }
   }
   if (!blob) { powerWindup = null; return; }
+  powerWindup.who = who;
   const input = ins
-    ? (ins.find((x, i) => activeBlobs[i] && activeBlobs[i].side === side) || ins[side] || {})
+    ? (ins[who] || {})
     : (side === 0 ? inL : inR);
   // Micro-ajustement latéral pendant le freeze (lecture + skill)
   const a = charOf(blob);
@@ -511,6 +520,7 @@ function applyDirectedHit(blob, ang, speed, smashTicks) {
   ball.spin = ball.vx * 0.02;
   ball.frozen = false;
   ball.smash = smashTicks || 0;
+  ball.lastHitTick = tick; // 1 frappe / tick (évite téléport coéquipier 2v2)
   clearBallHold();
   // Garde le point de contact (pas de téléport « collé aux mains ») :
   // on ne sépare que si la balle chevauche encore la hitbox.
@@ -955,6 +965,9 @@ function applyHitExtras(blob, a) {
 function ballBlobCollision(blob) {
   if (ball.heldBy >= 0) return; // balle contrôlée : pas de collision passive
   if (blob.battleStunT > 0) return; // perdant du Smash Battle : ne digue pas
+  // 2v2 : coéquipiers se traversent → sans ça, 2 frappes le même tick
+  // (auto-cloche + dig IA) et applyDirectedHit téléporte la balle.
+  if (ball.lastHitTick === tick) return;
   const a = charOf(blob);
 
   // Gameplay V2 :
@@ -1053,6 +1066,7 @@ function ballBlobCollision(blob) {
     ball.spin = ball.vx * 0.02;
     if (ball.frozen) ball.frozen = false;
     ball.smash = 0;
+    ball.lastHitTick = tick;
     registerTouch(blob);
     applyHitExtras(blob, a);
   }

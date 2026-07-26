@@ -22,7 +22,7 @@ Même procédé que `src/story.js` : rivalité/allié → **Volley**, conflit ou
 | gourou | Le Gourou | Bharatie | Stade Ashram | Méditation | [gourou.md](gourou.md) |
 | capitaine | Le Capitaine | Tropicalia | Grande Forêt | Déforestation | [capitaine.md](capitaine.md) |
 | faucon | Le Faucon | Levantie | Citadelle du Levant | Raid Éclair | [faucon.md](faucon.md) |
-| safran | Le Safran | Ramenie | Jardin des Roses | Voile d'Or | [safran.md](safran.md) |
+| safran | Le Safran | Safranie | Jardin des Roses | Voile d'Or | [safran.md](safran.md) |
 
 Le brief de rédaction commun : [_BRIEF.md](_BRIEF.md).
 

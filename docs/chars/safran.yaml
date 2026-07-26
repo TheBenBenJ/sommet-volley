@@ -1,8 +1,8 @@
-# Fiche personnage — Le Safran (Ramenie)
+# Fiche personnage — Le Safran (Safranie)
 # Alias de session utilisateur : « iran » → clé technique safran
 key: safran
 name: "Le Safran"
-pays_theme: "Ramenie — cour turquoise, safran, montagne"
+pays_theme: "Safranie — cour turquoise, safran, montagne"
 silhouette: "trapu, barbe soignée sel-et-poivre, cheveux grisonnants, costume anthracite, pochette safran-orange, posture mesurée"
 palette: ["#c45c26", "#2a9b8a", "#37474f"]
 look_lock: "Costume civil anthracite + pochette safran. JAMAIS de robe cléricale, turban, croissant, drapeau réel ou symbole confessionnel. Archétype composite (pas un portrait 1:1)."

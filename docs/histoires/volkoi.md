@@ -16,7 +16,7 @@ Le clou du spectacle, sur la Place Écarlate, c'est le **canon d'apparat** mont�
 
 On lui prête une jeunesse d'agent de l'ombre dans les services de renseignement bourassiens, où il aurait appris l'art de ne jamais montrer sa main — ni au poker, ni au filet. Il joue au volley comme il gouverne : peu de mouvements, beaucoup de menace, et toujours ce sourire qui n'atteint jamais les yeux. Quand il gagne, il ne célèbre pas. Quand il perd, il ne concède pas ; il « suspend temporairement ». Chez lui, une défaite n'existe pas, il n'y a que des victoires qui prennent leur temps.
 
-Ses relations avec le reste du roster sont un cours de géopolitique givrée. Avec l'Ouest — le mielleux **Cygne** de Gallardie, l'intraitable **Faucon** de Levantie — c'est la bombe : littéralement, dans le mode Bombe, une mèche qui grésille entre deux fronts qui ne veulent pas céder. Avec ses partenaires de l'entente froide — le **Grand Timonier** impassible, le jeune **Maréchal Bébé** et son radar, le mesuré **Safran** — c'est le volley d'affaires, poli, calculateur, chacun comptant les barils dans la tête de l'autre. Et puis il y a le **Baron Dorf**, cette bromance étrange faite de flatteries croisées où l'on ne sait jamais qui manipule qui : le Tsar sourit, le Baron se vante, et les analystes du monde entier prennent des notes affolées.
+Ses relations avec le reste du roster sont un cours de géopolitique givrée. Avec le Consortium — le mielleux **Cygne** de Gallardie, l'intraitable **Faucon** de Levantie — c'est la bombe : littéralement, dans le mode Bombe, une mèche qui grésille entre deux fronts qui ne veulent pas céder. Avec ses partenaires de l'entente froide — le **Grand Timonier** impassible, le jeune **Maréchal Bébé** et son radar, le mesuré **Safran** — c'est le volley d'affaires, poli, calculateur, chacun comptant les barils dans la tête de l'autre. Et puis il y a le **Baron Dorf**, cette bromance étrange faite de flatteries croisées où l'on ne sait jamais qui manipule qui : le Tsar sourit, le Baron se vante, et les analystes du monde entier prennent des notes affolées.
 
 Ses manies sont célèbres. Il arrive systématiquement en retard aux sommets — parfois de plusieurs heures — pour que l'adversaire attende dans le froid et comprenne, avant même le service, qui contrôle le tempo. Il n'enlève jamais son manteau. Il tutoie ses ennemis et vouvoie la neige. Il collectionne les traités qu'il n'a pas l'intention de respecter comme d'autres collectionnent les timbres, et il appelle ça « garder le contact ». Et il possède, dit-on, une table de négociation si longue qu'un adversaire assis à l'autre bout renonce à la traverser et finit par signer.
 
@@ -24,211 +24,224 @@ Le Tsar Volkoï ne veut pas seulement gagner le tournoi des Jeux du Sommet. Il v
 
 ## Mode Histoire de Tsar Volkoï
 
-Le Tsar rejoue sa géopolitique givrée en neuf manches, camp gauche. Trois actes : l'entente froide avec les partenaires de l'Est et du Sud (volley calculateur), la montée des tensions régionales, puis les grands duels avec l'Ouest où le ballon devient bombe et où le gel se fait impitoyable.
+Au dernier banquet du Consortium, quelqu'un a dit « puissance régionale ». Tout le monde a ri. Le Tsar a noté chaque rire, un par un, dans la glace. Neuf rencontres pour les faire taire : l'entente froide d'abord, les affaires qui chauffent ensuite, puis les grands duels à la bombe — jusqu'à la finale sur sa propre neige, canon décoratif compris.
 
 ```js
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 1, title: "L'axe sans limites", sub: "Bourassie–Panguo vs Doria–Gallardie · double au Country Club Doré",
+  act: 1, title: "Le partenariat sans limites", sub: "Bourassie–Panguo vs Doria–Gallardie · double de vérification au Country Club Doré",
   left: "volkoi", right: "dorf", ally: "timonier", right2: "cygne", terrain: 1, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Country Club Doré. Pour une fois, ce n'est plus un duel : c'est un 2 contre 2. Le Tsar amène le Grand Timonier ; le Baron a recruté le Cygne." },
-    { s: "dorf", t: "Le Cygne, mon partenaire ! Le plus élégant du monde ! On va écraser cet axe sans limites, tout le monde le dit." },
-    { s: "cygne", t: "En même temps partenaire du Baron, en même temps critique. C'est un exercice d'équilibriste, ce double." },
-    { s: "timonier", t: "Deux contre deux. L'harmonie aime les symétries. Toi, Tsar, tu gèles ; moi, je tiens le tempo." },
-    { s: "volkoi", t: "Reste dans ton couloir, camarade. L'hiver n'a jamais eu besoin d'un partenaire bavard — mais je fais une exception." },
-    { s: "narrator", t: "Match en double : l'alliance sans limites contre le duo occidental. Les partenaires comptent autant que les rivaux." },
+    { s: "narrator", t: "Country Club Doré. Le matin même, Bourassie et Panguo ont signé un « partenariat sans limites ». L'après-midi, le Consortium exige une vérification sur gazon : un double, deux camps, zéro confiance." },
+    { s: "dorf", t: "Le Cygne, mon partenaire ! Le plus élégant du monde — après moi, mais je le laisse gagner ça. Et vous deux, l'axe machin… On m'a dit que tu étais une « puissance régionale » ! ÉNORME comme c'est petit !" },
+    { s: "volkoi", t: "On a ri de cette phrase, au banquet. Retiens bien qui riait. Moi aussi je tiens une liste — la mienne est gravée dans la glace." },
+    { s: "cygne", t: "Messieurs, jouons. Je suis venu réconcilier les blocs par le sport — et accessoirement gagner, ce qui réconcilie surtout moi." },
+    { s: "timonier", t: "Un partenariat se vérifie comme un pont : en marchant dessus. Marche à mon tempo, Tsar, et laisse l'hiver faire le reste." },
+    { s: "volkoi", t: "Entendu, camarade. Toi le tempo, moi le gel. Et si le partenariat casse, on dira qu'il est en maintenance." },
+    { s: "narrator", t: "Quatre signatures, un filet. Le premier sommet se joue en double." },
   ],
   win:  [
-    { s: "volkoi", t: "Le gel et le tempo, ça tient mieux qu'un mur d'or et un pigeon doré." },
-    { s: "timonier", t: "Deux patiences valent mieux qu'une élégance seule. L'harmonie a gagné le set." },
-    { s: "dorf", t: "Truqué ! Mon partenaire élégant a trop dialogué au lieu de smasher !" },
-    { s: "cygne", t: "Défaite de binôme. En même temps, la fermeté reviendra. Toujours." },
+    { s: "dorf", t: "Truqué ! Ce gazon est truqué ! MON gazon ! J'ouvre une enquête sur ma propre pelouse !" },
+    { s: "cygne", t: "Une défaite de binôme, Baron. Vous parliez pendant mes smashes. Nous en débattrons." },
+    { s: "timonier", t: "Le pont a tenu. Le partenariat aussi. L'harmonie prend note — et l'harmonie ne perd jamais ses notes." },
+    { s: "volkoi", t: "« Puissance régionale. » Première région annexée : ton gazon, Baron. Purement défensif, bien sûr." },
   ],
   lose:  [
-    { s: "dorf", t: "GAGNÉ ! Le plus grand duo de l'histoire, moi et le Cygne ! On dialogue ET on écrase !" },
-    { s: "cygne", t: "Voilà : fermeté et élégance, en même temps. L'axe sans limites vient de dégeler." },
-    { s: "volkoi", t: "Suspension. Même à deux, l'hiver attend parfois. On reviendra plus froids." },
-    { s: "timonier", t: "Un set. L'harmonie corrige. Le tempo n'appartient à personne pour toujours." },
+    { s: "dorf", t: "GAGNÉ ! Le plus grand duo de l'histoire ! Moi et… comment tu t'appelles, déjà ? Peu importe : MOI !" },
+    { s: "cygne", t: "Fermeté et élégance ont dégelé votre axe, messieurs. Le sport rapproche — surtout du vestiaire." },
+    { s: "timonier", t: "Un set n'est pas un siècle. Nous corrigerons cela ensemble, Tsar. Doucement. Complètement." },
+    { s: "volkoi", t: "Je ne perds pas : je suspends. Le match, le partenariat, et ton droit de rire, Baron. Jusqu'à nouvel ordre." },
   ]
 },
 {
-  act: 1, title: "Le radar et le manteau", sub: "Bourassie–Ryonganie · le protégé nucléaire",
+  act: 1, title: "Le radar et le manteau", sub: "Bourassie–Ryonganie · le protégé qui compte tout",
   left: "volkoi", right: "bebe", terrain: 3, mode: "volley", ai: 1, doped: null,
   pre:  [
-    { s: "narrator", t: "Esplanade du Défilé. Granit, arc abstrait, bannières unies, et le radar militaire qui clignote comme un cœur nerveux." },
-    { s: "bebe", t: "Grand voisin ! Le Maréchal t'a préparé un défilé de douze mille pas de l'oie. Rien que pour un match amical !" },
-    { s: "volkoi", t: "Range ta parade, petit. Garde le carburant. Tu m'envoies des caisses, je t'envoie du blé. On appelle ça l'amitié moderne." },
-    { s: "bebe", t: "Ma Batterie AA t'interdit de sauter chez moi ! Personne ne saute chez le Maréchal !" },
-    { s: "volkoi", t: "Je n'ai pas besoin de sauter. Je reste au sol, et le sol vient à moi. Allume ton radar, il ne verra que de la neige." },
-    { s: "narrator", t: "Le radar tourne. Le manteau du Tsar ne bouge pas." }
+    { s: "narrator", t: "Esplanade du Défilé. Granit, arc abstrait, bannières au garde-à-vous. Le radar clignote comme un cœur qui aurait bu trop de thé." },
+    { s: "bebe", t: "Grand voisin ! Pour toi, j'ai compté : douze mille soldats, quatre cents missiles, trente et une médailles — dont vingt-neuf que je me suis décernées à l'unanimité !" },
+    { s: "volkoi", t: "Impressionnant. Chez moi, on ne compte pas. On attend que ce soit à nous. Après, plus besoin de compter." },
+    { s: "bebe", t: "Au banquet du Consortium, on a ri de toi ! Moi aussi on rit de moi ! On est pareils, grand frère !" },
+    { s: "volkoi", t: "Non." },
+    { s: "bebe", t: "…Bref ! Ma Batterie AA t'interdit de sauter ! Personne ne saute chez le Maréchal sans autorisation écrite en trois exemplaires !" },
+    { s: "volkoi", t: "Je ne saute pas. L'hiver ne saute pas : il s'installe. Allume ton radar, petit. Il ne verra que de la neige qui avance." },
   ],
   win:  [
-    { s: "volkoi", t: "Bon petit. Continue de fournir, continue de fanfaronner. L'un compense l'autre." },
-    { s: "bebe", t: "Le Maréchal DÉCRÈTE que c'était un entraînement ! Un entraînement glorieux ! Défilé quand même !" }
+    { s: "bebe", t: "Le Maréchal DÉCRÈTE que c'était un entraînement ! Un entraînement héroïque ! Le score sera corrigé dans les archives dès ce soir !" },
+    { s: "volkoi", t: "Corrige, corrige. Le carburant, lui, arrive au vrai tarif. L'amitié moderne : je livre, tu défiles, tout le monde fait semblant d'y croire." },
+    { s: "volkoi", t: "Et continue de compter, petit. Les missiles, les médailles, les points. Un jour, compte les amis. Ce sera vite fait." },
   ],
   lose:  [
-    { s: "bebe", t: "VICTOIRE ! Le radar l'avait prédit ! Le Maréchal a battu le Tsar ! Gravez-le dans le granit !" },
-    { s: "volkoi", t: "Profite, gamin. Un jour tu comprendras qui tient la clé du carburant. Ce jour-là, tu défileras plus doucement." }
+    { s: "bebe", t: "VICTOIRE ! Le radar l'avait prédite, l'artillerie l'a confirmée, et moi je l'avais décidée ! Trois preuves !" },
+    { s: "volkoi", t: "Profite. Celui qui tient le robinet du carburant tient aussi le calendrier des revanches." },
+    { s: "bebe", t: "Une statue ! Je veux une statue : « Le Maréchal terrassant l'Hiver » ! En granit ! Chauffé au gaz bourassien !" },
   ]
 },
 {
-  act: 1, title: "Le baril et la rose", sub: "Bourassie–Ramenie · pétro-partenaires sanctionnés",
+  act: 1, title: "Le baril et la rose", sub: "Bourassie–Safranie · le club des sanctionnés prend le thé",
   left: "volkoi", right: "safran", terrain: 9, mode: "volley", ai: 1, doped: null,
   pre:  [
-    { s: "narrator", t: "Jardin des Roses. Arcades turquoise, dômes en dôme, roseraie d'un rouge trop parfait. Un paon traverse, indifférent aux sanctions." },
-    { s: "safran", t: "Deux parias au même banquet. On nous ferme les portes ; nous, on ouvre des roseraies. Quelle élégance, non ?" },
-    { s: "volkoi", t: "Tu vends discret, je vends au rabais, l'Ouest fulmine et achète quand même. L'hypocrisie a un bon rendement." },
-    { s: "safran", t: "Mon Voile d'Or ralentit tes gestes. La patience, tu connais ; la lenteur, tu vas l'apprendre." },
-    { s: "volkoi", t: "Ralentis-moi tant que tu veux. Je suis déjà l'hiver. Personne ne va plus lentement que la banquise, et pourtant elle avance." },
-    { s: "narrator", t: "Volley feutré entre alliés de contrainte. Chacun compte les barils de l'autre." }
+    { s: "narrator", t: "Jardin des Roses. Arcades turquoise, roseraie trop parfaite, thé fumant. Un paon traverse, insensible aux embargos comme aux compliments." },
+    { s: "safran", t: "Bienvenue, Tsar. On nous ferme les mêmes portes, on nous gèle les mêmes comptes. Asseyez-vous : entre parias, le thé est toujours chaud." },
+    { s: "volkoi", t: "Tu vends discret, je vends au rabais, et le Consortium achète quand même en se pinçant le nez. L'hypocrisie a un excellent rendement." },
+    { s: "safran", t: "On a ri de vous à leur banquet, m'a-t-on dit. On rit de moi depuis quarante ans. Le mépris, cher ami, se cultive comme la rose : avec du temps et du fumier." },
+    { s: "volkoi", t: "La différence entre nous : toi, tu attends que le rire passe. Moi, je le fais taire. Chapitre par chapitre." },
+    { s: "safran", t: "Alors jouons. Mon Voile d'Or ralentira vos gestes — voyez-y du sur-mesure : je ne fige pas mes invités, je les mets à l'aise." },
+    { s: "volkoi", t: "Ralentis-moi. Personne ne va plus lentement que la banquise. Et pourtant elle finit toujours dans le port." },
   ],
   win:  [
-    { s: "volkoi", t: "Belle roseraie. Continue de me couvrir les flancs, je te couvrirai au conseil. Entre parias, on se tient chaud." },
-    { s: "safran", t: "Sardonique, le Nord. Note bien : la rose a des épines, et l'épine, elle, ne gèle pas." }
+    { s: "safran", t: "Défaite mesurée. Notez que je vous ai laissé gagner par sens de l'hospitalité — l'histoire retiendra la version qui l'arrange." },
+    { s: "volkoi", t: "Belle roseraie, Safran. Continue de me couvrir au conseil, je te couvrirai au filet. Entre sanctionnés, on se tient chaud." },
+    { s: "volkoi", t: "Et garde le thé au chaud. La prochaine fois, j'apporte la neige. Chacun ses exportations." },
   ],
   lose:  [
-    { s: "safran", t: "Le Voile d'Or a figé l'hiver. Mesuré, patient, victorieux. On m'avait dit le Tsar imbattable ; on m'a menti." },
-    { s: "volkoi", t: "Un revers entre amis. Rien de grave. Sers-moi encore du thé, et parlons de nos ennemis communs." }
+    { s: "safran", t: "Le Voile d'Or a figé l'hiver. On m'avait dit le Tsar imbattable ; les mêmes m'avaient dit l'Accord solide. Je me méfie des rumeurs." },
+    { s: "volkoi", t: "Un revers entre amis. Rien de grave : je le classe dans les conflits gelés. Je le ressortirai quand ça m'arrangera." },
+    { s: "safran", t: "Voilà pourquoi je vous apprécie, Tsar : même vos défaites ont un congélateur." },
   ]
 },
 
-// ===================== ACTE I — Petites rivalités (Volley) =====================
+// ===================== ACTE II — Les tensions montent (Ballon enflammé) =====================
 {
-  act: 2, title: "Le gaz et le gourou", sub: "Bourassie–Bharatie · neutralité intéressée",
+  act: 2, title: "La neutralité à prix cassé", sub: "Bourassie–Bharatie · le client qui médite",
   left: "volkoi", right: "gourou", terrain: 6, mode: "flame", ai: 1, doped: null,
   pre:  [
-    { s: "narrator", t: "Stade Ashram. Grès miel, guirlandes de soucis orange, palmiers. Une vache qui traverse traverse le court avec l'autorité d'un arbitre." },
-    { s: "gourou", t: "Namasté, ami du froid. Le monde te boude, et moi je t'achète ton pétrole au rabais. La neutralité est un yoga." },
-    { s: "volkoi", t: "Le seul qui reste debout quand tout le monde choisit un camp. Souple. Presque bourassien." },
-    { s: "gourou", t: "Ma Méditation gèle ton camp façon zen. Tu gèles par la peur ; moi, par la sérénité. Même patinoire, autre température d'âme." },
-    { s: "volkoi", t: "Zen ou glace, le résultat est le même : l'autre ne bouge plus. Servons, gourou. La vache attend, elle." },
-    { s: "narrator", t: "Deux immobilités s'affrontent. La plus froide gagnera. Ou la plus calme. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+    { s: "narrator", t: "Stade Ashram. Grès miel, guirlandes de soucis, palmiers. Une vache traverse le court avec l'autorité d'un arbitre international. Le ballon s'enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+    { s: "gourou", t: "Bienvenue, ami du froid. Le monde te tourne le dos ; moi, je te tourne un bon de commande. Ton pétrole à moins trente pour cent : la neutralité est une posture de yoga très rentable." },
+    { s: "volkoi", t: "Le seul dirigeant qui reste debout quand tout le monde choisit un camp. Souple. Presque bourassien." },
+    { s: "gourou", t: "Attention à la brûlure, Tsar. Ma Méditation gèle ton camp — même patinoire que la tienne, mais avec une meilleure température d'âme." },
+    { s: "volkoi", t: "Zen ou glace, le résultat est identique : l'autre ne bouge plus. Seule la musique d'ambiance change." },
+    { s: "gourou", t: "La vache, elle, a déjà choisi son camp : le milieu du terrain. Médite là-dessus pendant que tu brûles." },
   ],
   win:  [
-    { s: "volkoi", t: "L'hiver bat la méditation quand la méditation ferme les yeux. Continue d'acheter, ami neutre." },
-    { s: "gourou", t: "Un revers m'enseigne. Respirons. Je reviendrai, et j'aurai encore besoin de ton gaz." },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+    { s: "gourou", t: "Un revers m'enseigne. Heureusement, l'enseignement est mon métier : je me suis déjà facturé la leçon." },
+    { s: "volkoi", t: "La méditation a fermé les yeux ; l'hiver, jamais. C'est un avantage structurel." },
+    { s: "volkoi", t: "Continue d'acheter au rabais, gourou. Ta neutralité me coûte moins cher qu'une alliance — et elle ne pose pas de questions." },
   ],
   lose:  [
-    { s: "gourou", t: "Le calme absorbe le gel. Namasté, Tsar. La montagne ne prend pas parti, et pourtant elle gagne." },
-    { s: "volkoi", t: "Match nul pour l'histoire, victoire pour toi. Garde ta neutralité. Elle m'arrange plus que la tienne." },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+    { s: "gourou", t: "Le calme absorbe le gel. La montagne ne prend pas parti — mais note bien qu'elle encaisse des deux versants." },
+    { s: "volkoi", t: "Victoire pour toi, remise pour moi : moins quarante sur le prochain baril. Personne ne me bat sans finir client." },
+    { s: "gourou", t: "Marché conclu. Vois comme tout s'harmonise : tu perds le match, je gagne deux fois. Namasté, cher fournisseur." },
   ]
 },
 {
-  act: 2, title: "Le blé et l'ara", sub: "Bourassie–Tropicalia · céréales, engrais, populisme",
+  act: 2, title: "Le blé et l'ara", sub: "Bourassie–Tropicalia · engrais, muscles et perroquet",
   left: "volkoi", right: "capitaine", terrain: 7, mode: "flame", ai: 2, doped: null,
   pre:  [
-    { s: "narrator", t: "Grande Forêt. Clairière de jungle dorée, huttes sur pilotis, court en terre rouge. Un ara traverse en hurlant comme un supporter." },
-    { s: "capitaine", t: "Alors le Tsar ! On me vend ton engrais, ton blé, ta nostalgie de fer. Ici on aime les gars qui parlent fort et taillent le bois !" },
-    { s: "volkoi", t: "Tu abats des arbres, je gèle des fronts. Deux façons de faire du vide et d'appeler ça de la grandeur." },
-    { s: "capitaine", t: "Ma Déforestation te dresse un mur de troncs ! Bon courage pour geler ça, l'ami du Nord !" },
-    { s: "volkoi", t: "Un mur de bois ? J'en fais du gel qui craque. Le tien tombe ; le mien reste. Sers, capitaine." },
-    { s: "narrator", t: "Populistes des deux hémisphères. L'un vend le grain, l'autre le rugit. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+    { s: "narrator", t: "Grande Forêt. Clairière dorée, huttes sur pilotis, court en terre rouge. L'ara se pose sur le filet : l'arbitre le plus bruyant du circuit prend ses fonctions. Le ballon s'enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+    { s: "capitaine", t: "Le Tsar ! Mon fournisseur préféré ! Ton engrais fait pousser mon soja, ton blé nourrit mon barbecue, et ta tête froide me donne soif. Bienvenue chez les vrais !" },
+    { s: "volkoi", t: "Tu abats des arbres, je gèle des fronts. Deux façons de faire de la place. La mienne repousse au printemps — en théorie." },
+    { s: "capitaine", t: "On a ri de toi à leur banquet, paraît ! Chez moi, celui qui rit du barbecue ne mange pas. Règle de la forêt !" },
+    { s: "volkoi", t: "Voilà un code pénal que je pourrais importer." },
+    { s: "capitaine", t: "Ma Déforestation va te dresser un mur de troncs ! Essaie de geler ça, l'homme du Nord !" },
+    { s: "volkoi", t: "Du bois, ça brûle. De la glace, non. Ce soir, avec ce ballon, c'est un détail qui compte." },
   ],
   win:  [
-    { s: "volkoi", t: "Le froid porte plus loin que la tronçonneuse. Continue de m'acheter mes engrais, tribun." },
-    { s: "capitaine", t: "Truqué ! Fraude ! … Bon, remets-moi une cargaison, on oublie. Entre durs, on se comprend." },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+    { s: "capitaine", t: "L'ara dit que c'était faute ! Trois fois qu'il le crie ! C'est un arbitre assermenté, cet oiseau !" },
+    { s: "volkoi", t: "Le froid porte plus loin que la tronçonneuse. Et rassure-toi : l'engrais continue d'arriver. Les affaires n'ont pas d'états d'âme." },
+    { s: "volkoi", t: "Quant à ton arbitre à plumes : il vendrait le match pour une cacahuète. Je le sais. J'ai vérifié. Il a accepté." },
   ],
   lose:  [
-    { s: "capitaine", t: "HA ! La forêt a bouffé l'hiver ! Le Capitaine plante un ballon en pleine banquise ! On coupe, on gagne !" },
-    { s: "volkoi", t: "Tu gagnes une manche et tu coupes tes propres poumons. Chacun sa méthode pour se refroidir." },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+    { s: "capitaine", t: "HA ! La forêt a bouffé l'hiver ! Le Capitaine plante le ballon en pleine banquise et l'ara valide ! Barbecue général !" },
+    { s: "volkoi", t: "Tu gagnes une manche et tu brûles tes propres poumons pour fêter ça. Chacun sa méthode de refroidissement." },
+    { s: "capitaine", t: "Râle pas, mon vieux ! Reste dîner : y a ton blé dans le pain et ton engrais dans la salade. T'as perdu contre ta propre marchandise !" },
   ]
 },
 {
-  act: 2, title: "L'avion abattu", sub: "Bourassie–Bosforie · l'incident du détroit",
+  act: 2, title: "L'oiseau tombé du détroit", sub: "Bourassie–Bosforie · l'incident qui couve",
   left: "volkoi", right: "sultan", terrain: 5, mode: "flame", ai: 2, doped: null,
   pre:  [
-    { s: "narrator", t: "Pont des Deux Mondes. Détroit, dômes, bannière violette à liseré doré, tapis volant en approche. Le ballon s’enflamme : chaque contact brûle — à zéro PV, c’est perdu." },
-    { s: "sultan", t: "Tu m'achètes des dômes, tu me vends des fusées, et un jour l'un de nos oiseaux tombe. On appelle ça une amitié compliquée." },
-    { s: "volkoi", t: "Tu contrôles le détroit, moi le robinet. Tant qu'on a besoin l'un de l'autre, la braise couve lentement." },
-    { s: "sultan", t: "Mon Séisme te secoue et t'interdit de sauter ! Sur mon pont, c'est MOI qui fais trembler la terre !" },
-    { s: "volkoi", t: "Tremble tant que tu veux. Le gel, lui, ne saute pas : il glisse. Et il glisse toujours vers ton camp." },
-    { s: "narrator", t: "Ne te brûle pas les doigts : renvoie avant d’être à zéro. Entre le froid et le séisme, une seule braise décidera." }
+    { s: "narrator", t: "Pont des Deux Mondes. Dômes, barques, bannière violette à liseré d'or, tapis volant en approche non autorisée. Le ballon s'enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+    { s: "sultan", t: "Tsar ! Je t'achète du gaz, tu m'achètes des tomates, et un jour l'un de nos oiseaux tombe du ciel. Une amitié normale, quoi." },
+    { s: "volkoi", t: "L'incident est clos. J'ai décidé qu'il était clos. C'est la procédure bourassienne : un dossier gelé est un dossier réglé." },
+    { s: "sultan", t: "Rien n'est clos tant que le péage n'est pas payé ! Tout passe par mon détroit : les barques, les ballons, les excuses ! Tarif unique, majoré la nuit !" },
+    { s: "volkoi", t: "Tu contrôles le détroit, je contrôle le robinet. Deux péages. Le mien coule même en hiver." },
+    { s: "sultan", t: "Alors montre-moi ça au filet ! Mon Séisme t'interdira de sauter — sur MON pont, c'est MOI qui décide de qui décolle !" },
+    { s: "volkoi", t: "Parfait. Je ne décolle jamais. Les empires sérieux restent au sol." },
   ],
   win:  [
-    { s: "volkoi", t: "Le sang-froid éteint la brûlure. On reste amis, Sultan — amis qui gardent un doigt sur le robinet." },
-    { s: "sultan", t: "Tu gagnes le pont ce soir. Mais le détroit reste à moi, et le détroit se souvient." }
+    { s: "sultan", t: "Ce point est retenu à la douane ! Contrôle surprise ! Le résultat est suspendu jusqu'à inspection complète du filet !" },
+    { s: "volkoi", t: "Tu me voles ma réplique, Sultan. C'est moi qui suspends, ici. Toi, tu marchandes." },
+    { s: "volkoi", t: "Le sang-froid éteint la brûlure. Et retiens ceci : on ne fait pas trembler la banquise. Elle est déjà par terre." },
   ],
   lose:  [
-    { s: "sultan", t: "BOUM sur la banquise ! Le séisme a fissuré l'hiver ! Le détroit couronne son maître !" },
-    { s: "volkoi", t: "Grandiose, comme toujours. Profite. Le gaz continue de couler, et l'hiver a de la mémoire." },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+    { s: "sultan", t: "BOUM sur la banquise ! Le détroit couronne son maître — et le maître, c'est toujours celui qui encaisse le péage !" },
+    { s: "volkoi", t: "Théâtral. Grandiose. Épuisant. Profite : le gaz continue de couler, et chaque mètre cube a de la mémoire." },
+    { s: "sultan", t: "Alors on est d'accord : toi tu te souviens, moi j'encaisse. C'est ce que j'appelle un partenariat équilibré !" },
   ]
 },
 
-// ===================== ACTE I — Petites rivalités (Volley) =====================
+// ===================== ACTE III — Conflits ouverts (Bombe) =====================
 {
-  act: 3, title: "Sans limites, avec des limites", sub: "Bourassie–Panguo · l'amitié sans limites à l'épreuve du prix",
+  act: 3, title: "Sans limites, avec conditions", sub: "Bourassie–Panguo · l'amitié à prix coûtant",
   left: "volkoi", right: "timonier", terrain: 4, mode: "bomb", ai: 2, doped: null,
   pre:  [
-    { s: "narrator", t: "Cité du Matin. Lanternes rouges, lions de pierre. L'axe sans limites revient sur son propre sol — et cette fois, la balle est une bombe." },
-    { s: "timonier", t: "« Sans limites », disions-nous. Belle formule. Depuis, c'est toi qui vends le gaz au rabais, et moi qui fixe le prix. Les limites, on les a juste déplacées." },
-    { s: "volkoi", t: "Un partenaire junior qui se prend pour un senior. L'hiver n'aime pas qu'on lui dicte le tarif." },
-    { s: "timonier", t: "Junior, senior… L'harmonie n'a pas de rang, seulement un tempo. Et le tempo, ces temps-ci, ralentit surtout de ton côté." },
-    { s: "volkoi", t: "Ralentis tant que tu veux. Je suis toujours l'hiver. Toi, tu es encore l'atelier. Devine qui a le plus besoin de l'autre, ce soir." },
-    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd. Même une amitié sans limites a ses lignes rouges." }
+    { s: "narrator", t: "Cité du Matin. Lanternes rouges, lions de pierre, silence industriel. Les deux signataires du « partenariat sans limites » se retrouvent seuls — et le ballon est une bombe : le camp où elle tombe perd." },
+    { s: "timonier", t: "« Sans limites », disait notre communiqué. Depuis, tu vends ton gaz au rabais et c'est moi qui fixe le prix. Les limites existent : je les ai simplement achetées." },
+    { s: "volkoi", t: "Au Country Club, nous étions partenaires. Un set plus tard, tu me factures l'amitié au tarif de gros." },
+    { s: "timonier", t: "L'amitié est un produit comme un autre : la qualité se maintient, le prix se discute. Proverbe de chez moi. Je viens de l'inventer." },
+    { s: "volkoi", t: "Chez moi aussi, on invente des proverbes : « celui qui tient le thermostat n'a pas besoin de tenir la caisse. »" },
+    { s: "timonier", t: "Alors vérifions lequel de nos deux dictons renvoie le mieux la bombe. Calmement. Complètement." },
+    { s: "narrator", t: "Deux patiences, une mèche. Le sommet le plus poli de l'histoire va exploser quelque part." },
   ],
   win:  [
-    { s: "volkoi", t: "L'hiver a encore de la force. L'amitié sans limites reste debout — à mes conditions, aujourd'hui." },
-    { s: "timonier", t: "Un revers. Temporaire. Le siècle appartient à celui qui patiente le plus longtemps, et ce n'est toujours pas toi." },
-    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
+    { s: "timonier", t: "Un revers. Je le note au plan quinquennal, colonne « détails ». Le siècle est long, Tsar, et c'est moi qui possède le calendrier." },
+    { s: "volkoi", t: "L'hiver a encore de la force, camarade. Le partenariat reste sans limites — aux miennes près." },
+    { s: "volkoi", t: "Et la prochaine fois que tu inventes un proverbe, vérifie d'abord le thermostat." },
   ],
   lose:  [
-    { s: "timonier", t: "« Sans limites », disais-tu. Regarde où sont les limites, maintenant : de mon côté du filet." },
-    { s: "volkoi", t: "Une manche pour l'atelier. L'hiver, contrairement à ton usine, ne ferme jamais. Je reviendrai vendre moins cher." },
-    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
+    { s: "timonier", t: "« Sans limites », disais-tu au premier acte. Constate : elles sont là, les limites. Alignées de mon côté du filet, en bon ordre." },
+    { s: "volkoi", t: "Une manche pour l'atelier du monde. Note bien : l'hiver ne ferme jamais, lui. Pas de maintenance, pas de congés." },
+    { s: "timonier", t: "C'est ce qui me plaît chez toi, Tsar : même vaincu, tu fais de la publicité. Nous corrigerons cela ensemble." },
   ]
 },
 {
-  act: 3, title: "Le faucon dans la neige", sub: "Bourassie–Levantie · fronts croisés",
+  act: 3, title: "Dossier : l'hiver", sub: "Bourassie–Levantie · le briefing de trop",
   left: "volkoi", right: "faucon", terrain: 8, mode: "bomb", ai: 3, doped: "R",
   pre:  [
-    { s: "narrator", t: "Citadelle du Levant. Grès sur colline désertique, remparts, dômes anciens et tours de verre. Un faucon fend le ciel. La bombe est armée — et l'aura de l'adversaire vire au rouge." },
-    { s: "faucon", t: "Tu armes mes ennemis, tu couvres mes rivaux au conseil. Ce soir, pas de neutralité, pas de dégel." },
-    { s: "volkoi", t: "Intransigeant jusqu'à l'os. J'aime. Ça rend le froid plus utile. Toi tu frappes vite, moi je frappe tard." },
-    { s: "faucon", t: "Mon Raid Éclair t'interdit de sauter chez moi. Frappe préventive : je ne laisse pas l'hiver arriver." },
-    { s: "volkoi", t: "Frappe avant, si tu veux. On ne devance pas une saison. Elle arrive de toute façon, et elle te trouve fatigué." },
-    { s: "narrator", t: "Le rapace se dope à l'enjeu. Renvoie la bombe. Ne laisse jamais la mèche finir dans ton camp." }
+    { s: "narrator", t: "Citadelle du Levant. Grès, remparts, tours de verre, un faucon en vol stationnaire. Le ballon est une bombe : le camp où elle tombe perd. Et l'aura de l'adversaire vire au rouge." },
+    { s: "faucon", t: "Briefing. Dossier « Bourassie », page une : tu armes mes ennemis. Page deux : tu couvres mes rivaux au conseil. Page trois : il n'y a pas de page trois. J'ai déjà décidé." },
+    { s: "volkoi", t: "Un dossier sur moi. Touchant. J'en tiens un sur toi depuis trente ans. Le tien est plus mince : tu es prévisible." },
+    { s: "faucon", t: "Prévisible et vivant. C'est une stratégie, pas un défaut. Mon Raid Éclair t'interdira de sauter : je ne laisse jamais l'hiver le temps d'atterrir." },
+    { s: "volkoi", t: "On ne devance pas une saison, Faucon. Elle arrive. Elle te trouve fatigué, en train de relire tes fiches." },
+    { s: "faucon", t: "Mes fiches me tiennent chaud. …C'était de l'humour. J'en fais, parfois. C'est dans le dossier." },
+    { s: "narrator", t: "Le rapace carbure à l'enjeu. Renvoyez la bombe — la mèche ne lit pas les briefings." },
   ],
   win:  [
-    { s: "volkoi", t: "Le raid s'essouffle, l'hiver dure. Tu es rapide, faucon. Moi, je suis inévitable." },
-    { s: "faucon", t: "Une manche. Rien n'est réglé. Le rapace revient toujours, et il revient plus bas." },
-    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
+    { s: "faucon", t: "Échec tactique constaté. J'ouvre une commission d'enquête interne : moi, à huis clos, ce soir. Conclusions demain, classées secret." },
+    { s: "volkoi", t: "Le raid s'essouffle, l'hiver dure. Tu comptes en secondes, je compte en siècles. Ce n'est ni la même unité ni le même budget." },
+    { s: "volkoi", t: "Ajoute une page à ton dossier « Bourassie ». Page finale : « l'hiver est arrivé quand même. »" },
   ],
   lose:  [
-    { s: "faucon", t: "Frappe nette, cible neutralisée. L'hiver n'aura pas le temps de s'installer. Jamais." },
-    { s: "volkoi", t: "Rapide, brutal, précis. Et pressé. C'est ta faiblesse : tu comptes en secondes, je compte en siècles." },
-    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
+    { s: "faucon", t: "Frappe nette, cible neutralisée, bombe retournée à l'expéditeur. Le dossier « hiver » est clos. Dossier suivant." },
+    { s: "volkoi", t: "Rapide, brutal, précis. Et pressé. Tu gagnes ce soir et tu recommences à guetter demain. Moi, je dors. La neige monte la garde." },
+    { s: "faucon", t: "« La neige monte la garde. » Noté. Je fais mettre la neige sous surveillance." },
   ]
 },
 {
-  act: 3, title: "Le dégel n'aura pas lieu", sub: "Bourassie–Gallardie · le grand front de l'Ouest",
+  act: 3, title: "Personne ne rit plus", sub: "Bourassie–Gallardie · la finale sous la neige",
   left: "volkoi", right: "cygne", terrain: 0, mode: "bomb", ai: 3, doped: "R",
   pre:  [
-    { s: "narrator", t: "Finale. Place Écarlate, forteresse cramoisie sous la neige, bulbe rouge au loin, bannières bleu-vert claquant au gel. Le canon d'apparat pivote sur son traîneau. La bombe grésille, l'aura du Cygne rougeoit." },
-    { s: "cygne", t: "En même temps, un ennemi, ça se combat ET ça se parle. Je suis venu jusque sur ta place, Tsar. Le dialogue et le contre." },
-    { s: "volkoi", t: "Chez moi. Sous ma neige. Tu parles, tu proposes, tu tends la main… et moi j'attends que le froid réponde à ta place." },
-    { s: "cygne", t: "Ton Passage en Force, tes fronts gelés, ton canon décoratif… La Gallardie ne cédera pas un pouce de gazon." },
-    { s: "volkoi", t: "Ton Passage en Force à toi empêche mes smashes ? Parfait. Je n'ai pas besoin de smasher. J'ai besoin que tu aies froid." },
-    { s: "cygne", t: "En même temps… il fait vraiment très froid ici. Servons avant que je ne sente plus mes doigts." },
-    { s: "narrator", t: "Le canon tonne pour l'ouverture. Le Cygne se dope à l'enjeu. Le dégel de l'Ouest se joue en un dernier échange." }
+    { s: "narrator", t: "Finale. Place Écarlate, briques cramoisies sous la neige, bulbe rouge au loin. Le canon d'apparat — purement décoratif, insiste le protocole — pivote lentement vers le filet. Le ballon est une bombe : le camp où elle tombe perd." },
+    { s: "cygne", t: "Me voici sur votre place, Tsar. Le Consortium m'envoie en émissaire : on se combat ET on se parle. Je viens faire les deux, dans l'ordre que vous voudrez." },
+    { s: "volkoi", t: "Au banquet, vous avez ri. « Puissance régionale. » Huit matchs plus tard, me voilà en finale, et c'est vous qu'on envoie négocier dans ma neige. Le rire a refroidi." },
+    { s: "cygne", t: "Le Consortium a peut-être manqué de nuance. Je vous propose une formulation révisée : « puissance considérable à l'échelle de sa région — laquelle s'agrandit »." },
+    { s: "volkoi", t: "Voilà. Continue de réviser. Le froid aide à trouver les mots justes." },
+    { s: "cygne", t: "Cette aura, avant que vous ne demandiez : des vitamines. Parfaitement légales quelque part. Le champion du sport propre se doit d'arriver en pleine santé." },
+    { s: "volkoi", t: "Bien sûr. Et mon canon est décoratif. Nous avons tous nos communiqués." },
+    { s: "narrator", t: "Le canon tonne pour l'ouverture — décorativement. Le Cygne rougeoie. Le dégel du monde tient dans un dernier échange." },
   ],
   win:  [
-    { s: "volkoi", t: "Le canon a parlé, l'hiver a répondu. Rentre au Palais Gallard, Cygne. Dis-leur que la neige, elle, ne négocie pas." },
-    { s: "volkoi", t: "J'ai gelé tous les fronts, un par un, sans jamais courir. On appelle ça la patience. Vous appelez ça un problème." },
-    { s: "cygne", t: "Ce n'est pas une fin, c'est un front de plus. La diplomatie est un sport d'endurance — et l'endurance, je la garde." },
-    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
+    { s: "cygne", t: "Une défaite, certes — et pourtant une avancée diplomatique : vous me parlez encore. J'appelle cela un succès d'estime. L'estime, c'est mon secteur." },
+    { s: "volkoi", t: "Rentre au Palais Gallard, Cygne. Dis-leur que la neige ne négocie pas, et que le canon a beaucoup ri. Décorativement." },
+    { s: "volkoi", t: "J'ai gelé neuf rivaux sans courir. « Puissance régionale », disaient-ils. Exact. Ma région s'appelle l'hiver, et l'hiver est partout." },
+    { s: "narrator", t: "Sur la Place Écarlate, le silence est total. Au banquet du Consortium, plus personne ne rit. On grelotte, poliment. Générique." },
   ],
   lose:  [
-    { s: "cygne", t: "Le dégel a eu lieu. Sur ta propre place, sous ton propre canon. En même temps, il fallait bien que quelqu'un rallume le printemps." },
-    { s: "volkoi", t: "Une manche perdue chez moi. Je ne concède pas : je suspends. L'hiver, contrairement à ta victoire, reviendra. Il revient toujours." },
-    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
+    { s: "cygne", t: "Le dégel a eu lieu, chez vous, sous votre propre canon. Il fallait bien que quelqu'un rallume le printemps — en même temps que la lumière." },
+    { s: "volkoi", t: "Une manche perdue sur ma propre neige. Je ne concède pas : je suspends. Le printemps aussi, d'ailleurs. Sine die." },
+    { s: "cygne", t: "Suspendez, cher Tsar, suspendez. Moi, je rentre annoncer au banquet qu'on peut rire de nouveau. …Doucement. Vous entendez encore." },
   ]
 }
 ```
 
-**Répartition :** 9 rencontres — 6 volley (timonier, bebe, safran, gourou, capitaine, dorf) · 3 bombe (sultan, faucon, cygne). Deux adversaires dopés en Acte III (faucon, cygne). Finale à domicile sur la Place Écarlate, canon d'apparat à l'appui.
+**Répartition :** 9 rencontres — 1 double (dorf+cygne) · 2 volley (bebe, safran) · 3 flamme (gourou, capitaine, sultan) · 3 bombe (timonier, faucon, cygne). Deux adversaires dopés en acte III (faucon, cygne). Finale à domicile sur la Place Écarlate — canon décoratif, mais chargé.

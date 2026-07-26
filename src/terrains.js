@@ -845,7 +845,7 @@ function mapEventWarnPack(kind) {
   return null;
 }
 
-/** Icône d'annonce unique : celle de la map française (Micron), lisible partout. */
+/** Icône d'annonce unique : celle de la map française (le Cygne), lisible partout. */
 function mapEventWarnIcon() {
   const fr = SPRITES.mapPalaisGallard;
   return (fr && spriteReady(fr.warn)) ? fr.warn : null;
@@ -1411,7 +1411,7 @@ function drawBgParadePng(t, raining, storm) {
   drawMapEventOverlay();
 }
 
-/** Palais Gallard — fond PNG Micron. */
+/** Palais Gallard — fond PNG Palais Gallard. */
 function drawBgPrairiePng(t, raining, storm) {
   const p = SPRITES.mapPalaisGallard;
 

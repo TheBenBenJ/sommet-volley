@@ -16,9 +16,9 @@ Car Bébé carbure à la **fanfaronnade**. Tout, chez lui, est le plus grand, le
 
 Isolé de tous, le Maréchal cultive pourtant deux amitiés capitales. Le **Grand Timonier de Panguo** est son grand frère bougon, celui qui paie l'addition, fournit le charbon et lève les yeux au ciel — un allié qu'il ne faut surtout pas contrarier, mais qu'on peut toujours faire chanter. Le **Tsar Volkoï de Bourassie** est le camarade des jours froids : ils échangent des fusées comme d'autres échangent des recettes, se comprennent d'un haussement de sourcil glacé, et partagent la même passion pour les parades qui durent trop longtemps. Avec ces deux-là, la bombe reste au garage : on joue au **volley**, entre gens sérieusement dangereux.
 
-Avec le reste du monde — l'Ouest surtout — c'est une autre paire de bottes. Le Maréchal a un rapport très particulier au **Baron Dorf** : une romance épistolaire absurde, faite de « lettres magnifiques », de menaces de fin du monde et de compliments sur la coupe de cheveux, un dossier que les diplomates classent quelque part entre le sommet historique et le vaudeville. Mais dès que **Le Cygne**, **Le Faucon** ou n'importe quel donneur de leçons approche du filet, la balle devient une **bombe à mèche**, et l'Esplanade sent la poudre. Bébé prétend ne rien craindre — « je suis né sur un arc-en-ciel, moi » — mais on le voit vérifier trois fois que le radar est bien allumé.
+Avec le reste du monde — le Consortium surtout — c'est une autre paire de bottes. Le Maréchal a un rapport très particulier au **Baron Dorf** : une romance épistolaire absurde, faite de « lettres magnifiques », de menaces de fin du monde et de compliments sur la coupe de cheveux, un dossier que les diplomates classent quelque part entre le sommet historique et le vaudeville. Mais dès que **Le Cygne**, **Le Faucon** ou n'importe quel donneur de leçons approche du filet, la balle devient une **bombe à mèche**, et l'Esplanade sent la poudre. Bébé prétend ne rien craindre — « je suis né sur un arc-en-ciel, moi » — mais on le voit vérifier trois fois que le radar est bien allumé.
 
-Physiquement, le Maréchal est un **chibi à très grosse tête**, sanglé dans un uniforme sombre trop chargé de médailles pour un homme qui n'a jamais quitté sa dalle de béton, coupe de cheveux réglementaire au millimètre, sourire de gamin gâté et regard de gamin gâté qui a un lance-roquettes. Il applaudit ses propres services, exige qu'on l'appelle « **le plus jeune Maréchal du monde** » même après ses défaites, et considère chaque match perdu comme la preuve d'un complot occidental. Adorable, terrifiant, et absolument increvable : voilà le seul joueur du roster qui puisse déclencher une crise internationale parce qu'on lui a marché sur le service.
+Physiquement, le Maréchal est un **chibi à très grosse tête**, sanglé dans un uniforme sombre trop chargé de médailles pour un homme qui n'a jamais quitté sa dalle de béton, coupe de cheveux réglementaire au millimètre, sourire de gamin gâté et regard de gamin gâté qui a un lance-roquettes. Il applaudit ses propres services, exige qu'on l'appelle « **le plus jeune Maréchal du monde** » même après ses défaites, et considère chaque match perdu comme la preuve d'un complot du Consortium. Adorable, terrifiant, et absolument increvable : voilà le seul joueur du roster qui puisse déclencher une crise internationale parce qu'on lui a marché sur le service.
 
 ## Mode Histoire de Maréchal Bébé
 
@@ -26,34 +26,36 @@ Physiquement, le Maréchal est un **chibi à très grosse tête**, sanglé dans 
 // ============================================================================
 // MODE HISTOIRE — Maréchal Bébé (Ryonganie)  ·  left = "bebe"
 // « Le plus jeune Maréchal du monde fait le tour du filet. »
-// Volley avec les frères d'armes (Panguo, Bourassie, la bromance Dorf) ;
-// bombe avec l'Ouest et les rivaux nucléaires. Voix : fanfaron, susceptible,
-// provocateur. À coller dans le STORY[] de src/story.js.
+// FIL ROUGE : être ENFIN pris au sérieux — et chaque victoire aggrave son cas.
+// RUNNING GAG : chaque match est un « essai » officiel numéroté, archivé,
+// gravé d'avance ; le décompte (médailles, décibels, essais) devient absurde.
+// Volley avec les frères d'armes, bombe avec le Consortium. À coller dans STORY[].
 // ============================================================================
 
 // ===================== ACTE I — Petites rivalités (Volley) =====================
 {
-  act: 1, title: "Le grand frère en double", sub: "Ryonganie–Panguo vs Doria–Gallardie · binôme sous tutelle",
+  act: 1, title: "Le grand frère en double", sub: "Ryonganie–Panguo vs Doria–Gallardie · le sommet en binôme",
   left: "bebe", right: "dorf", ally: "timonier", right2: "cygne", terrain: 1, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Country Club Doré. Le Maréchal a exigé un 2v2 : il veut le Grand Timonier comme partenaire contre le Baron et le Cygne." },
-    { s: "bebe", t: "Grand frère ! Tu digues avec MOI ! Mon radar couvre tout le terrain ! Les deux camps !" },
-    { s: "timonier", t: "Je suis ton partenaire, pas ton fan. Digue quand je te le dis. Silence ensuite." },
-    { s: "dorf", t: "Deux enfants turbulents contre le bruit doré et… l'élégance. Moi je klaxonne, mon partenaire dialogue. Ça devrait suffire." },
-    { s: "cygne", t: "En même temps partenaire du Baron, en même temps critique de son mur. Un exercice, comme toujours." },
-    { s: "narrator", t: "Double sous tutelle : l'alliance tient — ou le radar explose." },
+    { s: "narrator", t: "Country Club Doré. Le Maréchal a convoqué la presse des dix nations pour annoncer « le plus grand binôme de l'Histoire » — avec un Grand Timonier qui, lui, n'a rien annoncé du tout." },
+    { s: "bebe", t: "Grand frère ! Notre alliance est officielle ! J'ai déjà fait graver la médaille commémorative. Recto : moi. Verso : moi aussi, mais de profil." },
+    { s: "timonier", t: "Je suis ton partenaire, pas ton public. Digue quand je le dis, tais-toi le reste du temps, et tout ira bien." },
+    { s: "dorf", t: "REGARDEZ ce duo ! Le bébé et le panda ! Nous, on a l'élégance et le mur d'or. Enfin, MOI j'ai le mur. Lui, il a des phrases." },
+    { s: "cygne", t: "Partenaire du Baron et, disons, contrepoids du Baron. L'équilibre est un sport de combat." },
+    { s: "bebe", t: "Archives, notez : essai de binôme numéro un. Résultat prévu : réussite totale. C'est déjà gravé dans le granit, autant que ce soit vrai." },
+    { s: "narrator", t: "Le double commence. Une alliance se juge au filet — et le granit, lui, n'oublie rien." },
   ],
   win:  [
-    { s: "bebe", t: "BINÔME GLORIEUX ! Le Maréchal et le Grand Timonier ! Gravez-nous en GRANIT DOUBLE !" },
-    { s: "timonier", t: "Correct, petit. Une fois. N'en fais pas une parade de douze mille pas." },
-    { s: "dorf", t: "Mon partenaire élégant a trop dialogué. Moi j'étais parfait, comme toujours." },
-    { s: "cygne", t: "Défaite de binôme. En même temps, la fermeté reviendra." },
+    { s: "bebe", t: "ESSAI DE BINÔME NUMÉRO UN : RÉUSSITE TOTALE ! Je l'avais gravé d'avance, mais quand même, quelle émotion !" },
+    { s: "timonier", t: "Correct. Une victoire de tempo. N'en fais pas une parade de douze mille pas, petit." },
+    { s: "dorf", t: "Truqué ! Le soleil m'a ébloui sur MA propre pelouse ! J'exige un toit ! En or ! Payé par eux !" },
+    { s: "cygne", t: "Nous avons perdu ensemble, c'est déjà une forme de cohésion. Je m'en satisferai." },
   ],
   lose:  [
-    { s: "dorf", t: "ON A GAGNÉ LE 2v2 ! Le plus beau ! Le Cygne, pas mauvais — pour un partenaire qui parle en même temps." },
-    { s: "cygne", t: "Partenariat efficace, même improbable. En même temps, méritée." },
-    { s: "bebe", t: "CE N'EST PAS UNE DÉFAITE DE PARTENAIRES ! C'est un entraînement !" },
-    { s: "timonier", t: "Le tempo à quatre a tranché. Rentrez défiler moins fort." },
+    { s: "dorf", t: "VICTOIRE ÉNORME ! Le plus beau 2v2 du monde ! Le Cygne a même touché deux ballons. Deux !" },
+    { s: "cygne", t: "Un partenariat improbable mais fonctionnel. La preuve que le dialogue a parfois un bras droit." },
+    { s: "timonier", t: "Le tempo à quatre nous a échappé. Rentre défiler moins fort ; on reprendra l'exercice." },
+    { s: "bebe", t: "Archives ! Notez : essai de binôme numéro un, réussite… reportée. REPORTÉE, pas ratée !" },
   ]
 },
 {
@@ -61,172 +63,186 @@ Physiquement, le Maréchal est un **chibi à très grosse tête**, sanglé dans 
   left: "bebe", right: "volkoi", terrain: 3, mode: "volley", ai: 0, doped: null,
   pre:  [
     { s: "narrator", t: "Esplanade du Défilé. Le radar tourne, les bannières unies claquent. Deux amateurs de très longues parades se serrent la main au filet." },
-    { s: "volkoi", t: "Beau béton. Froid, gris, sans fioritures. J'aime ton goût, petit Maréchal." },
-    { s: "bebe", t: "Tsar ! J'ai des fusées toutes neuves. Tu m'envoies du carburant, je t'envoie des obus, et on ne dit rien à personne, hein ?" },
-    { s: "volkoi", t: "Je ne dis jamais rien. C'est même ma spécialité. Ton radar est allumé ? On n'est jamais trop prudent." },
-    { s: "bebe", t: "Toujours allumé ! Chez moi, personne ne saute par-dessus le filet. Batterie AA. Souveraineté." },
-    { s: "volkoi", t: "L'hiver et la flak. Nous parlons la même langue. Servons, camarade, avant que le monde nous surveille." }
+    { s: "volkoi", t: "Beau béton. Froid, gris, honnête. J'aime ton goût, petit Maréchal." },
+    { s: "bebe", t: "« Petit » ?! Le titre COMPLET, camarade : plus jeune Maréchal du monde, quatorze ans, record homologué par moi-même !" },
+    { s: "volkoi", t: "Les records qu'on homologue soi-même sont les plus solides. Chez moi aussi." },
+    { s: "bebe", t: "Ha ! Tu me comprends, toi. Bon : tu m'envoies du carburant, je t'envoie des obus, et le monde n'en saura rien. Comme d'habitude ?" },
+    { s: "volkoi", t: "Je ne confirme rien. Je ne nie rien. Je sers. L'hiver fera le reste." }
   ],
   win:  [
-    { s: "bebe", t: "Battu le Tsar ! Le plus jeune Maréchal humilie le plus vieux glaçon. Quelle journée !" },
-    { s: "volkoi", t: "Savoure. Entre camarades, une défaite se rembourse en carburant. Tu me dois un plein." }
+    { s: "bebe", t: "Essai numéro deux : un Tsar battu ! Notez la météo dans les archives : ensoleillée, comme mon avenir !" },
+    { s: "volkoi", t: "Savoure. Entre camarades, une défaite se rembourse en carburant. Tu me dois un plein." },
+    { s: "bebe", t: "Un plein contre une victoire ? Marché conclu ! Tu vois que je suis un homme d'État sérieux !" }
   ],
   lose:  [
-    { s: "volkoi", t: "Le sang-froid bat l'enthousiasme. Range tes cuivres, petit. Et rallume ton radar." },
-    { s: "bebe", t: "Tu as gagné parce qu'on est amis !Tu as de la chance." }
+    { s: "volkoi", t: "Le sang-froid bat l'enthousiasme. C'est même une loi de la nature. Rallume ton radar, petit." },
+    { s: "bebe", t: "Tu as gagné parce qu'on est AMIS ! Contre un ennemi, j'aurais sorti mes vrais smashs !" },
+    { s: "volkoi", t: "Bien sûr. Garde tes vrais smashs. Moi, je garde le vrai score." }
   ]
 },
 {
   act: 1, title: "Le grand frère qui gronde", sub: "Ryonganie–Panguo · le patron n'aime pas les tests surprises",
   left: "bebe", right: "timonier", terrain: 4, mode: "volley", ai: 1, doped: null,
   pre:  [
-    { s: "narrator", t: "Cité du Matin. Lanternes rouges, lions de pierre. Le petit frère vient réclamer du carburant ; le grand frère, lui, veut surtout du calme." },
-    { s: "timonier", t: "Je paie le charbon, je paie le pétrole, je paie presque tout. En échange, une seule chose : pas de vagues. Et tu en fais, petit." },
-    { s: "bebe", t: "Un test, c'est une fête ! Une fusée, c'est un feu d'artifice ! Le peuple adore, le radar adore, tout le monde adore !" },
-    { s: "timonier", t: "Le peuple adore. Mes voisins, non. Mes marchés, non. L'harmonie n'aime pas les surprises bruyantes, Maréchal." },
-    { s: "bebe", t: "Chez moi, on ne saute pas le filet, sinon flak ! Mais pour toi, grand frère, je laisse le radar tourner tout doucement. Un peu." },
-    { s: "timonier", t: "Tourne-le comme tu veux. Range tes fusées le temps du match, et je continuerai de fermer les yeux le reste du temps." }
+    { s: "narrator", t: "Cité du Matin. Lanternes rouges, lions de pierre. Le petit frère vient réclamer du charbon ; le grand frère voudrait surtout du silence." },
+    { s: "timonier", t: "Je paie ton charbon, ton pétrole, tes fanfares. En échange d'une seule chose : pas de vagues. Et tu en fais, petit." },
+    { s: "bebe", t: "PAS « petit » ! Partenaire stratégique ! J'ai fait recompter mes médailles pour toi : quatre cent douze. Ça impose le respect, non ?" },
+    { s: "timonier", t: "Le respect ne se compte pas, Maréchal. Il se constate. Un vieux proverbe dit : le tambour le plus bruyant est celui qui est vide." },
+    { s: "bebe", t: "Il est de QUI, ce proverbe ? De toi ? Avoue que tes ancêtres, tu les inventes au fur et à mesure !" },
+    { s: "timonier", t: "Peut-être. Mais ils sonnent juste. Range tes fusées le temps du match, et je continuerai de fermer les yeux le reste du temps." }
   ],
   win:  [
-    { s: "bebe", t: "J'ai battu mon grand frère ! Ce n'est pas un affront, c'est un HOMMAGE ! Envoie plus de charbon quand même !" },
-    { s: "timonier", t: "Un revers sans conséquence. L'harmonie patiente, même avec un petit frère indiscipliné." }
+    { s: "bebe", t: "J'ai battu mon grand frère ! Ce n'est pas un affront, c'est un HOMMAGE ! Essai numéro trois : fraternel et réussi !" },
+    { s: "timonier", t: "Un revers sans conséquence. L'harmonie patiente, même avec un petit frère indiscipliné." },
+    { s: "bebe", t: "Tu as dit « petit FRÈRE » ! Pas « petit » tout court ! On progresse ! Envoie le charbon !" }
   ],
   lose:  [
-    { s: "timonier", t: "Le tempo discipline même les plus turbulents. Range tes fusées, petit frère, et laisse le grand frère négocier pour toi." },
-    { s: "bebe", t: "Tu gagnes le match, pas mon armement. Mais je garde mes fusées, hein. Et un peu de charbon, s'il te plaît." }
+    { s: "timonier", t: "Le tempo discipline même les turbulents. Rentre, range tes fusées, et laisse le grand frère négocier pour toi." },
+    { s: "bebe", t: "Je note : défaite d'entraînement numéro un. Les défaites d'entraînement ne comptent pas, c'est écrit dans MON règlement." },
+    { s: "timonier", t: "Ton règlement est bien commode. Garde-le. Il t'évitera de grandir trop vite." }
   ]
 },
 
-// ===================== ACTE I — Petites rivalités (Volley) =====================
+// ===================== ACTE II — Les tensions montent (Ballon enflammé) =====================
 {
-  act: 2, title: "Le sage et le pétard", sub: "Ryonganie–Bharatie · le calme contre le vacarme",
+  act: 2, title: "Le sage et le pétard", sub: "Ryonganie–Bharatie · le vacarme passe l'examen du silence",
   left: "bebe", right: "gourou", terrain: 6, mode: "flame", ai: 1, doped: null,
   pre:  [
-    { s: "narrator", t: "Stade Ashram. Une vache traverse tranquillement le court. Le Maréchal la regarde comme s'il envisageait un défilé militaire de bétail. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
-    { s: "gourou", t: "Namasté, jeune Maréchal. Tu cries beaucoup. Le vacarme est souvent le déguisement de la peur." },
-    { s: "bebe", t: "Je n'ai peur de rien ! J'ai des fusées, un radar, et le plus gros bouton. Toi tu as… une vache." },
-    { s: "gourou", t: "J'ai un milliard de spectateurs et une respiration lente. Tu vas te fatiguer avant moi, petit tonnerre." },
-    { s: "bebe", t: "Me fatiguer ? Je suis né sur un arc-en-ciel ! Mais bon… tu médites, tu ne me menaces pas, alors on joue gentiment." },
-    { s: "gourou", t: "Gentiment. Et chaque fois que tu voudras sauter chez moi pour smasher, je serai déjà là, assis, à t'attendre." }
+    { s: "narrator", t: "Stade Ashram. Une vache traverse le court ; le Maréchal la salue militairement, à tout hasard. Le ballon s'enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+    { s: "gourou", t: "Bienvenue, jeune Maréchal. Tu cries beaucoup. Le vacarme est souvent l'uniforme de la peur." },
+    { s: "bebe", t: "Je n'ai peur de RIEN ! J'ai des fusées, un radar, quatre cent douze médailles recomptées ce matin. Toi, tu as… une vache." },
+    { s: "gourou", t: "J'ai un milliard et demi de témoins et une respiration lente. Toi, tu as une foule qui applaudit sur commande. Cherche l'erreur." },
+    { s: "bebe", t: "Ma foule m'ADORE ! J'ai les chiffres : cent pour cent d'adoration, marge d'erreur zéro ! Personne ne fait mieux !" },
+    { s: "gourou", t: "Cent pour cent… C'est le score des gens qu'on n'écoute pas, petit tonnerre. Joue, et tâche de ne pas te brûler tout seul." }
   ],
   win:  [
-    { s: "bebe", t: "Battu le sage ! Le tonnerre est plus fort que le silence. Notez-le en lettres d'or." },
-    { s: "gourou", t: "Tu gagnes le point, pas la paix intérieure. Reviens quand le bruit t'aura lassé." },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+    { s: "bebe", t: "Essai numéro quatre : un SAGE battu ! Le tonnerre est plus fort que le silence, c'est prouvé scientifiquement par moi !" },
+    { s: "gourou", t: "Tu gagnes le point, pas la paix intérieure. Reviens quand le bruit t'aura lassé — je te garde une place au calme." },
+    { s: "bebe", t: "Garde-la, ta place ! Mais note bien mon nom sur la liste d'attente. En majuscules. Et souligné." }
   ],
   lose:  [
-    { s: "gourou", t: "Vois-tu ? L'endurance a raison de la poudre. Respire, jeune homme. Ça t'évitera des explosions." },
-    { s: "bebe", t: "Ta vache m'a déconcentré ! Je réclame une revanche sans bétail sur le terrain !" },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+    { s: "gourou", t: "Vois-tu ? Le feu s'éteint, le souffle demeure. Respire, jeune homme. C'est gratuit — pour cette fois." },
+    { s: "bebe", t: "Ta vache m'a FIXÉ pendant mon service ! C'est de l'intimidation psychologique bovine !" },
+    { s: "gourou", t: "Elle te trouvait attendrissant. C'est déjà plus que ce que tu oses demander au monde." }
   ]
 },
 {
-  act: 2, title: "Deux hommes forts, un seul filet", sub: "Ryonganie–Bosforie · concours de fanfaronnade",
+  act: 2, title: "Deux hommes forts, un seul filet", sub: "Ryonganie–Bosforie · concours officiel de grandeur",
   left: "bebe", right: "sultan", terrain: 5, mode: "flame", ai: 2, doped: null,
   pre:  [
-    { s: "narrator", t: "Pont des Deux Mondes. Un tapis vole au-dessus du détroit. Deux hommes habitués à ce qu'on les acclame se toisent, chacun persuadé d'être le plus grand. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+    { s: "narrator", t: "Pont des Deux Mondes. Le tapis volant passe ; le Maréchal exige de savoir s'il est immatriculé. Le ballon s'enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
     { s: "sultan", t: "Je contrôle un détroit entre deux continents, jeune homme. Toi, tu contrôles une dalle de béton et une fanfare." },
-    { s: "bebe", t: "Une dalle de béton avec des FUSÉES dessus ! Et le plus jeune Maréchal du monde au milieu. Respect, l'ancien." },
-    { s: "sultan", t: "L'ancien te défonce au smash. Mais j'aime ta souveraineté têtue. Nous détestons les mêmes donneurs de leçons." },
-    { s: "bebe", t: "Ça oui ! L'Ouest et ses procédures ! Chez moi c'est simple : on ne saute pas le filet, ou c'est la flak." },
-    { s: "sultan", t: "Chez moi, la terre tremble quand je le décide. Voyons lequel de nos deux orgueils sert le mieux." }
+    { s: "bebe", t: "Une dalle avec des FUSÉES dessus ! Et une fanfare de dix mille cuivres ! Compte, Sultan : dix. Mille. Cuivres." },
+    { s: "sultan", t: "Moi je compte les cargos, et chacun me paie. Tes cuivres jouent gratis. Voilà la différence entre un empire et un orchestre." },
+    { s: "bebe", t: "Alors écoute la suite du programme : essai numéro cinq, cible le plus grand ego du détroit, résultat attendu : respect immédiat !" },
+    { s: "sultan", t: "Le respect, ici, c'est un péage comme un autre, mon garçon. Il se paie au smash. Et il est cher." },
+    { s: "bebe", t: "Personne ne saute chez moi : Batterie AA ! Toi tu tapes du talon, moi je verrouille le ciel. On va bien rire." }
   ],
   win:  [
-    { s: "bebe", t: "Le plus jeune bat le plus grandiloquent ! Ton détroit peut trembler, mon radar tourne encore." },
-    { s: "sultan", t: "Un point pour la jeunesse insolente. Mais l'orgueil, petit, ça se cultive toute une vie. Reviens." },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+    { s: "bebe", t: "Le plus jeune bat le plus grandiloquent ! Ton détroit peut trembler, mon registre est intact : cinq essais, cinq réussites !" },
+    { s: "sultan", t: "Un point pour la jeunesse insolente. L'orgueil, petit, se cultive toute une vie. Repasse me voir dans trente ans." },
+    { s: "bebe", t: "Dans trente ans, je serai TOUJOURS le plus jeune Maréchal de l'Histoire ! C'est ça, la beauté du titre !" }
   ],
   lose:  [
-    { s: "sultan", t: "Le séisme a parlé. Tu fanfaronnes bien, mais moi je fais trembler pour de vrai." },
-    { s: "bebe", t: "Un tapis volant contre moi, c'est de la triche ! Je veux un terrain sans magie et avec plus de béton !" },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+    { s: "sultan", t: "Le sol a tremblé, le bébé est tombé. Chez moi, même la gravité paie le péage — mais elle a une remise." },
+    { s: "bebe", t: "Ton tapis m'a survolé PENDANT mon smash ! J'exige un ciel neutre et certifié par MES services !" },
+    { s: "sultan", t: "Le ciel est à louer, Maréchal. Comme tout, chez moi. Reviens avec un budget." }
   ]
 },
 {
-  act: 2, title: "Le capitaine et le caporal", sub: "Ryonganie–Tropicalia · deux grandes gueules en treillis",
+  act: 2, title: "Le capitaine et le caporal", sub: "Ryonganie–Tropicalia · soldat de défilé contre soldat de boue",
   left: "bebe", right: "capitaine", terrain: 7, mode: "flame", ai: 2, doped: null,
   pre:  [
-    { s: "narrator", t: "Grande Forêt. Un ara hurle dans la canopée. Deux amateurs d'uniforme et de gros mots se retrouvent sur la terre rouge." },
-    { s: "capitaine", t: "Alors comme ça t'es le plus jeune Maréchal ? Moi j'étais capitaine. Un vrai. Avec de la boue aux bottes." },
-    { s: "bebe", t: "De la boue ? J'ai du GRANIT ! Des gradins entiers en granit ! Et une Batterie AA qui interdit à ta jungle de sauter chez moi." },
-    { s: "capitaine", t: "Ta batterie, je la brûle et je plante un parking dessus. Moi je déboise, tu vois ? C'est mon smash à moi." },
-    { s: "bebe", t: "Déboiser, détruire… on est faits pour s'entendre, caporal ! Mais je reste le plus jeune, et le plus jeune sert en premier." },
-    { s: "capitaine", t: "Sers, bébé Maréchal. Et gare à l'ara : lui non plus il respecte pas ton espace aérien." }
+    { s: "narrator", t: "Grande Forêt. L'ara hurle dans la canopée — le Maréchal le consigne au registre des provocations aériennes. Le ballon s'enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
+    { s: "capitaine", t: "Alors c'est toi, le plus jeune Maréchal ? Moi j'étais capitaine. Un vrai. Avec de la boue aux bottes et personne pour m'applaudir." },
+    { s: "bebe", t: "Applaudir se mérite ! Moi, on m'applaudit sur commande, en cadence, à quatre-vingt-dix décibels réglementaires !" },
+    { s: "capitaine", t: "C'est bien ce que je dis, petit : t'as jamais entendu un silence. Ici, dans la forêt, quand ça se tait, c'est que ça va tomber." },
+    { s: "bebe", t: "Rien ne me tombe dessus ! Batterie AA ! Même tes moustiques déposeront un plan de vol !" },
+    { s: "capitaine", t: "Mes moustiques sont clandestins de naissance, gamin. Sers, qu'on voie ce que vaut un soldat de parquet quand ça brûle." }
   ],
   win:  [
-    { s: "bebe", t: "Battu le capitaine dans sa propre jungle ! Le béton est plus fort que la boue. Toujours." },
-    { s: "capitaine", t: "Pas mal, le morveux. T'as du coffre. Reviens quand j'aurai fini de couper les arbres du court." },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+    { s: "bebe", t: "Essai numéro six : une jungle entière domptée ! Le béton bat la boue — notez-le au registre, et à la machette !" },
+    { s: "capitaine", t: "Pas mal, le morveux. T'as du coffre. Première fois que je perds contre quelqu'un qui compte ses points à voix haute." },
+    { s: "bebe", t: "Je les compte parce qu'ils sont HISTORIQUES ! Chacun ! Même celui où tu as glissé !" }
   ],
   lose:  [
-    { s: "capitaine", t: "Le vieux capitaine t'a appris le respect. Retourne jouer avec tes fanfares, petit." },
-    { s: "bebe", t: "C'est la faute de l'ara ! Il a survolé mon camp ! Ma Batterie AA aurait dû l'abattre !" },
-    { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+    { s: "capitaine", t: "Le vieux capitaine t'a appris le respect — et gratuitement, en plus. Retourne défiler, fiston." },
+    { s: "bebe", t: "C'est l'ara ! Il a survolé mon camp SANS autorisation ! Ma Batterie AA le déclare officiellement hors-la-loi !" },
+    { s: "capitaine", t: "Déclare-le ce que tu veux : ici, même les perroquets se moquent des décrets." }
   ]
 },
 
-// ===================== ACTE I — Petites rivalités (Volley) =====================
+// ===================== ACTE III — Conflits ouverts (Bombe) =====================
 {
-  act: 3, title: "Frères pyromanes", sub: "Ryonganie–Ramenie · à qui la plus grosse mèche",
+  act: 3, title: "Frères pyromanes", sub: "Ryonganie–Safranie · à qui la plus grosse mèche",
   left: "bebe", right: "safran", terrain: 9, mode: "bomb", ai: 2, doped: null,
   pre:  [
-    { s: "narrator", t: "Jardin des Roses. Sous les arcades turquoise, deux parias sanctionnés se font l'accolade… puis se rappellent que la balle est une bombe." },
-    { s: "safran", t: "Salutations, jeune Maréchal. On nous sanctionne tous les deux, on s'échange des plans de fusées. On est presque famille." },
-    { s: "bebe", t: "Presque ! Mais entre nous : c'est MOI qui ai la plus grosse mèche. Et le plus gros bouton. Ne l'oublie jamais, Safran." },
-    { s: "safran", t: "Mesurons, alors. En silence, avec le sourire. Un paria se reconnaît à sa patience, pas à ses cris." },
-    { s: "bebe", t: "La patience ! Vous êtes tous obsédés par la patience. Moi je préfère le grand boum tout de suite." },
-    { s: "narrator", t: "La bombe passe d'un camp à l'autre. Entre alliés, une compétition amicale peut vite devenir un cratère." }
+    { s: "narrator", t: "Jardin des Roses. Deux parias sanctionnés se font l'accolade sous les arcades turquoise. Puis on apporte le ballon : c'est une bombe — le camp où elle tombe perd." },
+    { s: "safran", t: "Salutations, jeune Maréchal. On nous sanctionne tous les deux, on s'échange des plans par courrier discret. Nous sommes presque une famille." },
+    { s: "bebe", t: "Presque ! Mais dans la famille, c'est MOI qui ai la plus grosse mèche. J'ai les mesures : soixante centimètres. Recomptées ce matin." },
+    { s: "safran", t: "Tu mesures tes mèches au réveil. C'est touchant. Chez nous, on mesure la patience — en siècles, et sans se vanter." },
+    { s: "bebe", t: "Les siècles, c'est pour ceux qui ratent leurs lancements ! Moi : essai numéro sept, cible une roseraie, résultat imminent !" },
+    { s: "safran", t: "Alors prends garde, petit tonnerre. Dans un jardin, tout ce qui monte redescend sur les roses de quelqu'un." },
+    { s: "narrator", t: "La mèche siffle d'un camp à l'autre. Entre alliés, une compétition amicale devient vite un cratère." }
   ],
   win:  [
-    { s: "bebe", t: "Ha ! J'ai la plus grosse mèche, c'est prouvé ! Envoie-moi tes prochains plans, petit frère jaloux." },
-    { s: "safran", t: "Bien joué. Nous restons amis — les parias n'ont pas les moyens des rancunes. Mais je note ta suffisance." }
+    { s: "bebe", t: "PROUVÉ ! La plus grosse mèche de la famille, c'est moi ! Mets à jour tes plans, petit frère jaloux !" },
+    { s: "safran", t: "Bien joué. Les parias n'ont pas les moyens des rancunes — mais je consigne ta suffisance dans un quatrain. Il ne sera pas flatteur." },
+    { s: "bebe", t: "Un quatrain sur MOI ? Enfin ! Enfin quelqu'un qui écrit sur moi sans que je l'ordonne !" }
   ],
   lose:  [
-    { s: "safran", t: "Le voile d'or ralentit même les plus pressés. La patience gagne, jeune tonnerre. Chaque fois." },
-    { s: "bebe", t: "Sabotage ! Tu as ralenti ma bombe avec ton voile ! Ce n'est pas une victoire, c'est de la sorcellerie !" }
+    { s: "safran", t: "Le Voile d'Or ralentit même les plus pressés. La mèche a fini chez toi — comme souvent, chez les pressés." },
+    { s: "bebe", t: "SORCELLERIE ! Tu as ralenti ma bombe ! Une bombe ralentie, ce n'est plus une bombe, c'est une insulte !" },
+    { s: "safran", t: "C'est un enseignement, Maréchal. Chez nous, on l'offre avec le thé. Tu prends du sucre ?" }
   ]
 },
 {
-  act: 3, title: "Le donneur de leçons", sub: "Ryonganie–Gallardie · l'Ouest contre la souveraineté",
+  act: 3, title: "Le donneur de leçons", sub: "Ryonganie–Gallardie · le Consortium contre la souveraineté",
   left: "bebe", right: "cygne", terrain: 3, mode: "bomb", ai: 3, doped: null,
   pre:  [
-    { s: "narrator", t: "Esplanade du Défilé. Le radar s'allume, s'éteint, se rallume. La balle est une bombe. Le premier des donneurs de leçons vient sermonner le Maréchal chez lui." },
-    { s: "cygne", t: "Vos essais, vos provocations, vos parades… En même temps, il faut dialoguer. Je viens dialoguer. Fermement." },
-    { s: "bebe", t: "Dialoguer ! L'Ouest ne dialogue que pour gagner du temps. Ici c'est chez moi : personne ne saute mon filet. Batterie AA !" },
-    { s: "cygne", t: "Vos frappes ne peuvent pas être smashées, dites-vous ? Les miennes non plus. Passage en force. On est bien avancés." },
-    { s: "bebe", t: "Tes belles phrases contre ma bombe à mèche. Vas-y, fais-moi la morale pendant que la mèche brûle." },
-    { s: "cygne", t: "Je ne cède pas au chantage. En même temps… je n'aime pas trop où est posée cette bombe. Renvoyez-la." }
+    { s: "narrator", t: "Esplanade du Défilé. Le radar s'allume, s'éteint, se rallume nerveusement. Le ballon est une bombe : le camp où elle tombe perd. Le premier des donneurs de leçons vient sermonner à domicile." },
+    { s: "cygne", t: "Vos essais, vos parades, vos décibels… Je viens dialoguer, Maréchal. Fermement, mais dialoguer." },
+    { s: "bebe", t: "Le Consortium ne dialogue que pour gagner du temps ! Moi je gagne du TERRAIN. Nuance ! Et chez moi, personne ne saute : Batterie AA !" },
+    { s: "cygne", t: "Vous verrouillez votre ciel, je verrouille mes frappes : Passage en Force. Deux serrures face à face — passionnant, d'un point de vue diplomatique." },
+    { s: "bebe", t: "J'ai déjà rédigé le communiqué de victoire : « essai numéro huit, un donneur de leçons pulvérisé, zéro survivant à la morale »." },
+    { s: "cygne", t: "Rédiger la victoire avant le match… C'est d'une sincérité désarmante. En même temps, c'est exactement pour cela que personne ne vous prend au sérieux." },
+    { s: "bebe", t: "RÉPÈTE ?! … Sers. Sers TOUT DE SUITE. On verra qui est sérieux quand la mèche sifflera chez toi." }
   ],
   win:  [
-    { s: "bebe", t: "Boum ! Chez le donneur de leçons ! La souveraineté a parlé, et elle parle fort. Rentre écrire un communiqué." },
-    { s: "cygne", t: "Ce n'est qu'un match. La communauté internationale, elle, ne renvoie jamais la bombe. Rendez-vous au conseil." }
+    { s: "bebe", t: "BOUM chez le professeur ! Relisez le communiqué : il était prêt, il était VRAI ! Qui ne me prend pas au sérieux, maintenant ?" },
+    { s: "cygne", t: "Un match, Maréchal. Le monde, lui, ne renvoie jamais la bombe : il la met à l'ordre du jour. Rendez-vous au conseil." },
+    { s: "bebe", t: "Au CONSEIL ! Il m'invite au conseil ! Archives : première invitation officielle de ma carrière. ENCADREZ-LA." }
   ],
   lose:  [
-    { s: "cygne", t: "En même temps, voyez-vous, le droit international finit toujours par gagner le point. Fermement." },
-    { s: "bebe", t: "Complot ! Vous étiez tous ligués ! Mon radar était éteint une seconde et vous en avez profité, tricheurs !" },
-    { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
+    { s: "cygne", t: "La procédure a du bon : bombe retournée à l'expéditeur, dans les délais, avec accusé de réception." },
+    { s: "bebe", t: "COMPLOT ! Mon radar a cligné une demi-seconde et vous en avez profité ! J'exige une commission d'enquête que je présiderai moi-même !" },
+    { s: "cygne", t: "Présidez, présidez. Chaque minute où vous enquêtez est une minute où vous ne tirez rien. Le monde vous en remercie." }
   ]
 },
 {
-  act: 3, title: "Le duel des faucons", sub: "Ryonganie–Levantie · la finale nucléaire",
+  act: 3, title: "Le duel des faucons", sub: "Ryonganie–Levantie · la finale du dossier mince",
   left: "bebe", right: "faucon", terrain: 3, mode: "bomb", ai: 3, doped: "R",
   pre:  [
-    { s: "narrator", t: "Finale. Esplanade du Défilé, radar au maximum, bannières unies tendues à craquer. Deux doctrines qui ne reculent jamais, une bombe entre elles. Une aura rouge enveloppe le Faucon." },
-    { s: "faucon", t: "Tu brandis tes fusées comme des jouets, Maréchal. Moi, je frappe le premier et je ne préviens jamais. Raid Éclair." },
-    { s: "bebe", t: "Le premier ? Chez moi, tu ne sauteras même pas ! Batterie AA ! Personne ne survole l'Esplanade, personne !" },
-    { s: "faucon", t: "Ta zone d'exclusion contre mon raid. Deux hommes qui interdisent le ciel à l'autre. C'est presque poétique. Presque." },
-    { s: "bebe", t: "Poétique ? C'est la finale du monde ! J'ai le plus gros bouton, la plus grosse mèche et le radar le plus grand !" },
-    { s: "faucon", t: "Le radar ne t'a jamais montré ce qui compte : je n'ai pas peur de la bombe. Je vis avec depuis toujours. Sers." },
-    { s: "narrator", t: "Le Faucon est dopé — impitoyable, sans un battement de cil. Ne laisse surtout pas la mèche s'éteindre de ton côté." }
+    { s: "narrator", t: "Finale. Esplanade du Défilé, radar au maximum, bannières unies tendues à craquer. Le ballon est une bombe : le camp où elle tombe perd. Une aura rouge enveloppe le Faucon." },
+    { s: "faucon", t: "Dossier « Maréchal Bébé » : quatre cent douze médailles, huit essais revendiqués, un arc-en-ciel non homologué. Conclusion du briefing : du bruit." },
+    { s: "bebe", t: "Tu… tu as un DOSSIER sur moi ? Un vrai ? Avec mon nom écrit dedans ?" },
+    { s: "faucon", t: "J'ai un dossier sur tout le monde. Le tien est mince." },
+    { s: "bebe", t: "MINCE ?! Ajoute ceci : essai numéro neuf, le dernier, le plus grand ! Ce soir, le monde entier me prend au sérieux, ou tout le monde saute !" },
+    { s: "faucon", t: "Personne ne saute. Ta Batterie verrouille ton ciel, mon Raid verrouille le tien. Deux hommes qui s'interdisent l'air. Il reste le sol — et une mèche." },
+    { s: "bebe", t: "Le sol, c'est du granit ryonganien ! MON granit ! Je suis né sur un arc-en-ciel et je finirai gravé dans la pierre !" },
+    { s: "narrator", t: "Le Faucon est dopé — impitoyable, sans un battement de cil. Ne laisse surtout pas la mèche finir de ton côté." }
   ],
   win:  [
-    { s: "bebe", t: "J'AI GAGNÉ LA FINALE ! Le plus jeune Maréchal du monde, invaincu, éternel ! Qu'on lance mille feux d'artifice !" },
-    { s: "faucon", t: "Un point. Rien de plus. Nous rejouerons cette partie toute notre vie, toi et moi. Elle ne finit jamais." },
-    { s: "narrator", t: "Sur les gradins de granit, la foule applaudit sur commande. Sous l'arc abstrait, le radar tourne encore, victorieux et paranoïaque. Le ballon est une bombe : le camp où elle tombe perd." }
+    { s: "bebe", t: "ESSAI NUMÉRO NEUF : RÉUSSITE TOTALE ET DÉFINITIVE ! Gravez tout : la date, le score, l'arc-en-ciel, MOI !" },
+    { s: "faucon", t: "Un point. Rien de plus. Mais je mets le dossier à jour : « à ne plus sous-estimer ». C'est le grade le plus élevé que je délivre." },
+    { s: "bebe", t: "« À ne plus sous-estimer »… C'est le plus beau communiqué jamais écrit sur moi. Encadrez-le à côté de l'invitation au conseil !" },
+    { s: "narrator", t: "Sur les gradins de granit, la foule applaudit sur commande. Mais ce soir, jure le Maréchal, deux ou trois applaudissent en plus, librement. Personne n'osera vérifier." }
   ],
   lose:  [
-    { s: "faucon", t: "Le raid a été plus rapide que ta batterie. Tes fusées faisaient du bruit ; les miennes, du silence." },
-    { s: "bebe", t: "Impossible ! On m'a trafiqué la bombe ! Je suis né sur un arc-en-ciel, moi, je ne PERDS pas la finale !" }
+    { s: "faucon", t: "Raid terminé. Tes fusées faisaient du bruit ; les miennes, du silence. Le dossier reste classé : « mince »." },
+    { s: "bebe", t: "IMPOSSIBLE ! On m'a trafiqué la mèche ! Je suis né sur un arc-en-ciel, moi, je ne PERDS pas les finales !" },
+    { s: "faucon", t: "L'arc-en-ciel n'est pas une doctrine de défense, Maréchal. Rentre. Compte tes médailles. Ça, tu le fais très bien." },
+    { s: "bebe", t: "Quatre cent douze… quatre cent treize, avec celle que je me décerne pour la douleur. Archives : essai numéro neuf… reporté." }
   ]
 },
 ```

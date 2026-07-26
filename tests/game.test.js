@@ -713,6 +713,41 @@ test("soft ownership : cooldown frappe avance avec tick (smash post-réception i
   assert.strictEqual(g.canActiveHit(g.blobR), true, "smash autorisé après cooldown (tick qui avance)");
 });
 
+test("online : snapshot round-trip superEffects / lastHitTick / kitSpeed-kitPower", () => {
+  // Régression : ces champs manquaient de getSnapshot/applySnapshot → l'invité
+  // prédisait sans le Mur/glace/slow, avec les mauvaises stats Cygne, et sans
+  // la garde anti double-frappe 2v2.
+  const g = loadGame();
+  g.newGame(31);
+  g.setState("play"); g.setServeCountdown(0);
+  g.superEffects.push({ kind: "wall", side: 1, t: 200 });
+  g.ball.lastHitTick = 123;
+  g.blobL.kitSpeed = 1.3; g.blobL.kitPower = 0.8;
+  const s = JSON.parse(JSON.stringify(g.getSnapshot()));
+  g.superEffects.length = 0;
+  g.ball.lastHitTick = -999;
+  g.blobL.kitSpeed = null; g.blobL.kitPower = null;
+  g.applySnapshot(s);
+  assert.strictEqual(g.superEffects.length, 1, "superEffects resynchronisé");
+  assert.deepStrictEqual(
+    { kind: g.superEffects[0].kind, side: g.superEffects[0].side, t: g.superEffects[0].t },
+    { kind: "wall", side: 1, t: 200 });
+  assert.strictEqual(g.ball.lastHitTick, 123, "lastHitTick suit le snapshot");
+  assert.strictEqual(g.blobL.kitSpeed, 1.3, "kitSpeed suit le snapshot");
+  assert.strictEqual(g.blobL.kitPower, 0.8, "kitPower suit le snapshot");
+});
+
+test("online : packBallState/applyBallState transporte lastHitTick", () => {
+  const g = loadGame();
+  g.newGame(32);
+  g.setState("play"); g.setServeCountdown(0);
+  g.ball.lastHitTick = 456;
+  const p = JSON.parse(JSON.stringify(g.packBallState(true)));
+  g.ball.lastHitTick = -999;
+  g.applyBallState(p);
+  assert.strictEqual(g.ball.lastHitTick, 456);
+});
+
 // ---------- Gameplay V2 ----------
 const N0 = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
 
@@ -731,6 +766,37 @@ test("V2 : smash/X au sol = cloche dirigée", () => {
   assert.strictEqual(g.ball.slowMo, 0, "pas de ralenti");
   assert.strictEqual(g.blobL.poseAnim, "receive", "pose réception après cloche");
   assert.ok(g.blobL.poseT >= 35, "réception tenue assez longtemps (poseT=" + g.blobL.poseT + ")");
+});
+
+test("2v2 : coéquipiers empilés → une seule réception (pas de téléport)", () => {
+  // Régression : sans lastHitTick, blobL puis blob2L frappaient le même tick
+  // (cooldown par joueur seulement) → 2e applyDirectedHit téléportait la balle.
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.setMode("2v2");
+  g.newGame(77);
+  g.setState("play"); g.setServeCountdown(0);
+  const gy = g.consts.GROUND_Y;
+  g.blobL.x = 250; g.blobL.y = gy; g.blobL.onGround = true;
+  g.blobL.vx = 0; g.blobL.vy = 0;
+  g.blob2L.x = 258; g.blob2L.y = gy; g.blob2L.onGround = true;
+  g.blob2L.vx = 0; g.blob2L.vy = 0;
+  g.blobR.x = 750; g.blob2R.x = 700;
+  g.ball.x = 254; g.ball.y = gy - 64; g.ball.vx = 0; g.ball.vy = 2;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+  g.ball.serveAimLock = false; g.ball.serveFlight = false;
+  g.ball.lastTouchSide = 1; // échange, pas service
+  g.blobL.lastActiveHitTick = -999;
+  g.blob2L.lastActiveHitTick = -999;
+  const x0 = g.ball.x, y0 = g.ball.y;
+  const smash = { ...N0, smash: true };
+  g.stepGame(null, null, [smash, smash, N0, N0]);
+  assert.strictEqual(g.ball.touches[0], 1, "une seule touche d'équipe");
+  const hitters = [g.blobL, g.blob2L].filter(b => b.lastActiveHitTick === g.getTick());
+  assert.strictEqual(hitters.length, 1, "un seul coéquipier marque la frappe");
+  const jump = Math.hypot(g.ball.x - x0, g.ball.y - y0);
+  assert.ok(jump < 90, "balle ne téléporte pas (Δ=" + jump.toFixed(1) + "px)");
+  assert.ok(g.ball.x < g.consts.NET_X, "balle reste côté réception");
 });
 
 test("V2 : smash dirigé sans ralenti", () => {
@@ -2151,10 +2217,14 @@ test("options : ouverture depuis le menu", () => {
 
 test("fiction : dialogues shippés sans Amérique / Europe / S-400", () => {
   const g = loadGame();
-  const blob = JSON.stringify(g.STORY_CAMPAIGNS || g.STORY_BY_CHAR || {});
+  const blob = JSON.stringify([g.STORY_CAMPAIGNS || g.STORY_BY_CHAR || {}, g.STORY_BIOS || {}]);
   assert.ok(blob.indexOf("Amérique") < 0, "pas Amérique");
   assert.ok(blob.indexOf("Europe") < 0, "pas Europe");
   assert.ok(blob.indexOf("S-400") < 0, "pas S-400");
+  // Références réelles bannies (fictionnalisation) — pays, armées, institutions, religions.
+  const banned = /Ramenie|Syrie|Rafale|BRICS|parisien|énarque|mosquée|Occident|occidental|transatlantique/i;
+  const hit = blob.match(banned);
+  assert.ok(!hit, "référence bannie dans le texte shippé : " + (hit && hit[0]));
 });
 
 test("confort : Options → Confort + toggles persistés", () => {

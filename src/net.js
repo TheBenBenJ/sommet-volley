@@ -34,14 +34,48 @@ const PEER_PREFIX = "vda26-";  // espace de noms sur le cloud PeerJS
 // ne peuvent tout simplement jamais établir de connexion directe — la partie
 // restait bloquée sur "Recherche…" (voir CONNECT_TIMEOUT) sans que rien ne
 // puisse la débloquer. Le TURN relaie le trafic quand le direct échoue.
+// Un coturn tourne sur le même serveur que le matchmaker : le client récupère
+// des credentials ÉPHÉMÈRES via GET /mm/turn (voir matchmaker/server.js) — pas
+// de mot de passe en dur dans ce fichier public. Si l'appel échoue (dev local
+// sans matchmaker, endpoint absent…), on reste en STUN seul comme avant.
 const ICE_CONFIG = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
-    { urls: "turn:openrelay.metered.ca:80", username: "openrelayproject", credential: "openrelayproject" },
-    { urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" },
-    { urls: "turn:openrelay.metered.ca:443?transport=tcp", username: "openrelayproject", credential: "openrelayproject" }
   ]
 };
+
+function turnCredsUrl() {
+  try {
+    const loc = typeof location !== "undefined" ? location : null;
+    if (!loc || !loc.host || loc.protocol === "file:") return "http://127.0.0.1:8787/turn";
+    return loc.protocol + "//" + loc.host + "/mm/turn";
+  } catch (e) {
+    return "http://127.0.0.1:8787/turn";
+  }
+}
+
+// Rafraîchit les serveurs ICE avec des credentials TURN frais (ttl 12 h côté
+// serveur, on redemande au plus toutes les heures). Fire-and-forget : les
+// Peer créés ensuite lisent ICE_CONFIG au moment de leur création.
+let turnFetchedAt = 0;
+function refreshTurnCredentials() {
+  if (typeof fetch !== "function") return;
+  const now = Date.now();
+  if (now - turnFetchedAt < 60 * 60 * 1000) return;
+  turnFetchedAt = now;
+  fetch(turnCredsUrl(), { cache: "no-store" })
+    .then(r => (r && r.ok ? r.json() : null))
+    .then(j => {
+      if (!j || !Array.isArray(j.urls) || !j.urls.length || !j.username || !j.credential) return;
+      ICE_CONFIG.iceServers = [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: j.urls, username: String(j.username), credential: String(j.credential) },
+      ];
+    })
+    .catch(() => { /* STUN seul */ });
+}
+// premier fetch dès le chargement (le lobby online arrive bien après)
+if (typeof window !== "undefined") refreshTurnCredentials();
 
 let online = false;            // mode en ligne actif (dès le lobby)
 let netRole = null;            // "host" | "guest"
@@ -139,6 +173,7 @@ function onlineLocalInput() {
     left:  keyHeldOnline("left") || pl,
     right: keyHeldOnline("right") || pr,
     jump:  keyHeldOnline("jump") || pj,
+    kbdJump: keyHeldOnline("jump"), // service clavier « un appui » aussi en ligne
     smash: keyHeldOnline("smash") || psm,
     super: keyHeldOnline("super") || ps,
     up:    pu,
@@ -151,6 +186,7 @@ function onlineLocalInput() {
 
 // ---------- Connexion ----------
 function initHostPeer() {
+  refreshTurnCredentials();
   online = true; netRole = "host";
   netConnected = false; peerReady = false;
   netCode = makeCode();
@@ -171,6 +207,7 @@ function initHostPeer() {
 }
 
 function initGuestPeer(code) {
+  refreshTurnCredentials();
   online = true; netRole = "guest";
   netConnected = false;
   peer = new Peer(undefined, { config: ICE_CONFIG }); // id aléatoire pour l'invité
@@ -403,8 +440,10 @@ function onNetData(m) {
       if (netRole !== "host" || m.m !== matchId) break;
       if (m.s > guestInSeq) {
         guestInSeq = m.s;
-        guestIn = { left: !!m.l, right: !!m.r, jump: !!m.j, smash: !!(m.sh || m.rc),
-                    super: !!m.sp, ax: (m.ax || 0) / 100, ay: (m.ay || 0) / 100 };
+        guestIn = { left: !!m.l, right: !!m.r, jump: !!m.j, kbdJump: !!m.kj,
+                    smash: !!(m.sh || m.rc),
+                    super: !!m.sp, up: !!m.u, down: !!m.d,
+                    ax: (m.ax || 0) / 100, ay: (m.ay || 0) / 100 };
         setX(blobR, !!m.x);
       }
       if (m.b) {
@@ -592,6 +631,7 @@ function hostSnapCadence() {
 // apprennent juste leur slot via le message "start".
 
 function initHostPeer2v2() {
+  refreshTurnCredentials();
   online = true; netRole = "host";
   netConnected = false; peerReady = false;
   guests = []; lobbyStarted = false;
@@ -674,8 +714,10 @@ function onHostData(g, m) {
       if (m.m !== matchId) break;
       if (m.s > g.inSeq) {
         g.inSeq = m.s;
-        g.in = { left: !!m.l, right: !!m.r, jump: !!m.j, smash: !!(m.sh || m.rc),
-                 super: !!m.sp, ax: (m.ax || 0) / 100, ay: (m.ay || 0) / 100 };
+        g.in = { left: !!m.l, right: !!m.r, jump: !!m.j, kbdJump: !!m.kj,
+                 smash: !!(m.sh || m.rc),
+                 super: !!m.sp, up: !!m.u, down: !!m.d,
+                 ax: (m.ax || 0) / 100, ay: (m.ay || 0) / 100 };
         setX(activeBlobs[g.slot], !!m.x);
       }
       break;
@@ -868,7 +910,8 @@ function netUpdate() {
         // ne tombe qu'au tick suivant. Si on libère l'autorité sur `popped`
         // tout de suite, ce tick n'arrive jamais → pas de `pt` → partie bloquée.
         if (ball.popped && !pendingNetPoint && (state === "play" || state === "serve")) {
-                    if (holder) awardPoint(1 - holder.side, "Balle crevée !");
+          const ls = ball.lastTouchSide;
+          awardPoint(ls >= 0 ? 1 - ls : (ball.x < NET_X ? 1 : 0), "Balle crevée !");
         }
         netDeferScore = false;
         ballPkt = packBallState(true);
@@ -901,8 +944,10 @@ function netUpdate() {
 
       const msg = { t: "in", m: matchId, s: inputSeq,
                     l: input.left ? 1 : 0, r: input.right ? 1 : 0,
-                    j: input.jump ? 1 : 0, sh: input.smash ? 1 : 0,
+                    j: input.jump ? 1 : 0, kj: input.kbdJump ? 1 : 0,
+                    sh: input.smash ? 1 : 0,
                     sp: input.super ? 1 : 0,
+                    u: input.up ? 1 : 0, d: input.down ? 1 : 0,
                     ax: Math.round((input.ax || 0) * 100),
                     ay: Math.round((input.ay || 0) * 100),
                     x: xOn[mySlot] ? 1 : 0 };
@@ -1218,6 +1263,14 @@ function drawNetHUD() {
   ctx.font = "600 13px " + (typeof UI !== "undefined" ? UI.sans : "sans-serif");
   ctx.fillStyle = "rgba(255,255,255,0.9)";
   ctx.fillText(netRole === "host" ? "Tu joues à gauche" : "Tu joues à droite", W - 14, 44);
+
+  // Confirmation d'abandon (Échap ×2)
+  if (typeof quitArmed === "function" && quitArmed()) {
+    ctx.textAlign = "center";
+    ctx.font = "700 15px " + (typeof UI !== "undefined" ? UI.sans : "sans-serif");
+    ctx.fillStyle = "#ffb84d";
+    ctx.fillText("Encore Échap pour abandonner le match", W / 2, 66);
+  }
 
   // pause automatique si l'autre ne donne plus signe de vie
   const stale = netRole === "host"

@@ -52,8 +52,10 @@ const STEP = 1000 / 60; // tick fixe 60 Hz (indispensable pour le futur mode en 
 const TOUCH_COOLDOWN = 12;   // ticks mini entre deux touches comptées (anti double-comptage)
 
 // --- Gameplay V2 (réception / tir dirigé / smash) — voir docs/GAMEPLAY-V2.md ---
-// Toggle runtime : touche ` (Backquote) hors saisie de code.
 let GAMEPLAY_V2 = true;
+// Entrées de debug (toggle V1/V2 sur `, cheat « rler ») : jamais en prod —
+// un seul appui désynchronise une partie en ligne.
+const DEV_CHEATS = false;
 const RECEIVE_R = 56;          // smash/X + cloche : assez large, sans « aimant » trop fort
 const AUTO_LOB_DX = 28;        // auto-cloche : balle quasi au-dessus du joueur
 const AUTO_LOB_R = 42;         // auto-cloche : rayon path tête (balle qui tombe dessus)

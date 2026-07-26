@@ -1,24 +1,26 @@
-# Regen Tsar Volkoï — identité verrouillée sur idle_0
+# Regen Tsar Volkoï — passe art composite Steam (ancre idle_1)
 
-Tu as l’image de référence jointe : `assets/volkoi/idle_0.png` (Tsar Volkoï / Sommet Volley).
+Tu as l’image de référence jointe : `raw/volkoi/idle_1.png` (nouvelle ancre
+composite / Sommet Volley). **C’est la vérité d’identité.**
 
 ## Mission
 
-Regénère **toutes les autres frames** (PAS `idle_0` — vérité).
-Écris dans `raw/volkoi/<anim>_<n>.png`. Travaille par **LOTS de 3–4** (ordre ci-dessous).
-Après chaque lot : copie vers `raw/volkoi/` + contact sheet, puis lot suivant.
+Regénère **toutes les autres frames** (PAS `idle_1` — ne l’écrase JAMAIS).
+Écris dans `raw/volkoi/<anim>_<n>.png`. Travaille par **LOTS de 3–4** (ordre
+ci-dessous). Après chaque lot : confirme les fichiers présents, puis lot suivant.
 
 ## LOCK identité (OBLIGATOIRE)
 
 Même personnage que la référence, pixel-identity :
-- grosse tête chibi (~1/3 hauteur), corps trapu barrel-chest
-- crâne ENTIÈREMENT chauve brillant, sourcils noirs épais anguleux
-- yeux gris/bleus froids, mâchoire carrée, teint pâle
-- overshirt / veste bordeaux ouverte SUR col roulé NOIR
-- pantalon anthracite, ceinture noire boucle argent, chaussures noires
-- PAS de tracksuit, PAS de chemise ouverte
+- chibi grosse tête (~1/3), corps trapu barrel-chest
+- crâne ENTIÈREMENT chauve, forme RONDE/douce (composite, pas portrait réel)
+- petits yeux bleu glacé écartés, sourcils épais droits, bouche fine
+- overshirt bordeaux COL MANDARIN boutonnée SUR col roulé NOIR
+- pantalon anthracite, chaussures noires
+- PAS de tracksuit, PAS de médailles, PAS de chemise ouverte
 
-OUTFIT LOCK : tenue IDENTIQUE sur chaque frame.
+OUTFIT LOCK : tenue IDENTIQUE à `idle_1` sur chaque frame.
+Steam : mash-up caricature — must NOT look like any real politician.
 
 ## Format technique
 
@@ -27,62 +29,55 @@ OUTFIT LOCK : tenue IDENTIQUE sur chaque frame.
 - Vue **côté face à DROITE** (sauf `idle_face_0` = FACE)
 - Corps entier tête→pieds (sauf idle_face), une image = une pose = un fichier
 
-## Lots
+## Lots (séquentiels)
 
-### Lot 1 — idle
+### Lot 1 — idle_face + idle_0
 | fichier | pose |
 |---------|------|
-| `idle_face_0.png` | portrait buste de FACE, grosse tête, expression caractéristique |
-| `idle_1.png` | debout repos, variation légère vs idle_0, même tenue |
+| `idle_face_0.png` | portrait buste de FACE, même tête/tenue, expression froide |
+| `idle_0.png` | debout repos côté droite, légère variation vs idle_1 |
 
 ### Lot 2 — walk (CRITIQUE — QA avant de continuer)
 | fichier | pose |
 |---------|------|
-| `walk_0.png` | LEFT foot planted flat forward, right leg stretched back, clear stride, right arm forward |
-| `walk_1.png` | jambes rapprochées mid-step, pieds presque ensemble, bras neutres |
-| `walk_2.png` | RIGHT foot planted flat forward, left leg back (miroir walk_0), left arm forward |
-| `walk_3.png` | jambes rapprochées passage, bras opposés à walk_1 |
+| `walk_0.png` | WIDE stride: LEFT foot planted FLAT far FORWARD, RIGHT leg stretched far BACK, clear gap, RIGHT arm FORWARD |
+| `walk_1.png` | PASSING: BOTH legs CLOSE under body, feet nearly SIDE-BY-SIDE, NOT wide stride, arms near torso |
+| `walk_2.png` | WIDE stride MIRROR: RIGHT foot planted FLAT far FORWARD, LEFT leg BACK, LEFT arm FORWARD |
+| `walk_3.png` | PASSING again: legs CLOSE, arms OPPOSITE to walk_1 |
 
-Walk QA : walk_0/walk_2 = pieds OPPOSÉS ; walk_1/walk_3 = passage (PAS debout).
+Walk QA : walk_0≠walk_2 (pieds opposés) ; walk_1/walk_3 = passage collé.
 
 ### Lot 3 — jump
 | `jump_0.png` | flexion / crouch prêt à sauter |
 | `jump_1.png` | en l’air, montée |
-| `jump_2.png` | sommet / apex du saut |
+| `jump_2.png` | sommet / apex |
 
 ### Lot 4 — receive + aim
-| `receive_0.png` | manchette : bras joints bas devant, mains vides |
-| `receive_1.png` | dig / réception contact, bras joints bas, mains vides |
-| `aim_0.png` | mains ouvertes levées au-dessus de la tête, regard haut, sans balle |
-| `aim_1.png` | même geste set/passe variation, sans balle |
+| `receive_0.png` | manchette bras joints bas, mains vides |
+| `receive_1.png` | dig contact, bras joints bas, mains vides |
+| `aim_0.png` | mains ouvertes au-dessus de la tête, regard haut, sans balle |
+| `aim_1.png` | variation set/passe, sans balle |
 
 ### Lot 5 — smash
-| `smash_0.png` | armé bras haut (en l’air), main ouverte, pas de balle |
-| `smash_1.png` | frappe smash, main ouverte, pas de balle |
-| `smash_2.png` | accompagnement / follow-through |
+| `smash_0.png` | armé bras haut (air), main ouverte, pas de balle |
+| `smash_1.png` | frappe smash, main ouverte |
+| `smash_2.png` | follow-through |
 
-### Lot 6 — super
-| `super_0.png` | pose spéciale — wind-up |
-| `super_1.png` | pose spéciale — montée |
-| `super_2.png` | pose spéciale — pic |
-| `super_3.png` | pose spéciale — finish |
+### Lot 6 — super (Hiver Général)
+| `super_0.png` | wind-up dramatique |
+| `super_1.png` | montée |
+| `super_2.png` | pic |
+| `super_3.png` | finish |
 
 ### Lot 7 — panic + victory
-| `panic_0.png` | surpris, penché en arrière, bras en l’air |
+| `panic_0.png` | surpris, penché arrière, bras en l’air |
 | `panic_1.png` | panic plus marqué |
-| `victory_0.png` | célébration, bras levés |
+| `victory_0.png` | célébration bras levés |
 | `victory_1.png` | victory variation |
 
-### Lot 8 — defeat + cutout
+### Lot 8 — defeat + stop
 | `defeat_0.png` | abattu, épaules basses |
 | `defeat_1.png` | defeat plus marqué |
 
-
-Quand les 26 sont dans `raw/volkoi/` (et `idle_0` intact) :
-
-```bash
-python3 tools/cutout.py raw/volkoi assets/volkoi
-```
-
-Corrige `assets/volkoi/manifest.json` : `idle: 2`, `walk: 4`, comptes canoniques.
-**Ne touche PAS** à `idle_0.png` (raw ni assets).
+Quand les 26 + `idle_1` sont dans `raw/volkoi/`, **arrête** (ne lance pas cutout —
+l’humain / l’agent parent s’en charge).

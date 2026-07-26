@@ -28,6 +28,14 @@ const KEYBIND_BLOCKED = new Set([
   "F9", "F10", "F11", "F12", "ContextMenu", "CapsLock", "NumLock", "ScrollLock"
 ]);
 
+// Disposition réelle du clavier (AZERTY/QWERTY…) quand le navigateur l'expose :
+// KeyA s'affiche « Q » sur un AZERTY, pas « A ».
+let keyLayoutMap = null;
+if (typeof navigator !== "undefined" && navigator.keyboard &&
+    typeof navigator.keyboard.getLayoutMap === "function") {
+  navigator.keyboard.getLayoutMap().then(m => { keyLayoutMap = m; }).catch(() => {});
+}
+
 function formatKeyCode(code) {
   if (!code) return "?";
   if (code === "Space") return "Espace";
@@ -40,9 +48,18 @@ function formatKeyCode(code) {
   if (code === "Slash") return "/";
   if (code === "Semicolon") return ";";
   if (code === "Backquote") return "`";
+  if (keyLayoutMap && (code.startsWith("Key") || code.startsWith("Digit"))) {
+    const k = keyLayoutMap.get(code);
+    if (k) return k.length === 1 ? k.toUpperCase() : k;
+  }
   if (code.startsWith("Key") && code.length === 4) return code.slice(3);
   if (code.startsWith("Digit")) return code.slice(5);
   return code;
+}
+
+/** Libellé de la touche J1 assignée à une action (suit le rebind). */
+function bindLabel(action) {
+  return formatKeyCode(keybinds.p1 && keybinds.p1[action]);
 }
 
 function keybindsAllCodes() {
@@ -158,12 +175,14 @@ window.addEventListener("keydown", e => {
     tryApplyRebind(e.code);
     return;
   }
-  const ch = (e.key || "").toLowerCase();
-  if (ch.length === 1) { xSeq = (xSeq + ch).slice(-4); if (xSeq === "rler" && typeof xToggleLocal === "function") xToggleLocal(); }
-  // Toggle Gameplay V2 (touche `) — hors saisie de code en ligne
-  if (e.code === "Backquote" && state !== "joinEntry") {
-    GAMEPLAY_V2 = !GAMEPLAY_V2;
-    if (typeof beep === "function") beep(GAMEPLAY_V2 ? 720 : 320, 0.06, "square", 0.08);
+  if (typeof DEV_CHEATS !== "undefined" && DEV_CHEATS) {
+    const ch = (e.key || "").toLowerCase();
+    if (ch.length === 1) { xSeq = (xSeq + ch).slice(-4); if (xSeq === "rler" && typeof xToggleLocal === "function") xToggleLocal(); }
+    // Toggle Gameplay V2 (touche `) — hors saisie de code en ligne
+    if (e.code === "Backquote" && state !== "joinEntry") {
+      GAMEPLAY_V2 = !GAMEPLAY_V2;
+      if (typeof beep === "function") beep(GAMEPLAY_V2 ? 720 : 320, 0.06, "square", 0.08);
+    }
   }
   handleMenuKeys(e.code, e.key);
 });

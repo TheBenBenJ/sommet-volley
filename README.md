@@ -108,6 +108,22 @@ Configurer les secrets du dépôt dans **Settings → Secrets and variables → 
 | `DEPLOY_WEB_ROOT` | Répertoire web distant |
 | `DEPLOY_URL` | URL publique après déploiement |
 
+### Infra serveur (manuel, hors workflow)
+
+Trois briques vivent sur le serveur et ne sont PAS touchées par le déploiement
+continu (le workflow ne synchronise que les fichiers du jeu + `matchmaker/`) :
+
+- **nginx** : routes `/mm` (WebSocket matchmaker), `/mm/health` et `/mm/turn`
+  (credentials TURN) → proxy vers `127.0.0.1:8787`.
+- **systemd `sommet-mm`** : lance `node server.js` ; un override
+  (`/etc/systemd/system/sommet-mm.service.d/turn.conf`) fournit `TURN_SECRET`
+  et `TURN_URLS` au matchmaker pour l'endpoint `/turn`.
+- **coturn** (`/etc/turnserver.conf`) : relais TURN en `use-auth-secret`
+  (même secret que ci-dessus), plage UDP 49160-49960, quotas et
+  `denied-peer-ip` anti-abus. Le client ne contient AUCUN mot de passe : il
+  demande des credentials éphémères (HMAC, ttl 12 h) via `GET /mm/turn` au
+  chargement (voir `refreshTurnCredentials()` dans `src/net.js`).
+
 ## Licence
 
 MIT © Benjamin Mille — voir `LICENSE`.

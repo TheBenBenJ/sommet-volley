@@ -465,7 +465,11 @@ function handleMenuKeys(code, key) {
   } else if (code === "KeyO" && paused && !online) {
     openOptions(true);
   } else if (code === "Escape") {
-    if (online) quitOnline();
+    if (online) {
+      // En match en ligne : un appui accidentel ne doit pas abandonner.
+      if (quitArmed()) { quitArmAt = 0; quitOnline(); }
+      else quitArmAt = performance.now();
+    }
     else if (paused) { paused = false; pauseNavIdx = 0; goMenu(); }
     else { paused = false; goMenu(); }
   }
@@ -475,6 +479,13 @@ function handleMenuKeys(code, key) {
 let optionsReturnState = "menu";
 let optionsFromPause = false;
 let pauseNavIdx = 0;
+
+// Abandon en ligne : Échap ×2 dans la fenêtre (anti appui accidentel).
+let quitArmAt = 0;
+const QUIT_CONFIRM_MS = 2500;
+function quitArmed() {
+  return performance.now() - quitArmAt < QUIT_CONFIRM_MS;
+}
 
 function openOptions(fromPause) {
   optionsFromPause = !!fromPause;
@@ -543,10 +554,17 @@ function newGame(seed) {
     // (En ligne, l'hôte fixe persos — voir hostStartMatch2v2.)
     // Mode Histoire : les 4 slots sont déjà posés par storyStartMatch — ne pas écraser.
     blob2L.speedMul = 1; blobR.speedMul = 1; blob2R.speedMul = 1;
-    const used = new Set([blobL.charId]);
-    for (const b of [blob2L, blobR, blob2R]) {
-      b.charId = randomCharacterIdx([...used]);
-      used.add(b.charId);
+    // Casting IA tiré UNE fois : « Rejouer » (R) garde le même quatuor.
+    // On ne re-tire que si le casting est invalide (doublons / ids hors roster).
+    const cast = [blobL.charId, blob2L.charId, blobR.charId, blob2R.charId];
+    const castOk = cast.every(id => Number.isInteger(id) && id >= 0 && id < CHARACTERS.length) &&
+                   new Set(cast).size === 4;
+    if (!castOk) {
+      const used = new Set([blobL.charId]);
+      for (const b of [blob2L, blobR, blob2R]) {
+        b.charId = randomCharacterIdx([...used]);
+        used.add(b.charId);
+      }
     }
     blob2L._aiT = blobR._aiT = blob2R._aiT = 0; // timers IA neutres
   } else if (mode === "2v2" && !online) {
@@ -554,9 +572,11 @@ function newGame(seed) {
     blob2L._aiT = blobR._aiT = blob2R._aiT = 0;
   }
   particles.length = 0;
-  aiErr = 0; aiErrTimer = 0; aiRush = false; // repart d'un état IA neutre (déterminisme)
   xOn.fill(false);
-  for (const b of [blobL, blob2L, blobR, blob2R]) b._xSpd = undefined;
+  for (const b of [blobL, blob2L, blobR, blob2R]) {
+    b._xSpd = undefined;
+    b._aiErr1 = 0; b._aiRush = false; b._aiErrT = 0; // état IA neutre (déterminisme)
+  }
   streak[0] = streak[1] = 0; superCharge[0] = superCharge[1] = 0;
   if (typeof powerGauge !== "undefined") { powerGauge[0] = powerGauge[1] = 0; }
   if (typeof powerWindup !== "undefined") powerWindup = null;
@@ -607,6 +627,7 @@ function startTutorial() {
   tutorialStep = 0;
   tutorialAdvanceLock = 0;
   tutorialStepArmed = true;
+  TUTORIAL_STEPS = buildTutorialSteps(); // suit un rebind fait entre-temps
   bombMode = false;
   flameMode = false;
   mapEventsQuiet = true;
@@ -615,57 +636,64 @@ function startTutorial() {
   online = false;
   pendingMode = null;
   setMode("1v1");
-  blobL.charId = 2; // Micron
-  blobR.charId = 1; // Trompette
+  // Persos par CLÉ (l'ordre du roster peut changer sans casser le tutoriel)
+  blobL.charId = Math.max(0, CHARACTERS.findIndex(c => c.key === "cygne"));
+  blobR.charId = Math.max(0, CHARACTERS.findIndex(c => c.key === "dorf"));
   terrain = 2;      // Palais Gallard
   ballSkin = 0;
   paused = false;
   newGame(42);
 }
 
-/** Étapes coach du match tutoriel (textes + touches à mettre en avant). */
-const TUTORIAL_STEPS = [
-  {
-    title: "Déplacement",
-    body: "Cours avec Q / D. Entrée = passer l'étape.",
-    keys: ["Q", "D"]
-  },
-  {
-    title: "Saut",
-    body: "Z, Espace ou ↑ pour sauter · en l'air, re-saute = double saut.",
-    keys: ["Z", "Espace"]
-  },
-  {
-    title: "Service",
-    body: "F : lance la balle. Puis F à nouveau pour servir (sol = cloche, saut = smash).",
-    keys: ["F", "Espace"]
-  },
-  {
-    title: "Cloche",
-    body: "Au sol, place-toi sous la balle : cloche auto selon ta position.",
-    keys: ["Q", "D"]
-  },
-  {
-    title: "Smash",
-    body: "Saute vers la balle : smash auto au contact selon ta position.",
-    keys: ["Espace", "Z"]
-  },
-  {
-    title: "SUPER",
-    body: "Jauge or sous le score : 3 points d'affilée → E pour ta technique (bandeau d'effet).",
-    keys: ["E"]
-  },
-  {
-    title: "Super Smash",
-    body: "Jauge orange pleine → MAINTIENS F en smash aérien : freeze, dose, relâche. Sans maintien = smash normal.",
-    keys: ["F", "Espace"]
-  },
-  {
-    title: "Objectif",
-    body: "Marque " + TUTORIAL_WIN_SCORE + " points. Astuce : au filet à deux en l'air = Smash Battle.",
-    keys: ["Q", "D", "F"]
-  }
-];
+/** Étapes coach du match tutoriel — construites depuis les VRAIS binds J1
+ *  (suivent le rebind + la disposition clavier réelle). */
+function buildTutorialSteps() {
+  const L = bindLabel("left"), R = bindLabel("right"), J = bindLabel("jump");
+  const F = bindLabel("smash"), S = bindLabel("super");
+  return [
+    {
+      title: "Déplacement",
+      body: "Cours avec " + L + " / " + R + ". Entrée = passer l'étape.",
+      keys: [L, R]
+    },
+    {
+      title: "Saut",
+      body: J + ", Espace ou ↑ pour sauter · en l'air, re-saute = double saut.",
+      keys: [J, "Espace"]
+    },
+    {
+      title: "Service",
+      body: F + " : lance la balle. Puis " + F + " à nouveau pour servir (sol = cloche, saut = smash).",
+      keys: [F, "Espace"]
+    },
+    {
+      title: "Cloche",
+      body: "Au sol, place-toi sous la balle : cloche auto selon ta position.",
+      keys: [L, R]
+    },
+    {
+      title: "Smash",
+      body: "Saute vers la balle : smash auto au contact selon ta position.",
+      keys: ["Espace", J]
+    },
+    {
+      title: "SUPER",
+      body: "Jauge or sous le score : 3 points d'affilée → " + S + " pour ta technique (bandeau d'effet).",
+      keys: [S]
+    },
+    {
+      title: "Super Smash",
+      body: "Jauge orange pleine → MAINTIENS " + F + " en smash aérien : freeze, dose, relâche. Sans maintien = smash normal.",
+      keys: [F, "Espace"]
+    },
+    {
+      title: "Objectif",
+      body: "Marque " + TUTORIAL_WIN_SCORE + " points. Astuce : au filet à deux en l'air = Smash Battle.",
+      keys: [L, R, F]
+    }
+  ];
+}
+let TUTORIAL_STEPS = buildTutorialSteps();
 
 function tutorialStepCanSkip() {
   // Entrée pour passer ; pas Espace (évite les skips accidentels)
@@ -797,7 +825,7 @@ function tickMenuActors() {
   for (const b of [menuActors.L, menuActors.R]) {
     if (!b) continue;
     b._menuActor = true;
-    b.scramble = 0; // jamais de patinage décoratif (ex. Trompette slip)
+    b.scramble = 0; // jamais de patinage décoratif (ex. Dorf slip)
     const spd = Math.max(1.2, Math.abs(b.dispVx) || 1.4);
     let dir = b.dispVx >= 0 ? 1 : -1;
     b.hopT--;
@@ -1390,7 +1418,9 @@ function drawTutorialInvite() {
 function controlsHint() {
   if (padConnected) return "🎮 Manette — stick/croix choisir · A valider · B retour";
   if (hasTouch) return "📱 Tactile — pavé + SAUT / SMASH / SUPER / Super Smash";
-  return "Solo  Q/D · Z/Espace · F action · E SUPER · jauge orange = Super Smash";
+  return "Solo  " + bindLabel("left") + "/" + bindLabel("right") + " · " + bindLabel("jump") +
+         "/Espace · " + bindLabel("smash") + " action · " + bindLabel("super") +
+         " SUPER · jauge orange = Super Smash";
 }
 function controlsHintColor() { return (padConnected || hasTouch) ? "#7ed957" : UI.muted; }
 
@@ -1572,14 +1602,16 @@ function drawTutorialTab(label, code, x, y, w, active) {
 }
 
 function drawTutorialControls(dev, x, y, maxW) {
+  const kL = bindLabel("left"), kR = bindLabel("right"), kJ = bindLabel("jump");
+  const kF = bindLabel("smash"), kS = bindLabel("super");
   const rows = {
     keyboard: [
-      ["Bouger / sauter", "Q / D  bouger   ·   Z / Espace / ↑  sauter (double saut en l'air)"],
+      ["Bouger / sauter", kL + " / " + kR + "  bouger   ·   " + kJ + " / Espace / ↑  sauter (double saut en l'air)"],
       ["Cloche (au sol)", "Place-toi sous la balle — cloche auto (angle = ta position)"],
       ["Smash (en l'air)", "Saute au contact : smash automatique selon ta position"],
-      ["Service / action", "F pour lancer, puis F pour servir (pas d'auto)"],
-      ["SUPER (jauge or)", "3 points d'affilée → E  (technique du perso)"],
-      ["Super Smash (jauge orange)", "Plein → MAINTIENS F longtemps en l'air, puis relâche (sinon smash normal)"],
+      ["Service / action", kF + " pour lancer, puis " + kF + " pour servir (pas d'auto)"],
+      ["SUPER (jauge or)", "3 points d'affilée → " + kS + "  (technique du perso)"],
+      ["Super Smash (jauge orange)", "Plein → MAINTIENS " + kF + " longtemps en l'air, puis relâche (sinon smash normal)"],
       ["Smash Battle", "Les deux au filet en l'air + balle proche → duel de sauts"],
       ["Camp droite (local 1v1)", "← →  ·  ↑ saut  ·  ↓ ou / frappe  ·  Shift dr. SUPER"],
       ["Pause / son", "P pause · M son · N musique · Échap menu"]
@@ -1605,8 +1637,8 @@ function drawTutorialControls(dev, x, y, maxW) {
     ],
     mouse: [
       ["En match", "La souris ne vise plus — menus uniquement"],
-      ["Pour jouer", "Clavier : Q D bouger · Z/Espace saut · F action · E SUPER"],
-      ["Smash / Super Smash", "Saute au contact ; jauge orange → maintiens F pour doser"],
+      ["Pour jouer", "Clavier : " + kL + " " + kR + " bouger · " + kJ + "/Espace saut · " + kF + " action · " + kS + " SUPER"],
+      ["Smash / Super Smash", "Saute au contact ; jauge orange → maintiens " + kF + " pour doser"],
       ["Cloche", "Au sol, place-toi sous la balle"]
     ]
   };
@@ -1951,7 +1983,8 @@ function drawRules() {
   p("Fais tomber la balle dans le camp adverse. Premier à " + WIN_SCORE + " avec 2 d'écart. Max " + MAX_TOUCHES + " touches par camp.");
   y += 4;
   h("Commandes");
-  p("Solo : Q/D bouger · Z/Espace saut · F action · E SUPER");
+  p("Solo : " + bindLabel("left") + "/" + bindLabel("right") + " bouger · " + bindLabel("jump") +
+    "/Espace saut · " + bindLabel("smash") + " action · " + bindLabel("super") + " SUPER");
   p("Clavier : contact auto — sol = cloche, air = smash (selon ta position).");
   p("Manette : stick viser · A saut · X/Y frappe · B SUPER (inchangé).");
   p("Droite local : ← → · ↑ · ↓ ou / frappe · Shift dr. SUPER");
@@ -1959,10 +1992,13 @@ function drawRules() {
   y += 4;
   h("Gameplay");
   p("Au sol, balle sur toi = cloche auto. En l'air = smash auto au contact.");
-  p("Service clavier : Espace = envoi direct · ou F pour lancer puis sauter dans la balle / F. Manette : X lancer + X frapper. Double saut en l'air.");
+  p("Service clavier : Espace = envoi direct · ou " + bindLabel("smash") +
+    " pour lancer puis sauter dans la balle / " + bindLabel("smash") +
+    ". Manette : X lancer + X frapper. Double saut en l'air.");
   y += 4;
   h("★ SUPER", "#ffd93d");
-  p("3 points d'affilée chargent la jauge or. E / B lance la technique : un bandeau explique l'effet ~4 s.");
+  p("3 points d'affilée chargent la jauge or. " + bindLabel("super") +
+    " / B lance la technique : un bandeau explique l'effet ~4 s.");
   y += 4;
   h("⚡ SUPER SMASH", "#ff6a2a");
   p("Jauge orange : se remplit lentement en échange. Plein → MAINTIENS smash aérien (F/X) pour doser ; sans maintien = smash normal. Relâche pour frapper (plus fort + ralenti).");

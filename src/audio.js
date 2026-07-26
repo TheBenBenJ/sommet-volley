@@ -37,8 +37,6 @@ function setMusicVolume(v) {
 // ces fonctions ne s'exécutent qu'au runtime, une fois tous les modules
 // chargés, donc la référence est sûre.
 const SETTINGS_KEY = "sommetVolleySettings";
-/** Migration depuis un fork antérieur — peut être retiré après quelques versions. */
-const SETTINGS_KEY_LEGACY = "crabbyVolleySettings";
 function saveSettings() {
   try {
     const quiet = (typeof mapEventsQuiet !== "undefined") ? !!mapEventsQuiet : false;
@@ -54,7 +52,7 @@ function saveSettings() {
 }
 function loadSettings() {
   try {
-    const raw = localStorage.getItem(SETTINGS_KEY) || localStorage.getItem(SETTINGS_KEY_LEGACY);
+    const raw = localStorage.getItem(SETTINGS_KEY);
     if (!raw) return;
     const s = JSON.parse(raw);
     if (typeof s.muted === "boolean") muted = s.muted;
@@ -589,7 +587,18 @@ function setMusicTerrain(key) {
   }
 }
 
+// Ne créer l'AudioContext qu'après un premier geste utilisateur (sinon
+// warning Chrome + contexte « suspended » dès la première frame).
+let audioGestureOk = false;
+if (typeof window !== "undefined" && window.addEventListener) {
+  const armAudio = () => { audioGestureOk = true; };
+  window.addEventListener("keydown", armAudio, { once: true });
+  window.addEventListener("pointerdown", armAudio, { once: true });
+  window.addEventListener("touchstart", armAudio, { once: true });
+}
+
 function musicTick() {
+  if (!audioGestureOk) return;
   try {
     ensureMusicGraph();
     loadAudioManifest();

@@ -19,6 +19,7 @@ function packBallState(owning) {
     sal: ball.serveAimLock ? 1 : 0,
     sf: ball.serveFlight ? 1 : 0,
     lts: ball.lastTouchSide, ltt: ball.lastTouchTick,
+    lh: ball.lastHitTick | 0,
     t0: ball.touches[0], t1: ball.touches[1],
     hb: ball.heldBy | 0, ht: ball.holdT | 0, ch: ball.chargeT | 0,
     aa: ball.aimAngle || 0, sa: ball.shotArmed ? 1 : 0,
@@ -44,6 +45,7 @@ function applyBallState(b) {
   if (b.sf !== undefined) ball.serveFlight = !!b.sf;
   ball.lastTouchSide = b.lts;
   ball.lastTouchTick = b.ltt !== undefined ? b.ltt : -999;
+  ball.lastHitTick = b.lh !== undefined ? b.lh : -999;
   ball.touches = [b.t0 | 0, b.t1 | 0];
   if (b.hb !== undefined) ball.heldBy = b.hb;
   if (b.ht !== undefined) ball.holdT = b.ht;
@@ -73,9 +75,13 @@ function getSnapshot() {
       }))
     },
     streak: [streak[0], streak[1]], superCharge: [superCharge[0], superCharge[1]],
+    // Effets de zone des Supers (mur/glace/slow/noground) : consultés par la
+    // prédiction locale de l'invité (Blob.update) → sans sync, désync garantie.
+    superFx: superEffects.map(e => ({ k: e.kind, s: e.side | 0, t: e.t | 0 })),
     powerGauge: typeof powerGauge !== "undefined" ? [powerGauge[0]|0, powerGauge[1]|0] : [0, 0],
     powerWindup: powerWindup ? {
-      side: powerWindup.side, t: powerWindup.t|0, charge: +powerWindup.charge || 0,
+      side: powerWindup.side, who: powerWindup.who|0,
+      t: powerWindup.t|0, charge: +powerWindup.charge || 0,
       ang: +powerWindup.ang || 0, auto: !!powerWindup.auto
     } : null,
     battle: { active: battle.active, t: battle.t,
@@ -89,6 +95,7 @@ function getSnapshot() {
       serveAimLock: !!ball.serveAimLock,
       serveFlight: !!ball.serveFlight,
       lastTouchSide: ball.lastTouchSide, lastTouchTick: ball.lastTouchTick,
+      lastHitTick: ball.lastHitTick | 0,
       touches: [ball.touches[0], ball.touches[1]],
       heldBy: ball.heldBy, holdT: ball.holdT, chargeT: ball.chargeT,
       aimAngle: ball.aimAngle, shotArmed: !!ball.shotArmed
@@ -100,6 +107,9 @@ function getSnapshot() {
       superT: b.superT, superKind: b.superKind, superSmash: b.superSmash,
       poseAnim: b.poseAnim || "", poseT: b.poseT | 0, poseDur: b.poseDur | 0,
       battleStunT: b.battleStunT | 0,
+      // Stats swappées par le trait Cygne (scoring hôte) — l'invité prédit avec
+      kitSpeed: b.kitSpeed == null ? null : b.kitSpeed,
+      kitPower: b.kitPower == null ? null : b.kitPower,
       flameHp: (b.flameHp == null ? FLAME_HP_MAX : b.flameHp) | 0,
       flameIgniteT: b.flameIgniteT | 0,
       charredT: b.charredT | 0
@@ -120,11 +130,16 @@ function applySnapshot(s) {
   if (typeof powerWindup !== "undefined") {
     powerWindup = s.powerWindup ? {
       side: s.powerWindup.side | 0,
+      who: s.powerWindup.who !== undefined ? (s.powerWindup.who | 0) : -1,
       t: s.powerWindup.t | 0,
       charge: +s.powerWindup.charge || 0,
       ang: +s.powerWindup.ang || 0,
       auto: !!s.powerWindup.auto
     } : null;
+  }
+  if (s.superFx) {
+    superEffects.length = 0;
+    for (const e of s.superFx) superEffects.push({ kind: e.k, side: e.s | 0, t: e.t | 0 });
   }
   if (s.weather !== undefined) { weather = s.weather; weatherTimer = s.weatherTimer; }
   if (s.bombMode !== undefined) { bombMode = s.bombMode; bombTimer = s.bombTimer || 0; }
@@ -157,6 +172,7 @@ function applySnapshot(s) {
   if (s.ball.serveFlight !== undefined) ball.serveFlight = !!s.ball.serveFlight;
   ball.lastTouchSide = s.ball.lastTouchSide;
   ball.lastTouchTick = s.ball.lastTouchTick !== undefined ? s.ball.lastTouchTick : -999;
+  ball.lastHitTick = s.ball.lastHitTick !== undefined ? s.ball.lastHitTick : -999;
   ball.touches = [s.ball.touches[0], s.ball.touches[1]];
   if (s.ball.heldBy !== undefined) ball.heldBy = s.ball.heldBy;
   if (s.ball.holdT !== undefined) ball.holdT = s.ball.holdT;
@@ -182,6 +198,8 @@ function applySnapshot(s) {
     if (s.blobs[i].poseT !== undefined) b.poseT = s.blobs[i].poseT | 0;
     if (s.blobs[i].poseDur !== undefined) b.poseDur = s.blobs[i].poseDur | 0;
     b.battleStunT = s.blobs[i].battleStunT | 0;
+    if (s.blobs[i].kitSpeed !== undefined) b.kitSpeed = s.blobs[i].kitSpeed;
+    if (s.blobs[i].kitPower !== undefined) b.kitPower = s.blobs[i].kitPower;
     if (s.blobs[i].flameHp !== undefined) b.flameHp = s.blobs[i].flameHp | 0;
     if (s.blobs[i].flameIgniteT !== undefined) b.flameIgniteT = s.blobs[i].flameIgniteT | 0;
     if (s.blobs[i].charredT !== undefined) b.charredT = s.blobs[i].charredT | 0;

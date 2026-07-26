@@ -60,10 +60,31 @@ test("timeout ticket", () => {
   const msgs = [];
   const q = createQueue({ ticketMs: 100, now: () => t });
   q.onHello((m) => msgs.push(m), "classic");
+  // promu "hosting" : il attend légitimement un invité → survit au ticket
+  // court (avant, il était éjecté à 30 s pile alors qu'un invité pouvait
+  // arriver la seconde d'après)
   t = 1200;
+  q.sweep();
+  assert.ok(!msgs.some(m => m.t === "timeout"), "hôte pas expiré à 2x ticket");
+  assert.strictEqual(q.snapshot().classic.length, 1);
+  // mais expire sur le ticket long (connexion morte / oubliée)
+  t = 1401;
   q.sweep();
   assert.ok(msgs.some(m => m.t === "timeout"));
   assert.deepStrictEqual(q.snapshot().classic, []);
+});
+
+test("timeout ticket : un 2e client queued expire au ticket court", () => {
+  let t = 1000;
+  const hostMsgs = [], guestMsgs = [];
+  const q = createQueue({ ticketMs: 100, now: () => t });
+  q.onHello((m) => hostMsgs.push(m), "classic");        // promu hosting
+  // 2e arrivant : reste "queued" (l'hôte n'a pas encore publié son code)
+  q.onHello((m) => guestMsgs.push(m), "classic");
+  t = 1150;
+  q.sweep();
+  assert.ok(guestMsgs.some(m => m.t === "timeout"), "queued expiré à 1x ticket");
+  assert.ok(!hostMsgs.some(m => m.t === "timeout"), "hosting encore vivant");
 });
 
 console.log("\n" + pass + " réussis, " + fail + " échoués (matchmaker)");

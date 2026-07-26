@@ -220,7 +220,7 @@ function weatherClimate() {
       clear: [3200, 5600], rain: [100, 260], storm: [80, 160],
       pLeaveClear: 0.22, pStormFromRain: 0.08, pClearFromStorm: 0.92
     },
-    // Ramenie — jardin aride, averses occasionnelles
+    // Safranie — jardin aride, averses occasionnelles
     "jardin-des-roses": {
       clear: [2600, 4800], rain: [200, 420], storm: [100, 220],
       pLeaveClear: 0.3, pStormFromRain: 0.1, pClearFromStorm: 0.88

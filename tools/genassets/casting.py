@@ -9,58 +9,73 @@ inchangées (dossiers assets/). Consommé par build_prompts.py.
 # key = clé technique (dossier assets/, roster) · name/nation = fiction ·
 # look = description d'apparence injectée dans les prompts (archétype, pas un vrai nom).
 CHARACTERS = [
+    # Looks = archétypes COMPOSITES (Steam). Exagérer le chibi ; mash-up facial ;
+    # JAMAIS le portrait 1:1 d'un dirigeant réel. Tenue = LOCK pour gen.
     {"key": "volkoi", "name": "Tsar Volkoï", "nation": "Bourassie",
-     "look": "a short stocky barrel-chested eastern-bloc autocrat mascot, completely "
-             "bald shiny head (head height ≈ ONE THIRD of full body crown-to-shoes — "
-             "NOT half the body, NOT an oversized balloon skull; same head scale every "
-             "pose), pale skin, cold steely stare, ALWAYS wearing a deep "
-             "burgundy standing-collar wool overshirt (buttoned, NOT a tracksuit, NOT "
-             "athletic jogging wear) over a black turtleneck, charcoal trousers, black "
-             "leather shoes — NOT a tracksuit, NOT a military uniform, NOT an open dress shirt"},
+     "look": "COMPOSITE eastern-bloc autocrat mascot (mash-up, NOT a real person), "
+             "short stocky barrel body, chibi head ≈ 1/3 body height, ROUND softer skull "
+             "(NOT a long rectangular real-politician head), pale cool skin, SMALL narrow "
+             "ice-blue eyes set wide apart, THICK straight brow ridge, short broad nose, "
+             "thin unsmiling mouth, NO facial hair, completely bald with a subtle purple "
+             "scalp sheen, ALWAYS deep burgundy buttoned standing-collar wool overshirt "
+             "over black turtleneck, charcoal trousers, black leather shoes — NOT tracksuit, "
+             "NOT military medals, NOT open dress shirt"},
     {"key": "dorf", "name": "Baron Dorf", "nation": "Doria",
-     "look": "a boastful tycoon-turned-leader mascot, stocky chibi build, platinum-cream "
-             "blond hair in a voluminous ASYMMETRIC wave swept to one side (NOT a classic "
-             "comb-over bouffant), warm golden tan WITHOUT orange spray-tan skin, ALWAYS "
-             "wearing an oversized navy business suit with wide cartoon lapels and shiny "
-             "gold buttons, cream dress shirt, SHORT gold necktie OR champagne pocket square "
-             "(NEVER a long bright-red necktie), black dress shoes, open-handed deal-maker "
-             "gesture energy (raised index or open palms — NEVER a permanent thumbs-up)"},
+     "look": "COMPOSITE boastful tycoon-leader caricature in the SAME polished game style "
+             "as the rest of the roster (clean thick outlines, cel shading, adult satire — "
+             "NOT cute toddler mascot, NOT rosy cheeks, NOT buck teeth, NOT kindergarten art), "
+             "stocky chibi-lite build, confident smug smirk, sharp small blue eyes, strong "
+             "jaw softened into mash-up (NOT a photo likeness of any real tycoon), "
+             "platinum-cream blond hair in a voluminous ASYMMETRIC side-wave (NOT classic "
+             "comb-over), warm golden-tan skin WITHOUT orange spray-tan, ALWAYS navy business "
+             "suit with gold buttons, cream shirt, SHORT gold necktie (NEVER long bright-red "
+             "tie), white pocket square, black dress shoes, hands in pockets or open deal "
+             "gesture — NEVER permanent thumbs-up"},
     {"key": "cygne", "name": "Le Cygne", "nation": "Gallardie",
-     "look": "a slim young technocrat leader mascot, slicked-back dark hair, sharp navy "
-             "tailored suit, small tricolor lapel pin, assured debating gesture"},
+     "look": "COMPOSITE young technocrat mascot (mash-up, NOT a real person), slim chibi "
+             "build, OVAL face with slightly oversized forehead, soft jaw (NOT a photo "
+             "likeness), short wavy dark hair with a SIDE PART (NOT slicked-back wet look), "
+             "round wire glasses optional thin frames, bright curious eyes, small polite "
+             "smile, ALWAYS sharp navy tailored suit, white shirt, navy tie, ONE tiny plain "
+             "gold circle lapel pin (NO national flag colors, NO tricolor), black shoes"},
     {"key": "bebe", "name": "Maréchal Bébé", "nation": "Ryonganie",
-     "look": "a chubby young dynastic heir-marshal mascot, glossy jet-black BOWL-CUT hair "
-             "(straight fringe across the forehead), plump soft cheeks, tiny smug smile, "
-             "dark grey plain Mao-style tunic with mandarin collar and no lapels, black "
-             "trousers — NOT an older emperor, NOT swept-back hair, NOT a western suit"},
+     "look": "COMPOSITE chubby dynastic heir-marshal mascot (mash-up, NOT a real person), "
+             "VERY round moon face, glossy jet-black BOWL-CUT with thick straight fringe, "
+             "tiny dot eyes, tiny smug smile, soft double chin, ALWAYS dark grey plain "
+             "mandarin-collar tunic without medals or stars, black trousers — NOT older "
+             "emperor, NOT swept-back hair, NOT western suit"},
     {"key": "timonier", "name": "Le Grand Timonier", "nation": "Panguo",
-     "look": "an older round-jowled impassive emperor-leader mascot, high forehead with "
-             "thin swept-back black hair (side part, NO bowl cut, NO fringe), heavy calm "
-             "half-lidded eyes, charcoal Zhongshan jacket with four flap pockets and a "
-             "single small red lapel pin, black trousers, stoic controlled expression — "
-             "NOT a young chubby heir, NOT a glossy bowl cut, NOT a plain grey Mao tunic "
-             "without pockets"},
+     "look": "COMPOSITE older impassive emperor-leader mascot (mash-up, NOT a real person), "
+             "ROUND heavy jowls, HIGH forehead, thin swept-back black hair with side part "
+             "(NO bowl cut), calm HALF-LIDDED eyes set in soft cartoon wrinkles, ALWAYS "
+             "charcoal Zhongshan jacket with four flap pockets and one SMALL plain red "
+             "dot pin (NO stars, NO real emblems), black trousers — NOT young chubby heir"},
     {"key": "sultan", "name": "Le Sultan", "nation": "Bosforie",
-     "look": "a stern imposing neo-sultan leader mascot, thick dark mustache, dark tailored "
-             "suit, broad commanding stance"},
+     "look": "COMPOSITE imposing neo-sultan leader mascot (mash-up, NOT a real person), "
+             "SQUARE cartoon jaw, THICK dark mustache that is slightly UPSWEPT (stylized, "
+             "not photo-real), heavy brows, deep-set eyes, ALWAYS dark charcoal tailored "
+             "suit with subtle burgundy pocket square, white shirt, dark tie, broad "
+             "commanding stance — NO fez, NO religious garb, NO national flag colors"},
     {"key": "gourou", "name": "Le Gourou", "nation": "Bharatie",
-     "look": "a lean ascetic guru-manager leader mascot, short white beard, round glasses, "
-             "saffron-orange sleeveless vest over a white tunic, serene intense eyes"},
+     "look": "COMPOSITE lean ascetic guru-manager mascot (mash-up, NOT a real person), "
+             "narrow face, short NEAT white beard, ROUND cartoon glasses, calm intense "
+             "eyes, ALWAYS saffron-orange sleeveless vest over white tunic and white "
+             "trousers — NO religious symbols, NO turbans, NO real party badges"},
     {"key": "capitaine", "name": "Le Capitaine", "nation": "Tropicalia",
-     "look": "a stocky ex-military populist captain mascot, short dark hair, olive-green "
-             "military-style jacket, rugged toothy grin"},
+     "look": "COMPOSITE stocky populist captain mascot (mash-up, NOT a real person), "
+             "SQUARE friendly face, short dark hair with a slight curl, thick brows, "
+             "WIDE toothy cartoon grin, ALWAYS olive-green utility jacket (no rank "
+             "insignia), dark trousers, rugged boots — NOT a photo likeness of any leader"},
     {"key": "faucon", "name": "Le Faucon", "nation": "Levantie",
-     "look": "a stern hardliner elder-statesman mascot, mostly bald head with short "
-             "close-cropped grey side hair, thick grey eyebrows and a neat grey mustache, "
-             "stocky square-jawed build, slate-grey double-breasted suit with a burgundy "
-             "tie and a small plain silver pin, rigid arms-crossed stance "
-             "(GENERIC composite hardliner — must NOT resemble any real leader; "
-             "no national colors, no religious garb or symbols)"},
-    {"key": "safran", "name": "Le Safran", "nation": "Ramenie",
-     "look": "a composed highland-capital premier mascot, neatly trimmed dark beard, "
-             "salt-and-pepper hair, charcoal tailored suit with a saffron-orange pocket "
-             "square, calm measured stance (composite archetype, NO clerical robes, "
-             "turbans, or religious symbols)"},
+     "look": "COMPOSITE stern hardliner elder mascot (mash-up, NOT a real person), "
+             "mostly bald with short grey side hair, THICK grey brows, neat grey "
+             "mustache, stocky square build, ALWAYS slate-grey double-breasted suit, "
+             "burgundy tie, tiny plain silver pin — NO national colors, NO religious garb"},
+    {"key": "safran", "name": "Le Safran", "nation": "Safranie",
+     "look": "COMPOSITE highland-capital premier mascot (mash-up, NOT a real person), "
+             "neatly trimmed dark beard, salt-and-pepper hair, calm oval face, ALWAYS "
+             "charcoal tailored suit with saffron-orange pocket square — NO clerical "
+             "robes, turbans, or religious symbols"},
 ]
 
 # Maps : terrainKey = TERRAINS[].key (mapping historique) · theme = décor abstrait,

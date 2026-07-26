@@ -38,7 +38,7 @@ qu'une clé d'inspiration pour toi — il ne doit PAS apparaître littéralement
 | gourou | Le Gourou | Bharatie | gourou-manager | **Méditation** (gèle/glace le camp adverse, façon zen) | Stade Ashram (6) | vache qui traverse | stade de grès miel, façade à arches festonnées, guirlandes de soucis orange, palmiers, vache qui traverse |
 | capitaine | Le Capitaine | Tropicalia | ex-militaire populiste | **Déforestation** (mur de troncs bloque le sol) | Grande Forêt (7) | ara (macaw) | clairière de jungle dorée, huttes sur pilotis, canopée, court en terre rouge |
 | faucon | Le Faucon | Levantie | faucon composite | **Raid Éclair** (interdit de sauter au camp adverse) | Citadelle du Levant (8) | faucon en vol | citadelle de grès sur colline désertique face à la mer, dômes anciens + tours de verre, remparts, faucon |
-| safran | Le Safran | Ramenie | premier composite des hautes terres | **Voile d'Or** (ralentit le camp adverse) | Jardin des Roses (9) | paon | jardin de roses de palais, arcades à tuiles turquoise, dômes en dôme, roseraie |
+| safran | Le Safran | Safranie | premier composite des hautes terres | **Voile d'Or** (ralentit le camp adverse) | Jardin des Roses (9) | paon | jardin de roses de palais, arcades à tuiles turquoise, dômes en dôme, roseraie |
 
 ### Inspirations internes (NE PAS écrire dans le jeu — repère pour toi)
 volkoi≈Poutine/Russie · dorf≈Trump/USA · cygne≈Macron/France · bebe≈Kim/Corée du Nord ·
@@ -46,10 +46,10 @@ timonier≈Xi/Chine · sultan≈Erdoğan/Turquie · gourou≈Modi/Inde · capita
 faucon≈Netanyahou/composite Israël · safran≈composite Iran.
 
 ### Pistes de relations réelles (transposées) pour choisir Volley / Flamme / Bombe
-- **Bourassie (volkoi)** : conflit ouvert avec l'Ouest (Cygne, Faucon) → *bombe* ; entente froide avec Panguo, Ryonganie, Ramenie → *volley* ; rivalité-flatterie ambiguë avec Baron Dorf → *volley*.
+- **Bourassie (volkoi)** : conflit ouvert avec le Consortium (Cygne, Faucon) → *bombe* ; entente froide avec Panguo, Ryonganie, Safranie → *volley* ; rivalité-flatterie ambiguë avec Baron Dorf → *volley*.
 - **Baron Dorf (dorf)** : bravade/rivalité avec presque tous (*volley*), guerre commerciale avec le Timonier, « bromance » étrange avec Maréchal Bébé, tension d'alliance avec Le Cygne ; duel plus dur avec Le Safran (*bombe* possible).
-- **Le Cygne (cygne)** : allié de l'Ouest (*volley*), friction mer intérieure/adhésion avec Le Sultan, clash écolo célèbre avec Le Capitaine (forêt !), *bombe* avec le Tsar.
-- **Maréchal Bébé (bebe)** : nucléaire/isolé → beaucoup de *bombe* avec l'Ouest ; entente avec Panguo, Bourassie.
+- **Le Cygne (cygne)** : allié du Consortium (*volley*), friction mer intérieure/adhésion avec Le Sultan, clash écolo célèbre avec Le Capitaine (forêt !), *bombe* avec le Tsar.
+- **Maréchal Bébé (bebe)** : nucléaire/isolé → beaucoup de *bombe* avec le Consortium ; entente avec Panguo, Bourassie.
 - **Le Grand Timonier (timonier)** : rivalité de frontière avec Le Gourou → *bombe* ; guerre froide commerciale avec Baron Dorf ; alliances Bourassie/Ryonganie.
 - **Le Sultan (sultan)** : tensions Union/Cygne, mer intérieure, dossiers régionaux.
 - **Le Gourou (gourou)** : conflit de crête avec Le Timonier (*bombe*), rivalités régionales.
@@ -102,7 +102,7 @@ Pour CHAQUE rencontre, un bloc au format `src/story.js` (données JS, prêtes à
 Le chapitre d'ouverture (acte I, mode `2v2`) doit coller à des **alliances plausibles**
 (transposées) : `ally` = partenaire crédible du protagoniste ; `right`+`right2` = camp
 adverse cohérent. Exemples stables :
-- Occident : Cygne ↔ Dorf ; Faucon ↔ Dorf
+- Consortium : Cygne ↔ Dorf ; Faucon ↔ Dorf
 - Axe Est : Volkoï ↔ Timonier ; Bébé sous tutelle du Timonier ; Safran ↔ Volkoï
 - Gourou ↔ Faucon (sécurité) ; Capitaine ↔ Dorf (populistes) ; Sultan ↔ Volkoï (deal froid)
 Éviter les absurdes (ex. Cygne+Safran contre Dorf, Bébé qui affronte le Timonier en binôme adverse).

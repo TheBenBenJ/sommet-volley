@@ -98,7 +98,12 @@ function createQueue(opts) {
       const q = queues[mode];
       for (let i = q.length - 1; i >= 0; i--) {
         const c = q[i];
-        if (t - c.t0 > ticketMs) {
+        // Un hôte "hosting"/"ready" attend LÉGITIMEMENT un invité : son
+        // ticket est prolongé (sinon il était éjecté à 30 s pile, alors
+        // qu'un invité pouvait arriver la seconde d'après). Il n'expire
+        // que sur un ticket 4× plus long (connexion morte / oubliée).
+        const ttl = (c.status === "hosting" || c.status === "ready") ? ticketMs * 4 : ticketMs;
+        if (t - c.t0 > ttl) {
           try { c.send({ t: "timeout" }); } catch (e) { /* ignore */ }
           q.splice(i, 1);
         }

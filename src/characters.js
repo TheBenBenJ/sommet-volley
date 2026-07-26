@@ -21,8 +21,8 @@ function drawCharacter(b) {
     : (typeof drawSpriteChar === "function" && drawSpriteChar(b));
   if (!sprited) {
     if (key === "volkoi") drawVladou(b);
-    else if (key === "dorf") drawTrompette(b);
-    else if (key === "cygne") drawMicron(b);
+    else if (key === "dorf") drawDorfFallback(b);
+    else if (key === "cygne") drawCygneFallback(b);
     else if (key === "bebe") drawBebe(b);
     else drawGenericChar(b);
   }
@@ -228,7 +228,7 @@ function drawGenericChar(b) {
   });
 }
 
-function drawTrompette(b) {
+function drawDorfFallback(b) {
   drawCharBody(b, (c) => {
     c.fillStyle = "#1a237e";
     c.fillRect(-11, -30, 9, 30); c.fillRect(2, -30, 9, 30);
@@ -249,7 +249,7 @@ function drawTrompette(b) {
   });
 }
 
-function drawMicron(b) {
+function drawCygneFallback(b) {
   drawCharBody(b, (c) => {
     c.fillStyle = "#1a237e";
     c.fillRect(-10, -32, 8, 32); c.fillRect(2, -32, 8, 32);

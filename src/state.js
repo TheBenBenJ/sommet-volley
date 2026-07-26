@@ -14,7 +14,7 @@ const TERRAINS = [
   { key: "stade-ashram",   name: "Stade Ashram",            character: 6 }, // Le Gourou / Bharatie
   { key: "grande-foret",   name: "Grande Forêt",            character: 7 }, // Le Capitaine / Tropicalia
   { key: "citadelle-du-levant",  name: "Citadelle du Levant",     character: 8 }, // Le Faucon / Levantie
-  { key: "jardin-des-roses", name: "Jardin des Roses",         character: 9 }  // Le Safran / Ramenie
+  { key: "jardin-des-roses", name: "Jardin des Roses",         character: 9 }  // Le Safran / Safranie
 ];
 let terrain = 0;
 
@@ -191,7 +191,7 @@ const CHARACTERS = [
     superDesc: "Interdit de sauter au camp adverse ~3,7 s — collés au sol. Visuel : bande d’alerte au sol."
   },
   {
-    key: "safran", name: "Le Safran", nation: "Ramenie",
+    key: "safran", name: "Le Safran", nation: "Safranie",
     color: "#c45c26", darkColor: "#8a3d14",
     stats: { vitesse: 3, detente: 3, puissance: 3, controle: 4 },
     speed: 1.06, jump: 1.06, power: 1.06, control: 0.91,
@@ -330,8 +330,7 @@ const AI_LEVELS = [
   { name: "Impitoyable", err: 34,  rush: 0.14, attack: 7,  react: 0.45, dbl: true,  aim: 0 }
 ];
 let aiLevel = 1;
-let aiErr = 0, aiErrTimer = 0;  // erreur de placement volontaire de l'IA
-let aiRush = false;             // envie du moment : provoquer un duel au filet
+// (erreur/rush IA : état PAR BLOB — _aiErr1/_aiRush/_aiErrT, voir ai.js)
 
 // Mode triche X : seul endroit où on accélère volontairement un blob.
 const X_LEVEL = { name: "X", speedMul: 1.2, err: 0, rush: 1, attack: 30, react: 1, dbl: true, aim: 1 };
@@ -405,11 +404,11 @@ class Blob {
     this.y = GROUND_Y;
     this.vx = 0;
     this.vy = 0;
-    this.dispVx = 0;      // vitesse lissée (inertie / dérapage Trompette)
+    this.dispVx = 0;      // vitesse lissée (inertie / dérapage Dorf)
     this.onGround = true;
     this.squash = 0; // animation d'écrasement
     this.walkPhase = 0;
-    this.scramble = 0;       // patinage (Trompette)
+    this.scramble = 0;       // patinage (Dorf)
     this.jumpsUsed = 0;      // 0 sol, 1 après saut, 2 après double saut
     this.prevJump = false;   // front montant (double saut)
     this.superT = 0;         // ticks restants de technique
@@ -492,7 +491,7 @@ class Blob {
     if (input.left)  this.vx = -sp;
     if (input.right) this.vx =  sp;
 
-    // dérapage (Trompette) : la vitesse affichée rattrape la consigne avec inertie
+    // dérapage (Dorf) : la vitesse affichée rattrape la consigne avec inertie
     if (a.slip) {
       this.dispVx += (this.vx - this.dispVx) * 0.07;
       if (Math.abs(this.dispVx) < 0.05) this.dispVx = 0;
@@ -502,7 +501,7 @@ class Blob {
     const moveVx = a.slip ? this.dispVx : this.vx;
 
     // Marche : avancer le cycle dès qu'on veut bouger (slip) ou qu'on glisse.
-    // Sinon Trompette reste bloqué / alterne idle↔walk sur 1–2 frames.
+    // Sinon Dorf reste bloqué / alterne idle↔walk sur 1–2 frames.
     const wantWalk = this.onGround && (
       Math.abs(this.vx) > 0.01 || Math.abs(moveVx) > 0.12
     );
@@ -513,7 +512,9 @@ class Blob {
       // (plus lisible que /8, surtout sur packs à 4 frames)
       this._walkTick = (this._walkTick || 0) + 1;
       if (this._walkTick % 6 === 0) this.walkPhase += 1;
-      if (Math.random() < (scrambling ? 0.35 : 0.1)) {
+      // Poussière de course : purement visuel, cadence déterministe (pas de
+      // Math.random dans la boucle de simulation — convention core.js).
+      if (this._walkTick % (scrambling ? 3 : 10) === 0) {
         spawnSand(this.x - Math.sign(this.vx || moveVx) * 12, GROUND_Y, 1);
       }
     } else {
@@ -562,7 +563,7 @@ class Blob {
     const half = 34;
     let minX = this.side === 0 ? half : NET_X + NET_W / 2 + half - 6;
     let maxX = this.side === 0 ? NET_X - NET_W / 2 - half + 6 : W - half;
-    // Le Mur (Trompette / Panda / Jair) : barrière one-way au sol.
+    // Le Mur (Dorf / Timonier / Capitaine) : barrière one-way au sol.
     // On se base sur la position AVANT le pas : si on était derrière, on ne
     // traverse pas en marchant ; si on a déjà sauté de l’autre côté, on ne
     // reclame pas (pas de téléport à l’atterrissage).

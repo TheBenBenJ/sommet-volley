@@ -12,13 +12,13 @@ Puis vint l'ascension nationale, et là, le Gourou inventa la politique-spectacl
 
 Son terrain de prédilection, le **Stade Ashram**, lui ressemble : une enceinte de **grès couleur miel**, chaude comme une fin d'après-midi, dont la **façade s'ouvre en arches festonnées** comme les portes d'un temple qu'on aurait converti en salle de sport. Partout pendent des **guirlandes de soucis orange**, ces fleurs de fête et d'offrande qu'on suspend aux tribunes comme aux dieux ; des palmiers montent la garde ; et l'air sent l'encens, le curcuma et la ferveur. C'est moins un stade qu'un lieu de culte où l'on vient l'adorer entre deux échanges.
 
-Là, régulièrement, une **vache qui traverse traverse le court** de sa démarche placide, indifférente au score, et l'arbitre s'incline : on ne bouscule pas la vache. Le Gourou en a fait un art de gouverner. Chez lui, la vache n'est pas un aléa, c'est une politique : sacralisée, protégée, elle sépare les fidèles des autres, et gare à qui touche à son statut. Végétarien strict, jeûneur pendant les neuf nuits sacrées, il glisse volontiers que « la sérénité commence dans l'assiette » — et que ceux qui mangent trop lourd finissent essoufflés au troisième set.
+Là, régulièrement, une **vache traverse le court** de sa démarche placide, indifférente au score, et l'arbitre s'incline : on ne bouscule pas la vache. Le Gourou en a fait un art de gouverner. Chez lui, la vache n'est pas un aléa, c'est une politique : sacralisée, protégée, elle sépare les fidèles des autres, et gare à qui touche à son statut. Végétarien strict, jeûneur pendant les neuf nuits sacrées, il glisse volontiers que « la sérénité commence dans l'assiette » — et que ceux qui mangent trop lourd finissent essoufflés au troisième set.
 
 Sa botte secrète, c'est la **Méditation**. Là où d'autres frappent, hurlent, ou dressent des murs, le Gourou **s'assoit en tailleur, ferme les yeux, respire — et glace le camp adverse d'un souffle zen**. Le froid ne vient pas de l'hiver, comme chez le Tsar : il vient du calme absolu, d'un lac parfaitement immobile qui gèle par la seule force de la quiétude. Il a exporté ce truc au monde entier sous le nom de **Journée Internationale du Souffle**, invitant chefs d'État et caméras à s'asseoir sur des tapis dans des stades, jambes croisées, pendant qu'il murmurait : « Inspirez la victoire, expirez l'adversaire. » Diplomatie du yoga, arme du bien-être, gel enrobé de bienveillance.
 
 Manager dans l'âme, il adore les **coups d'éclat économiques théâtraux** : un soir, sans prévenir, il a décrété que les vieilles balles n'avaient plus cours et que tout le monde devait aller échanger ses ballons au guichet — trois semaines de files d'attente, une pagaille monumentale, et lui, serein, expliquant que « le désordre passager purifie ». « Fabriqué en Bharatie », proclame-t-il en brandissant un ballon local ; et il a numérisé jusqu'aux offrandes, si bien qu'on peut désormais payer la vache qui traverse par QR code.
 
-À l'international, le Gourou pratique le **non-alignement gourmand** : il fait ses courses partout, achète le pétrole du Tsar à prix d'ami, les avions du Cygne, les gadgets du Faucon, et se fait courtiser par le Baron Dorf lors de galas où l'on scande son nom. Ni tout à fait de l'Ouest, ni tout à fait de l'Est : il est **de lui-même**, pivot souriant que tout le monde veut à sa table. « Je ne choisis pas de camp, dit-il en joignant les paumes. Je choisis la Bharatie. Namasté. »
+À l'international, le Gourou pratique le **non-alignement gourmand** : il fait ses courses partout, achète le pétrole du Tsar à prix d'ami, les avions du Cygne, les gadgets du Faucon, et se fait courtiser par le Baron Dorf lors de galas où l'on scande son nom. Ni tout à fait du couchant, ni tout à fait du levant : il est **de lui-même**, pivot souriant que tout le monde veut à sa table. « Je ne choisis pas de camp, dit-il en joignant les paumes. Je choisis la Bharatie. Namasté. »
 
 Mais derrière la sérénité, il y a une **crête**. Sa grande obsession, sa rivalité fondatrice, c'est **Le Grand Timonier** de Panguo, l'autre géant du continent, celui avec qui il se dispute une ligne de montagne au sommet du monde. Deux empires démographiques, deux remparts et une méditation, deux patiences qui s'affrontent en silence à très haute altitude. Contre le Timonier, le lac immobile se fend d'une vague : la balle devient **bombe**, et le Gourou range sa douceur au vestiaire. « L'harmonie, oui, sourit-il. Mais l'harmonie passe par où JE décide qu'elle passe. »
 
@@ -96,9 +96,9 @@ const STORY = [
     ]
   },
 
-  // ===================== ACTE I — Petites rivalités (Volley) =====================
+  // ===================== ACTE II — Les tensions montent (Ballon enflammé) =====================
   {
-    act: 2, title: "En même temps, namasté", sub: "Bharatie–Gallardie · Rafales, valeurs et courtoisie",
+    act: 2, title: "En même temps, namasté", sub: "Bharatie–Gallardie · chasseurs gallards, valeurs et courtoisie",
     left: "gourou", right: "cygne", terrain: 2, mode: "flame", ai: 1, doped: null,
     pre:  [
       { s: "narrator", t: "Palais Gallard. Un partenaire d'armement en visite, entre ventes d'avions et petites leçons de morale. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
@@ -110,13 +110,11 @@ const STORY = [
     ],
     win:  [
       { s: "gourou", t: "En même temps, j'ai gagné. Tes avions volent, ma sérénité aussi. Reste partenaire, Cygne. Namasté." },
-      { s: "cygne", t: "Une belle défaite, si tant est. Reconnaissons-le : de l'endurance. Nous rediscuterons des valeurs." },
-      { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
+      { s: "cygne", t: "Une belle défaite, si tant est qu'une défaite puisse l'être. Reconnaissons-le : de l'endurance. Nous rediscuterons des valeurs." },
     ],
     lose:  [
       { s: "cygne", t: "L'équilibre l'emporte. En même temps, félicitez-vous d'avoir tenu si longtemps face au Cygne." },
       { s: "gourou", t: "Un revers courtois. Je le range dans le lac. La montagne, elle, ne bouge pas. Namasté." },
-      { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ]
   },
   {
@@ -133,16 +131,14 @@ const STORY = [
     win:  [
       { s: "gourou", t: "Le calme tient même sous le grès brûlant. Bel échange, Faucon. Continuons nos affaires. Namasté." },
       { s: "faucon", t: "Un revers commercial, sans conséquence stratégique. Je reviendrai vendre, et je reviendrai gagner." },
-      { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ],
     lose:  [
       { s: "faucon", t: "Le Raid Éclair gagne, même entre partenaires. Rien de personnel, Gourou : juste ma doctrine." },
       { s: "gourou", t: "Une défaite amicale. J'apprends, je respire, je reviens acheter. Namasté, fournisseur intransigeant." },
-      { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ]
   },
   {
-    act: 2, title: "Le port des roses", sub: "Bharatie–Ramenie · corridor d'énergie sous sanctions",
+    act: 2, title: "Le port des roses", sub: "Bharatie–Safranie · corridor d'énergie sous sanctions",
     left: "gourou", right: "safran", terrain: 9, mode: "flame", ai: 2, doped: null,
     pre:  [
       { s: "narrator", t: "Jardin des Roses, arcades turquoise. Deux vieilles civilisations discutent d'un port stratégique entre deux odeurs de pétales. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
@@ -155,14 +151,13 @@ const STORY = [
     win:  [
       { s: "gourou", t: "Ton voile ralentit, mais mon souffle gèle le voile lui-même. Bel échange, Safran. Le port tiendra. Namasté." },
       { s: "safran", t: "Concédé, avec mesure. Tu joues sur tous les tableaux et tu gagnes sur le mien. Habile funambule." },
-      { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ],
     lose:  [
       { s: "safran", t: "Le Voile d'Or endort même les sages. Repose-toi, Gourou. Le paon, lui, ne cligne pas des yeux." },
       { s: "gourou", t: "Ralenti, pas vaincu. Je respire, je repars. La roseraie reverra mon souffle. Namasté." },
-      { s: "narrator", t: "Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." }
     ]
   },
+  // ===================== ACTE III — Conflits ouverts (Bombe) =====================
   {
     act: 3, title: "La porte du détroit", sub: "Bharatie–Bosforie · un pont trop bavard sur la crête",
     left: "gourou", right: "sultan", terrain: 5, mode: "bomb", ai: 2, doped: null,
@@ -178,7 +173,6 @@ const STORY = [
     win:  [
       { s: "gourou", t: "Le pont a tremblé, le lac non. Occupe-toi de ton détroit, Sultan, et laisse ma montagne méditer en paix. Namasté." },
       { s: "sultan", t: "Grr… ta sérénité m'exaspère plus que ta défense. Un jour, je crierai plus fort que ton silence." },
-      { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ],
     lose:  [
       { s: "sultan", t: "BOUM ! Sur l'ashram ! Le carrefour du monde a parlé, et le sage s'est tu ! Grandiose !" },
@@ -186,7 +180,6 @@ const STORY = [
     ]
   },
 
-  // ===================== ACTE I — Petites rivalités (Volley) =====================
   {
     act: 3, title: "Les boutons du voisinage", sub: "Bharatie–Ryonganie · missiles au-dessus de la région",
     left: "gourou", right: "bebe", terrain: 3, mode: "bomb", ai: 3, doped: null,
@@ -202,7 +195,6 @@ const STORY = [
     win:  [
       { s: "gourou", t: "Tu clous mes sauts, pas mon calme. Un enfant qui hurle finit par s'endormir. Range tes boutons, Maréchal. Namasté." },
       { s: "bebe", t: "Grrr ! Il a gagné SANS SAUTER ! C'est de la triche zen ! Je… je refais un défilé, na !" },
-      { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ],
     lose:  [
       { s: "bebe", t: "BOUM ! HÉ HÉ ! Le grand sage explosé par le petit Maréchal ! Refaites le défilé, doublez les tribunes !" },
@@ -225,12 +217,10 @@ const STORY = [
     win:  [
       { s: "gourou", t: "Le rempart s'énerve, le lac reste lisse. Le calme bat le mur quand le mur veut tout. La crête est méditée : elle est mienne. Namasté, voisin." },
       { s: "timonier", t: "Un revers. Sur ton propre grès. Temporaire, forcément. L'harmonie corrigera la trajectoire… un jour, à mon tempo." },
-      { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ],
     lose:  [
       { s: "timonier", t: "Le tempo, toujours le tempo. Même chez toi, sous tes soucis, le rempart tient. La patience impériale absorbe la ferveur." },
       { s: "gourou", t: "Tu gagnes un set, pas la montagne. On médite, on respire, on remonte. La crête ne disparaît pas — et moi non plus. Namasté." },
-      { s: "narrator", t: "Le ballon est une bombe : le camp où elle tombe perd." }
     ]
   }
 ];

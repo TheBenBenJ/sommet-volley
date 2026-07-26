@@ -1,21 +1,43 @@
-# File d’attente — regen sprites Steam
+# File d’attente — passe art composite Steam (phase 1)
 
-## Regen nocturne (2026-07-22) — terminée
+> **DÉCISION 2026-07-26 : passe composite SUSPENDUE pour volkoi et dorf.**
+> Test utilisateurs : personne ne reconnaît de vraies personnes dans les
+> sprites d'origine → on GARDE les anciens persos en jeu (`assets/` restaurés
+> depuis git). Les 26 poses composites restent disponibles dans `raw/volkoi`
+> et `raw/dorf` si on veut y revenir.
 
-10/10 sets à 27 frames (`walk:4`, look casting). Volkoï sans jogging.
-Vladou + Sultan : raw généré par agents, cutout finalisé ensuite (assets étaient restés à l’ancien set).
+> Objectif : visages / silhouettes **mash-up chibi**, plus de portrait 1:1.
+> Pipeline : ancre (imagegen) → Codex lots 1–8 → `cutout.py` → assets.
 
-| Clé | Nom | Statut |
-|-----|-----|--------|
-| volkoi | Tsar Volkoï | [Volkoï](ffbddda2-89e4-4615-a590-079532a403ec) — **OK 27/27** (sans jogging) |
-| dorf | Baron Dorf | [Dorf](f68949b6-5655-41db-851c-525e19661555) — **OK 27/27** |
-| cygne | Le Cygne | [Cygne](025c5abc-d798-4e0c-9648-cba648e308aa) — **OK 27/27** |
-| bebe | Maréchal Bébé | [Bébé](472d1537-c7e6-4932-a49f-1edd44e34062) — **OK 27/27** |
-| timonier | Le Grand Timonier | [Timonier](337cb84e-8dc6-46dc-a0b6-0d691f8bc659) — **OK 27/27** |
-| sultan | Le Sultan | [Sultan](200da5f7-9205-45c9-9c07-bd6878fe322a) — **OK 27/27** (cutout suivi) |
-| gourou | Le Gourou | [Gourou](caf9a07e-7056-492c-b96e-4032a8a8cc6d) — **OK 27/27** |
-| capitaine | Le Capitaine | [Capitaine](e39de007-a570-4e47-94b8-c97b1640ffad) — **OK 27/27** |
-| faucon | Le Faucon | [Faucon](5532f4a9-d684-403f-9dc0-989f51b3fb2e) — **OK 27/27** |
-| safran | Le Safran | [Safran](812144b5-4775-4327-ad69-c769d6911bbd) — **OK 27/27** |
+## Casting
 
-Au réveil : QA visuelle `_contact.png` + `npm test` + soft Steam (identifiabilité).
+Looks durcis dans `tools/genassets/casting.py` (suffixe COMPOSITE, pins
+nationaux interdits, mash-up facial explicite).
+
+## Progression
+
+| Clé | Ancre composite | Codex 26 poses | Cutout assets | Notes |
+|-----|-----------------|----------------|---------------|-------|
+| volkoi | **OK** `raw/volkoi/idle_1.png` | **26 poses OK** | **annulé** — anciens sprites gardés | composite dispo dans raw/ si besoin |
+| dorf | **OK** v3 → `raw/dorf/idle_1.png` | **26 poses OK** Codex `019f9bfd-…` | **annulé** — anciens sprites gardés | v2 rejetée ; composite v3 dispo dans raw/ |
+| cygne | **OK** lunettes `raw/cygne/idle_1_composite_new.png` | en attente | — | à arbitrer (même logique que volkoi/dorf ?) |
+| bebe | — | — | — | |
+| timonier | — | — | — | |
+| sultan | — | — | — | |
+| gourou | — | — | — | |
+| capitaine | — | — | — | |
+| faucon | — | — | — | |
+| safran | — | — | — | |
+
+**Règle** : un seul `codex exec` à la fois. Après Volkoï → cutout → Dorf → …
+
+## Session Volkoï
+
+```bash
+# log
+raw/volkoi/_regen_composite_codex_log.txt
+# resume si besoin
+codex exec resume 019f9be4-e8ce-71f2-a338-33a262c523d4 \
+  --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check \
+  -i "raw/volkoi/idle_1.png"
+```

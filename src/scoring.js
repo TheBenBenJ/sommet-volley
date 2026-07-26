@@ -33,7 +33,7 @@ function awardPoint(side, reason) {
     }
   }
 
-  // En même temps (Micron) : swap seedé vitesse ↔ puissance
+  // En même temps (le Cygne) : swap seedé vitesse ↔ puissance
   for (const b of activeBlobs) {
     const a = charOf(b);
     if (!a.swapStats) continue;

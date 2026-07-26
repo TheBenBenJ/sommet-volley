@@ -270,11 +270,15 @@ function aiInput(side, lvlOverride, god) {
   const me = side === 0 ? blobL : blobR;
   const opp = side === 0 ? blobR : blobL;
 
-  if (--aiErrTimer <= 0) {
-    aiErr = (rng() - 0.5) * 2 * lvl.err;
-    aiRush = rng() < lvl.rush;
-    aiErrTimer = 48 + Math.floor((1 - lvl.react) * 20);
+  // État par blob (comme aiInput2v2) : deux IA le même tick (mode X, bot
+  // backfill) ne partagent ni timer ni erreur.
+  if (me._aiErrT === undefined) { me._aiErrT = 0; me._aiErr1 = 0; me._aiRush = false; }
+  if (--me._aiErrT <= 0) {
+    me._aiErr1 = (rng() - 0.5) * 2 * lvl.err;
+    me._aiRush = rng() < lvl.rush;
+    me._aiErrT = 48 + Math.floor((1 - lvl.react) * 20);
   }
+  const aiErr = me._aiErr1, aiRush = me._aiRush;
 
   if (!(typeof tutorialMode !== "undefined" && tutorialMode) &&
       superCharge[side] === 1 && me.superT <= 0 && !ball.frozen && state === "play" &&
