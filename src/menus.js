@@ -714,7 +714,9 @@ function startTutorial() {
   tutorialStep = 0;
   tutorialAdvanceLock = 0;
   tutorialStepArmed = true;
-  TUTORIAL_STEPS = buildTutorialSteps(); // suit un rebind fait entre-temps
+  // Figé au lancement : tuto clavier OU manette (listes d'étapes distinctes)
+  tutorialPadLocked = typeof padConnected !== "undefined" && !!padConnected;
+  TUTORIAL_STEPS = buildTutorialSteps();
   bombMode = false;
   flameMode = false;
   mapEventsQuiet = true;
@@ -798,8 +800,8 @@ function tutorialGivePlayerServe() {
 }
 
 /**
- * Feed scripté pour Cloche / Smash / SUPER / Super Smash.
- * kind: "lob" | "smash" | "super" | "power"
+ * Feed scripté pour Réception / Smash / SUPER / Super Smash.
+ * kind: "receive" | "smash" | "super" | "power"
  */
 function tutorialFeedBall(kind) {
   if (!tutorialMode) return;
@@ -828,43 +830,41 @@ function tutorialFeedBall(kind) {
   ball.lastTouchTick = -999;
   ball.lastHitTick = -999;
   if (typeof clearNextTouchers === "function") clearNextTouchers();
-  if (kind === "lob" || kind === "super") {
-    // Cloche / SUPER : balle qui descend au-dessus du joueur (réception sol)
+  if (kind === "receive" || kind === "super") {
+    // Réception : balle qui tombe pile sur la tête (zone auto-cloche / dig X)
     ball.x = px;
-    ball.y = GROUND_Y - 200;
+    ball.y = GROUND_Y - 88;
     ball.vx = 0;
-    ball.vy = 2.2;
+    ball.vy = 3.2;
   } else {
-    // Smash / Super Smash : balle un peu plus haute, légèrement décalée
-    ball.x = px + 8;
-    ball.y = GROUND_Y - 210;
-    ball.vx = 0.4;
-    ball.vy = 1.6;
+    // Smash / Super Smash : balle un peu plus haute pour sauter dedans
+    ball.x = px + 6;
+    ball.y = GROUND_Y - 155;
+    ball.vx = 0.3;
+    ball.vy = 1.2;
   }
 }
 
 /** Applique le scénario en dur de l'étape coach (entrée d'étape). */
 function tutorialApplyScenario(step) {
   if (!tutorialMode) return;
-  const s = step | 0;
-  if (s === 0) {
-    // Déplacement — terrain libre, PAS de service
+  const kind = tutorialStepKind(step);
+  if (kind === "move") {
     tutorialResetBlobs();
     tutorialParkBall();
-  } else if (s === 1) {
-    // Saut — toujours pas de service (on garde la position du joueur)
+  } else if (kind === "jump" || kind === "hud") {
+    // Saut / explication HUD — terrain libre, pas de service
     tutorialParkBall();
-  } else if (s === 2) {
-    // Service — balle dans les mains du joueur
+  } else if (kind === "serve") {
     tutorialGivePlayerServe();
-  } else if (s === 3) {
-    tutorialFeedBall("lob");
-  } else if (s === 4) {
+  } else if (kind === "receive") {
+    tutorialFeedBall("receive");
+  } else if (kind === "smash") {
     tutorialFeedBall("smash");
-  } else if (s === 5) {
+  } else if (kind === "super") {
     if (typeof superCharge !== "undefined") superCharge[0] = 1;
     tutorialFeedBall("super");
-  } else if (s === 6) {
+  } else if (kind === "power") {
     if (typeof powerGauge !== "undefined" && typeof POWER_GAUGE_MAX === "number") {
       powerGauge[0] = POWER_GAUGE_MAX;
     }
@@ -879,14 +879,13 @@ function tutorialApplyScenario(step) {
 function tickTutorialScenario() {
   if (!tutorialMode) return;
   if (state !== "serve" && state !== "play") return;
-  const s = tutorialStep | 0;
-  if (s === 0 || s === 1) {
-    // Toujours hors service pendant Déplacement / Saut
+  const kind = tutorialStepKind(tutorialStep);
+  if (kind === "move" || kind === "jump" || kind === "hud") {
     const parked = ball.frozen && !ball.inHands && state === "play";
     if (!parked) tutorialParkBall();
     return;
   }
-  if (s === 2) {
+  if (kind === "serve") {
     const playerHolding = servingSide === 0 && ball.inHands && ball.frozen;
     const playerTossing = servingSide === 0 && (
       (ball.tossGrace | 0) > 0 || (ball.serveAimLock && !ball.inHands)
@@ -894,70 +893,81 @@ function tickTutorialScenario() {
     if (!playerHolding && !playerTossing) tutorialGivePlayerServe();
     return;
   }
-  if (s >= 3 && s <= 6) {
-    // Feed mort / parti trop loin → renvoi scripté (sans point)
+  if (kind === "receive" || kind === "smash" || kind === "super" || kind === "power") {
     const onGround = ball.y + (typeof BALL_R === "number" ? BALL_R : 14) >= GROUND_Y - 1;
     const lost = ball.popped || ball.inHands || ball.frozen || onGround ||
       ball.x < 20 || ball.x > W - 20 || ball.y < -80;
-    if (lost) tutorialApplyScenario(s);
+    if (lost) tutorialApplyScenario(tutorialStep);
   }
 }
 
-/** Étapes coach du match tutoriel — markup [[K:]] / [[X:]] (mêmes pictos que l'aide). */
+/** Manette branchée au lancement du tuto (figé pour toute la session). */
+let tutorialPadLocked = false;
+function tutorialUsesPad() {
+  if (tutorialMode) return !!tutorialPadLocked;
+  return typeof padConnected !== "undefined" && !!padConnected;
+}
+
+/**
+ * Étapes coach — listes DISTINCTES clavier vs manette.
+ * kind pilote scénario + conditions (pas l'index).
+ */
 function buildTutorialSteps() {
   const L = bindLabel("left"), R = bindLabel("right"), J = bindLabel("jump");
   const F = bindLabel("smash"), S = bindLabel("super");
+  const win = "Marque " + TUTORIAL_WIN_SCORE + " points  ·  filet à deux en l'air = Smash Battle";
+  // HUD : 3 pastilles = touches (pas une jauge) · orange = Super Smash · or = SUPER
+  const hud = "Regarde à gauche : ●●● = touches (max " + MAX_TOUCHES +
+    ")  ·  barre orange = Super Smash  ·  barre or = SUPER";
+  if (tutorialUsesPad()) {
+    return [
+      { kind: "move", title: "Déplacement",
+        body: "Cours avec [[X:LS]] ou [[X:DPAD]]" },
+      { kind: "jump", title: "Saut",
+        body: "Saute [[X:A]]  ·  en l'air = double saut" },
+      { kind: "serve", title: "Service",
+        body: "[[X:X]] lance  →  [[X:A]] saute  →  [[X:Y]] frappe  ·  pas au sol" },
+      { kind: "receive", title: "Réception",
+        body: "Au sol, sous la balle → [[X:X]] (ou [[X:Y]]) pour diguer" },
+      { kind: "smash", title: "Smash",
+        body: "Saute [[X:A]] puis [[X:Y]] près de la balle" },
+      { kind: "hud", title: "Score & barres", body: hud },
+      { kind: "super", title: "SUPER (barre or)",
+        body: "3 points d'affilée remplissent l'or → [[X:B]] = technique du perso" },
+      { kind: "power", title: "Super Smash (orange)",
+        body: "L'orange se remplit en échange → maintiens [[X:Y]] en l'air, dose, relâche" },
+      { kind: "goal", title: "Objectif", body: win }
+    ];
+  }
   return [
-    {
-      title: "Déplacement",
-      bodyK: "Cours avec [[K:" + L + "]] [[K:" + R + "]]",
-      bodyP: "Cours avec [[X:LS]] ou [[X:DPAD]]"
-    },
-    {
-      title: "Saut",
-      bodyK: "Saute [[K:" + J + "]] / [[K:Espace]] / [[K:↑]]  ·  en l'air = double saut",
-      bodyP: "Saute [[X:A]]  ·  en l'air = double saut"
-    },
-    {
-      title: "Service",
-      bodyK: "[[K:" + F + "]] lance  →  saute  →  frappe en l'air  ·  pas au sol",
-      bodyP: "[[X:X]] lance  →  [[X:A]] saute  →  frappe en l'air  ·  pas au sol"
-    },
-    {
-      title: "Cloche",
-      bodyK: "Au sol, place-toi sous la balle [[K:" + L + "]] [[K:" + R + "]]  ·  cloche auto",
-      bodyP: "Au sol, place-toi sous la balle [[X:LS]]  ·  cloche auto"
-    },
-    {
-      title: "Smash",
-      bodyK: "Saute [[K:" + J + "]] / [[K:Espace]] vers la balle  ·  smash auto au contact",
-      bodyP: "Saute [[X:A]] vers la balle  ·  smash auto au contact"
-    },
-    {
-      title: "SUPER",
-      bodyK: "Jauge or pleine → [[K:" + S + "]] technique",
-      bodyP: "Jauge or pleine → [[X:B]] technique"
-    },
-    {
-      title: "Super Smash",
-      bodyK: "Jauge orange → maintiens [[K:" + F + "]] en l'air, dose, relâche",
-      bodyP: "Jauge orange → maintiens [[X:Y]] en l'air, dose, relâche"
-    },
-    {
-      title: "Objectif",
-      bodyK: "Marque " + TUTORIAL_WIN_SCORE + " points  ·  filet à deux en l'air = Smash Battle",
-      bodyP: "Marque " + TUTORIAL_WIN_SCORE + " points  ·  filet à deux en l'air = Smash Battle"
-    }
+    { kind: "move", title: "Déplacement",
+      body: "Cours avec [[K:" + L + "]] [[K:" + R + "]]" },
+    { kind: "jump", title: "Saut",
+      body: "Saute [[K:" + J + "]] / [[K:Espace]] / [[K:↑]]  ·  double saut en l'air" },
+    { kind: "serve", title: "Service",
+      body: "[[K:" + F + "]] lance  →  saute  →  [[K:" + F + "]] frappe en l'air  ·  pas au sol" },
+    { kind: "receive", title: "Réception",
+      body: "Au sol, place-toi sous la balle [[K:" + L + "]] [[K:" + R + "]]  ·  cloche auto" },
+    { kind: "smash", title: "Smash",
+      body: "Saute [[K:" + J + "]] / [[K:Espace]] vers la balle  ·  smash auto au contact" },
+    { kind: "hud", title: "Score & barres", body: hud },
+    { kind: "super", title: "SUPER (barre or)",
+      body: "3 points d'affilée remplissent l'or → [[K:" + S + "]] = technique du perso" },
+    { kind: "power", title: "Super Smash (orange)",
+      body: "L'orange se remplit en échange → maintiens [[K:" + F + "]] en l'air, dose, relâche" },
+    { kind: "goal", title: "Objectif", body: win }
   ];
 }
 let TUTORIAL_STEPS = buildTutorialSteps();
 
-/** Corps d'étape selon périphérique branché (clavier ou manette). */
+function tutorialStepKind(step) {
+  const tip = TUTORIAL_STEPS[step | 0];
+  return (tip && tip.kind) || "";
+}
+
 function tutorialStepBody(tip) {
   if (!tip) return "";
-  const pad = typeof padConnected !== "undefined" && padConnected;
-  if (pad && tip.bodyP) return tip.bodyP;
-  return tip.bodyK || tip.body || "";
+  return tip.body || tip.bodyK || tip.bodyP || "";
 }
 
 const TUTORIAL_STEP_MIN_T = 300; // 5 s @ 60 Hz — durée mini d'affichage par étape
@@ -982,15 +992,23 @@ let tutorialAdvanceLock = 0; // tick jusqu'auquel on bloque l'auto-avance (anti-
 let tutorialStepArmed = true; // false = attendre que la condition soit fausse (action anticipée)
 
 function tutorialStepConditionMet(me) {
-  if (tutorialStep === 0) return Math.abs(me.vx) > 1.2;
-  if (tutorialStep === 1) return !me.onGround;
-  if (tutorialStep === 2) return servingSide === 0 && ball.tossGrace > 0;
-  if (tutorialStep === 3) return me.poseAnim === "receive";
-  if (tutorialStep === 4) return me.poseAnim === "smash";
-  // SUPER : uniquement l'activation (pas la jauge déjà pleine d'avant)
-  if (tutorialStep === 5) return me.superT > 0;
-  // Super Smash : dosage (freeze) ou frappe lourde déjà tirée
-  if (tutorialStep === 6) {
+  const kind = tutorialStepKind(tutorialStep);
+  if (kind === "move") return Math.abs(me.vx) > 1.2;
+  if (kind === "jump") return !me.onGround;
+  if (kind === "serve") {
+    // Clavier : lancer suffit (frappe auto en sautant). Manette : lancer puis Y.
+    if (servingSide !== 0) return false;
+    if ((ball.tossGrace | 0) > 0) return true;
+    if (tutorialUsesPad() && !ball.inHands && ball.lastTouchSide === 0 &&
+        me.poseAnim === "smash") return true;
+    return false;
+  }
+  if (kind === "receive") return me.poseAnim === "receive";
+  if (kind === "smash") return me.poseAnim === "smash";
+  // Étape info : pas d'action — auto-avance après le délai mini (voir tickTutorialCoach)
+  if (kind === "hud") return false;
+  if (kind === "super") return me.superT > 0;
+  if (kind === "power") {
     if (powerWindup && powerWindup.side === 0) return true;
     if (ball.smash > 40 && ball.lastTouchSide === 0) return true;
     return false;
@@ -1024,6 +1042,11 @@ function tickTutorialCoach() {
   if (typeof tickTutorialScenario === "function") tickTutorialScenario();
   if (typeof tick === "number" && tick < tutorialAdvanceLock) return;
   if (!tutorialStepMinElapsed()) return; // 5 s mini avant auto-avance / skip
+  // Étape « Score & barres » : pure info → avance seule après le délai
+  if (tutorialStepKind(tutorialStep) === "hud") {
+    advanceTutorialStep();
+    return;
+  }
   const me = blobL;
   const met = tutorialStepConditionMet(me);
   if (!tutorialStepArmed) {
@@ -2304,9 +2327,9 @@ function drawTutorialControls(dev, x, y, maxW) {
   const rows = {
     keyboard: [
       ["Bouger / sauter", "[[K:" + kL + "]] [[K:" + kR + "]] bouger  ·  [[K:" + kJ + "]] / [[K:Espace]] sauter"],
-      ["Cloche (au sol)", "Place-toi sous la balle — cloche auto"],
+      ["Réception (au sol)", "Place-toi sous la balle — cloche auto"],
       ["Smash (en l'air)", "Saute au contact : smash auto"],
-      ["Service", "[[K:" + kF + "]] lancer, puis saute et frappe en l'air"],
+      ["Service", "[[K:" + kF + "]] lancer, puis saute et [[K:" + kF + "]] frappe"],
       ["SUPER (jauge or)", "3 points d'affilée → [[K:" + kS + "]]"],
       ["Super Smash", "Jauge orange → maintiens [[K:" + kF + "]] en l'air, relâche"],
       ["Pause", "[[K:P]] ou [[K:Échap]]"]
@@ -2314,7 +2337,9 @@ function drawTutorialControls(dev, x, y, maxW) {
     pad: [
       ["Déplacement", "[[X:LS]] stick gauche  ou  [[X:DPAD]] croix"],
       ["Saut", "[[X:A]]  (double saut en l'air)"],
-      ["Cloche / smash", "[[X:X]] / [[X:Y]]  —  sol = cloche · air = smash"],
+      ["Service", "[[X:X]] lance  →  [[X:A]] saute  →  [[X:Y]] frappe"],
+      ["Réception", "Au sol, sous la balle → [[X:X]] (ou [[X:Y]])"],
+      ["Smash", "En l'air → [[X:Y]] près de la balle"],
       ["SUPER (jauge or)", "[[X:B]]  (ou [[X:RB]]) — technique du perso"],
       ["Super Smash", "Jauge orange → maintiens [[X:Y]] en l'air, relâche"],
       ["Pause", "[[X:START]]"],
@@ -2715,8 +2740,11 @@ function drawRules() {
   h("Gameplay");
   p("Au sol, balle sur toi = cloche auto. En l'air = smash auto au contact.");
   y = drawControlMarkup(lx, y,
-    "Service : [[K:" + bindLabel("smash") + "]] / [[X:X]] lancer, puis saute et frappe (pas au sol).",
+    "Service : [[K:" + bindLabel("smash") + "]] / [[X:X]] lancer, puis saute et [[X:Y]] frappe (pas au sol).",
     leftW, 12);
+  y += 4;
+  h("HUD — 2 jauges + touches");
+  p("Sous le score : ●●● = touches du camp (max " + MAX_TOUCHES + ", ce n'est PAS une jauge). Barre orange = Super Smash (échange). Barre or = SUPER du perso (points d'affilée).");
   y += 4;
   h("★ SUPER", "#ffd93d");
   y = drawControlMarkup(lx, y,

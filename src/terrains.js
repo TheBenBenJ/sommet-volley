@@ -1850,6 +1850,36 @@ function drawBombHUD() {
 }
 
 /**
+ * Tutoriel : libellés sur le camp gauche.
+ * ●●● = touches (faute à 4) · orange = Super Smash · or = SUPER perso.
+ */
+function drawTutorialHudLegend(SANS, STROKE, py, ph) {
+  const cx = W * 0.22;
+  const bw = 100, bx = cx - bw / 2;
+  const bySuper = py + ph - 12;   // barre or (SUPER)
+  const byPower = bySuper - 8;    // barre orange (Super Smash)
+  const touchY = GROUND_Y + 8;
+  ctx.save();
+  ctx.font = "800 9px " + SANS;
+  ctx.textAlign = "left";
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = "round";
+  const label = (txt, x, y, col) => {
+    ctx.strokeStyle = "rgba(12,20,42,0.85)";
+    ctx.strokeText(txt, x, y);
+    ctx.fillStyle = col;
+    ctx.fillText(txt, x, y);
+  };
+  // Pastilles touches — à droite des 3 points
+  label("touches", cx + 30, touchY + 3, "rgba(255,246,232,0.92)");
+  // Barre orange
+  label("Super Smash", bx + bw + 6, byPower + 4, "#ff8a4a");
+  // Barre or
+  label("SUPER", bx + bw + 6, bySuper + 5, "#ffd84a");
+  ctx.restore();
+}
+
+/**
  * Messages d'info dans la bande score, entre les deux pastilles.
  * @returns {boolean} true si un message a été dessiné (masque le VS).
  */
@@ -1908,7 +1938,7 @@ function drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph) {
     }
     if (!title && state === "serve") {
       title = "Service : " + sideLabel(servingSide);
-      sub = "[[K:F]] / [[X:X]] lancer, puis saute et frappe";
+      sub = "[[K:F]] / [[X:X]] lancer, puis saute et [[X:Y]] frappe";
       fill = "#ffcc00";
     }
   }
@@ -2026,6 +2056,7 @@ function drawHUD() {
     if (scorePop[s] > 0) scorePop[s]--;
   }
   // touches (pastilles) dans la bande score, sous la ligne de terrain
+  // = compteur de contacts (max MAX_TOUCHES), PAS une jauge de pouvoir
   for (const side of [0, 1]) {
     const baseX = side === 0 ? W * 0.22 - 24 : W * 0.78 - 24;
     for (let i = 0; i < MAX_TOUCHES; i++) {
@@ -2079,6 +2110,12 @@ function drawHUD() {
         ctx.fill();
       }
     }
+  }
+
+  // Tutoriel : légendes sur le camp joueur pour lever l'ambiguïté des 3 éléments
+  if (typeof tutorialMode !== "undefined" && tutorialMode &&
+      (state === "serve" || state === "play")) {
+    drawTutorialHudLegend(SANS, STROKE, py, ph);
   }
 
   // Infos de match (SUPER, event map, balle de match, service) entre les 2 scores.

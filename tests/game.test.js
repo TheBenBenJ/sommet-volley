@@ -2753,22 +2753,50 @@ test("tutoriel : chaque étape reste au moins 5 s", () => {
   assert.strictEqual(g.getTutorialStep(), 1, "avance après délai");
 });
 
-test("tutoriel : feeds Cloche/Smash + pas de point en pratique", () => {
+test("tutoriel : feeds Réception/Smash + pas de point en pratique", () => {
   const g = loadGame();
   g.startTutorial();
-  g.setTutorialStep(3);
-  g.tutorialApplyScenario(3);
+  const steps = g.TUTORIAL_STEPS;
+  assert.ok(steps.some(s => s.kind === "receive"), "étape Réception présente");
+  assert.ok(steps.some(s => s.title === "Réception"), "titre Réception");
+  const recv = steps.findIndex(s => s.kind === "receive");
+  g.setTutorialStep(recv);
+  g.tutorialApplyScenario(recv);
   assert.strictEqual(g.getState(), "play");
-  assert.ok(!g.ball.inHands && !g.ball.frozen, "feed cloche en jeu");
-  assert.ok(g.ball.y < g.consts.GROUND_Y - 80, "balle en l'air");
+  assert.ok(!g.ball.inHands && !g.ball.frozen, "feed réception en jeu");
+  assert.ok(g.ball.y < g.consts.GROUND_Y - 40, "balle en l'air");
+  // Feed réception : assez bas pour diguer (tête)
+  assert.ok(g.ball.y > g.consts.GROUND_Y - 140, "balle proche pour réception");
   const s0 = g.scores[0], s1 = g.scores[1];
-  // Simule un point au sol → absorbé, scénario renvoyé
   g.ball.y = g.consts.GROUND_Y;
   g.ball.vy = 4;
   g.awardPoint(1, "test");
   assert.strictEqual(g.scores[0], s0, "pas de score en pratique");
   assert.strictEqual(g.scores[1], s1, "pas de score adverse");
   assert.ok(!g.ball.frozen && g.ball.y < g.consts.GROUND_Y - 40, "feed relancé");
+});
+
+test("tutoriel : textes distincts clavier vs manette (réception)", () => {
+  const g = loadGame();
+  g.startTutorial(); // clavier (pas de pad en headless)
+  assert.ok(!g.tutorialUsesPad(), "tuto clavier par défaut");
+  const kb = g.TUTORIAL_STEPS.find(s => s.kind === "receive");
+  assert.ok(kb.body.indexOf("cloche auto") >= 0, "clavier = cloche auto");
+  assert.ok(kb.body.indexOf("[[X:") < 0, "pas de pictos manette en clavier");
+});
+
+test("tutoriel : étape Score & barres explique les 3 éléments HUD", () => {
+  const g = loadGame();
+  g.startTutorial();
+  const hud = g.TUTORIAL_STEPS.find(s => s.kind === "hud");
+  assert.ok(hud, "étape hud présente");
+  assert.ok(/touches/i.test(hud.body), "explique les touches");
+  assert.ok(/orange/i.test(hud.body), "explique Super Smash orange");
+  assert.ok(/or|SUPER/i.test(hud.body), "explique SUPER or");
+  const sup = g.TUTORIAL_STEPS.find(s => s.kind === "super");
+  const pow = g.TUTORIAL_STEPS.find(s => s.kind === "power");
+  assert.ok(/or/i.test(sup.title), "titre SUPER = barre or");
+  assert.ok(/orange/i.test(pow.title), "titre Super Smash = orange");
 });
 
 test("pictos commandes : markup K / X / stick parsé", () => {
