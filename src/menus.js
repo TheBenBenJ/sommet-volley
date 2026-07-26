@@ -1055,7 +1055,7 @@ function uiTitle(txt, x, y, size, align) {
 const XBOX_PICTO = {
   A: "#3ddc84", B: "#e74c3c", X: "#3d9bdb", Y: "#f1c40f",
   LB: "#5a6270", RB: "#5a6270", LT: "#5a6270", RT: "#5a6270",
-  START: "#6b7280", VIEW: "#6b7280", MENU: "#6b7280"
+  START: "#6b7280", VIEW: "#6b7280", SELECT: "#6b7280", MENU: "#6b7280"
 };
 
 /** Capuchon clavier — retourne la largeur dessinée. */
@@ -2221,7 +2221,7 @@ function drawTutorial() {
   drawTutorialTab("Jouer le tutoriel", "TutPlay", W - UI.mx - playW / 2, btnY, playW, selPlay);
 }
 
-/** Bandeau coach pendant la partie tutoriel (bas d'écran, entre les scores). */
+/** Bandeau coach tutoriel — créneau central de la bande score (entre les 2 pastilles). */
 function drawTutorialCoach() {
   if (!tutorialMode || (state !== "serve" && state !== "play")) return;
   const tip = TUTORIAL_STEPS[Math.min(tutorialStep, TUTORIAL_STEPS.length - 1)];
@@ -2229,45 +2229,56 @@ function drawTutorialCoach() {
   const pad = typeof padConnected !== "undefined" && padConnected;
   const body = tutorialStepBody(tip);
   const canSkip = tutorialStepCanSkip();
-  const pw = Math.min(520, W - 28);
-  const ph = canSkip ? 96 : 78;
+
+  // Géométrie alignée sur drawHUD : pastilles à W*0.22 / W*0.78, pw=132, py=GROUND_Y+14
+  const pillR = W * 0.22 + 66;   // bord droit pastille gauche
+  const pillL = W * 0.78 - 66;   // bord gauche pastille droite
+  const gap = pillL - pillR;
+  const pw = Math.min(340, Math.max(200, gap - 16));
+  const ph = 62;                 // même hauteur que les pastilles score
   const px = (W - pw) / 2;
-  // Dans la bande score, entre les deux pastilles (laisse le terrain libre en haut)
-  const py = GROUND_Y + 6;
-  ctx.fillStyle = "rgba(12,20,42,0.94)";
+  const py = GROUND_Y + 14;
+  // Ne pas dépasser le bas du canvas (SCORE_BAND)
+  if (py + ph > H - 2) return;
+
+  ctx.save();
+  ctx.fillStyle = "rgba(12,20,42,0.96)";
   ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 14); else ctx.rect(px, py, pw, ph);
+  if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 12); else ctx.rect(px, py, pw, ph);
   ctx.fill();
   ctx.strokeStyle = UI.gold; ctx.lineWidth = 2.5; ctx.stroke();
 
   ctx.textAlign = "center";
   ctx.fillStyle = UI.gold;
-  ctx.font = "800 13px " + UI.sans;
+  ctx.font = "800 12px " + UI.sans;
   ctx.fillText(
     "Tutoriel · " + (tutorialStep + 1) + "/" + TUTORIAL_STEPS.length + "  —  " + tip.title,
-    W / 2, py + 20
+    W / 2, py + 16
   );
 
-  // Ligne d'action avec pictos clavier OU manette (selon périphérique)
-  const textW = pw - 28;
-  const bodyY = py + 44;
-  ctx.save();
+  const textW = pw - 20;
+  const bodyY = py + 36;
   if (typeof drawControlMarkup === "function" && body.indexOf("[[") >= 0) {
-    drawControlMarkup(px + 16, bodyY, body, textW, 13);
+    // Centrer approximativement la ligne de pictos
+    const plain = body.replace(/\[\[[KkXx]:([^\]]+)\]\]/g, "••");
+    ctx.font = "12px " + UI.sans;
+    const est = Math.min(textW, ctx.measureText(plain).width + 36);
+    drawControlMarkup(px + (pw - est) / 2, bodyY, body, textW, 12);
   } else {
-    ctx.textAlign = "left";
     ctx.fillStyle = "rgba(255,246,232,0.95)";
-    ctx.font = "700 13px " + UI.sans;
-    ctx.fillText(body, px + 16, bodyY);
+    ctx.font = "700 12px " + UI.sans;
+    ctx.fillText(body, W / 2, bodyY);
   }
 
   if (canSkip) {
-    const skip = pad
-      ? "Passer : [[X:A]]"
-      : "Passer : [[K:Entrée]]";
+    // Manette : Select/View — jamais A (saut) ni B (SUPER)
+    const skip = pad ? "Passer [[X:SELECT]]" : "Passer [[K:Entrée]]";
     if (typeof drawControlMarkup === "function") {
-      ctx.globalAlpha = 0.8;
-      drawControlMarkup(px + 16, py + ph - 20, skip, textW, 11);
+      ctx.globalAlpha = 0.85;
+      const plain = skip.replace(/\[\[[KkXx]:([^\]]+)\]\]/g, "••");
+      ctx.font = "11px " + UI.sans;
+      const est = Math.min(textW, ctx.measureText(plain).width + 28);
+      drawControlMarkup(px + (pw - est) / 2, py + ph - 12, skip, textW, 10);
     }
   }
   ctx.restore();

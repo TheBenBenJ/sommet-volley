@@ -300,6 +300,7 @@ function readPad(gp) {
     confirm: b(0),          // A / Croix
     // Menus : B retour ; Select aussi. En match, B est lu via superT (pas back).
     back:    b(1) || b(8),
+    select:  b(8),          // View/Select — passer étape tutoriel (pas A = saut)
     start:   b(9)           // Start → menu pause en match
   };
 }
@@ -536,8 +537,8 @@ function handlePadMenu() {
   } else if ((state === "serve" || state === "play" || state === "point") && !paused) {
     // Start = pause. B reste SUPER (ne pas mapper back → Escape ici).
     if (padEdge("start")) handleMenuKeys("Escape", "");
-    // Tutoriel : A / Entrée passe l'étape — jamais B (SUPER)
-    if (tutorialMode && padEdge("confirm")) handleMenuKeys("Enter", "");
+    // Tutoriel : Select/View passe l'étape — pas A (saut) ni B (SUPER)
+    if (tutorialMode && padEdge("select")) handleMenuKeys("Enter", "");
   } else if (state === "gameover") {
     if (padEdge("confirm") && gameoverTimer <= 0) handleMenuKeys(online ? "KeyR" : "Space", "");
     if (padEdge("back")) handleMenuKeys("Escape", "");

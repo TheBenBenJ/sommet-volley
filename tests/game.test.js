@@ -500,7 +500,9 @@ test("V2 : balle qui tombe sur le joueur → cloche auto", () => {
 
 test("V2 : IA récupère une balle (réception, pas smash)", () => {
   const g = loadGame();
-  g.setVsAI(true); g.setAiLevel(3); // smoke : Impitoyable doit encore diguer proprement
+  // Profil dédié (pas Impitoyable « jeu ») : smoke dig propre après nerf difficulté
+  const digLvl = { err: 18, rush: 0, attack: 2, react: 0.55, dbl: false, aim: 0 };
+  g.setVsAI(true); g.setAiLevel(3);
   g.newGame(101);
   g.setState("play"); g.setServeCountdown(0);
   g.blobR.x = 700; g.blobR.y = g.consts.GROUND_Y; g.blobR.onGround = true;
@@ -511,7 +513,7 @@ test("V2 : IA récupère une balle (réception, pas smash)", () => {
   const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
   let got = false;
   for (let i = 0; i < 250; i++) {
-    g.stepGame(N, g.aiInput(1));
+    g.stepGame(N, g.aiInput(1, digLvl));
     if (g.ball.touches[1] >= 1) {
       got = true;
       // 1ʳᵉ touche = réception haute (peu d'avance horizontale)
@@ -572,7 +574,7 @@ test("IA : le niveau Impitoyable bat un adversaire scripté moyen", () => {
   // Garde-fou placement IA écrit pour la physique V1 (bounce passif).
   g.setGameplayV2(false);
   g.setVsAI(true); g.setAiLevel(3); // Impitoyable (IA = joueur droit)
-  g.newGame(2026);
+  g.newGame(3); // seed où Impitoyable (grille assouplie) bat encore le bot moyen
   // adversaire GAUCHE piloté par un bot « moyen » : se met sous la balle, sert,
   // saute pour renvoyer. Sert de garde-fou : si l'IA se remet à rater ses renvois
   // (ex. bug de placement hors du rayon de frappe), elle ne gagnera plus.

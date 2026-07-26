@@ -2082,8 +2082,10 @@ function drawHUD() {
   }
 
   // Infos de match (SUPER, event map, balle de match, service) entre les 2 scores.
-  // Les messages de POINT restent en haut (drawPointCelebBanner).
-  const infoDrawn = drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph);
+  // Pendant le tutoriel : le coach occupe ce créneau (évite superposition Service/tuto).
+  const tutoring = typeof tutorialMode !== "undefined" && tutorialMode &&
+    (state === "serve" || state === "play");
+  const infoDrawn = tutoring ? true : drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph);
   if (!infoDrawn) {
     ctx.textAlign = "center";
     ctx.fillStyle = CREAM;

@@ -333,11 +333,11 @@ const AI_LEVELS = [
   // attack : décalage derrière la balle pour viser franchement le camp adverse
   // react : anticipation (0=lent, 1=parfait) · dbl : utilise le double saut
   // aim : 1 = place ses frappes LOIN de l'adversaire (drive profond / amorti court)
-  // Grille volontairement molle : Facile rate beaucoup ; Impitoyable ≈ ancienne Normale+.
-  { name: "Facile",      err: 105, rush: 0.01, attack: 1,  react: 0.08, dbl: false, aim: 0 },
-  { name: "Normale",     err: 80,  rush: 0.02, attack: 2,  react: 0.16, dbl: false, aim: 0 },
-  { name: "Difficile",   err: 55,  rush: 0.05, attack: 3,  react: 0.28, dbl: false, aim: 0 },
-  { name: "Impitoyable", err: 34,  rush: 0.14, attack: 7,  react: 0.45, dbl: true,  aim: 0 }
+  // Encore −2 crans : Difficile ≈ ancien Facile ; Impitoyable ≈ entre Facile et Normale d’avant.
+  { name: "Facile",      err: 155, rush: 0.00, attack: 0,  react: 0.02, dbl: false, aim: 0 },
+  { name: "Normale",     err: 130, rush: 0.005, attack: 0, react: 0.04, dbl: false, aim: 0 },
+  { name: "Difficile",   err: 105, rush: 0.01, attack: 1,  react: 0.08, dbl: false, aim: 0 },
+  { name: "Impitoyable", err: 72,  rush: 0.03, attack: 2,  react: 0.20, dbl: false, aim: 0 }
 ];
 let aiLevel = 1;
 // (erreur/rush IA : état PAR BLOB — _aiErr1/_aiRush/_aiErrT, voir ai.js)
