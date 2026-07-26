@@ -1,7 +1,7 @@
 {
   "name": "sommet-volley",
-  "version": "1.1.32",
-  "description": "Sommet Volley \u2014 volley satirique HTML5 Canvas (solo, local, en ligne WebRTC/PeerJS).",
+  "version": "1.1.33",
+  "description": "Sommet Volley — volley satirique HTML5 Canvas (solo, local, en ligne WebRTC/PeerJS).",
   "type": "commonjs",
   "scripts": {
     "test": "node tests/game.test.js && node matchmaker/server.test.js",
