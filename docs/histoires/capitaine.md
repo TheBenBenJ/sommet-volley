@@ -216,7 +216,6 @@ Sous la vanne, il y a un joueur redoutable. Rustre, oui. Imprévisible, oui. Mai
     { s: "narrator", t: "Grande Forêt. Terre rouge, huttes sur pilotis, canopée dorée — et à l'horizon une lueur : des feux, ou « du barbecue », selon qui parle. Le ballon est une bombe : le camp où elle tombe perd." },
     { s: "cygne", t: "Votre forêt brûle, Capitaine, et c'est le poumon de la planète. Je viens le défendre — puisque, visiblement, le propriétaire fume dedans." },
     { s: "capitaine", t: "MA forêt, Cygne ! La MIENNE ! Et si c'est un poumon, alors écoute la suite : depuis le début du tournoi je le répète — le poumon a des poings." },
-    { s: "cygne", t: "Belle forêt, d'ailleurs. Ce serait dommage qu'elle brûle." },
     { s: "capitaine", t: "HÉ ! C'est MA réplique ! Rends-la ! Quatorze fois que je la place, et il me la vole sur MON terrain !" },
     { s: "narrator", t: "Quinze, d'après les archives du Maréchal. Et regardez l'aura rouge : le héraut du sport propre s'est préparé. Chimiquement." },
     { s: "cygne", t: "Des vitamines. Parfaitement légales quelque part. On ne défend pas un poumon avec des poumons ordinaires." },

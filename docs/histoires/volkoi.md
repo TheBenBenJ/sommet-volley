@@ -228,7 +228,6 @@ Au dernier banquet du Consortium, quelqu'un a dit « puissance régionale ». To
     { s: "volkoi", t: "Voilà. Continue de réviser. Le froid aide à trouver les mots justes." },
     { s: "cygne", t: "Cette aura, avant que vous ne demandiez : des vitamines. Parfaitement légales quelque part. Le champion du sport propre se doit d'arriver en pleine santé." },
     { s: "volkoi", t: "Bien sûr. Et mon canon est décoratif. Nous avons tous nos communiqués." },
-    { s: "narrator", t: "Le canon tonne pour l'ouverture — décorativement. Le Cygne rougeoie. Le dégel du monde tient dans un dernier échange." },
   ],
   win:  [
     { s: "cygne", t: "Une défaite, certes — et pourtant une avancée diplomatique : vous me parlez encore. J'appelle cela un succès d'estime. L'estime, c'est mon secteur." },

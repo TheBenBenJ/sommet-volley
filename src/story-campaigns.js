@@ -601,10 +601,6 @@ const STORY_BY_CHAR = {
         {
           "s": "volkoi",
           "t": "Bien sûr. Et mon canon est décoratif. Nous avons tous nos communiqués."
-        },
-        {
-          "s": "narrator",
-          "t": "Le canon tonne pour l'ouverture — décorativement. Le Cygne rougeoie. Le dégel du monde tient dans un dernier échange."
         }
       ],
       "win": [
@@ -1200,10 +1196,6 @@ const STORY_BY_CHAR = {
           "t": "Cher Cygne ! On s'aime, tout le monde le dit — je le dis. Mais tu me dois de l'argent pour ta défense. Bonne nouvelle : j'ai LE deal. Le Deal du siècle. Celui que j'annonce depuis le premier match."
         },
         {
-          "s": "cygne",
-          "t": "J'écoute. Avec l'enthousiasme prudent de l'homme qui a lu vos clauses cinq."
-        },
-        {
           "s": "dorf",
           "t": "Tu gagnes : je te pardonne ta dette. Je gagne : tu me la paies double, et tu m'applaudis. C'est équilibré : dans les deux cas, je suis content."
         },
@@ -1374,6 +1366,10 @@ const STORY_BY_CHAR = {
         {
           "s": "timonier",
           "t": "Un revers mineur. L'harmonie corrigera la trajectoire. Reviens dans mille ans, on recomptera."
+        },
+        {
+          "s": "cygne",
+          "t": "Je demanderai une commission sur votre calendrier. Elle rendra ses conclusions juste avant."
         }
       ],
       "lose": [
@@ -1384,6 +1380,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "Défaite instructive. J'ai beaucoup appris. Et en même temps, je referai exactement pareil au prochain set."
+        },
+        {
+          "s": "timonier",
+          "t": "Prévisible. L'harmonie apprécie les partenaires qui remplissent eux-mêmes leur fiche."
         }
       ]
     },
@@ -1431,6 +1431,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Beau point. On respire, on s'incline, on revient. La montagne, elle, ne s'incline devant personne."
+        },
+        {
+          "s": "cygne",
+          "t": "J'institue donc une commission montagne. Première conclusion : contourner la vache."
         }
       ],
       "lose": [
@@ -1441,6 +1445,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "Défaite. Recentrage. Verticale. Je note tout ça, et en même temps, je repars conquérant."
+        },
+        {
+          "s": "gourou",
+          "t": "Tu as surtout noté la vache. Elle préside déjà ta commission, sans indemnité."
         }
       ]
     },
@@ -1488,6 +1496,10 @@ const STORY_BY_CHAR = {
         {
           "s": "sultan",
           "t": "Tu gagnes le match, pas le détroit. Je reste sur le pas de ta porte. Debout. Immense. Et j'ai la clé."
+        },
+        {
+          "s": "cygne",
+          "t": "Gardez-la : ma commission vient justement de changer la serrure. C'est une avancée institutionnelle."
         }
       ],
       "lose": [
@@ -1498,6 +1510,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "Puissant, indéniablement. Défaite honorable. Nos critères, eux, restent debout. Comme mon obélisque."
+        },
+        {
+          "s": "sultan",
+          "t": "Ton obélisque attendra au guichet avec les autres. Sur mon détroit, même les symboles paient."
         }
       ]
     },
@@ -1545,6 +1561,10 @@ const STORY_BY_CHAR = {
         {
           "s": "safran",
           "t": "Joli point, technocrate. Mais tant que ton allié déchire mes accords, ton thé aura un goût de trahison."
+        },
+        {
+          "s": "cygne",
+          "t": "Nous créerons un groupe de travail sur l'arrière-goût. La diplomatie commence souvent par une tasse mal lavée."
         }
       ],
       "lose": [
@@ -1555,6 +1575,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "Défaite mesurée pour un adversaire mesuré. Je repars, en même temps déçu et déterminé. Nous rebâtirons cet accord."
+        },
+        {
+          "s": "safran",
+          "t": "Apportez des briques, cette fois. Vos grandes phrases résistent mal au premier courant d'air."
         }
       ]
     },
@@ -1602,6 +1626,10 @@ const STORY_BY_CHAR = {
         {
           "s": "faucon",
           "t": "Tu as gagné un point, pas un débat. Je reste intransigeant. C'est la seule position qui ne fait pas de morts."
+        },
+        {
+          "s": "cygne",
+          "t": "Je ferai inscrire votre désaccord au procès-verbal. Il y sera très en sécurité."
         }
       ],
       "lose": [
@@ -1612,6 +1640,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "Défaite. Grave. Je maintiens ma ligne : la fermeté et la nuance. Même sous les décombres, je refuse de choisir un seul bout de la corde."
+        },
+        {
+          "s": "faucon",
+          "t": "Garde la corde. Moi, je sécurise les sorties avant ton prochain discours."
         }
       ]
     },
@@ -1659,6 +1691,10 @@ const STORY_BY_CHAR = {
         {
           "s": "dorf",
           "t": "Truqué ! Un allié qui gagne, c'est déjà suspect ! On renégocie l'accord, cher Cygne. Un accord plus grand. Le plus grand."
+        },
+        {
+          "s": "cygne",
+          "t": "Une commission vérifiera sa taille. Vous fournirez les chiffres, ce qui garantit déjà un résultat immense."
         }
       ],
       "lose": [
@@ -1669,6 +1705,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "Une escalade regrettable, entre partenaires. En même temps, je maintiens le canal de discussion — et mes tarifs, eux aussi."
+        },
+        {
+          "s": "dorf",
+          "t": "Excellent ! Un canal avec péage, des tarifs, mon nom en or : enfin une diplomatie qui rapporte !"
         }
       ]
     },
@@ -1720,6 +1760,10 @@ const STORY_BY_CHAR = {
         {
           "s": "capitaine",
           "t": "Tsss. Tu gagnes un match, pas ma forêt. Reviens quand tu voudras, l'oiseau : mes troncs t'attendent, et mon ara aussi."
+        },
+        {
+          "s": "cygne",
+          "t": "Je reviendrai avec des experts. L'ara sera entendu : il semble être le seul témoin indépendant."
         }
       ],
       "lose": [
@@ -1730,6 +1774,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "Une défaite qui ne change rien à ma ligne. Je continuerai à défendre le poumon du monde. Même seul. Même en miettes. En même temps déterminé, en même temps inflexible."
+        },
+        {
+          "s": "capitaine",
+          "t": "Et moi je défendrai la forêt contre tes commissions. L'ara vient de voter : il ricane contre."
         }
       ]
     },
@@ -1795,6 +1843,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "L'hiver a gagné une bataille, pas la partie. Je me relève. Je retends la main, et je retends la corde. Premier de la classe, on ne le reste qu'en recommençant."
+        },
+        {
+          "s": "volkoi",
+          "t": "Recommence. J'ai classé ta commission dans la neige : dossier blanc, réponse froide."
         }
       ]
     }
@@ -2368,10 +2420,6 @@ const STORY_BY_CHAR = {
         {
           "s": "bebe",
           "t": "Tu… tu as un DOSSIER sur moi ? Un vrai ? Avec mon nom écrit dedans ?"
-        },
-        {
-          "s": "faucon",
-          "t": "J'ai un dossier sur tout le monde. Le tien est mince."
         },
         {
           "s": "bebe",
@@ -3009,10 +3057,6 @@ const STORY_BY_CHAR = {
         {
           "s": "timonier",
           "t": "Les dix n'avaient pas mon tempo. Un proverbe dit : la crête appartient à celui qui respire le plus lentement."
-        },
-        {
-          "s": "gourou",
-          "t": "Ce proverbe est de MOI. Tu me copies jusque dans les sagesses, voisin. Ce soir, je ne médite plus : je brûle."
         },
         {
           "s": "narrator",
@@ -3656,10 +3700,6 @@ const STORY_BY_CHAR = {
           "t": "TOUT se négocie ! J'ai taxé la neige, l'attente et le karma — ce soir, je taxe le destin lui-même : s'il veut passer, il paiera le péage comme les autres !"
         },
         {
-          "s": "faucon",
-          "t": "Le destin ne paie pas, Sultan. Il encaisse. Dossier clos. Sers."
-        },
-        {
           "s": "narrator",
           "t": "Deux supers qui clouent l'adversaire au sol, une mèche qui siffle, un pont entre deux mondes. Ne gardez pas la bombe de votre côté."
         }
@@ -3822,6 +3862,10 @@ const STORY_BY_CHAR = {
         {
           "s": "capitaine",
           "t": "Rrraah ! Battu par un buveur de thé ! Bon… t'as du coffre, l'ascète. On remet ça au barbecue."
+        },
+        {
+          "s": "gourou",
+          "t": "Namasté. Apporte le feu ; j'apporterai le souffle — et la vache choisira le menu."
         }
       ],
       "lose": [
@@ -3832,6 +3876,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Bien joué. La force brute a son jour. Mais l'endurance a toutes les saisons. Namasté."
+        },
+        {
+          "s": "capitaine",
+          "t": "Garde tes saisons, le sage. Chez moi, on tronçonne à l'aube et on plaisante avant le café."
         }
       ]
     },
@@ -3879,6 +3927,10 @@ const STORY_BY_CHAR = {
         {
           "s": "dorf",
           "t": "Truqué ! Totalement truqué ! … Mais quelle foule, mon pote. On refait le show, plus grand encore."
+        },
+        {
+          "s": "gourou",
+          "t": "Plus grand, peut-être. Plus long, jamais : ton ego manque de souffle avant mon silence."
         }
       ],
       "lose": [
@@ -3889,6 +3941,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Profite du bruit, Baron. Moi je garde le souffle. Le silence gagne à la fin. Namasté."
+        },
+        {
+          "s": "dorf",
+          "t": "Mon silence serait le plus impressionnant du monde. Mais mes admirateurs exigent que je parle !"
         }
       ]
     },
@@ -3936,6 +3992,10 @@ const STORY_BY_CHAR = {
         {
           "s": "cygne",
           "t": "Une belle défaite, si tant est qu'une défaite puisse l'être. Reconnaissons-le : de l'endurance. Nous rediscuterons des valeurs."
+        },
+        {
+          "s": "gourou",
+          "t": "Apporte tes valeurs, Cygne. J'apporterai le thé et assez de souffle pour attendre la fin de ton exposé."
         }
       ],
       "lose": [
@@ -3946,6 +4006,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Un revers courtois. Je le range dans le lac. La montagne, elle, ne bouge pas. Namasté."
+        },
+        {
+          "s": "cygne",
+          "t": "Je salue ce classement. En même temps, une commission vérifiera que le lac respecte nos valeurs."
         }
       ]
     },
@@ -3993,6 +4057,10 @@ const STORY_BY_CHAR = {
         {
           "s": "faucon",
           "t": "Un revers commercial, sans conséquence stratégique. Je reviendrai vendre, et je reviendrai gagner."
+        },
+        {
+          "s": "gourou",
+          "t": "Reviens. Les contrats expirent ; mon souffle, non. Voilà ma garantie fournisseur."
         }
       ],
       "lose": [
@@ -4003,6 +4071,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Une défaite amicale. J'apprends, je respire, je reviens acheter. Namasté, fournisseur intransigeant."
+        },
+        {
+          "s": "faucon",
+          "t": "Respire tant que tu veux. J'ai sécurisé le contrat, la sortie et la prochaine visite."
         }
       ]
     },
@@ -4050,6 +4122,10 @@ const STORY_BY_CHAR = {
         {
           "s": "safran",
           "t": "Concédé, avec mesure. Tu joues sur tous les tableaux et tu gagnes sur le mien. Habile funambule."
+        },
+        {
+          "s": "gourou",
+          "t": "Le funambule ne regarde pas le vide, Safran. Il respire et accepte volontiers une seconde tasse."
         }
       ],
       "lose": [
@@ -4060,6 +4136,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Ralenti, pas vaincu. Je respire, je repars. La roseraie reverra mon souffle. Namasté."
+        },
+        {
+          "s": "safran",
+          "t": "Revenez. Mes roses ont connu des empires ; elles survivront très bien à votre expiration."
         }
       ]
     },
@@ -4111,6 +4191,10 @@ const STORY_BY_CHAR = {
         {
           "s": "sultan",
           "t": "Grr… ta sérénité m'exaspère plus que ta défense. Un jour, je crierai plus fort que ton silence."
+        },
+        {
+          "s": "gourou",
+          "t": "Essaie. Ton détroit aura perdu sa voix avant que mon souffle ait perdu son rythme."
         }
       ],
       "lose": [
@@ -4121,6 +4205,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Tu gagnes le bruit, pas la crête. Je remonte la montagne. Namasté — on n'y entend plus tes cris."
+        },
+        {
+          "s": "sultan",
+          "t": "Alors j'y bâtirai un péage ! Même ton silence paiera pour redescendre !"
         }
       ]
     },
@@ -4172,6 +4260,10 @@ const STORY_BY_CHAR = {
         {
           "s": "bebe",
           "t": "Grrr ! Il a gagné SANS SAUTER ! C'est de la triche zen ! Je… je refais un défilé, na !"
+        },
+        {
+          "s": "gourou",
+          "t": "Compte tes chars, petit. Moi, je compte mes respirations ; elles sont plus nombreuses et moins bruyantes."
         }
       ],
       "lose": [
@@ -4182,6 +4274,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "L'agité gagne un point, jamais la paix. Je respire, je reviens. Le radar s'éteindra avant mon souffle. Namasté."
+        },
+        {
+          "s": "bebe",
+          "t": "Alors je DÉCRÈTE un radar qui respire ! Projet numéro deux cent huit, statue comprise !"
         }
       ]
     },
@@ -4221,10 +4317,6 @@ const STORY_BY_CHAR = {
           "t": "Alors gelons-nous, sage. Le plus impassible restera. La patience du panda contre l'endurance du gourou."
         },
         {
-          "s": "gourou",
-          "t": "Que la vache passe, que la bombe fume : je ne cille pas. Servons pour le toit du monde."
-        },
-        {
           "s": "narrator",
           "t": "L'aura du Timonier vire au rouge : il ne joue plus, il domine. Renvoyez la bombe, ou l'ashram s'embrase."
         }
@@ -4237,6 +4329,10 @@ const STORY_BY_CHAR = {
         {
           "s": "timonier",
           "t": "Un revers. Sur ton propre grès. Temporaire, forcément. L'harmonie corrigera la trajectoire… un jour, à mon tempo."
+        },
+        {
+          "s": "gourou",
+          "t": "Ton tempo a trouvé plus patient que lui. La crête respire encore, et chaque souffle dit namasté."
         }
       ],
       "lose": [
@@ -4247,6 +4343,10 @@ const STORY_BY_CHAR = {
         {
           "s": "gourou",
           "t": "Tu gagnes un set, pas la montagne. On médite, on respire, on remonte. La crête ne disparaît pas — et moi non plus. Namasté."
+        },
+        {
+          "s": "timonier",
+          "t": "Remonte. Le rempart t'attendra au même endroit, dans la même harmonie, à mon tempo."
         }
       ]
     }
@@ -4808,10 +4908,6 @@ const STORY_BY_CHAR = {
         {
           "s": "capitaine",
           "t": "MA forêt, Cygne ! La MIENNE ! Et si c'est un poumon, alors écoute la suite : depuis le début du tournoi je le répète — le poumon a des poings."
-        },
-        {
-          "s": "cygne",
-          "t": "Belle forêt, d'ailleurs. Ce serait dommage qu'elle brûle."
         },
         {
           "s": "capitaine",
@@ -5443,10 +5539,6 @@ const STORY_BY_CHAR = {
           "t": "Et moi le même dossier sur toi, mesuré au gramme près. Deux hommes convaincus que l'autre prépare la fin du monde. L'un de nous a peut-être raison."
         },
         {
-          "s": "faucon",
-          "t": "Il n'y a pas de peut-être dans la sécurité. Il y a l'action, et le regret. J'ai choisi mon camp il y a quarante ans, sur cette colline."
-        },
-        {
           "s": "safran",
           "t": "Quarante ans à guetter mon ombre… Savez-vous, Faucon, que vous êtes l'homme qui a passé le plus de temps au monde à penser à moi ? Mes roses en seraient jalouses."
         },
@@ -6073,7 +6165,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "safran",
-          "t": "Comme c'est étrange, Faucon. Votre quatrain, je l'écris depuis quarante ans aussi. Il n'a toujours pas de dernier vers. Nous souffrons du même mal : l'autre est notre œuvre inachevée."
+          "t": "Comme c'est étrange, Faucon. Votre quatrain, je l'écris depuis quarante ans aussi. Il n'a toujours pas de dernier vers. Thé froid, roses taillées, Voile d'Or reprisé : l'autre reste notre œuvre inachevée."
         },
         {
           "s": "faucon",

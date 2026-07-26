@@ -63,11 +63,13 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   ],
   win:  [
     { s: "cygne", t: "Vous voyez ? On peut être ferme et courtois. En même temps. C'est toute ma doctrine, résumée en un point gagnant." },
-    { s: "timonier", t: "Un revers mineur. L'harmonie corrigera la trajectoire. Reviens dans mille ans, on recomptera." }
+    { s: "timonier", t: "Un revers mineur. L'harmonie corrigera la trajectoire. Reviens dans mille ans, on recomptera." },
+    { s: "cygne", t: "Je demanderai une commission sur votre calendrier. Elle rendra ses conclusions juste avant." }
   ],
   lose:  [
     { s: "timonier", t: "Trop de mots, pas assez de points. Le silence a gagné, comme d'habitude." },
-    { s: "cygne", t: "Défaite instructive. J'ai beaucoup appris. Et en même temps, je referai exactement pareil au prochain set." }
+    { s: "cygne", t: "Défaite instructive. J'ai beaucoup appris. Et en même temps, je referai exactement pareil au prochain set." },
+    { s: "timonier", t: "Prévisible. L'harmonie apprécie les partenaires qui remplissent eux-mêmes leur fiche." }
   ]
 },
 {
@@ -83,11 +85,13 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   ],
   win:  [
     { s: "cygne", t: "Vous voyez, la sérénité et l'action se rejoignent au sommet. En même temps zen, en même temps efficace." },
-    { s: "gourou", t: "Beau point. On respire, on s'incline, on revient. La montagne, elle, ne s'incline devant personne." }
+    { s: "gourou", t: "Beau point. On respire, on s'incline, on revient. La montagne, elle, ne s'incline devant personne." },
+    { s: "cygne", t: "J'institue donc une commission montagne. Première conclusion : contourner la vache." }
   ],
   lose:  [
     { s: "gourou", t: "Le calme a couru plus longtemps que l'ambition. Namasté, premier de la classe." },
-    { s: "cygne", t: "Défaite. Recentrage. Verticale. Je note tout ça, et en même temps, je repars conquérant." }
+    { s: "cygne", t: "Défaite. Recentrage. Verticale. Je note tout ça, et en même temps, je repars conquérant." },
+    { s: "gourou", t: "Tu as surtout noté la vache. Elle préside déjà ta commission, sans indemnité." }
   ]
 },
 
@@ -106,10 +110,12 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   win:  [
     { s: "cygne", t: "Reconnaissons de la puissance. On reparlera des critères au prochain sommet. En même temps ferme, en même temps ouvert : voilà." },
     { s: "sultan", t: "Tu gagnes le match, pas le détroit. Je reste sur le pas de ta porte. Debout. Immense. Et j'ai la clé." },
+    { s: "cygne", t: "Gardez-la : ma commission vient justement de changer la serrure. C'est une avancée institutionnelle." },
   ],
   lose:  [
     { s: "sultan", t: "La porte a cédé ! Un jour, c'est ton Union qui frappera chez MOI. Et je délibérerai. Longtemps." },
     { s: "cygne", t: "Puissant, indéniablement. Défaite honorable. Nos critères, eux, restent debout. Comme mon obélisque." },
+    { s: "sultan", t: "Ton obélisque attendra au guichet avec les autres. Sur mon détroit, même les symboles paient." },
   ]
 },
 {
@@ -126,10 +132,12 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   win:  [
     { s: "cygne", t: "Vous voyez : la fermeté et la main tendue, en même temps. Reprenons les négociations demain, à froid, autour d'un thé." },
     { s: "safran", t: "Joli point, technocrate. Mais tant que ton allié déchire mes accords, ton thé aura un goût de trahison." },
+    { s: "cygne", t: "Nous créerons un groupe de travail sur l'arrière-goût. La diplomatie commence souvent par une tasse mal lavée." },
   ],
   lose:  [
     { s: "safran", t: "Le Voile d'Or l'a emporté. La lenteur patiente use l'impatience élégante. Reviens quand tu tiendras parole." },
     { s: "cygne", t: "Défaite mesurée pour un adversaire mesuré. Je repars, en même temps déçu et déterminé. Nous rebâtirons cet accord." },
+    { s: "safran", t: "Apportez des briques, cette fois. Vos grandes phrases résistent mal au premier courant d'air." },
   ]
 },
 {
@@ -145,11 +153,13 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   ],
   win:  [
     { s: "cygne", t: "Vous voyez ? On peut être un allié loyal ET une conscience. Le ballon enflammé est reparti. Le dialogue, lui, reste sur la table." },
-    { s: "faucon", t: "Tu as gagné un point, pas un débat. Je reste intransigeant. C'est la seule position qui ne fait pas de morts." }
+    { s: "faucon", t: "Tu as gagné un point, pas un débat. Je reste intransigeant. C'est la seule position qui ne fait pas de morts." },
+    { s: "cygne", t: "Je ferai inscrire votre désaccord au procès-verbal. Il y sera très en sécurité." }
   ],
   lose:  [
     { s: "faucon", t: "Boum. De ton côté. Voilà ce que coûte l'équilibre quand le terrain brûle : une explosion polie." },
-    { s: "cygne", t: "Défaite. Grave. Je maintiens ma ligne : la fermeté et la nuance. Même sous les décombres, je refuse de choisir un seul bout de la corde." }
+    { s: "cygne", t: "Défaite. Grave. Je maintiens ma ligne : la fermeté et la nuance. Même sous les décombres, je refuse de choisir un seul bout de la corde." },
+    { s: "faucon", t: "Garde la corde. Moi, je sécurise les sorties avant ton prochain discours." }
   ]
 },
 
@@ -168,10 +178,12 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   win:  [
     { s: "cygne", t: "Vous voyez : la fermeté commerciale paie mieux que le klaxon. Ma porte reste ouverte. En même temps, mes tarifs restent en place." },
     { s: "dorf", t: "Truqué ! Un allié qui gagne, c'est déjà suspect ! On renégocie l'accord, cher Cygne. Un accord plus grand. Le plus grand." },
+    { s: "cygne", t: "Une commission vérifiera sa taille. Vous fournirez les chiffres, ce qui garantit déjà un résultat immense." },
   ],
   lose:  [
     { s: "dorf", t: "BOUM ! Chez l'élégant ! Même mes meilleurs amis explosent quand je décide de gagner ! Rien de personnel, cher Cygne — enfin, un peu." },
-    { s: "cygne", t: "Une escalade regrettable, entre partenaires. En même temps, je maintiens le canal de discussion — et mes tarifs, eux aussi." }
+    { s: "cygne", t: "Une escalade regrettable, entre partenaires. En même temps, je maintiens le canal de discussion — et mes tarifs, eux aussi." },
+    { s: "dorf", t: "Excellent ! Un canal avec péage, des tarifs, mon nom en or : enfin une diplomatie qui rapporte !" }
   ]
 },
 {
@@ -189,10 +201,12 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   win:  [
     { s: "cygne", t: "Voilà. On peut aimer un peuple et condamner ses feux. En même temps ferme sur l'écologie, en même temps ouvert au partenariat. La forêt vous remercie." },
     { s: "capitaine", t: "Tsss. Tu gagnes un match, pas ma forêt. Reviens quand tu voudras, l'oiseau : mes troncs t'attendent, et mon ara aussi." },
+    { s: "cygne", t: "Je reviendrai avec des experts. L'ara sera entendu : il semble être le seul témoin indépendant." },
   ],
   lose:  [
     { s: "capitaine", t: "BOUM ! En pleine capitale ! Retourne compter tes pigeons, technocrate ! La forêt est à MOI, et elle vient de te le rappeler à l'explosif !" },
-    { s: "cygne", t: "Une défaite qui ne change rien à ma ligne. Je continuerai à défendre le poumon du monde. Même seul. Même en miettes. En même temps déterminé, en même temps inflexible." }
+    { s: "cygne", t: "Une défaite qui ne change rien à ma ligne. Je continuerai à défendre le poumon du monde. Même seul. Même en miettes. En même temps déterminé, en même temps inflexible." },
+    { s: "capitaine", t: "Et moi je défendrai la forêt contre tes commissions. L'ara vient de voter : il ricane contre." }
   ]
 },
 {
@@ -214,7 +228,8 @@ Et lorsque, le soir, les pigeons se rangent enfin sur les corniches de son palai
   ],
   lose:  [
     { s: "volkoi", t: "Boum. Sous ton propre palais. Ton emblème a gelé les ailes ouvertes. Ton « en même temps » a fini en glaçon. Comme prévu." },
-    { s: "cygne", t: "L'hiver a gagné une bataille, pas la partie. Je me relève. Je retends la main, et je retends la corde. Premier de la classe, on ne le reste qu'en recommençant." }
+    { s: "cygne", t: "L'hiver a gagné une bataille, pas la partie. Je me relève. Je retends la main, et je retends la corde. Premier de la classe, on ne le reste qu'en recommençant." },
+    { s: "volkoi", t: "Recommence. J'ai classé ta commission dans la neige : dossier blanc, réponse froide." }
   ]
 }
 ```

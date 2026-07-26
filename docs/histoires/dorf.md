@@ -233,7 +233,6 @@ Au fond — mais il ne l'avouera jamais, et si vous le citez il dira que c'est *
     { s: "narrator", t: "Finale. Country Club Doré : fontaine allumée, palmiers au garde-à-vous, gazon tondu au millimètre par décret. Le Cygne débarque, costume impeccable, facture à la main. Le ballon est une bombe : le camp où elle tombe perd." },
     { s: "cygne", t: "Alors voilà votre palais, Baron. Beaucoup d'or, peu de nuance — et une addition : vous taxez mes vins, mes fromages, mes avions. L'Alliance mérite mieux qu'un péage." },
     { s: "dorf", t: "Cher Cygne ! On s'aime, tout le monde le dit — je le dis. Mais tu me dois de l'argent pour ta défense. Bonne nouvelle : j'ai LE deal. Le Deal du siècle. Celui que j'annonce depuis le premier match." },
-    { s: "cygne", t: "J'écoute. Avec l'enthousiasme prudent de l'homme qui a lu vos clauses cinq." },
     { s: "dorf", t: "Tu gagnes : je te pardonne ta dette. Je gagne : tu me la paies double, et tu m'applaudis. C'est équilibré : dans les deux cas, je suis content." },
     { s: "narrator", t: "Les veines du Cygne pulsent, l'aura rouge irradie jusqu'à la fontaine. Le champion de l'antidopage a des reflets de finale." },
     { s: "cygne", t: "Ceci ? Des vitamines. Parfaitement légales quelque part. Le champion du sport propre se doit de finir la saison en pleine forme — c'est presque une obligation morale." },

@@ -229,7 +229,6 @@ const STORY_TIMONIER = [
       { s: "timonier", t: "La ligne passe où l'harmonie le décide, et l'harmonie, c'est moi. J'ai d'ailleurs apporté un document : bail d'altitude, quatre-vingt-dix-neuf ans, renouvelable. Signe ici." },
       { s: "gourou", t: "La montagne ne signe pas, Timonier. Elle n'a pas de mains — et elle a déjà vu passer dix empires qui avaient des carnets." },
       { s: "timonier", t: "Les dix n'avaient pas mon tempo. Un proverbe dit : la crête appartient à celui qui respire le plus lentement." },
-      { s: "gourou", t: "Ce proverbe est de MOI. Tu me copies jusque dans les sagesses, voisin. Ce soir, je ne médite plus : je brûle." },
       { s: "narrator", t: "L'œil du Gourou s'injecte de rouge — l'ascète a rangé sa douceur. La patience de l'empire contre la fureur du sage, et une mèche entre les deux." },
       { s: "timonier", t: "Brûle. Le feu s'épuise ; le rempart reste. Sers, voisin. Le siècle nous regarde — et il est à moi jusqu'à l'avant-veille de sa fin." }
     ],

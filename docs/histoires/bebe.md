@@ -226,7 +226,6 @@ Physiquement, le Maréchal est un **chibi à très grosse tête**, sanglé dans 
     { s: "narrator", t: "Finale. Esplanade du Défilé, radar au maximum, bannières unies tendues à craquer. Le ballon est une bombe : le camp où elle tombe perd. Une aura rouge enveloppe le Faucon." },
     { s: "faucon", t: "Dossier « Maréchal Bébé » : quatre cent douze médailles, huit essais revendiqués, un arc-en-ciel non homologué. Conclusion du briefing : du bruit." },
     { s: "bebe", t: "Tu… tu as un DOSSIER sur moi ? Un vrai ? Avec mon nom écrit dedans ?" },
-    { s: "faucon", t: "J'ai un dossier sur tout le monde. Le tien est mince." },
     { s: "bebe", t: "MINCE ?! Ajoute ceci : essai numéro neuf, le dernier, le plus grand ! Ce soir, le monde entier me prend au sérieux, ou tout le monde saute !" },
     { s: "faucon", t: "Personne ne saute. Ta Batterie verrouille ton ciel, mon Raid verrouille le tien. Deux hommes qui s'interdisent l'air. Il reste le sol — et une mèche." },
     { s: "bebe", t: "Le sol, c'est du granit ryonganien ! MON granit ! Je suis né sur un arc-en-ciel et je finirai gravé dans la pierre !" },

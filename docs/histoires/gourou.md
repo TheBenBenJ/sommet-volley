@@ -68,11 +68,13 @@ const STORY = [
     ],
     win:  [
       { s: "gourou", t: "Le végétarien tient la distance, vois-tu. Moins lourd sur les jambes. Namasté — et longue vie à ta forêt." },
-      { s: "capitaine", t: "Rrraah ! Battu par un buveur de thé ! Bon… t'as du coffre, l'ascète. On remet ça au barbecue." }
+      { s: "capitaine", t: "Rrraah ! Battu par un buveur de thé ! Bon… t'as du coffre, l'ascète. On remet ça au barbecue." },
+      { s: "gourou", t: "Namasté. Apporte le feu ; j'apporterai le souffle — et la vache choisira le menu." }
     ],
     lose:  [
       { s: "capitaine", t: "HA ! La forêt broie le jardin ! Retourne méditer, le maigre, et ramène-moi du soja !" },
-      { s: "gourou", t: "Bien joué. La force brute a son jour. Mais l'endurance a toutes les saisons. Namasté." }
+      { s: "gourou", t: "Bien joué. La force brute a son jour. Mais l'endurance a toutes les saisons. Namasté." },
+      { s: "capitaine", t: "Garde tes saisons, le sage. Chez moi, on tronçonne à l'aube et on plaisante avant le café." }
     ]
   },
   {
@@ -88,11 +90,13 @@ const STORY = [
     ],
     win:  [
       { s: "gourou", t: "Ton mur brille, mais un mur d'or, ça ne respire pas. Le lac gèle même l'or. Namasté, ami showman." },
-      { s: "dorf", t: "Truqué ! Totalement truqué ! … Mais quelle foule, mon pote. On refait le show, plus grand encore." }
+      { s: "dorf", t: "Truqué ! Totalement truqué ! … Mais quelle foule, mon pote. On refait le show, plus grand encore." },
+      { s: "gourou", t: "Plus grand, peut-être. Plus long, jamais : ton ego manque de souffle avant mon silence." }
     ],
     lose:  [
       { s: "dorf", t: "Gagné ! Le plus grand câlin ET le plus grand match ! Les gens pleuraient, ils pleuraient !" },
-      { s: "gourou", t: "Profite du bruit, Baron. Moi je garde le souffle. Le silence gagne à la fin. Namasté." }
+      { s: "gourou", t: "Profite du bruit, Baron. Moi je garde le souffle. Le silence gagne à la fin. Namasté." },
+      { s: "dorf", t: "Mon silence serait le plus impressionnant du monde. Mais mes admirateurs exigent que je parle !" }
     ]
   },
 
@@ -111,10 +115,12 @@ const STORY = [
     win:  [
       { s: "gourou", t: "En même temps, j'ai gagné. Tes avions volent, ma sérénité aussi. Reste partenaire, Cygne. Namasté." },
       { s: "cygne", t: "Une belle défaite, si tant est qu'une défaite puisse l'être. Reconnaissons-le : de l'endurance. Nous rediscuterons des valeurs." },
+      { s: "gourou", t: "Apporte tes valeurs, Cygne. J'apporterai le thé et assez de souffle pour attendre la fin de ton exposé." },
     ],
     lose:  [
       { s: "cygne", t: "L'équilibre l'emporte. En même temps, félicitez-vous d'avoir tenu si longtemps face au Cygne." },
       { s: "gourou", t: "Un revers courtois. Je le range dans le lac. La montagne, elle, ne bouge pas. Namasté." },
+      { s: "cygne", t: "Je salue ce classement. En même temps, une commission vérifiera que le lac respecte nos valeurs." },
     ]
   },
   {
@@ -131,10 +137,12 @@ const STORY = [
     win:  [
       { s: "gourou", t: "Le calme tient même sous le grès brûlant. Bel échange, Faucon. Continuons nos affaires. Namasté." },
       { s: "faucon", t: "Un revers commercial, sans conséquence stratégique. Je reviendrai vendre, et je reviendrai gagner." },
+      { s: "gourou", t: "Reviens. Les contrats expirent ; mon souffle, non. Voilà ma garantie fournisseur." },
     ],
     lose:  [
       { s: "faucon", t: "Le Raid Éclair gagne, même entre partenaires. Rien de personnel, Gourou : juste ma doctrine." },
       { s: "gourou", t: "Une défaite amicale. J'apprends, je respire, je reviens acheter. Namasté, fournisseur intransigeant." },
+      { s: "faucon", t: "Respire tant que tu veux. J'ai sécurisé le contrat, la sortie et la prochaine visite." },
     ]
   },
   {
@@ -151,10 +159,12 @@ const STORY = [
     win:  [
       { s: "gourou", t: "Ton voile ralentit, mais mon souffle gèle le voile lui-même. Bel échange, Safran. Le port tiendra. Namasté." },
       { s: "safran", t: "Concédé, avec mesure. Tu joues sur tous les tableaux et tu gagnes sur le mien. Habile funambule." },
+      { s: "gourou", t: "Le funambule ne regarde pas le vide, Safran. Il respire et accepte volontiers une seconde tasse." },
     ],
     lose:  [
       { s: "safran", t: "Le Voile d'Or endort même les sages. Repose-toi, Gourou. Le paon, lui, ne cligne pas des yeux." },
       { s: "gourou", t: "Ralenti, pas vaincu. Je respire, je repars. La roseraie reverra mon souffle. Namasté." },
+      { s: "safran", t: "Revenez. Mes roses ont connu des empires ; elles survivront très bien à votre expiration." },
     ]
   },
   // ===================== ACTE III — Conflits ouverts (Bombe) =====================
@@ -173,10 +183,12 @@ const STORY = [
     win:  [
       { s: "gourou", t: "Le pont a tremblé, le lac non. Occupe-toi de ton détroit, Sultan, et laisse ma montagne méditer en paix. Namasté." },
       { s: "sultan", t: "Grr… ta sérénité m'exaspère plus que ta défense. Un jour, je crierai plus fort que ton silence." },
+      { s: "gourou", t: "Essaie. Ton détroit aura perdu sa voix avant que mon souffle ait perdu son rythme." },
     ],
     lose:  [
       { s: "sultan", t: "BOUM ! Sur l'ashram ! Le carrefour du monde a parlé, et le sage s'est tu ! Grandiose !" },
-      { s: "gourou", t: "Tu gagnes le bruit, pas la crête. Je remonte la montagne. Namasté — on n'y entend plus tes cris." }
+      { s: "gourou", t: "Tu gagnes le bruit, pas la crête. Je remonte la montagne. Namasté — on n'y entend plus tes cris." },
+      { s: "sultan", t: "Alors j'y bâtirai un péage ! Même ton silence paiera pour redescendre !" }
     ]
   },
 
@@ -195,10 +207,12 @@ const STORY = [
     win:  [
       { s: "gourou", t: "Tu clous mes sauts, pas mon calme. Un enfant qui hurle finit par s'endormir. Range tes boutons, Maréchal. Namasté." },
       { s: "bebe", t: "Grrr ! Il a gagné SANS SAUTER ! C'est de la triche zen ! Je… je refais un défilé, na !" },
+      { s: "gourou", t: "Compte tes chars, petit. Moi, je compte mes respirations ; elles sont plus nombreuses et moins bruyantes." },
     ],
     lose:  [
       { s: "bebe", t: "BOUM ! HÉ HÉ ! Le grand sage explosé par le petit Maréchal ! Refaites le défilé, doublez les tribunes !" },
-      { s: "gourou", t: "L'agité gagne un point, jamais la paix. Je respire, je reviens. Le radar s'éteindra avant mon souffle. Namasté." }
+      { s: "gourou", t: "L'agité gagne un point, jamais la paix. Je respire, je reviens. Le radar s'éteindra avant mon souffle. Namasté." },
+      { s: "bebe", t: "Alors je DÉCRÈTE un radar qui respire ! Projet numéro deux cent huit, statue comprise !" }
     ]
   },
   {
@@ -211,16 +225,17 @@ const STORY = [
       { s: "timonier", t: "Je contrôle le tempo. Toujours. Deux milliards d'hommes retiennent leur souffle — et moi je respire lentement." },
       { s: "gourou", t: "Respirer, c'est MON métier. Un milliard et demi de témoins m'accompagnent. Ton rempart est un mur ; mon lac gèle les murs." },
       { s: "timonier", t: "Alors gelons-nous, sage. Le plus impassible restera. La patience du panda contre l'endurance du gourou." },
-      { s: "gourou", t: "Que la vache passe, que la bombe fume : je ne cille pas. Servons pour le toit du monde." },
       { s: "narrator", t: "L'aura du Timonier vire au rouge : il ne joue plus, il domine. Renvoyez la bombe, ou l'ashram s'embrase." }
     ],
     win:  [
       { s: "gourou", t: "Le rempart s'énerve, le lac reste lisse. Le calme bat le mur quand le mur veut tout. La crête est méditée : elle est mienne. Namasté, voisin." },
       { s: "timonier", t: "Un revers. Sur ton propre grès. Temporaire, forcément. L'harmonie corrigera la trajectoire… un jour, à mon tempo." },
+      { s: "gourou", t: "Ton tempo a trouvé plus patient que lui. La crête respire encore, et chaque souffle dit namasté." },
     ],
     lose:  [
       { s: "timonier", t: "Le tempo, toujours le tempo. Même chez toi, sous tes soucis, le rempart tient. La patience impériale absorbe la ferveur." },
       { s: "gourou", t: "Tu gagnes un set, pas la montagne. On médite, on respire, on remonte. La crête ne disparaît pas — et moi non plus. Namasté." },
+      { s: "timonier", t: "Remonte. Le rempart t'attendra au même endroit, dans la même harmonie, à mon tempo." },
     ]
   }
 ];

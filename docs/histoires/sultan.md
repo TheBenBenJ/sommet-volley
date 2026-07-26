@@ -232,7 +232,6 @@ const STORY_SULTAN = [
       { s: "sultan", t: "Mes discours font tomber des gouvernements ! Ton Raid Éclair m'interdit de sauter ? Parfait : je ne saute jamais. Je reste. Je frappe le sol. Et le sol me rend la monnaie." },
       { s: "faucon", t: "Reste donc. Cloué. Moi, je frappe vite, sans préavis, et je ne négocie pas. La bombe non plus." },
       { s: "sultan", t: "TOUT se négocie ! J'ai taxé la neige, l'attente et le karma — ce soir, je taxe le destin lui-même : s'il veut passer, il paiera le péage comme les autres !" },
-      { s: "faucon", t: "Le destin ne paie pas, Sultan. Il encaisse. Dossier clos. Sers." },
       { s: "narrator", t: "Deux supers qui clouent l'adversaire au sol, une mèche qui siffle, un pont entre deux mondes. Ne gardez pas la bombe de votre côté." }
     ],
     win:  [

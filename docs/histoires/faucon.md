@@ -233,7 +233,6 @@ const STORY_FAUCON = [
       { s: "safran", t: "Nous voilà donc. Après tant d'années de proxys, de communiqués, de bombes échangées à distance… enfin le filet entre nous. Presque décevant de tomber si près." },
       { s: "faucon", t: "Rien de décevant, Safran. J'ai un dossier sur toi épais comme mes remparts. Chaque ligne dit la même chose : ne jamais te laisser sauter." },
       { s: "safran", t: "Et moi le même dossier sur toi, mesuré au gramme près. Deux hommes convaincus que l'autre prépare la fin du monde. L'un de nous a peut-être raison." },
-      { s: "faucon", t: "Il n'y a pas de peut-être dans la sécurité. Il y a l'action, et le regret. J'ai choisi mon camp il y a quarante ans, sur cette colline." },
       { s: "safran", t: "Quarante ans à guetter mon ombre… Savez-vous, Faucon, que vous êtes l'homme qui a passé le plus de temps au monde à penser à moi ? Mes roses en seraient jalouses." },
       { s: "faucon", t: "La dernière page de ton dossier est blanche, Safran. Quarante ans, et je n'ai jamais su écrire ta fin. On la joue ce soir." },
       { s: "narrator", t: "La mèche brûle sous les vieux dômes et les tours de verre. Deux auras rouges au-dessus des remparts. Pas de deuxième chance : le camp où la bombe retombe saute avec sa forteresse." }

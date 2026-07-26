@@ -220,7 +220,7 @@ Car c'est là, au fond, tout Le Safran : un joueur qui a compris que dans un mon
     { s: "faucon", t: "Je te surveille depuis toujours, Safran. Tes alambics, tes proxys, tes ombres. J'ai un dossier sur toi épais comme mes remparts." },
     { s: "safran", t: "Et moi le même sur vous, mesuré au gramme près. Deux hommes convaincus que l'autre prépare la fin du monde. L'un de nous a peut-être raison." },
     { s: "faucon", t: "Il n'y a pas de peut-être dans la sécurité. Il y a l'action, et le regret. Quarante ans que j'écris ta fin — et la page reste blanche." },
-    { s: "safran", t: "Comme c'est étrange, Faucon. Votre quatrain, je l'écris depuis quarante ans aussi. Il n'a toujours pas de dernier vers. Nous souffrons du même mal : l'autre est notre œuvre inachevée." },
+    { s: "safran", t: "Comme c'est étrange, Faucon. Votre quatrain, je l'écris depuis quarante ans aussi. Il n'a toujours pas de dernier vers. Thé froid, roses taillées, Voile d'Or reprisé : l'autre reste notre œuvre inachevée." },
     { s: "faucon", t: "Assez de poésie du plateau. Raid Éclair : tu ne sauteras plus. La citadelle jugera." },
     { s: "narrator", t: "Deux auras rouges au-dessus des remparts : le vieux conflit les dope tous les deux. La patience affronte enfin la vitesse — et la mèche n'attendra ni l'une ni l'autre." }
   ],
