@@ -41,9 +41,10 @@ store partagé. API :
 
 - `POST /queue { mode, region? }` → renvoie soit `{ role:"host", ticket }` (tu
   attends), soit `{ role:"guest", hostPeerId }` (connecte-toi tout de suite).
-- Logique : file d'attente par `mode` (1v1 / 2v2 / bombe). Deux joueurs en
-  attente → le 1er devient **host** (on lui a demandé son peerId à l'entrée en
-  file), le 2e reçoit ce peerId comme **guest**.
+- Logique : file d'attente par `mode` (**classic / bomb / flame**, **1v1
+  uniquement** en v1). Deux joueurs en attente → le 1er devient **host**
+  (code 5 lettres), le 2e le reçoit comme **guest**. Le 2v2 reste via
+  Créer / Rejoindre (code), hors matchmaker.
 - Nettoyage : timeout des tickets abandonnés (heartbeat WebSocket).
 - Peut tourner **sur le même serveur que le jeu** (beast / OVH) : un process
   Node derrière nginx, `wss://…/mm`. Coût quasi nul.
@@ -68,12 +69,10 @@ coincé**. Flux « Partie rapide » :
 Effet : l'online est **toujours** jouable, même à 3 joueurs connectés dans le
 monde. C'est ce qui distingue un online « vivant » d'un online « désert ».
 
-## Lobby / navigateur de parties (bonus, phase 2)
+## Lobby / navigateur de parties (bonus, ultérieur)
 
-Au-delà du quickplay : une liste de parties ouvertes (mode, région, ping,
-1/2 joueurs) avec bouton Rejoindre. Utile pour le 2v2 et les parties entre amis
-publiques. Réutilise le matchmaker (endpoint `GET /rooms`). Non prioritaire vs
-le quickplay + bots.
+Au-delà du quickplay : liste de parties ouvertes + 2v2 en file. Non livré en
+v1 — le 2v2 online passe par code d'ami.
 
 ## Implémentation (livré)
 

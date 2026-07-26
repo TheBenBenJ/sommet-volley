@@ -1,9 +1,35 @@
 // sommet-volley · particules & marqueur de balle hors-écran
 "use strict";
 
+/** Densité particules selon confort (reduceMotion / juiceLite). */
+function fxParticleMul() {
+  if (typeof reduceMotion !== "undefined" && reduceMotion) return 0.22;
+  if (typeof juiceLite !== "undefined" && juiceLite) return 0.45;
+  return 1;
+}
+function fxCount(n) {
+  return Math.max(0, Math.round(n * fxParticleMul()));
+}
+/** Multiplicateur shake / zoom caméra au rendu. */
+function fxShakeMul() {
+  if (typeof reduceMotion !== "undefined" && reduceMotion) return 0.12;
+  if (typeof juiceLite !== "undefined" && juiceLite) return 0.55;
+  return 1;
+}
+function fxAllowFlash() {
+  if (typeof flashSafe !== "undefined" && flashSafe) return false;
+  if (typeof reduceMotion !== "undefined" && reduceMotion) return false;
+  return true;
+}
+function fxAllowCamPunch() {
+  return !(typeof reduceMotion !== "undefined" && reduceMotion);
+}
+
 // ---------- Particules (plumes, sable) ----------
 function spawnSand(x, y, n) {
   if (noFx) return;
+  n = fxCount(n);
+  if (n <= 0) return;
   const tkey = TERRAINS[terrain].key;
   const col = tkey === "place-ecarlate" ? "#eef4fa" : tkey === "palais-gallard" ? "#8fbf4a"
             : "#c9a24f";
@@ -19,7 +45,9 @@ function spawnSand(x, y, n) {
 // petit nuage blanc sous les pieds lors d'un double saut
 function spawnAirPuff(x, y) {
   if (noFx) return;
-  for (let i = 0; i < 6; i++) particles.push({
+  const n = fxCount(6);
+  if (n <= 0) return;
+  for (let i = 0; i < n; i++) particles.push({
     type: "sand",
     x: x + (Math.random() - 0.5) * 20, y: y + Math.random() * 6,
     vx: (Math.random() - 0.5) * 2.5, vy: 0.5 + Math.random() * 1.5,
@@ -31,8 +59,10 @@ function spawnAirPuff(x, y) {
 // explosion au sol d'un smash destructeur
 function spawnBoom(x, y) {
   if (noFx) return;
+  const n = fxCount(26);
+  if (n <= 0) return;
   const cols = ["#ff9800", "#ff5722", "#ffcc00", "#fff3c4"];
-  for (let i = 0; i < 26; i++) particles.push({
+  for (let i = 0; i < n; i++) particles.push({
     type: "sand",
     x: x + (Math.random() - 0.5) * 10, y: y - Math.random() * 6,
     vx: (Math.random() - 0.5) * 9, vy: -Math.random() * 6 - 1,
@@ -44,9 +74,11 @@ function spawnBoom(x, y) {
 // gerbe d'étoiles à l'activation d'un SUPER
 function spawnSuperBurst(blob) {
   if (noFx) return;
+  const n = fxCount(22);
+  if (n <= 0) return;
   const cols = ["#ffe14d", "#ffffff", "#ffa23e", blob.color];
-  for (let i = 0; i < 22; i++) {
-    const ang = (i / 22) * Math.PI * 2;
+  for (let i = 0; i < n; i++) {
+    const ang = (i / n) * Math.PI * 2;
     const sp = 3 + Math.random() * 4;
     particles.push({
       type: "star",
@@ -63,6 +95,8 @@ function spawnSuperBurst(blob) {
 const CONFETTI_COLS = ["#ff5b5b", "#ffd93d", "#4db3ff", "#7ed957", "#ff6fae", "#c07bff", "#ffffff"];
 function spawnConfetti(n, cx) {
   if (noFx) return;
+  n = fxCount(n);
+  if (n <= 0) return;
   for (let i = 0; i < n; i++) particles.push({
     type: "confetti",
     x: cx !== undefined ? cx + (Math.random() - 0.5) * 220 : Math.random() * W,

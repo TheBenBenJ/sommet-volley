@@ -4,9 +4,160 @@
 // ---------- Entrées clavier ----------
 const keys = {};
 let xSeq = "";
+
+/** Actions rebindables (joueur 1 / solo / online). J2 local = flèches (fixe). */
+const KEYBIND_ACTIONS = ["left", "right", "jump", "smash", "super"];
+const KEYBIND_LABELS = {
+  left: "Gauche", right: "Droite", jump: "Sauter / servir",
+  smash: "Frappe", super: "Super"
+};
+const KEYBIND_DEFAULTS = {
+  p1: { left: "KeyA", right: "KeyD", jump: "KeyW", smash: "KeyF", super: "KeyE" },
+  p2: { left: "ArrowLeft", right: "ArrowRight", jump: "ArrowUp", smash: "ArrowDown", super: "ShiftRight" }
+};
+let keybinds = {
+  p1: Object.assign({}, KEYBIND_DEFAULTS.p1),
+  p2: Object.assign({}, KEYBIND_DEFAULTS.p2)
+};
+/** null | { player: "p1"|"p2", action: string } — écoute la prochaine touche. */
+let rebindWait = null;
+
+const KEYBIND_BLOCKED = new Set([
+  "Escape", "Tab", "MetaLeft", "MetaRight", "ControlLeft", "ControlRight",
+  "AltLeft", "AltRight", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8",
+  "F9", "F10", "F11", "F12", "ContextMenu", "CapsLock", "NumLock", "ScrollLock"
+]);
+
+function formatKeyCode(code) {
+  if (!code) return "?";
+  if (code === "Space") return "Espace";
+  if (code === "ArrowLeft") return "←";
+  if (code === "ArrowRight") return "→";
+  if (code === "ArrowUp") return "↑";
+  if (code === "ArrowDown") return "↓";
+  if (code === "ShiftRight") return "Shift D";
+  if (code === "ShiftLeft") return "Shift G";
+  if (code === "Slash") return "/";
+  if (code === "Semicolon") return ";";
+  if (code === "Backquote") return "`";
+  if (code.startsWith("Key") && code.length === 4) return code.slice(3);
+  if (code.startsWith("Digit")) return code.slice(5);
+  return code;
+}
+
+function keybindsAllCodes() {
+  const out = [];
+  for (const p of ["p1", "p2"]) {
+    for (const a of KEYBIND_ACTIONS) {
+      const c = keybinds[p] && keybinds[p][a];
+      if (c) out.push(c);
+    }
+  }
+  // alias historique : Espace sert aussi au saut J1 si libre
+  out.push("Space", "Enter", "Slash");
+  return out;
+}
+
+function keyHeldPlayer(player, action) {
+  const code = keybinds[player] && keybinds[player][action];
+  if (code && keys[code]) return true;
+  // Alias confort : Espace → saut J1, Slash → frappe J2 (si non réassignés ailleurs)
+  if (player === "p1" && action === "jump" && keys["Space"]) {
+    return !KEYBIND_ACTIONS.some(a => a !== "jump" && keybinds.p1[a] === "Space");
+  }
+  if (player === "p2" && action === "smash" && keys["Slash"]) {
+    return !KEYBIND_ACTIONS.some(a => a !== "smash" && keybinds.p2[a] === "Slash");
+  }
+  return false;
+}
+
+function keyHeldOnline(action) {
+  return keyHeldPlayer("p1", action) || keyHeldPlayer("p2", action);
+}
+
+function keybindBusy() {
+  return !!rebindWait;
+}
+
+function startRebind(player, action) {
+  if (!KEYBIND_ACTIONS.includes(action)) return;
+  if (player !== "p1" && player !== "p2") return;
+  rebindWait = { player, action };
+  if (typeof beep === "function") beep(640, 0.05, "square", 0.07);
+}
+
+function cancelRebind() {
+  rebindWait = null;
+}
+
+function resetKeybinds() {
+  keybinds = {
+    p1: Object.assign({}, KEYBIND_DEFAULTS.p1),
+    p2: Object.assign({}, KEYBIND_DEFAULTS.p2)
+  };
+  rebindWait = null;
+  if (typeof saveSettings === "function") saveSettings();
+  if (typeof beep === "function") beep(480, 0.06, "square", 0.07);
+}
+
+function applyKeybinds(data) {
+  if (!data || typeof data !== "object") return;
+  for (const p of ["p1", "p2"]) {
+    if (!data[p] || typeof data[p] !== "object") continue;
+    for (const a of KEYBIND_ACTIONS) {
+      const c = data[p][a];
+      if (typeof c === "string" && c.length > 0 && !KEYBIND_BLOCKED.has(c)) {
+        keybinds[p][a] = c;
+      }
+    }
+  }
+}
+
+function serializeKeybinds() {
+  return {
+    p1: Object.assign({}, keybinds.p1),
+    p2: Object.assign({}, keybinds.p2)
+  };
+}
+
+/** Applique une touche capturée ; échange si conflit sur le même joueur. */
+function tryApplyRebind(code) {
+  if (!rebindWait) return false;
+  if (KEYBIND_BLOCKED.has(code)) {
+    if (typeof beep === "function") beep(220, 0.08, "square", 0.08);
+    return true;
+  }
+  const { player, action } = rebindWait;
+  const prev = keybinds[player][action];
+  for (const a of KEYBIND_ACTIONS) {
+    if (a !== action && keybinds[player][a] === code) {
+      keybinds[player][a] = prev;
+      break;
+    }
+  }
+  keybinds[player][action] = code;
+  rebindWait = null;
+  if (typeof saveSettings === "function") saveSettings();
+  if (typeof beep === "function") beep(720, 0.06, "square", 0.08);
+  return true;
+}
+
 window.addEventListener("keydown", e => {
   keys[e.code] = true;
-  if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space","KeyW","KeyA","KeyS","KeyD","KeyE","KeyF","Slash","ShiftRight"].includes(e.code)) e.preventDefault();
+  if (keybindsAllCodes().includes(e.code) ||
+      ["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code)) {
+    e.preventDefault();
+  }
+  if (rebindWait) {
+    e.preventDefault();
+    if (e.code === "Escape") {
+      cancelRebind();
+      if (typeof beep === "function") beep(320, 0.05, "square", 0.06);
+      return;
+    }
+    tryApplyRebind(e.code);
+    return;
+  }
   const ch = (e.key || "").toLowerCase();
   if (ch.length === 1) { xSeq = (xSeq + ch).slice(-4); if (xSeq === "rler" && typeof xToggleLocal === "function") xToggleLocal(); }
   // Toggle Gameplay V2 (touche `) — hors saisie de code en ligne
@@ -53,11 +204,11 @@ if (typeof canvas.addEventListener === "function") { // absent en environnement 
     const tc = document.getElementById("touchControls");
     function touchKeySet() {
       if (online) {
-        if (mySlot === 0) return { left: "KeyA", right: "KeyD", jump: "KeyW", smash: "KeyF", super: "KeyE" };
-        if (mySlot === 1) return { left: "ArrowLeft", right: "ArrowRight", jump: "ArrowUp", smash: "KeyF", super: "ShiftRight" };
+        if (mySlot === 0) return Object.assign({}, keybinds.p1);
+        if (mySlot === 1) return Object.assign({}, keybinds.p2);
         return null; // 2v2 en ligne (slots 2/3) : pas pris en charge au tactile
       }
-      if (vsAI || mode === "2v2") return { left: "KeyA", right: "KeyD", jump: "KeyW", smash: "KeyF", super: "KeyE" };
+      if (vsAI || mode === "2v2") return Object.assign({}, keybinds.p1);
       return null; // 2 joueurs locaux sur le même appareil : peu pertinent au tactile
     }
     function bindTouchBtn(sel, field) {
@@ -185,7 +336,8 @@ function padForSide(side) {
 // manette, et tactile (qui pilote déjà KeyW/ArrowUp via les mêmes touches,
 // voir touchKeySet plus haut).
 function pointAdvanceRequested() {
-  if (keys["Space"] || keys["Enter"] || keys["KeyW"] || keys["ArrowUp"]) return true;
+  if (keys["Space"] || keys["Enter"]) return true;
+  if (keyHeldPlayer("p1", "jump") || keyHeldPlayer("p2", "jump")) return true;
   for (const p of padsNow) if (p.jump) return true;
   return false;
 }
@@ -196,7 +348,9 @@ function navOptions() {
     case "menu":          return tutorialInviteOpen
       ? ["TutPlay", "TutLater", "TutNever"]
       : ["Digit1", "Digit2", "KeyT", "KeyO", "KeyH", "KeyR", "KeyC"];
-    case "options":       return ["OptMute", "OptMusic", "OptQuiet", "OptBack"];
+    case "options":       return ["OptMute", "OptMusic", "OptQuiet", "OptBinds", "OptComfort", "OptBack"];
+    case "optionsBinds":  return KEYBIND_ACTIONS.map(a => "Bind_p1_" + a).concat(["OptResetBinds", "OptBindsBack"]);
+    case "optionsComfort": return ["OptMotion", "OptFlash", "OptJuice", "OptComfortBack"];
     case "soloMenu":      return ["Digit1", "Digit2", "Digit3"];
     case "multiMenu":     return ["Digit1", "Digit2"];
     case "tournamentBracket": return ["TourPlay", "TourBack"];

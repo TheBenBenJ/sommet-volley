@@ -104,8 +104,75 @@ function handleMenuKeys(code, key) {
       beep(mapEventsQuiet ? 360 : 520, 0.06, "square", 0.08);
       return;
     }
+    if (code === "OptBinds") {
+      state = "optionsBinds";
+      navIdx = 0;
+      if (typeof cancelRebind === "function") cancelRebind();
+      return;
+    }
+    if (code === "OptComfort") {
+      state = "optionsComfort";
+      navIdx = 0;
+      return;
+    }
     if (code === "Escape" || code === "OptBack" || code === "Enter" || code === "Space") {
       leaveOptions();
+      return;
+    }
+
+  } else if (state === "optionsComfort") {
+    if (code === "OptMotion") {
+      reduceMotion = !reduceMotion;
+      saveSettings();
+      beep(reduceMotion ? 360 : 520, 0.06, "square", 0.08);
+      return;
+    }
+    if (code === "OptFlash") {
+      flashSafe = !flashSafe;
+      saveSettings();
+      beep(flashSafe ? 360 : 520, 0.06, "square", 0.08);
+      return;
+    }
+    if (code === "OptJuice") {
+      juiceLite = !juiceLite;
+      saveSettings();
+      beep(juiceLite ? 360 : 520, 0.06, "square", 0.08);
+      return;
+    }
+    if (code === "Escape" || code === "OptComfortBack" || code === "Enter" || code === "Space") {
+      state = "options";
+      navIdx = 0;
+      return;
+    }
+
+  } else if (state === "optionsBinds") {
+    if (code === "OptResetBinds") {
+      if (typeof resetKeybinds === "function") resetKeybinds();
+      return;
+    }
+    if (code === "Escape" || code === "OptBindsBack") {
+      if (typeof cancelRebind === "function") cancelRebind();
+      state = "options";
+      navIdx = 0;
+      return;
+    }
+    if (typeof code === "string" && code.startsWith("Bind_")) {
+      const parts = code.split("_"); // Bind_p1_jump
+      if (parts.length === 3 && typeof startRebind === "function") {
+        startRebind(parts[1], parts[2]);
+      }
+      return;
+    }
+    // Enter / Espace : valider la ligne surlignée (manette ou nav clavier)
+    if (code === "Enter" || code === "Space") {
+      const opts = typeof navOptions === "function" ? navOptions() : null;
+      if (opts && opts[navIdx] != null && opts[navIdx] !== "OptBindsBack") {
+        handleMenuKeys(opts[navIdx], "");
+      } else {
+        if (typeof cancelRebind === "function") cancelRebind();
+        state = "options";
+        navIdx = 0;
+      }
       return;
     }
 
@@ -1125,7 +1192,7 @@ function drawOptions() {
   menuScreenBase({
     title: "Options",
     kicker: optionsFromPause ? "Pause · réglages" : "Préférences",
-    subtitle: "Son, musique, terrain calme"
+    subtitle: "Son, contrôles, confort"
   });
   const mx = UI.mx;
   drawVolumeControl(W - UI.mx, 200);
@@ -1134,14 +1201,16 @@ function drawOptions() {
   const rows = [
     { code: "OptMute", label: muted ? "Son : coupé" : "Son : activé" },
     { code: "OptMusic", label: musicOn ? "Musique : activée" : "Musique : coupée" },
-    { code: "OptQuiet", label: "Terrain calme : " + (mapEventsQuiet ? "ON" : "OFF") }
+    { code: "OptQuiet", label: "Terrain calme : " + (mapEventsQuiet ? "ON" : "OFF") },
+    { code: "OptBinds", label: "Contrôles clavier…" },
+    { code: "OptComfort", label: "Confort & accessibilité…" }
   ];
   rows.forEach((r, i) => {
-    const y = 270 + i * 44;
+    const y = 262 + i * 36;
     const sel = (padConnected && navIdx === i) || isHover(r.code);
-    hit(mx + 200, y, 400, 36, r.code);
+    hit(mx + 200, y, 400, 34, r.code);
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(mx - 4, y - 22, 420, 36, 12); else ctx.rect(mx - 4, y - 22, 420, 36);
+    if (ctx.roundRect) ctx.roundRect(mx - 4, y - 20, 420, 34, 12); else ctx.rect(mx - 4, y - 20, 420, 34);
     ctx.fillStyle = sel ? "rgba(255,216,74,0.95)" : "rgba(255,246,232,0.92)";
     ctx.fill();
     ctx.strokeStyle = UI.stroke;
@@ -1149,15 +1218,103 @@ function drawOptions() {
     ctx.stroke();
     ctx.textAlign = "left";
     ctx.fillStyle = UI.stroke;
-    ctx.font = "700 16px " + UI.sans;
+    ctx.font = "700 15px " + UI.sans;
     ctx.fillText(r.label, mx + 14, y + 2);
   });
 
   const wins = (typeof meta !== "undefined" && meta) ? (meta.tournamentWins | 0) : 0;
   const skin = BALL_SKINS[ballSkin] || BALL_SKINS[0];
   uiLabel("Tournoi · " + wins + " couronne" + (wins !== 1 ? "s" : "") +
-    "  ·  Ballon : " + (skin ? skin.name : "Cartoon"), mx, 420, 12, UI.muted, 0.3);
+    "  ·  Ballon : " + (skin ? skin.name : "Cartoon"), mx, 448, 11, UI.muted, 0.3);
   hit(mx + 70, H - 28, 160, 28, "OptBack");
+}
+
+function drawOptionsComfort() {
+  menuScreenBase({
+    title: "Confort",
+    kicker: "Accessibilité",
+    subtitle: "Mouvements, flashs, densité des effets"
+  });
+  const mx = UI.mx;
+  const rows = [
+    { code: "OptMotion", label: "Réduire les mouvements : " + (reduceMotion ? "ON" : "OFF") },
+    { code: "OptFlash", label: "Anti-flash : " + (flashSafe ? "ON" : "OFF") },
+    { code: "OptJuice", label: "Effets : " + (juiceLite ? "légers" : "complets") }
+  ];
+  rows.forEach((r, i) => {
+    const y = 230 + i * 48;
+    const sel = (padConnected && navIdx === i) || isHover(r.code);
+    hit(mx + 200, y, 400, 40, r.code);
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(mx - 4, y - 22, 420, 40, 12); else ctx.rect(mx - 4, y - 22, 420, 40);
+    ctx.fillStyle = sel ? "rgba(255,216,74,0.95)" : "rgba(255,246,232,0.92)";
+    ctx.fill();
+    ctx.strokeStyle = UI.stroke;
+    ctx.lineWidth = sel ? 3 : 2;
+    ctx.stroke();
+    ctx.textAlign = "left";
+    ctx.fillStyle = UI.stroke;
+    ctx.font = "700 15px " + UI.sans;
+    ctx.fillText(r.label, mx + 14, y + 3);
+  });
+  uiLabel("Réduire mouvements = moins de shake / zoom / slow-mo", mx, 400, 12, UI.muted, 0.35);
+  uiLabel("Anti-flash = pas d’éclair bombe ni clignotements agressifs", mx, 420, 12, UI.muted, 0.35);
+  hit(mx + 70, H - 28, 160, 28, "OptComfortBack");
+}
+
+function drawOptionsBinds() {
+  menuScreenBase({
+    title: "Contrôles",
+    kicker: "Clavier · Joueur 1",
+    subtitle: rebindWait
+      ? "Appuie sur une touche… (Échap pour annuler)"
+      : "Clique une action, puis la nouvelle touche · J2 = flèches"
+  });
+  const mx = UI.mx;
+  const actions = typeof KEYBIND_ACTIONS !== "undefined" ? KEYBIND_ACTIONS : [];
+  actions.forEach((action, i) => {
+    const code = "Bind_p1_" + action;
+    const y = 210 + i * 38;
+    const waiting = rebindWait && rebindWait.player === "p1" && rebindWait.action === action;
+    const sel = waiting || (padConnected && navIdx === i) || isHover(code);
+    hit(mx + 200, y, 400, 32, code);
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(mx - 4, y - 18, 420, 32, 10); else ctx.rect(mx - 4, y - 18, 420, 32);
+    ctx.fillStyle = waiting ? "rgba(255,180,80,0.95)" : (sel ? "rgba(255,216,74,0.95)" : "rgba(255,246,232,0.92)");
+    ctx.fill();
+    ctx.strokeStyle = UI.stroke;
+    ctx.lineWidth = sel || waiting ? 3 : 2;
+    ctx.stroke();
+    const label = (KEYBIND_LABELS && KEYBIND_LABELS[action]) || action;
+    const keyLabel = waiting
+      ? "…"
+      : formatKeyCode(keybinds.p1[action]);
+    ctx.textAlign = "left";
+    ctx.fillStyle = UI.stroke;
+    ctx.font = "700 14px " + UI.sans;
+    ctx.fillText(label, mx + 14, y + 3);
+    ctx.textAlign = "right";
+    ctx.font = "800 14px " + UI.mono;
+    ctx.fillText(keyLabel, mx + 400, y + 3);
+  });
+
+  const resetY = 210 + actions.length * 38 + 10;
+  const resetSel = (padConnected && navIdx === actions.length) || isHover("OptResetBinds");
+  hit(mx + 200, resetY, 400, 30, "OptResetBinds");
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(mx - 4, resetY - 16, 420, 30, 10); else ctx.rect(mx - 4, resetY - 16, 420, 30);
+  ctx.fillStyle = resetSel ? "rgba(255,216,74,0.95)" : "rgba(255,246,232,0.88)";
+  ctx.fill();
+  ctx.strokeStyle = UI.stroke;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.textAlign = "left";
+  ctx.fillStyle = UI.stroke;
+  ctx.font = "700 13px " + UI.sans;
+  ctx.fillText("Réinitialiser (défaut A D W F E)", mx + 14, resetY + 2);
+
+  uiLabel("Espace reste un alias de saut · Slash = frappe J2", mx, H - 48, 11, UI.muted, 0.35);
+  hit(mx + 70, H - 28, 160, 28, "OptBindsBack");
 }
 
 function drawPauseMenu() {
@@ -1247,12 +1404,13 @@ function controlsHintColor() { return (padConnected || hasTouch) ? "#7ed957" : U
 // Solo / en ligne : après le mode de jeu, toujours "1v1 ou équipes".
 // Multijoueur local : pas d'étape équipes (1v1 seulement).
 function wizardTotal() {
-  const hasTeamChoice = pendingMode.vsAI || pendingMode.online;
+  // Partie rapide = 1v1 forcé (pas d'étape équipes)
+  const hasTeamChoice = (pendingMode.vsAI || pendingMode.online) && !pendingMode.quickplay;
   return (pendingMode.vsAI ? 1 : 0)                                  /* Difficulté (solo uniquement) */
        + 1                                                            /* Mode de jeu */
        + (hasTeamChoice ? 1 : 0)                                      /* 1v1 ou équipes (2v2) */
        + (pendingMode.bomb ? 1 : 0)                                   /* Durée de mèche */
-       + 2;                                                            /* Personnage + Terrain */
+       + (pendingMode.quickplay ? 0 : 2);                              /* Perso+terrain (sauf QP) */
 }
 function wizardStep(idx, label) { return "Étape " + idx + "/" + wizardTotal() + " · " + label; }
 
@@ -1285,7 +1443,9 @@ function drawGameModeSelect() {
   ];
   drawOptionList(items, 236, 44);
 
-  if (teamChoice) {
+  if (pendingMode && pendingMode.quickplay) {
+    uiLabel("Partie rapide : 1v1 uniquement · recherche d’adversaire (bot si besoin)", UI.mx, 376, 11, UI.muted, 1);
+  } else if (teamChoice) {
     uiLabel("Ensuite : 1v1 ou en équipes (2v2) pour chaque mode", UI.mx, 376, 11, UI.muted, 1);
   } else if (padConnected) {
     // clavier VS manette (1v1 local uniquement)
@@ -1366,24 +1526,23 @@ function tutorialLiveInput() {
   if (dev === "touch") {
     // Les boutons tactiles écrivent déjà dans keys{}
     return {
-      left: !!keys["KeyA"], right: !!keys["KeyD"],
+      left: keyHeldPlayer("p1", "left"), right: keyHeldPlayer("p1", "right"),
       up: false, down: false, ax: 0, ay: 0,
-      smash: !!keys["KeyF"],
-      jump: !!(keys["KeyW"] || keys["Space"] || keys["ArrowUp"]),
-      super: !!keys["KeyE"]
+      smash: keyHeldPlayer("p1", "smash"),
+      jump: keyHeldPlayer("p1", "jump"),
+      super: keyHeldPlayer("p1", "super")
     };
   }
   // Clavier : visée démo = stick fictif neutre (géométrie en match)
   const leftSide = tutorialSide === 0;
+  const p = leftSide ? "p1" : "p2";
   return {
-    left:  leftSide ? !!keys["KeyA"] : !!keys["ArrowLeft"],
-    right: leftSide ? !!keys["KeyD"] : !!keys["ArrowRight"],
+    left:  keyHeldPlayer(p, "left"),
+    right: keyHeldPlayer(p, "right"),
     up: false, down: false, ax: 0, ay: 0,
-    smash: leftSide
-      ? !!keys["KeyF"]
-      : !!(keys["ArrowDown"] || keys["Slash"]),
-    jump:  leftSide ? !!(keys["KeyW"] || keys["Space"] || keys["ArrowUp"]) : !!keys["ArrowUp"],
-    super: leftSide ? !!keys["KeyE"] : !!keys["ShiftRight"]
+    smash: keyHeldPlayer(p, "smash"),
+    jump:  keyHeldPlayer(p, "jump"),
+    super: keyHeldPlayer(p, "super")
   };
 }
 

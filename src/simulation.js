@@ -269,32 +269,33 @@ function localInputs(side) {
   // comportement historique : manette n° i → joueur i (l'humain est en 0).
   const twoHumans = !vsAI && !online && mode === "1v1";
   const pad = twoHumans ? padForSide(side) : padGameInput(side);
-  // Clavier : Q/D · Z/Espace · F (action) · E — visée géométrique (pas souris).
+  // Clavier : binds J1 (gauche) / J2 (droite) — voir Options → Contrôles.
   // Manette : inchangée (stick = visée, X/Y = frappe).
-  // ↑ réservé au joueur droit en 1v1 local 2 humains.
-  const kbdL = !!(keys["KeyA"] || keys["KeyD"] || keys["KeyW"] || keys["Space"] ||
-    keys["KeyF"] || keys["KeyE"] || (!twoHumans && keys["ArrowUp"]));
-  const kbdR = !!(keys["ArrowLeft"] || keys["ArrowRight"] || keys["ArrowUp"] ||
-    keys["ArrowDown"] || keys["Slash"] || keys["ShiftRight"]);
+  // En solo / 2v2 : ↑ J2 peut aussi sauter (confort 1 clavier).
+  const jl = keyHeldPlayer("p1", "jump") || (!twoHumans && keyHeldPlayer("p2", "jump"));
+  const kbdL = keyHeldPlayer("p1", "left") || keyHeldPlayer("p1", "right") ||
+    jl || keyHeldPlayer("p1", "smash") || keyHeldPlayer("p1", "super");
+  const kbdR = keyHeldPlayer("p2", "left") || keyHeldPlayer("p2", "right") ||
+    keyHeldPlayer("p2", "jump") || keyHeldPlayer("p2", "smash") || keyHeldPlayer("p2", "super");
   // Clavier actif sur ce côté → ignore stick (dérive manette branchée).
   const raw = side === 0 ? {
-    left:  !!keys["KeyA"] || pad.left,
-    right: !!keys["KeyD"] || pad.right,
-    jump:  !!(keys["KeyW"] || keys["Space"] || (!twoHumans && keys["ArrowUp"])) || pad.jump,
-    kbdJump: !!(keys["KeyW"] || keys["Space"] || (!twoHumans && keys["ArrowUp"])),
-    smash: !!keys["KeyF"] || !!pad.smash,
-    super: !!keys["KeyE"] || pad.super,
+    left:  keyHeldPlayer("p1", "left") || pad.left,
+    right: keyHeldPlayer("p1", "right") || pad.right,
+    jump:  jl || pad.jump,
+    kbdJump: jl,
+    smash: keyHeldPlayer("p1", "smash") || !!pad.smash,
+    super: keyHeldPlayer("p1", "super") || pad.super,
     up:    kbdL ? false : !!pad.up,
     down:  kbdL ? false : !!pad.down,
     ax:    kbdL ? 0 : (pad.ax || 0),
     ay:    kbdL ? 0 : (pad.ay || 0)
   } : {
-    left:  !!keys["ArrowLeft"] || pad.left,
-    right: !!keys["ArrowRight"] || pad.right,
-    jump:  !!keys["ArrowUp"] || pad.jump,
-    kbdJump: !!keys["ArrowUp"],
-    smash: !!(keys["ArrowDown"] || keys["Slash"]) || !!pad.smash,
-    super: !!keys["ShiftRight"] || pad.super,
+    left:  keyHeldPlayer("p2", "left") || pad.left,
+    right: keyHeldPlayer("p2", "right") || pad.right,
+    jump:  keyHeldPlayer("p2", "jump") || pad.jump,
+    kbdJump: keyHeldPlayer("p2", "jump"),
+    smash: keyHeldPlayer("p2", "smash") || !!pad.smash,
+    super: keyHeldPlayer("p2", "super") || pad.super,
     up:    kbdR ? false : !!pad.up,
     down:  kbdR ? false : !!pad.down,
     ax:    kbdR ? 0 : (pad.ax || 0),

@@ -276,6 +276,10 @@ let gameoverTimer = 0;    // ticks restants avant skip fin de match
 let shake = 0;                 // intensité du tremblement d'écran
 let muted = false;
 let noFx = false;             // coupe sons/particules (re-simulations réseau)
+// Confort / accessibilité (persistés via saveSettings)
+let reduceMotion = false;     // atténue shake, zoom, slowMo, densités FX
+let flashSafe = false;        // coupe éclairs plein écran + clignotements agressifs
+let juiceLite = false;        // particules / confettis en mode léger
 const scorePop = [0, 0];       // animation du score qui grossit
 const particles = [];          // plumes et sable
 // --- éléments purement visuels (hors simulation, non synchronisés) ---

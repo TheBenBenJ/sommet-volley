@@ -2149,6 +2149,135 @@ test("options : ouverture depuis le menu", () => {
   assert.strictEqual(g.getState(), "menu");
 });
 
+test("fiction : dialogues shippés sans Amérique / Europe / S-400", () => {
+  const g = loadGame();
+  const blob = JSON.stringify(g.STORY_CAMPAIGNS || g.STORY_BY_CHAR || {});
+  assert.ok(blob.indexOf("Amérique") < 0, "pas Amérique");
+  assert.ok(blob.indexOf("Europe") < 0, "pas Europe");
+  assert.ok(blob.indexOf("S-400") < 0, "pas S-400");
+});
+
+test("confort : Options → Confort + toggles persistés", () => {
+  const g = loadGame();
+  g.setReduceMotion(false);
+  g.setFlashSafe(false);
+  g.setJuiceLite(false);
+  g.openOptions(false);
+  g.handleMenuKeys("OptComfort", "");
+  assert.strictEqual(g.getState(), "optionsComfort");
+  g.handleMenuKeys("OptMotion", "");
+  assert.ok(g.getReduceMotion());
+  g.handleMenuKeys("OptFlash", "");
+  assert.ok(g.getFlashSafe());
+  g.handleMenuKeys("OptJuice", "");
+  assert.ok(g.getJuiceLite());
+  g.saveSettings();
+  g.setReduceMotion(false);
+  g.setFlashSafe(false);
+  g.setJuiceLite(false);
+  g.loadSettings();
+  assert.ok(g.getReduceMotion() && g.getFlashSafe() && g.getJuiceLite());
+  g.setReduceMotion(false);
+  g.setFlashSafe(false);
+  g.setJuiceLite(false);
+  g.saveSettings();
+});
+
+test("confort : reduceMotion atténue shake et flash", () => {
+  const g = loadGame();
+  g.setReduceMotion(false);
+  g.setFlashSafe(false);
+  g.setJuiceLite(false);
+  assert.ok(g.fxShakeMul() >= 0.99);
+  assert.ok(g.fxAllowFlash());
+  assert.strictEqual(g.fxCount(100), 100);
+  g.setReduceMotion(true);
+  assert.ok(g.fxShakeMul() < 0.2);
+  assert.ok(!g.fxAllowFlash());
+  assert.ok(g.fxCount(100) < 40);
+  g.setReduceMotion(false);
+  g.setFlashSafe(true);
+  assert.ok(!g.fxAllowFlash());
+  g.setFlashSafe(false);
+  g.setJuiceLite(true);
+  assert.ok(g.fxCount(100) < 60);
+  g.setJuiceLite(false);
+});
+
+test("juice : lancer de service produit un puff", () => {
+  const g = loadGame();
+  g.setVsAI(true);
+  g.setAiLevel(1);
+  g.newGame(11);
+  g.setState("serve");
+  g.setServeCountdown(0);
+  g.setServingSide(0);
+  g.startRally();
+  g.setServeCountdown(0);
+  assert.ok(g.ball.inHands);
+  const before = g.getParticles().length;
+  g.tossServeBall(g.blobL);
+  assert.ok(!g.ball.inHands);
+  assert.ok(g.getParticles().length > before || g.getShake() > 0, "puff ou micro-shake");
+});
+
+test("rebind : Options → Contrôles + capture touche", () => {
+  const g = loadGame();
+  g.resetKeybinds();
+  g.openOptions(false);
+  g.handleMenuKeys("OptBinds", "");
+  assert.strictEqual(g.getState(), "optionsBinds");
+  g.startRebind("p1", "left");
+  assert.ok(g.tryApplyRebind("KeyQ"));
+  assert.strictEqual(g.getKeybinds().p1.left, "KeyQ");
+  g.keys.KeyQ = true;
+  assert.ok(g.keyHeldPlayer("p1", "left"));
+  g.keys.KeyQ = false;
+  g.resetKeybinds();
+  assert.strictEqual(g.getKeybinds().p1.left, "KeyA");
+});
+
+test("rebind : localInputs suit les binds J1", () => {
+  const g = loadGame();
+  g.resetKeybinds();
+  g.setVsAI(true);
+  g.setAiLevel(1);
+  g.newGame(7);
+  g.setState("play");
+  g.setServeCountdown(0);
+  g.applyKeybinds({ p1: { left: "KeyQ", right: "KeyD", jump: "KeyW", smash: "KeyF", super: "KeyE" } });
+  g.keys.KeyQ = true;
+  const inp = g.localInputs(0);
+  assert.ok(inp.left, "KeyQ = gauche après rebind");
+  g.keys.KeyQ = false;
+  g.keys.KeyA = true;
+  assert.ok(!g.localInputs(0).left, "ancien KeyA ne bouge plus");
+  g.keys.KeyA = false;
+  g.resetKeybinds();
+});
+
+test("rebind : conflit échange les touches", () => {
+  const g = loadGame();
+  g.resetKeybinds();
+  g.startRebind("p1", "smash");
+  g.tryApplyRebind("KeyE"); // E était Super
+  assert.strictEqual(g.getKeybinds().p1.smash, "KeyE");
+  assert.strictEqual(g.getKeybinds().p1.super, "KeyF", "Super récupère l'ancienne frappe");
+  g.resetKeybinds();
+});
+
+test("rebind : persistance saveSettings / loadSettings", () => {
+  const g = loadGame();
+  g.applyKeybinds({ p1: { left: "KeyZ", right: "KeyX", jump: "KeyC", smash: "KeyV", super: "KeyB" } });
+  g.saveSettings();
+  // reset mémoire sans réécrire le storage (resetKeybinds persiste aussi)
+  g.applyKeybinds(g.KEYBIND_DEFAULTS);
+  assert.strictEqual(g.getKeybinds().p1.left, "KeyA");
+  g.loadSettings();
+  assert.strictEqual(g.getKeybinds().p1.left, "KeyZ");
+  g.resetKeybinds(); // remet défaut + storage propre pour les tests suivants
+});
+
 test("meta : victoire finale tournoi débloque un skin", () => {
   const g = loadGame();
   const before = g.getMeta().tournamentWins | 0;

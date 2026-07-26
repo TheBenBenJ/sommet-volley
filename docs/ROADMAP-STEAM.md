@@ -59,15 +59,18 @@ Le jeu est du Canvas 2D → on l'emballe dans un runtime desktop.
 
 ## Séquencement proposé
 
-| Phase | Contenu | Sortie de phase |
-|-------|---------|-----------------|
-| **0. Décision** | Choisir le curseur de fictionnalisation (A/B/C) | Go/No-go commercial |
-| **1. Dérisquage** | Fictionnalisation texte + passe art | Build montrable sans risque |
-| **2. Online** | Quickplay + bot-backfill (ou assumer local) | Online « vivant » ou promesse retirée |
-| **3. Contenu/juice** | Tournoi, déblocables, options, polish | Verticale « qualité Steam » |
-| **4. Packaging** | Electron + Steamworks, builds Win/Mac/Linux | Exécutable + succès + cloud |
-| **5. Store** | Fiche, trailer, démo, wishlists, Next Fest | Page live ≥ 30 j avant sortie |
-| **6. Lancement** | Sortie + suivi (patchs, reviews) | 🚀 |
+| Phase | Contenu | Sortie de phase | Statut |
+|-------|---------|-----------------|--------|
+| **0. Décision** | Curseur fictionnalisation A/B/C | Go/No-go commercial | **Fait** — Option A actée ([FICTIONNALISATION.md]) |
+| **1. Dérisquage** | Fiction texte + passe art | Build montrable sans risque | **Texte OK** — reste passe art composite (hors code) |
+| **2. Online** | Quickplay + bot-backfill | Online « vivant » | **Fait** — QP 1v1 + bot ~15 s + `/mm` |
+| **3. Contenu/juice** | Tournoi, déblocables, options, polish | Verticale « qualité Steam » | **Fait** — tournoi, skins, options, rebind, confort |
+| **4. Packaging** | Electron + Steamworks, builds Win/Mac/Linux | Exécutable + succès + cloud | *reporté* |
+| **5. Store** | Fiche, trailer, démo, wishlists, Next Fest | Page live ≥ 30 j avant sortie | *reporté* |
+| **6. Lancement** | Sortie + suivi (patchs, reviews) | 🚀 | *reporté* |
+
+> Périmètre actuel : **phases 0–3**. Packaging / store / lancement = plus tard.
+> Seul reste volontaire phase 1 : retouche art composite (pipeline sprites).
 
 ## Verdict de faisabilité
 

@@ -1601,7 +1601,9 @@ function drawBomb() {
   ctx.translate(ball.x, ball.y);
   ctx.rotate(ball.angle * 0.4);
   // corps : sphère métallique sombre. Vire au rouge et clignote en fin de mèche.
-  const flashRed = frac < 0.25 && Math.floor(now / 120) % 2 === 0;
+  const flashRed = frac < 0.25 &&
+    (typeof fxAllowFlash !== "function" || fxAllowFlash()) &&
+    Math.floor(now / 120) % 2 === 0;
   const bgrad = ctx.createRadialGradient(-4, -5, 2, 0, 0, BALL_R + 2);
   bgrad.addColorStop(0, flashRed ? "#ff6a5a" : "#5a5f6b");
   bgrad.addColorStop(0.6, flashRed ? "#c62a1c" : "#2b2f38");
@@ -1828,7 +1830,8 @@ function drawBombHUD() {
   const frac = Math.max(0, bombTimer) / (bombTime || BOMB_TIME);
   const low = bombTimer <= 180;
   const col = frac > 0.5 ? "#7ed957" : frac > 0.25 ? "#ffcc00" : "#ff4030";
-  const blink = low && Math.floor(performance.now() / 140) % 2 === 0;
+  const blink = low && (typeof fxAllowFlash !== "function" || fxAllowFlash()) &&
+    Math.floor(performance.now() / 140) % 2 === 0;
   ctx.save();
   const bx = NET_X - 56, by = 18, bw = 112, bh = 44;
   ctx.fillStyle = "rgba(10,12,18,0.72)";
@@ -1960,8 +1963,10 @@ function drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph) {
 function drawHUD() {
   // mode bombe : éclair d'explosion plein écran (visuel, se résorbe au rendu)
   if (bombFlash > 0) {
-    ctx.fillStyle = "rgba(255,240,205," + (bombFlash * 0.6).toFixed(3) + ")";
-    ctx.fillRect(0, 0, W, H);
+    if (typeof fxAllowFlash === "function" ? fxAllowFlash() : true) {
+      ctx.fillStyle = "rgba(255,240,205," + (bombFlash * 0.6).toFixed(3) + ")";
+      ctx.fillRect(0, 0, W, H);
+    }
     bombFlash *= 0.8;
     if (bombFlash < 0.02) bombFlash = 0;
   }

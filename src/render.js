@@ -32,7 +32,8 @@ function drawBattleFx() {
 
 function drawBattleHUD() {
   if (!battle.active) return;
-  const blink = Math.sin(performance.now() / 70) > 0;
+  const blink = (typeof fxAllowFlash !== "function" || fxAllowFlash()) &&
+    Math.sin(performance.now() / 70) > 0;
   ctx.save();
   const bx = W / 2 - 320, by = 112, bw = 640, bh = 132;
   ctx.fillStyle = "rgba(10,12,18,0.78)";
@@ -101,6 +102,8 @@ function render() {
   if (state === "soloMenu") { drawSoloMenu(); return; }
   if (state === "multiMenu") { drawMultiMenu(); return; }
   if (state === "options") { drawOptions(); return; }
+  if (state === "optionsBinds") { drawOptionsBinds(); return; }
+  if (state === "optionsComfort") { drawOptionsComfort(); return; }
   if (state === "aiDifficulty") { drawAiDifficulty(); return; }
   if (state === "gameModeSelect") { drawGameModeSelect(); return; }
   if (state === "teamFormat" || state === "bombFormat" || state === "flameFormat") {
@@ -133,16 +136,21 @@ function render() {
   if (online && netRole === "guest") guestApplyView();
 
   ctx.save();
+  const shakeMul = typeof fxShakeMul === "function" ? fxShakeMul() : 1;
   if (shake > 0) {
     // tremblement d'écran sur les frappes puissantes et les points
-    ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+    const amt = shake * shakeMul;
+    if (amt > 0.15) ctx.translate((Math.random() - 0.5) * amt, (Math.random() - 0.5) * amt);
     shake *= 0.88;
     if (shake < 0.4) shake = 0;
   }
   // punch de caméra : uniquement Smash Battle (slowMo) ou point marqué
   let tz = 1;
-  if (state === "play" && (ball.slowMo > 0 || powerWindup)) tz = 1.16;
-  else if (state === "point") tz = 1.10;
+  const camOk = typeof fxAllowCamPunch !== "function" || fxAllowCamPunch();
+  if (camOk) {
+    if (state === "play" && (ball.slowMo > 0 || powerWindup)) tz = 1.16;
+    else if (state === "point") tz = 1.10;
+  }
   camZoom += (tz - camZoom) * 0.12;
   if (camZoom > 1.002) {
     const fx = Math.max(W * 0.30, Math.min(W * 0.70, ball.x));

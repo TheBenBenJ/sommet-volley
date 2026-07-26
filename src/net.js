@@ -136,11 +136,11 @@ function onlineLocalInput() {
     }
   }
   const raw = {
-    left:  !!(keys["KeyA"] || keys["ArrowLeft"]) || pl,
-    right: !!(keys["KeyD"] || keys["ArrowRight"]) || pr,
-    jump:  !!(keys["KeyW"] || keys["Space"] || keys["ArrowUp"]) || pj,
-    smash: !!keys["KeyF"] || psm,
-    super: !!(keys["KeyE"] || keys["ShiftRight"]) || ps,
+    left:  keyHeldOnline("left") || pl,
+    right: keyHeldOnline("right") || pr,
+    jump:  keyHeldOnline("jump") || pj,
+    smash: keyHeldOnline("smash") || psm,
+    super: keyHeldOnline("super") || ps,
     up:    pu,
     down:  pd,
     ax:    pax,

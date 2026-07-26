@@ -213,10 +213,10 @@ Au fond — mais il ne l'avouera jamais, et si vous le citez il dira que c'est *
     { s: "dorf", t: "Cher Cygne ! On s'aime bien, toi et moi, tout le monde le dit — enfin, moi je le dis. Mais tu me dois de l'argent. Beaucoup d'argent. Pour la défense. La tienne." },
     { s: "cygne", t: "En même temps allié fidèle, en même temps facture salée. C'est un numéro d'équilibriste que je maîtrise depuis toujours." },
     { s: "narrator", t: "Ses veines pulsent, l'aura rouge irradie. Le dopage d'État, à ciel ouvert, sur la plus belle pelouse du monde. Le Cygne, pour une fois, joue à cran." },
-    { s: "dorf", t: "Le plus grand match de tous les temps. L'Amérique contre l'élégance. Et je vais gagner. Sans carburant. Juste avec MOI, ma mèche et Le Mur. Servons." }
+    { s: "dorf", t: "Le plus grand match de tous les temps. Doria contre l'élégance. Et je vais gagner. Sans carburant. Juste avec MOI, ma mèche et Le Mur. Servons." }
   ],
   win:  [
-    { s: "dorf", t: "CHAMPION ! À domicile ! Sans dopage ! Le plus grand vainqueur de l'histoire des sommets ! J'ai battu l'Europe entière à moi seul ! On construit une tour pour fêter ça !" },
+    { s: "dorf", t: "CHAMPION ! À domicile ! Sans dopage ! Le plus grand vainqueur de l'histoire des sommets ! J'ai battu tous les clubs à moi seul ! On construit une tour pour fêter ça !" },
     { s: "cygne", t: "Une défaite. Sur votre gazon, sous vos palmiers dorés. En même temps, l'Alliance survivra à cette facture-là aussi. Elle survit à tout." },
     { s: "narrator", t: "L'élégance dopée tombe au bout du monde doré. Baron Dorf lève les bras, salue une foule immense — et pour une fois, elle existe vraiment. Générique." }
   ],

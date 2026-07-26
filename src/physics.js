@@ -675,6 +675,8 @@ function tossServeBall(blob) {
   blob._serveAwaitRelease = true;
   // Le lancer ne compte PAS comme une touche
   beep(520, 0.08, "sine", 0.1, 0, 780);
+  if (!noFx && typeof spawnAirPuff === "function") spawnAirPuff(ball.x, ball.y + 10);
+  shake = Math.max(shake, 2.5);
   return true;
 }
 
@@ -917,6 +919,7 @@ function collideCircle(c, blob, isHead) {
 
 function applyHitExtras(blob, a) {
   let heavy = false;
+  let didBoom = false;
   if (blob.superSmash && blob.superT > 0) {
     const dir = blob.side === 0 ? 1 : -1;
     ball.vx = dir * SMASH_VX;
@@ -926,12 +929,25 @@ function applyHitExtras(blob, a) {
     blob.superSmash = false; blob.superT = 0; blob.superKind = "";
     shake = 13;
     spawnBoom(ball.x, ball.y);
+    didBoom = true;
     heavy = true;
   }
   heavy = heavy || Math.hypot(ball.vx, ball.vy) > 10.5 ||
     (blob.poseAnim === "smash" && blob.poseT > 0);
-  if (heavy) sfxBallSmash();
-  else sfxBallHit();
+  if (heavy) {
+    sfxBallSmash();
+    // Juice smash normal (hors superSmash déjà boomé plus haut)
+    if (!didBoom && !noFx && blob.poseAnim === "smash" && typeof spawnBoom === "function") {
+      spawnBoom(ball.x, ball.y);
+      shake = Math.max(shake, 6);
+    } else if (!didBoom && !noFx && typeof spawnSand === "function") {
+      spawnSand(ball.x, ball.y, 10);
+      shake = Math.max(shake, 5);
+    }
+  } else {
+    sfxBallHit();
+    if (!noFx && typeof spawnSand === "function") spawnSand(ball.x, ball.y, 5);
+  }
   charHitSound(a, heavy);
   if (Math.hypot(ball.vx, ball.vy) > 11.5) shake = Math.min(shake + 4, 9);
 }

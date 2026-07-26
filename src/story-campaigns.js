@@ -158,7 +158,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "volkoi",
-          "t": "Tu vends discret, je vends au rabais, l'Ouest fulmine et achète quand même. L'hypocrisie a un bon rendement."
+          "t": "Tu vends discret, je vends au rabais, le Consortium fulmine et achète quand même. L'hypocrisie a un bon rendement."
         },
         {
           "s": "safran",
@@ -518,7 +518,7 @@ const STORY_BY_CHAR = {
     {
       "act": 3,
       "title": "Le dégel n'aura pas lieu",
-      "sub": "Bourassie–Gallardie · le grand front de l'Ouest",
+      "sub": "Bourassie–Gallardie · le grand front du Consortium",
       "left": "volkoi",
       "right": "cygne",
       "terrain": 0,
@@ -552,7 +552,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "narrator",
-          "t": "Le canon tonne pour l'ouverture. Le Cygne se dope à l'enjeu. Le dégel de l'Ouest se joue en un dernier échange."
+          "t": "Le canon tonne pour l'ouverture. Le Cygne se dope à l'enjeu. Le dégel du Consortium se joue en un dernier échange."
         }
       ],
       "win": [
@@ -621,7 +621,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "safran",
-          "t": "Alliance de circonstance, mais alliance quand même. L'Ouest se réunit contre nous ; nous, on patiente, ensemble."
+          "t": "Alliance de circonstance, mais alliance quand même. Le Consortium se réunit contre nous ; nous, on patiente, ensemble."
         },
         {
           "s": "narrator",
@@ -1069,13 +1069,13 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "dorf",
-          "t": "Le plus grand match de tous les temps. L'Amérique contre l'élégance. Et je vais gagner. Sans carburant. Juste avec MOI, ma mèche et Le Mur. Servons."
+          "t": "Le plus grand match de tous les temps. Doria contre l'élégance. Et je vais gagner. Sans carburant. Juste avec MOI, ma mèche et Le Mur. Servons."
         }
       ],
       "win": [
         {
           "s": "dorf",
-          "t": "CHAMPION ! À domicile ! Sans dopage ! Le plus grand vainqueur de l'histoire des sommets ! J'ai battu l'Europe entière à moi seul ! On construit une tour pour fêter ça !"
+          "t": "CHAMPION ! À domicile ! Sans dopage ! Le plus grand vainqueur de l'histoire des sommets ! J'ai battu tous les clubs à moi seul ! On construit une tour pour fêter ça !"
         },
         {
           "s": "cygne",
@@ -1951,7 +1951,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "bebe",
-          "t": "Ça oui ! L'Ouest et ses procédures ! Chez moi c'est simple : on ne saute pas le filet, ou c'est la flak."
+          "t": "Ça oui ! Le Consortium et ses procédures ! Chez moi c'est simple : on ne saute pas le filet, ou c'est la flak."
         },
         {
           "s": "sultan",
@@ -2112,7 +2112,7 @@ const STORY_BY_CHAR = {
     {
       "act": 3,
       "title": "Le donneur de leçons",
-      "sub": "Ryonganie–Gallardie · l'Ouest contre la souveraineté",
+      "sub": "Ryonganie–Gallardie · le Consortium contre la souveraineté",
       "left": "bebe",
       "right": "cygne",
       "terrain": 3,
@@ -2130,7 +2130,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "bebe",
-          "t": "Dialoguer ! L'Ouest ne dialogue que pour gagner du temps. Ici c'est chez moi : personne ne saute mon filet. Batterie AA !"
+          "t": "Dialoguer ! Le Consortium ne dialogue que pour gagner du temps. Ici c'est chez moi : personne ne saute mon filet. Batterie AA !"
         },
         {
           "s": "cygne",
@@ -2577,7 +2577,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "timonier",
-          "t": "Sanctionné, tu vends moins cher. Moins cher, j'achète plus. Ta colère contre l'Ouest fait mes marges."
+          "t": "Sanctionné, tu vends moins cher. Moins cher, j'achète plus. Ta colère contre le Consortium fait mes marges."
         },
         {
           "s": "safran",
@@ -2817,7 +2817,7 @@ const STORY_BY_CHAR = {
     {
       "act": 1,
       "title": "Le marché à quatre",
-      "sub": "Bosforie–Bourassie vs Doria–Levantie · double contre l'Ouest et l'or",
+      "sub": "Bosforie–Bourassie vs Doria–Levantie · double contre le Consortium et l'or",
       "left": "sultan",
       "right": "dorf",
       "ally": "volkoi",
@@ -2829,7 +2829,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Country Club Doré. Le Sultan s'allie au Tsar pour un 2v2 contre le Baron et le Faucon — S-400, détroit, et défi à l'Ouest."
+          "t": "Country Club Doré. Le Sultan s'allie au Tsar pour un 2v2 contre le Baron et le Faucon — batteries Sentinelle, détroit, et défi aux rivaux."
         },
         {
           "s": "sultan",
@@ -2877,7 +2877,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "faucon",
-          "t": "Ligne tenue. Double gagné. Rentrez négocier vos S-400."
+          "t": "Ligne tenue. Double gagné. Rentrez négocier vos Sentinelles."
         },
         {
           "s": "sultan",
@@ -3071,7 +3071,7 @@ const STORY_BY_CHAR = {
     {
       "act": 2,
       "title": "Les amis du détroit gelé",
-      "sub": "Bosforie–Bourassie · S-400, corridor & manœuvres croisées",
+      "sub": "Bosforie–Bourassie · Sentinelles, corridor & manœuvres croisées",
       "left": "sultan",
       "right": "volkoi",
       "terrain": 0,
@@ -3150,7 +3150,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "timonier",
-          "t": "Sultan. Tu te dis protecteur des peuples cousins de mes provinces de l'ouest. Puis tu signes mes contrats de la Route. Le tempo te contredit."
+          "t": "Sultan. Tu te dis protecteur des peuples cousins de mes provinces du couchant. Puis tu signes mes contrats de la Route. Le tempo te contredit."
         },
         {
           "s": "sultan",
@@ -4523,7 +4523,7 @@ const STORY_BY_CHAR = {
   "faucon": [
     {
       "act": 1,
-      "title": "L'ami de l'ouest, le duo de l'est",
+      "title": "L'ami du Consortium, le duo de l'est",
       "sub": "Levantie–Doria vs Bourassie–Ramenie · double de sécurité sous la neige",
       "left": "faucon",
       "right": "volkoi",
@@ -4548,7 +4548,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "volkoi",
-          "t": "Deux hommes de l'Ouest contre l'hiver et la patience. Amusant. Digue, faucon — ou tais-toi."
+          "t": "Deux hommes du Consortium contre l'hiver et la patience. Amusant. Digue, faucon — ou tais-toi."
         },
         {
           "s": "safran",
@@ -4723,7 +4723,7 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Country Club Doré. Fontaine, palmiers, gazon parfait. Le grand parrain de l'ouest reçoit son protégé le plus intense. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
+          "t": "Country Club Doré. Fontaine, palmiers, gazon parfait. Le grand parrain du Consortium reçoit son protégé le plus intense. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "dorf",
@@ -5093,7 +5093,7 @@ const STORY_BY_CHAR = {
     {
       "act": 1,
       "title": "La table à quatre places",
-      "sub": "Ramenie–Bourassie vs Doria–Levantie · double face à l'Ouest",
+      "sub": "Ramenie–Bourassie vs Doria–Levantie · double face au Consortium",
       "left": "safran",
       "right": "dorf",
       "ally": "volkoi",
@@ -5284,11 +5284,11 @@ const STORY_BY_CHAR = {
       "pre": [
         {
           "s": "narrator",
-          "t": "Place Écarlate sous la neige. Deux habitués des listes noires de l'Ouest se retrouvent au filet, entre gens qui se comprennent. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
+          "t": "Place Écarlate sous la neige. Deux habitués des listes noires du Consortium se retrouvent au filet, entre gens qui se comprennent. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu."
         },
         {
           "s": "volkoi",
-          "t": "Safran. On nous sanctionne tous les deux. On nous déteste tous les deux. Ça crée des liens, le mépris de l'Ouest."
+          "t": "Safran. On nous sanctionne tous les deux. On nous déteste tous les deux. Ça crée des liens, le mépris du Consortium."
         },
         {
           "s": "safran",
@@ -5296,7 +5296,7 @@ const STORY_BY_CHAR = {
         },
         {
           "s": "volkoi",
-          "t": "Je gèle, tu ralentis. Le froid et le miel. L'Ouest transpire entre les deux."
+          "t": "Je gèle, tu ralentis. Le froid et le miel. Le Consortium transpire entre les deux."
         },
         {
           "s": "safran",

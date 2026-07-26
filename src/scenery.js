@@ -1014,28 +1014,31 @@ function drawWeatherOverlay() {
 
   drawWeatherRain(storm ? 1 : 0.55);
 
-  // Éclairs (orage seulement)
+  // Éclairs (orage seulement) — respect confort anti-flash / reduceMotion
   if (storm) {
+    const allowFlash = typeof fxAllowFlash !== "function" || fxAllowFlash();
     if (weatherFlashCool > 0) weatherFlashCool -= 1;
-    else if (Math.random() < 0.012) {
+    else if (allowFlash && Math.random() < 0.012) {
       weatherFlash = 2 + (Math.random() < 0.35 ? 1 : 0);
       weatherFlashCool = 70 + Math.floor(Math.random() * 90);
     }
     if (weatherFlash > 0) {
-      const peak = weatherFlash >= 2;
-      ctx.fillStyle = peak ? "rgba(230,240,255,0.55)" : "rgba(180,200,255,0.22)";
-      ctx.fillRect(0, 0, W, H);
-      // trait d'éclair stylisé
-      if (peak) {
-        const lx = 80 + Math.random() * (W - 160);
-        ctx.strokeStyle = "rgba(255,255,255,0.85)";
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(lx, 0);
-        ctx.lineTo(lx - 18, GROUND_Y * 0.28);
-        ctx.lineTo(lx + 10, GROUND_Y * 0.28);
-        ctx.lineTo(lx - 8, GROUND_Y * 0.55);
-        ctx.stroke();
+      if (allowFlash) {
+        const peak = weatherFlash >= 2;
+        ctx.fillStyle = peak ? "rgba(230,240,255,0.55)" : "rgba(180,200,255,0.22)";
+        ctx.fillRect(0, 0, W, H);
+        // trait d'éclair stylisé
+        if (peak) {
+          const lx = 80 + Math.random() * (W - 160);
+          ctx.strokeStyle = "rgba(255,255,255,0.85)";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(lx, 0);
+          ctx.lineTo(lx - 18, GROUND_Y * 0.28);
+          ctx.lineTo(lx + 10, GROUND_Y * 0.28);
+          ctx.lineTo(lx - 8, GROUND_Y * 0.55);
+          ctx.stroke();
+        }
       }
       weatherFlash -= 1;
     }

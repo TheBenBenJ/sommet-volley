@@ -4,6 +4,13 @@
 > sel comique (les archetypes, les clichés nationaux) en supprimant la
 > ressemblance avec une personne réelle nommable**. Pas un avis juridique.
 
+## Décision (phase 0) — ACTÉE
+
+**Option A — Fictionnalisation forte** — actée pour le produit shippable
+(nations + noms affichés fictifs, dialogues scrubbés ; clés internes
+`volkoi`/`dorf`… inchangées). Go commercial conditionné à la passe art
+composite (phase 1 restante) avant store Steam.
+
 ## Le principe
 
 Un dirigeant réel = risque (droit à l'image, diffamation, blocages régionaux).
@@ -18,17 +25,14 @@ même temps »…) = satire légitime et intemporelle. On vise donc :
 On garde intacts : le gameplay, les kits/supers, les maps, le mode histoire —
 tout est *data-driven*, donc c'est surtout de l'édition de texte.
 
-## Le spectre (à toi de choisir le curseur)
+## Le spectre (référence)
 
-- **Option A — Fictionnalisation forte** *(recommandée pour Steam)* : nations +
-  noms + designs composites. Safe juridiquement ET région-safe. Perd ~10 % de
-  mordant, gagne l'intemporalité.
-- **Option B — Milieu** : nations fictives, mais caricatures qui évoquent encore
-  fortement l'archétype réel. Plus drôle, un peu plus risqué.
-- **Option C — Tel quel** (personnes réelles) : réservé à itch.io / diffusion
-  gratuite non commerciale. À éviter sur Steam.
+- **Option A — Fictionnalisation forte** *(retenue)* : nations + noms + designs
+  composites. Safe juridiquement ET région-safe.
+- **Option B — Milieu** : nations fictives, caricatures encore très proches.
+- **Option C — Tel quel** : itch.io / non commercial uniquement. Hors scope Steam.
 
-## Proposition concrète (Option A — à amender)
+## Proposition concrète (Option A — en vigueur dans le code)
 
 Clés techniques internes **inchangées** (`volkoi`, `dorf`… = dossiers
 assets/, packs sprites) — on ne touche qu'au **nom affiché** + textes.
@@ -85,10 +89,7 @@ perso, pousser le design **d'un cran vers le composite** :
 C'est aussi l'occasion de la **passe de cohérence artistique** que réclament les
 reviews (cf. STEAM-VIABILITE.md).
 
-## Recommandation
+## Suite (phase 1 art)
 
-Partir sur **Option A**, garder les clés internes, faire d'abord la passe
-texte (noms + nations + dialogues) — jouable et démontrable en une journée —
-puis planifier la retouche visuelle composite via le pipeline existant
-(PIPELINE-PERSONNAGE.md). On conserve 100 % du gameplay et l'essentiel de
-l'humour, on supprime le risque et les blocages régionaux.
+Passe texte **faite**. Reste la retouche visuelle composite via
+PIPELINE-PERSONNAGE.md (visages moins 1:1) avant mise en store Steam.

@@ -28,7 +28,10 @@ function loop(now) {
   musicTick();     // planifie la musique de fond
   // ralenti dramatique : après Smash Battle / Super Smash (hors-ligne).
   // Pas pendant powerWindup : le freeze simu suffit pour doser.
-  const tScale = (!online && state === "play" && ball.slowMo > 0) ? 0.45 : 1;
+  // reduceMotion : pas de slowMo dramatique (confort / accessibilité)
+  const wantSlow = !online && state === "play" && ball.slowMo > 0 &&
+    !(typeof reduceMotion !== "undefined" && reduceMotion);
+  const tScale = wantSlow ? 0.45 : 1;
   timeScale += (tScale - timeScale) * 0.25;
   advance(now);
   render();

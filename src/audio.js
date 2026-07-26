@@ -42,9 +42,14 @@ const SETTINGS_KEY_LEGACY = "crabbyVolleySettings";
 function saveSettings() {
   try {
     const quiet = (typeof mapEventsQuiet !== "undefined") ? !!mapEventsQuiet : false;
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+    const payload = {
       muted, musicOn, volume, musicVolume, mapEventsQuiet: quiet
-    }));
+    };
+    if (typeof serializeKeybinds === "function") payload.keybinds = serializeKeybinds();
+    if (typeof reduceMotion !== "undefined") payload.reduceMotion = !!reduceMotion;
+    if (typeof flashSafe !== "undefined") payload.flashSafe = !!flashSafe;
+    if (typeof juiceLite !== "undefined") payload.juiceLite = !!juiceLite;
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(payload));
   } catch (e) { /* navigation privée, quota dépassé… tant pis, pas bloquant */ }
 }
 function loadSettings() {
@@ -59,6 +64,16 @@ function loadSettings() {
     if (typeof s.mapEventsQuiet === "boolean" && typeof mapEventsQuiet !== "undefined") {
       mapEventsQuiet = s.mapEventsQuiet;
     }
+    if (typeof s.reduceMotion === "boolean" && typeof reduceMotion !== "undefined") {
+      reduceMotion = s.reduceMotion;
+    }
+    if (typeof s.flashSafe === "boolean" && typeof flashSafe !== "undefined") {
+      flashSafe = s.flashSafe;
+    }
+    if (typeof s.juiceLite === "boolean" && typeof juiceLite !== "undefined") {
+      juiceLite = s.juiceLite;
+    }
+    if (s.keybinds && typeof applyKeybinds === "function") applyKeybinds(s.keybinds);
   } catch (e) { /* réglages corrompus/absents : on garde les valeurs par défaut */ }
 }
 

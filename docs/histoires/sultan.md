@@ -33,7 +33,7 @@ const STORY_SULTAN = [
   act: 1, title: "Le marché à quatre", sub: "Bosforie–Bourassie vs Doria–Levantie · double contre l'Ouest et l'or",
   left: "sultan", right: "dorf", ally: "volkoi", right2: "faucon", terrain: 1, mode: "2v2", ai: 0, doped: null,
   pre:  [
-    { s: "narrator", t: "Country Club Doré. Le Sultan s'allie au Tsar pour un 2v2 contre le Baron et le Faucon — S-400, détroit, et défi à l'Ouest." },
+    { s: "narrator", t: "Country Club Doré. Le Sultan s'allie au Tsar pour un 2v2 contre le Baron et le Faucon — batteries Sentinelle, détroit, et défi aux rivaux." },
     { s: "sultan", t: "Toi, Tsar, tu es mon partenaire. Je t'achète tes défenses, tu me couvres au filet. Le meilleur des deals." },
     { s: "volkoi", t: "Alliance de circonstance. Tant que ton détroit ne bloque pas mon gaz au milieu du set." },
     { s: "dorf", t: "J'ai le Faucon en partenaire ! Le plus dur ! On va sécuriser cette alliance de bric et de broc !" },
@@ -48,7 +48,7 @@ const STORY_SULTAN = [
   ],
   lose:  [
     { s: "dorf", t: "GAGNÉ ! Meilleure alliance sécuritaire du monde !" },
-    { s: "faucon", t: "Ligne tenue. Double gagné. Rentrez négocier vos S-400." },
+    { s: "faucon", t: "Ligne tenue. Double gagné. Rentrez négocier vos Sentinelles." },
     { s: "sultan", t: "La porte a tenu… contre nous. On reviendra plus nombreux — enfin, à deux." },
     { s: "volkoi", t: "Recalons la table. Les doubles, ça se renégocie, camarade." },
   ]
@@ -118,7 +118,7 @@ const STORY_SULTAN = [
     ]
   },
   {
-    act: 2, title: "Les amis du détroit gelé", sub: "Bosforie–Bourassie · S-400, corridor & manœuvres croisées",
+    act: 2, title: "Les amis du détroit gelé", sub: "Bosforie–Bourassie · Sentinelles, corridor & manœuvres croisées",
     left: "sultan", right: "volkoi", terrain: 0, mode: "flame", ai: 2, doped: null,
     pre:  [
       { s: "narrator", t: "Place Écarlate sous la neige. Le canon d'apparat tonne au loin. Deux hommes qui se vendent des armes le matin et se marchent dessus l'après-midi. Le ballon s’enflamme : chaque contact brûle — à zéro PV, le point est perdu." },
