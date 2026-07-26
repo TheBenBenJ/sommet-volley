@@ -20,7 +20,7 @@ nationaux interdits, mash-up facial explicite).
 |-----|-----------------|----------------|---------------|-------|
 | volkoi | **OK** `raw/volkoi/idle_1.png` | **26 poses OK** | **annulé** — anciens sprites gardés | composite dispo dans raw/ si besoin |
 | dorf | **OK** v3 → `raw/dorf/idle_1.png` | **26 poses OK** Codex `019f9bfd-…` | **annulé** — anciens sprites gardés | v2 rejetée ; composite v3 dispo dans raw/ |
-| cygne | **OK** lunettes `raw/cygne/idle_1_composite_new.png` | en attente | — | à arbitrer (même logique que volkoi/dorf ?) |
+| cygne | **OK** lunettes `raw/cygne/idle_1_composite_new.png` | **26 poses OK** Codex `019f9eb9-…` | **OK** cutout assets | composite intégré (walk QA Codex OK) |
 | bebe | — | — | — | |
 | timonier | — | — | — | |
 | sultan | — | — | — | |

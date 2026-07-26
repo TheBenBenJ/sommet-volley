@@ -745,6 +745,39 @@ function storyDrawPortrait(key, cx, cy, boxW, boxH, opts) {
   if (doped) storyDrawDopeGlow(cx, cy, Math.min(boxW, boxH) * 0.52);
 }
 
+/** Collage 2×5 des portraits roster — fiche « Jeux du Sommet » (pas d'emoji canvas). */
+function storyDrawSommetCollage(cx, cy, box) {
+  const keys = (typeof CHARACTERS !== "undefined" && CHARACTERS.length)
+    ? CHARACTERS.map(c => c.key).filter(Boolean).slice(0, 10)
+    : ["volkoi", "dorf", "cygne", "bebe", "timonier", "sultan", "gourou", "capitaine", "faucon", "safran"];
+  const n = Math.min(10, keys.length);
+  const cols = 5, rows = 2;
+  const gap = 3;
+  const cellW = (box - gap * (cols - 1)) / cols;
+  const cellH = (box - gap * (rows - 1)) / rows;
+  const cell = Math.min(cellW, cellH);
+  const gridW = cols * cell + (cols - 1) * gap;
+  const gridH = rows * cell + (rows - 1) * gap;
+  const x0 = cx - gridW / 2;
+  const y0 = cy - gridH / 2;
+  for (let i = 0; i < n; i++) {
+    const col = i % cols, row = (i / cols) | 0;
+    const px = x0 + col * (cell + gap) + cell / 2;
+    const py = y0 + row * (cell + gap) + cell / 2;
+    const ci = storyCharIdx(keys[i]);
+    const c = (ci >= 0 && CHARACTERS[ci]) ? CHARACTERS[ci] : null;
+    ctx.save();
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(px - cell / 2, py - cell / 2, cell, cell, 5);
+    else ctx.rect(px - cell / 2, py - cell / 2, cell, cell);
+    ctx.fillStyle = c ? (c.darkColor || c.color || "#333") : "#333";
+    ctx.globalAlpha = 0.55;
+    ctx.fill();
+    ctx.restore();
+    storyDrawPortrait(keys[i], px, py, cell - 3, cell - 3, {});
+  }
+}
+
 // Halo « dopé » : pulsation rouge + petites gouttes. Cosmétique (Math.random OK).
 function storyDrawDopeGlow(cx, cy, r) {
   const t = performance.now() / 1000;
@@ -1172,9 +1205,8 @@ function drawStoryCharIntro() {
   if (isChar) {
     storyDrawPortrait(key, pcx, pcy, pBox - 16, pBox - 16, {});
   } else {
-    ctx.textAlign = "center";
-    ctx.font = "72px " + UI.sans;
-    ctx.fillText("🏆", pcx, pcy + 18);
+    // Collage roster (les emoji canvas ne s'affichent souvent pas avec nos polices)
+    storyDrawSommetCollage(pcx, pcy, pBox - 20);
   }
 
   // Nation + map sous le portrait
