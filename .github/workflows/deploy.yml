@@ -105,10 +105,14 @@ jobs:
         run: |
           rsync -az --delete \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            index.html src assets matchmaker \
+            index.html src assets matchmaker deploy \
             "$DEPLOY_USER@$DEPLOY_HOST:/home/$DEPLOY_USER/sommet-deploy/"
 
-      - name: Publier dans la racine web + matchmaker
+      - name: Publier dans la racine web + matchmaker + infra scopée
+        env:
+          # Optionnel : si présent, réécrit le drop-in TURN (sinon conserve l'existant)
+          TURN_SECRET: ${{ secrets.TURN_SECRET }}
+          TURN_URLS: ${{ secrets.TURN_URLS }}
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             "$DEPLOY_USER@$DEPLOY_HOST" \
@@ -121,11 +125,12 @@ jobs:
              mkdir -p /home/$DEPLOY_USER/sommet-matchmaker; \
              rsync -a --delete --exclude node_modules /home/$DEPLOY_USER/sommet-deploy/matchmaker/ /home/$DEPLOY_USER/sommet-matchmaker/; \
              cd /home/$DEPLOY_USER/sommet-matchmaker && npm ci --omit=dev; \
-             if systemctl is-enabled sommet-mm >/dev/null 2>&1 || systemctl cat sommet-mm >/dev/null 2>&1; then \
-               sudo systemctl restart sommet-mm || true; \
-             else \
-               echo 'sommet-mm unit not installed yet — see matchmaker/systemd/sommet-mm.service'; \
-             fi"
+             chmod +x /home/$DEPLOY_USER/sommet-deploy/deploy/apply-infra.sh; \
+             DEPLOY_USER='$DEPLOY_USER' \
+               TURN_SECRET='${TURN_SECRET}' \
+               TURN_URLS='${TURN_URLS}' \
+               APPLY_NGINX=1 APPLY_SYSTEMD=1 APPLY_COTURN=0 \
+               /home/$DEPLOY_USER/sommet-deploy/deploy/apply-infra.sh"
 
       - name: Vérifier que le site répond
         run: |

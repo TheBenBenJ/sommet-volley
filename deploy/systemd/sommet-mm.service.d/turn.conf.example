@@ -1,0 +1,5 @@
+# Copié en turn.conf sur le serveur par apply-infra.sh si TURN_SECRET est fourni
+# (secret GitHub Actions — JAMAIS committer la vraie valeur).
+[Service]
+Environment=TURN_SECRET=CHANGE_ME
+Environment=TURN_URLS=turn:37.187.139.122:3478?transport=udp,turn:37.187.139.122:3478?transport=tcp

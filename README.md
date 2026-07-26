@@ -107,22 +107,28 @@ Configurer les secrets du dépôt dans **Settings → Secrets and variables → 
 | `DEPLOY_SSH_KEY` | Clé privée SSH, encodée en base64 |
 | `DEPLOY_WEB_ROOT` | Répertoire web distant |
 | `DEPLOY_URL` | URL publique après déploiement |
+| `TURN_SECRET` | (optionnel) secret coturn / drop-in systemd — **ne pas committer** |
+| `TURN_URLS` | (optionnel) ex. `turn:IP:3478?transport=udp,turn:IP:3478?transport=tcp` |
 
-### Infra serveur (manuel, hors workflow)
+### Infra serveur (gitée + CI scopée)
 
-Trois briques vivent sur le serveur et ne sont PAS touchées par le déploiement
-continu (le workflow ne synchronise que les fichiers du jeu + `matchmaker/`) :
+Sources dans [`deploy/`](deploy/) :
 
-- **nginx** : routes `/mm` (WebSocket matchmaker), `/mm/health` et `/mm/turn`
-  (credentials TURN) → proxy vers `127.0.0.1:8787`.
-- **systemd `sommet-mm`** : lance `node server.js` ; un override
-  (`/etc/systemd/system/sommet-mm.service.d/turn.conf`) fournit `TURN_SECRET`
-  et `TURN_URLS` au matchmaker pour l'endpoint `/turn`.
-- **coturn** (`/etc/turnserver.conf`) : relais TURN en `use-auth-secret`
-  (même secret que ci-dessus), plage UDP 49160-49960, quotas et
-  `denied-peer-ip` anti-abus. Le client ne contient AUCUN mot de passe : il
-  demande des credentials éphémères (HMAC, ttl 12 h) via `GET /mm/turn` au
-  chargement (voir `refreshTurnCredentials()` dans `src/net.js`).
+| Fichier | Rôle | Réappliqué par CI ? |
+|---------|------|---------------------|
+| `deploy/nginx/ns3104412.ip-37-187-139.eu.conf` | Vhost (blobby racine + `/sommet-volley/` + `/mm`) | **Oui** — remplace uniquement ce vhost ; **ne touche pas** `pterodactyl` / `default` |
+| `deploy/systemd/sommet-mm.service` | Unit matchmaker | **Oui** |
+| `deploy/systemd/.../turn.conf.example` | Modèle drop-in TURN | **Oui** si secret `TURN_SECRET` présent, sinon conserve l'existant |
+| `deploy/coturn/turnserver.conf.example` | Modèle coturn | **Non** par défaut (`APPLY_COTURN=0`) — install one-shot |
+| `deploy/apply-infra.sh` | Script idempotent | Appelé à chaque deploy |
+
+**Hors scope CI (volontaire)** : package `coturn` système, secret TURN sur disque
+si le secret GitHub n'est pas configuré, firewall, Certbot, Pterodactyl, site
+`blobby-volley` (seul le *fichier* vhost est renommé/resync — la racine
+`/var/www/blobby-volley` reste servie).
+
+Le client récupère des credentials TURN éphémères via `GET /mm/turn`
+(`refreshTurnCredentials()` dans `src/net.js`) — aucun mot de passe dans le JS.
 
 ## Licence
 
