@@ -62,6 +62,13 @@ function handleMenuKeys(code, key) {
   // niveau et réactive le son au passage, où qu'on soit dans les menus.
   const volMatch = /^Vol([1-5])$/.exec(code);
   if (volMatch) { muted = false; setVolume(Number(volMatch[1]) / 5); return; }
+  const musMatch = /^Mus([1-5])$/.exec(code);
+  if (musMatch) { musicOn = true; setMusicVolume(Number(musMatch[1]) / 5); return; }
+
+  // Pause actionable (hitboxes dessinées par drawPauseMenu).
+  if (code === "PauseResume") { paused = false; pauseNavIdx = 0; return; }
+  if (code === "PauseOptions") { openOptions(true); return; }
+  if (code === "PauseQuit") { paused = false; pauseNavIdx = 0; goMenu(); return; }
 
   if (state === "menu") {
     // Invitation 1ʳᵉ visite : bloque le reste du menu
@@ -83,9 +90,24 @@ function handleMenuKeys(code, key) {
     if (code === "KeyT") startTutorial();
     if (code === "KeyH") { tutorialReset(); state = "tutorialHelp"; }
     if (code === "KeyC") state = "credits";
+    if (code === "KeyO") openOptions(false);
     if (code === "TutPlay") startTutorial();
     if (code === "TutLater") { tutorialInviteOpen = false; tutorialInviteSessionDismissed = true; }
     if (code === "TutNever") { tutorialInviteOpen = false; markTutorialDone(); }
+
+  } else if (state === "options") {
+    if (code === "OptMute") { muted = !muted; saveSettings(); return; }
+    if (code === "OptMusic") { musicOn = !musicOn; saveSettings(); return; }
+    if (code === "OptQuiet") {
+      mapEventsQuiet = !mapEventsQuiet;
+      saveSettings();
+      beep(mapEventsQuiet ? 360 : 520, 0.06, "square", 0.08);
+      return;
+    }
+    if (code === "Escape" || code === "OptBack" || code === "Enter" || code === "Space") {
+      leaveOptions();
+      return;
+    }
 
   } else if (state === "soloMenu") {
     if (code === "Digit1" && typeof storyOpen === "function") storyOpen();          // Histoire
@@ -156,20 +178,25 @@ function handleMenuKeys(code, key) {
 
   } else if (state === "gameModeSelect") {
     // Solo / en ligne : mode puis TOUJOURS 1v1 ou équipes (teamFormat).
+    // Partie rapide : 1v1 forcé → matchmaking (pas de 2v2).
     // Multijoueur local : 1v1 seulement.
     const teamChoice = pendingMode.vsAI || pendingMode.online;
+    const qp = !!(pendingMode && pendingMode.quickplay);
     if (teamChoice) {
       if (code === "Digit1") { // Classique
         pendingMode.bomb = false; pendingMode.flame = false;
-        state = "teamFormat";
+        if (qp) { setTeamMode(false); startQuickplay(); }
+        else state = "teamFormat";
       }
       if (code === "Digit2") { // Bombe
         pendingMode.bomb = true; pendingMode.flame = false;
-        state = "teamFormat";
+        if (qp) { setTeamMode(false); state = "bombDuration"; }
+        else state = "teamFormat";
       }
       if (code === "Digit3") { // Ballon enflammé
         pendingMode.flame = true; pendingMode.bomb = false;
-        state = "teamFormat";
+        if (qp) { setTeamMode(false); startQuickplay(); }
+        else state = "teamFormat";
       }
     } else {
       if (code === "Digit1") {
@@ -219,16 +246,37 @@ function handleMenuKeys(code, key) {
 
   } else if (state === "bombDuration") {
     const d = { Digit1: 0, Digit2: 1, Digit3: 2 }[code];
-    if (d !== undefined) { pendingMode.bombTime = BOMB_DURATIONS[d].ticks; startCharacterSelect(); }
-    if (code === "Escape") state = (pendingMode.vsAI || pendingMode.online) ? "teamFormat" : "gameModeSelect";
+    if (d !== undefined) {
+      pendingMode.bombTime = BOMB_DURATIONS[d].ticks;
+      if (pendingMode.quickplay) startQuickplay();
+      else startCharacterSelect();
+    }
+    if (code === "Escape") {
+      if (pendingMode.quickplay) state = "gameModeSelect";
+      else state = (pendingMode.vsAI || pendingMode.online) ? "teamFormat" : "gameModeSelect";
+    }
 
   } else if (state === "rules") {
     if (code === "Escape" || code === "Enter" || code === "Space" || code === "KeyR") goMenu();
 
   } else if (state === "onlineMenu") {
-    if (code === "Digit1") { pendingMode = { online: true, o2v2: false }; state = "gameModeSelect"; } // Créer → mode + 1v1/2v2
-    if (code === "Digit2") { joinCode = ""; state = "joinEntry"; }                        // Rejoindre avec un code
+    if (code === "Digit1") { // Partie rapide
+      pendingMode = { online: true, quickplay: true, o2v2: false };
+      state = "gameModeSelect";
+      navIdx = 0;
+    }
+    if (code === "Digit2") { pendingMode = { online: true, o2v2: false }; state = "gameModeSelect"; } // Créer
+    if (code === "Digit3") { joinCode = ""; state = "joinEntry"; } // Rejoindre
     if (code === "Escape") { state = "multiMenu"; navIdx = 0; }
+
+  } else if (state === "matchmaking") {
+    if (code === "MmBot" || code === "Digit1" || code === "KeyB") startQuickplayBot();
+    if (code === "Escape" || code === "MmCancel") {
+      cancelQuickplay();
+      teardownNet();
+      state = "onlineMenu";
+      navIdx = 0;
+    }
 
   } else if (state === "hostLobby") {
     if ((code === "Enter" || code === "Space") && guests.length >= 1) hostStartMatch2v2();
@@ -269,6 +317,8 @@ function handleMenuKeys(code, key) {
           // l'invité a choisi : on prévient l'hôte, qui lancera la partie
           sendRel({ t: "hello", charId: n });
           state = "netWait";
+        } else if (pendingMode.quickplay && typeof quickplayHostAfterChar === "function") {
+          quickplayHostAfterChar();
         } else {
           navIdx = 0;
           state = "selectTerrain"; // l'hôte choisit aussi le terrain
@@ -298,7 +348,20 @@ function handleMenuKeys(code, key) {
     if (n !== undefined) { terrain = n; navIdx = 0; commitSetup(); }
     if (code === "KeyC") {
       mapEventsQuiet = !mapEventsQuiet;
+      saveSettings();
       beep(mapEventsQuiet ? 360 : 520, 0.06, "square", 0.08);
+    }
+    if (code === "KeyB" || code === "BallNext") {
+      if (typeof metaCycleBallSkin === "function") {
+        metaCycleBallSkin(1);
+        beep(520, 0.05, "square", 0.07);
+      }
+    }
+    if (code === "BallPrev") {
+      if (typeof metaCycleBallSkin === "function") {
+        metaCycleBallSkin(-1);
+        beep(440, 0.05, "square", 0.07);
+      }
     }
     if (code === "Escape") { selPlayer = 0; state = "selectCharacter"; }
 
@@ -328,10 +391,40 @@ function handleMenuKeys(code, key) {
     if (tutorialStepCanSkip()) advanceTutorialStep();
 
   } else if (code === "KeyP") {
-    if (!online) paused = !paused; // pas de pause manuelle en ligne
+    if (!online && (state === "serve" || state === "play" || state === "point")) {
+      paused = !paused;
+      pauseNavIdx = 0;
+    }
+  } else if (code === "KeyO" && paused && !online) {
+    openOptions(true);
   } else if (code === "Escape") {
     if (online) quitOnline();
+    else if (paused) { paused = false; pauseNavIdx = 0; goMenu(); }
     else { paused = false; goMenu(); }
+  }
+}
+
+/** Retour après Options : menu, ou reprise de la pause en match. */
+let optionsReturnState = "menu";
+let optionsFromPause = false;
+let pauseNavIdx = 0;
+
+function openOptions(fromPause) {
+  optionsFromPause = !!fromPause;
+  optionsReturnState = fromPause ? state : "menu";
+  state = "options";
+  navIdx = 0;
+}
+
+function leaveOptions() {
+  if (optionsFromPause) {
+    state = optionsReturnState;
+    paused = true;
+    optionsFromPause = false;
+    pauseNavIdx = 0;
+  } else {
+    optionsFromPause = false;
+    goMenu();
   }
 }
 
@@ -353,7 +446,8 @@ function setTeamMode(v) {
 // ou l'hébergement en ligne. Point unique : applique bombMode + bombTime
 // (5/7/10 s) pour TOUS les modes — 1v1, 2v2 et en ligne.
 function commitSetup() {
-  ballSkin = 0; // ballon cartoon unique
+  if (typeof metaUseEquippedBall === "function") metaUseEquippedBall();
+  else ballSkin = 0;
   bombMode = !!pendingMode.bomb;
   bombTime = pendingMode.bombTime || BOMB_TIME;
   flameMode = !!pendingMode.flame && !bombMode;
@@ -700,7 +794,10 @@ function drawMenuWorld() {
     ctx.translate(bx, by);
     // légère rotation liée au rebond
     ctx.rotate((menuBg.ballVy || 0) * 0.08 + performance.now() / 900);
-    const spr = typeof SPRITES !== "undefined" ? SPRITES.ballPurple : null;
+    const skin = (typeof BALL_SKINS !== "undefined" && BALL_SKINS[ballSkin]) || null;
+    const sprName = (skin && skin.sprite) || "ballPurple";
+    let spr = (typeof SPRITES !== "undefined") ? (SPRITES[sprName] || SPRITES.ballPurple) : null;
+    if (typeof spriteReady === "function" && !spriteReady(spr) && SPRITES) spr = SPRITES.ballPurple;
     if (typeof spriteReady === "function" && spriteReady(spr)) {
       const d = BALL_R * 2.15;
       ctx.drawImage(spr, -d / 2, -d / 2, d, d);
@@ -959,11 +1056,12 @@ function drawMenu() {
     "1  —  Solo",
     "2  —  Multijoueur",
     "T  —  Tutoriel" + (tutorialDone ? "" : "  · Nouveau"),
+    "O  —  Options",
     "H  —  Aide commandes",
     "R  —  Règles du jeu",
     "C  —  Crédits"
   ];
-  drawOptionList(items, 198, 36);
+  drawOptionList(items, 190, 34);
 
   uiLabel(controlsHint(), UI.mx, H - 52, 12, controlsHintColor(), 0.3);
   uiLabel("Premier à " + WIN_SCORE + " · 2 pts d'écart · " + MAX_TOUCHES + " touches max",
@@ -999,6 +1097,108 @@ function drawMultiMenu() {
     "1  —  Local",
     "2  —  En ligne"
   ], 238, 52);
+}
+
+function drawMusicVolumeControl(x, y) {
+  const bw = 14, gap = 4, n = 5;
+  const totalW = n * bw + (n - 1) * gap;
+  const labelGap = 88;
+  const bx0 = x - labelGap - totalW;
+  const hov = isHover("OptMusic");
+  hit(x - labelGap / 2, y - 5, labelGap, 18, "OptMusic");
+  ctx.textAlign = "right";
+  ctx.font = "700 10px " + UI.mono;
+  ctx.fillStyle = hov ? UI.gold : UI.muted;
+  ctx.fillText((musicOn ? "♪" : "♩") + " MUSIQUE", x, y);
+  for (let i = 0; i < n; i++) {
+    const bxi = bx0 + i * (bw + gap);
+    const code = "Mus" + (i + 1);
+    hit(bxi + bw / 2, y - 4, bw + gap, 18, code);
+    const filled = musicOn && musicVolume * n > i + 0.001;
+    ctx.fillStyle = filled ? UI.gold : "rgba(255,255,255,0.18)";
+    ctx.fillRect(bxi, y - 9, bw, 9);
+    if (isHover(code)) { ctx.strokeStyle = UI.gold; ctx.lineWidth = 1.5; ctx.strokeRect(bxi - 1, y - 10, bw + 2, 11); }
+  }
+}
+
+function drawOptions() {
+  menuScreenBase({
+    title: "Options",
+    kicker: optionsFromPause ? "Pause · réglages" : "Préférences",
+    subtitle: "Son, musique, terrain calme"
+  });
+  const mx = UI.mx;
+  drawVolumeControl(W - UI.mx, 200);
+  drawMusicVolumeControl(W - UI.mx, 228);
+
+  const rows = [
+    { code: "OptMute", label: muted ? "Son : coupé" : "Son : activé" },
+    { code: "OptMusic", label: musicOn ? "Musique : activée" : "Musique : coupée" },
+    { code: "OptQuiet", label: "Terrain calme : " + (mapEventsQuiet ? "ON" : "OFF") }
+  ];
+  rows.forEach((r, i) => {
+    const y = 270 + i * 44;
+    const sel = (padConnected && navIdx === i) || isHover(r.code);
+    hit(mx + 200, y, 400, 36, r.code);
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(mx - 4, y - 22, 420, 36, 12); else ctx.rect(mx - 4, y - 22, 420, 36);
+    ctx.fillStyle = sel ? "rgba(255,216,74,0.95)" : "rgba(255,246,232,0.92)";
+    ctx.fill();
+    ctx.strokeStyle = UI.stroke;
+    ctx.lineWidth = sel ? 3 : 2;
+    ctx.stroke();
+    ctx.textAlign = "left";
+    ctx.fillStyle = UI.stroke;
+    ctx.font = "700 16px " + UI.sans;
+    ctx.fillText(r.label, mx + 14, y + 2);
+  });
+
+  const wins = (typeof meta !== "undefined" && meta) ? (meta.tournamentWins | 0) : 0;
+  const skin = BALL_SKINS[ballSkin] || BALL_SKINS[0];
+  uiLabel("Tournoi · " + wins + " couronne" + (wins !== 1 ? "s" : "") +
+    "  ·  Ballon : " + (skin ? skin.name : "Cartoon"), mx, 420, 12, UI.muted, 0.3);
+  hit(mx + 70, H - 28, 160, 28, "OptBack");
+}
+
+function drawPauseMenu() {
+  ctx.fillStyle = "rgba(12, 20, 42, 0.72)";
+  ctx.fillRect(0, 0, W, H);
+  const pw = 360, ph = 240;
+  const px = (W - pw) / 2, py = (H - ph) / 2 - 8;
+  ctx.fillStyle = "rgba(255,246,232,0.97)";
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 18); else ctx.rect(px, py, pw, ph);
+  ctx.fill();
+  ctx.strokeStyle = UI.stroke; ctx.lineWidth = 3.5; ctx.stroke();
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = UI.stroke;
+  ctx.font = "800 28px " + UI.display;
+  ctx.fillText("PAUSE", W / 2, py + 42);
+
+  const btns = [
+    { code: "PauseResume", label: "Reprendre" },
+    { code: "PauseOptions", label: "Options" },
+    { code: "PauseQuit", label: "Quitter" }
+  ];
+  if (pauseNavIdx < 0 || pauseNavIdx >= btns.length) pauseNavIdx = 0;
+  btns.forEach((b, i) => {
+    const y = py + 88 + i * 42;
+    const sel = (padConnected && pauseNavIdx === i) || isHover(b.code);
+    hit(W / 2, y, 220, 34, b.code);
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(W / 2 - 110, y - 16, 220, 34, 12);
+    else ctx.rect(W / 2 - 110, y - 16, 220, 34);
+    ctx.fillStyle = sel ? "rgba(255,216,74,0.95)" : "rgba(255,255,255,0.55)";
+    ctx.fill();
+    ctx.strokeStyle = UI.stroke; ctx.lineWidth = sel ? 3 : 2; ctx.stroke();
+    ctx.fillStyle = UI.stroke;
+    ctx.font = "700 15px " + UI.sans;
+    ctx.fillText(b.label, W / 2, y + 5);
+  });
+  ctx.font = "600 11px " + UI.sans;
+  ctx.fillStyle = "rgba(27,23,48,0.55)";
+  ctx.fillText("P reprendre  ·  Échap quitter", W / 2, py + ph - 16);
 }
 
 function drawTutorialInvite() {
@@ -1909,7 +2109,15 @@ function drawSelectTerrain() {
     ctx.fillText(TERRAINS[i].name, px + pw / 2, py + ph + 40);
   }
 
-  uiLabel("↑↓←→ / stick pour naviguer   ·   Entrée pour valider   ·   C terrain calme : " + (mapEventsQuiet ? "ON" : "OFF") +
-          "   ·   Échap ← retour", UI.mx, 466, 10, UI.muted, 1);
+  // Picker ballon cosmétique (skins débloqués via tournoi)
+  const skin = BALL_SKINS[ballSkin] || BALL_SKINS[0];
+  const unlockedN = (typeof meta !== "undefined" && meta && meta.ballUnlocked)
+    ? meta.ballUnlocked.length : 1;
+  hit(UI.mx + 70, 448, 48, 24, "BallPrev");
+  hit(UI.mx + 220, 448, 48, 24, "BallNext");
+  uiLabel("B / ◀ ▶  Ballon : " + (skin ? skin.name : "Cartoon") +
+    "  (" + unlockedN + "/" + BALL_SKINS.length + ")" +
+    "   ·   C terrain calme : " + (mapEventsQuiet ? "ON" : "OFF") +
+    "   ·   Échap ← retour", UI.mx, 466, 10, UI.muted, 1);
 }
 

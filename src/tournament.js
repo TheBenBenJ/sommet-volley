@@ -207,7 +207,8 @@ function tournamentStartNextMatch() {
   let tIdx = TERRAINS.findIndex(t => t.character === rival);
   if (tIdx < 0) tIdx = rival % TERRAINS.length;
   terrain = tIdx;
-  ballSkin = 0;
+  if (typeof metaUseEquippedBall === "function") metaUseEquippedBall();
+  else ballSkin = 0;
   tournamentInMatch = true;
   tournament._matchIndex = mi;
   newGame();
@@ -235,6 +236,7 @@ function tournamentOnMatchEnd() {
     return;
   }
   if (mi === TOURNEY_FINAL) {
+    if (typeof metaOnTournamentWin === "function") metaOnTournamentWin();
     state = "tournamentEnding";
     tournament._eliminated = false;
     return;
@@ -409,10 +411,14 @@ function drawTournamentEnding() {
     noEscHint: true
   });
   const mx = UI.mx;
+  const wins = (typeof meta !== "undefined" && meta) ? (meta.tournamentWins | 0) : 0;
   if (won) {
     uiLabel("Tu remportes le Tournoi du Sommet.", mx, 180, 16, UI.gold, 0.3);
+    uiLabel("Couronnes : " + wins + (wins > 1 ? "  ·  Ballon débloqué !" : "  ·  Ballon Or débloqué"),
+      mx, 202, 13, UI.muted, 0.3);
   } else {
     uiLabel("La route s'arrête ici — pour cette fois.", mx, 180, 16, UI.muted, 0.3);
+    if (wins > 0) uiLabel("Couronnes en palmarès : " + wins, mx, 202, 13, UI.muted, 0.3);
   }
   if (champ != null) {
     tournamentDrawPortrait(champ, W / 2, 280, 120);

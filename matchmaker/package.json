@@ -1,0 +1,17 @@
+{
+  "name": "sommet-matchmaker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "File d'attente WebSocket pour Partie rapide (Sommet Volley)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node server.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

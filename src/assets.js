@@ -3,6 +3,9 @@
 
 const SPRITES = {
   ballPurple: null,      // ballon volley violet / crème
+  ballGold: null,        // cosmétique tournoi — or
+  ballNight: null,       // cosmétique tournoi — nuit
+  ballCream: null,       // cosmétique tournoi — crème
   ballFlame: [null, null, null, null], // mode Ballon enflammé — stages 0..3
   fxFlameFeet: [null, null, null],     // overlays feu pieds 0..2
   fxFlameBody: [null, null, null],     // overlays feu corps 0..2
@@ -45,6 +48,9 @@ function loadMapPack(key, files) {
 
 function initSprites() {
   SPRITES.ballPurple = loadSprite("assets/ball/volley_purple.png");
+  SPRITES.ballGold = loadSprite("assets/ball/volley_gold.png");
+  SPRITES.ballNight = loadSprite("assets/ball/volley_night.png");
+  SPRITES.ballCream = loadSprite("assets/ball/volley_cream.png");
   for (let i = 0; i < 4; i++) {
     SPRITES.ballFlame[i] = loadSprite("assets/ball/flame_" + i + ".png");
   }

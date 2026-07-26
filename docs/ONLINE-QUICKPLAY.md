@@ -75,24 +75,38 @@ Au-delà du quickplay : une liste de parties ouvertes (mode, région, ping,
 publiques. Réutilise le matchmaker (endpoint `GET /rooms`). Non prioritaire vs
 le quickplay + bots.
 
-## Ce qu'il faut toucher
+## Implémentation (livré)
 
-1. **Nouveau service** `matchmaker/` (Node WS) + conf nginx (`wss://…/mm`).
-2. **`src/net.js`** : un mode « quickplay » qui, au lieu d'afficher un code,
-   parle au matchmaker puis retombe dans `initHostPeer` / connexion-par-id
-   existants. States UI : `matchmaking` (recherche) réutilisant l'essentiel de
-   `connecting` / `hostWait`.
-3. **`src/menus.js`** : bouton « Partie rapide » (menu en ligne) + écran de
-   recherche avec compteur + bouton « Jouer contre un bot ».
-4. **Bot-backfill** : réutilise `newGame()` vs IA — trivial (le solo existe
-   déjà). L'essentiel est la **transition douce** depuis l'écran de recherche.
+| Élément | Emplacement |
+|---------|-------------|
+| Service WS | [`matchmaker/server.js`](../matchmaker/server.js) + [`queue.js`](../matchmaker/queue.js) |
+| Client | `startQuickplay` / `startQuickplayBot` dans [`src/net.js`](../src/net.js) |
+| UI | menu En ligne → **Partie rapide** ; état `matchmaking` |
+| Deploy | rsync `matchmaker/` + `systemctl restart sommet-mm` (si unit installée) |
 
-Effort : matchmaker ~0,5–1 j, intégration client ~1 j, bot-backfill ~0,5 j.
-Risque faible : le transport ne change pas.
+### Dev local
+
+```bash
+cd matchmaker && npm install && npm start
+# → ws://127.0.0.1:8787/mm
+# Client : ouvrir le jeu ; override optionnel :
+#   window.SOMMET_MM_URL = "ws://127.0.0.1:8787/mm"
+```
+
+Sans matchmaker joignable, l'écran propose **Jouer contre un bot** (bot-backfill).
+
+### Prod (une fois)
+
+1. Copier [`matchmaker/systemd/sommet-mm.service`](../matchmaker/systemd/sommet-mm.service) vers `/etc/systemd/system/sommet-mm.service`, remplacer `DEPLOY_USER`, puis :
+   `sudo systemctl enable --now sommet-mm`
+2. Ajouter le bloc [`matchmaker/nginx.conf.example`](../matchmaker/nginx.conf.example) au vhost HTTPS (`location /mm`), `nginx -t && reload`.
+3. Health : `curl -s https://TON_DOMAINE/mm/health` ou `http://127.0.0.1:8787/health`.
+
+### Steam / Electron
+
+Même client : pointer `window.SOMMET_MM_URL = "wss://TON_DOMAINE/mm"` au boot. Pas de serveur de simu à embarquer.
 
 ## Priorité
 
 **Quickplay + bot-backfill = must-have avant Steam** si on garde une promesse
-« jouable en ligne ». Le lobby/navigateur est un plus ultérieur. Sans ça, mieux
-vaut **assumer un positionnement « party game local + bots »** et ne pas
-survendre l'online (un online vide fait plus de mal qu'une absence d'online).
+« jouable en ligne ». Le lobby/navigateur est un plus ultérieur.

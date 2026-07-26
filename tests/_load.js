@@ -66,6 +66,16 @@ if (typeof Image === "undefined") {
     this.src = "";
   });
 }
+// localStorage mémoire (Node n'en a pas) — settings / méta / histoire.
+if (typeof localStorage === "undefined" || !global.localStorage) {
+  const _store = Object.create(null);
+  define("localStorage", {
+    getItem: (k) => (k in _store ? _store[k] : null),
+    setItem: (k, v) => { _store[k] = String(v); },
+    removeItem: (k) => { delete _store[k]; },
+    clear: () => { for (const k of Object.keys(_store)) delete _store[k]; }
+  });
+}
 
 // épilogue : ce que les tests peuvent inspecter/piloter
 const EPILOGUE = `
@@ -151,6 +161,28 @@ const EPILOGUE = `
     inMatch: typeof tournamentInMatch !== "undefined" ? tournamentInMatch : null
   }),
   setScores: (a, b) => { scores[0] = a | 0; scores[1] = b | 0; },
+  BALL_SKINS: typeof BALL_SKINS !== "undefined" ? BALL_SKINS : [],
+  getBallSkin: () => (typeof ballSkin !== "undefined" ? ballSkin : 0),
+  setBallSkin: v => { ballSkin = v | 0; },
+  getMeta: () => (typeof meta !== "undefined" ? meta : null),
+  metaLoad: typeof metaLoad === "function" ? metaLoad : null,
+  metaSave: typeof metaSave === "function" ? metaSave : null,
+  metaOnTournamentWin: typeof metaOnTournamentWin === "function" ? metaOnTournamentWin : null,
+  metaUseEquippedBall: typeof metaUseEquippedBall === "function" ? metaUseEquippedBall : null,
+  metaCycleBallSkin: typeof metaCycleBallSkin === "function" ? metaCycleBallSkin : null,
+  commitSetup: typeof commitSetup === "function" ? commitSetup : null,
+  openOptions: typeof openOptions === "function" ? openOptions : null,
+  leaveOptions: typeof leaveOptions === "function" ? leaveOptions : null,
+  setPendingMode: v => { pendingMode = v; },
+  saveSettings: typeof saveSettings === "function" ? saveSettings : null,
+  loadSettings: typeof loadSettings === "function" ? loadSettings : null,
+  handleMenuKeys: typeof handleMenuKeys === "function" ? handleMenuKeys : null,
+  startQuickplay: typeof startQuickplay === "function" ? startQuickplay : null,
+  startQuickplayBot: typeof startQuickplayBot === "function" ? startQuickplayBot : null,
+  cancelQuickplay: typeof cancelQuickplay === "function" ? cancelQuickplay : null,
+  getMmQuickplay: () => (typeof mmQuickplay !== "undefined" ? !!mmQuickplay : false),
+  getOnline: () => !!online,
+  getVsAI: () => !!vsAI,
   SPRITES: typeof SPRITES !== "undefined" ? SPRITES : null,
   spriteReady: typeof spriteReady === "function" ? spriteReady : () => false,
   SUPER_DUR: typeof SUPER_DUR !== "undefined" ? SUPER_DUR : {},

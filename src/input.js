@@ -195,7 +195,8 @@ function navOptions() {
   switch (state) {
     case "menu":          return tutorialInviteOpen
       ? ["TutPlay", "TutLater", "TutNever"]
-      : ["Digit1", "Digit2", "KeyT", "KeyH", "KeyR", "KeyC"];
+      : ["Digit1", "Digit2", "KeyT", "KeyO", "KeyH", "KeyR", "KeyC"];
+    case "options":       return ["OptMute", "OptMusic", "OptQuiet", "OptBack"];
     case "soloMenu":      return ["Digit1", "Digit2", "Digit3"];
     case "multiMenu":     return ["Digit1", "Digit2"];
     case "tournamentBracket": return ["TourPlay", "TourBack"];
@@ -208,7 +209,8 @@ function navOptions() {
     // Solo / en ligne : Classique / Bombe / Flamme (puis teamFormat).
     // Multijoueur local : mêmes 3 modes, 1v1 seulement.
     case "gameModeSelect": return ["Digit1", "Digit2", "Digit3"];
-    case "onlineMenu":    return ["Digit1", "Digit2"];
+    case "onlineMenu":    return ["Digit1", "Digit2", "Digit3"];
+    case "matchmaking":   return ["MmBot", "MmCancel"];
     case "selectCharacter": {
       const vis = characterIndices();
       return vis.map((_, slot) => "Digit" + (slot + 1));
@@ -303,11 +305,27 @@ function handlePadMenu() {
     if (padEdge("back")) handleMenuKeys("Escape", "");
   } else if (state === "rules" || state === "tutorialHelp" || state === "netError" || state === "credits") {
     if (padEdge("confirm") || padEdge("back")) handleMenuKeys("Escape", "");
+  } else if (paused && !online && (state === "serve" || state === "play" || state === "point")) {
+    if (padEdge("up")) {
+      pauseNavIdx = (pauseNavIdx - 1 + 3) % 3;
+      beep(500, 0.03, "square", 0.05);
+    }
+    if (padEdge("down")) {
+      pauseNavIdx = (pauseNavIdx + 1) % 3;
+      beep(500, 0.03, "square", 0.05);
+    }
+    if (padEdge("confirm")) {
+      handleMenuKeys(["PauseResume", "PauseOptions", "PauseQuit"][pauseNavIdx | 0], "");
+    }
+    if (padEdge("back")) handleMenuKeys("PauseQuit", "");
   } else if ((state === "serve" || state === "play") && tutorialMode) {
     if (padEdge("confirm")) handleMenuKeys("Enter", "");
     if (padEdge("back")) handleMenuKeys("Escape", "");
   } else if (state === "gameover") {
     if (padEdge("confirm") && gameoverTimer <= 0) handleMenuKeys(online ? "KeyR" : "Space", "");
+    if (padEdge("back")) handleMenuKeys("Escape", "");
+  } else if (state === "matchmaking") {
+    if (padEdge("confirm")) handleMenuKeys("MmBot", "");
     if (padEdge("back")) handleMenuKeys("Escape", "");
   } else if (state === "hostWait" || state === "connecting" || state === "netWait" || state === "joinEntry") {
     if (padEdge("back")) handleMenuKeys("Escape", "");

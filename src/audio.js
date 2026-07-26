@@ -41,7 +41,10 @@ const SETTINGS_KEY = "sommetVolleySettings";
 const SETTINGS_KEY_LEGACY = "crabbyVolleySettings";
 function saveSettings() {
   try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ muted, musicOn, volume, musicVolume }));
+    const quiet = (typeof mapEventsQuiet !== "undefined") ? !!mapEventsQuiet : false;
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+      muted, musicOn, volume, musicVolume, mapEventsQuiet: quiet
+    }));
   } catch (e) { /* navigation privée, quota dépassé… tant pis, pas bloquant */ }
 }
 function loadSettings() {
@@ -53,6 +56,9 @@ function loadSettings() {
     if (typeof s.musicOn === "boolean") musicOn = s.musicOn;
     if (typeof s.volume === "number") volume = Math.max(0, Math.min(1, s.volume));
     if (typeof s.musicVolume === "number") musicVolume = Math.max(0, Math.min(1, s.musicVolume));
+    if (typeof s.mapEventsQuiet === "boolean" && typeof mapEventsQuiet !== "undefined") {
+      mapEventsQuiet = s.mapEventsQuiet;
+    }
   } catch (e) { /* réglages corrompus/absents : on garde les valeurs par défaut */ }
 }
 

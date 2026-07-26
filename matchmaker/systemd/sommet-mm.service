@@ -1,0 +1,16 @@
+[Unit]
+Description=Sommet Volley matchmaker (WebSocket /mm)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/DEPLOY_USER/sommet-matchmaker
+ExecStart=/usr/bin/node server.js
+Environment=PORT=8787
+Environment=HOST=127.0.0.1
+Restart=on-failure
+RestartSec=3
+User=DEPLOY_USER
+
+[Install]
+WantedBy=multi-user.target

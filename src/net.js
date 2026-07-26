@@ -218,15 +218,26 @@ function checkBothOpen() {
   startPinging();
   if (netRole === "guest") {
     // connecté : l'invité choisit son personnage (le vert), puis enverra "hello"
-    pendingMode = { online: true };
+    if (!pendingMode) pendingMode = { online: true };
+    pendingMode.online = true;
+    if (mmQuickplay) pendingMode.quickplay = true;
     selPlayer = 1;
     peerTakenCharacters = [];
     state = "selectCharacter";
   } else if (netRole === "host") {
-    // hôte 1v1 : prévenir l'invité des persos déjà pris
-    sendRel({ t: "taken", a: [blobL.charId] });
+    if (mmQuickplay) {
+      // Partie rapide : l'hôte choisit son perso après le matchmaking
+      if (!pendingMode) pendingMode = { online: true, quickplay: true };
+      pendingMode.online = true;
+      pendingMode.quickplay = true;
+      selPlayer = 0;
+      state = "selectCharacter";
+    } else {
+      // hôte 1v1 classique : prévenir l'invité des persos déjà pris
+      sendRel({ t: "taken", a: [blobL.charId] });
+    }
   }
-  // côté hôte : l'écran hostWait affiche "joueur connecté…" jusqu'au hello
+  // côté hôte (créer) : l'écran hostWait affiche "joueur connecté…" jusqu'au hello
 }
 
 // diagnostic technique (état des 2 canaux + de la négociation ICE sous-jacente)
@@ -241,11 +252,14 @@ function netDiag() {
 
 function onPeerError(err) {
   const t = err && err.type;
-  if (netRole === "host" && t === "unavailable-id" && state === "hostWait") {
+  if (netRole === "host" && t === "unavailable-id" &&
+      (state === "hostWait" || state === "matchmaking")) {
     // collision de code (rarissime) : on en retire un autre
     const p = peer; peer = null;
     try { p.destroy(); } catch (e) {}
+    mmHostReadySent = false;
     initHostPeer();
+    if (mmQuickplay) mmWaitPeerReadyThenReady();
     return;
   }
   let msg = "Erreur réseau" + (t ? " (" + t + ")" : "") + ".";
@@ -284,6 +298,11 @@ function teardownNet() {
   peerTakenCharacters = [];
   paused = false;
   netErrorDetail = "";
+  mmCloseSocketOnly();
+  mmQuickplay = false;
+  mmStatus = "";
+  mmHostReadySent = false;
+  mmPendingGuestChar = null;
 }
 
 /** Persos déjà réservés côté hôte 2v2 (hôte + invités prêts). */
@@ -343,6 +362,11 @@ function onNetData(m) {
       if (netRole !== "host") break;
       let a = clampCharacterIdx(m.charId);
       if (a === blobL.charId) a = randomCharacterIdx([blobL.charId]);
+      // Partie rapide : l'hôte peut encore être en selectCharacter
+      if (mmQuickplay && state === "selectCharacter") {
+        mmPendingGuestChar = a;
+        break;
+      }
       blobR.charId = a;
       hostStartMatch();
       break;
@@ -1203,6 +1227,197 @@ function drawNetHUD() {
   if (stale) overlay("Connexion instable…", "La partie reprendra automatiquement");
 }
 
+// ---------- Partie rapide (matchmaker WS) ----------
+const MM_BOT_MS = 15000;
+let mmWs = null;
+let mmQuickplay = false;
+let mmStatus = "";           // waiting | hosting | matched | error
+let mmStartedAt = 0;
+let mmBotTimer = null;
+let mmPendingGuestChar = null;
+let mmHostReadySent = false;
+
+function matchmakerUrl() {
+  if (typeof window !== "undefined" && window.SOMMET_MM_URL) return String(window.SOMMET_MM_URL);
+  try {
+    const loc = typeof location !== "undefined" ? location : null;
+    if (!loc || !loc.host) return "ws://127.0.0.1:8787/mm";
+    const proto = loc.protocol === "https:" ? "wss:" : "ws:";
+    return proto + "//" + loc.host + "/mm";
+  } catch (e) {
+    return "ws://127.0.0.1:8787/mm";
+  }
+}
+
+function quickplayModeKey() {
+  if (pendingMode && pendingMode.flame) return "flame";
+  if (pendingMode && pendingMode.bomb) return "bomb";
+  return "classic";
+}
+
+function mmCloseSocketOnly() {
+  if (mmBotTimer) { clearTimeout(mmBotTimer); mmBotTimer = null; }
+  if (mmWs) {
+    try { mmWs.onclose = null; mmWs.onerror = null; mmWs.onmessage = null; } catch (e) {}
+    try { mmWs.close(); } catch (e) {}
+    mmWs = null;
+  }
+}
+
+function mmSend(msg) {
+  if (mmWs && mmWs.readyState === 1) {
+    try { mmWs.send(JSON.stringify(msg)); } catch (e) { /* ignore */ }
+  }
+}
+
+function cancelQuickplay() {
+  mmSend({ t: "cancel" });
+  mmCloseSocketOnly();
+  mmQuickplay = false;
+  mmStatus = "";
+  mmHostReadySent = false;
+  mmPendingGuestChar = null;
+}
+
+/** Démarre la recherche d'adversaire (pendingMode déjà posé : bomb/flame/online/quickplay). */
+function startQuickplay() {
+  cancelQuickplay();
+  mmQuickplay = true;
+  mmStatus = "waiting";
+  mmStartedAt = performance.now();
+  mmHostReadySent = false;
+  mmPendingGuestChar = null;
+  if (!pendingMode) pendingMode = {};
+  pendingMode.online = true;
+  pendingMode.quickplay = true;
+  pendingMode.o2v2 = false;
+  state = "matchmaking";
+  navIdx = 0;
+
+  const url = matchmakerUrl();
+  let ws;
+  try { ws = new WebSocket(url); } catch (e) {
+    mmStatus = "error";
+    scheduleQuickplayBot(1200);
+    return;
+  }
+  mmWs = ws;
+  ws.onopen = () => {
+    mmSend({ t: "hello", mode: quickplayModeKey() });
+    mmBotTimer = setTimeout(() => {
+      if (state === "matchmaking" && !netConnected) offerOrStartBotHint();
+    }, MM_BOT_MS);
+  };
+  ws.onmessage = (ev) => {
+    let m;
+    try { m = JSON.parse(ev.data); } catch (e) { return; }
+    if (!m || !m.t) return;
+    if (m.t === "waiting") { mmStatus = "waiting"; return; }
+    if (m.t === "host") {
+      mmStatus = "hosting";
+      initHostPeer();
+      mmWaitPeerReadyThenReady();
+      return;
+    }
+    if (m.t === "join" && m.code) {
+      mmStatus = "matched";
+      mmCloseSocketOnly();
+      initGuestPeer(String(m.code).toUpperCase());
+      state = "connecting";
+      return;
+    }
+    if (m.t === "matched") {
+      mmStatus = "matched";
+      mmCloseSocketOnly(); // garde mmQuickplay=true pour le flux perso
+      // host : reste jusqu'à netConnected → selectCharacter (checkBothOpen)
+      return;
+    }
+    if (m.t === "timeout") {
+      mmStatus = "error";
+      scheduleQuickplayBot(400);
+    }
+  };
+  ws.onerror = () => {
+    if (state === "matchmaking") {
+      mmStatus = "error";
+      scheduleQuickplayBot(800);
+    }
+  };
+  ws.onclose = () => {
+    if (mmWs === ws) mmWs = null;
+  };
+}
+
+function mmWaitPeerReadyThenReady() {
+  const trySend = () => {
+    if (!mmQuickplay || !peer) return;
+    if (peerReady && netCode && !mmHostReadySent) {
+      mmHostReadySent = true;
+      mmSend({ t: "ready", code: netCode });
+      return;
+    }
+    if (state === "matchmaking" || state === "hostWait") setTimeout(trySend, 50);
+  };
+  trySend();
+}
+
+function offerOrStartBotHint() {
+  // L'UI affiche le bouton bot ; on ne force pas le lancement auto.
+  mmStatus = mmStatus === "error" ? "error" : "bot_ready";
+}
+
+function scheduleQuickplayBot(delay) {
+  if (mmBotTimer) clearTimeout(mmBotTimer);
+  mmBotTimer = setTimeout(() => {
+    if (state === "matchmaking") mmStatus = "error";
+  }, delay | 0);
+}
+
+/** Quitte la file et lance une partie locale vs IA (même mode bombe/flamme). */
+function startQuickplayBot() {
+  const bomb = !!(pendingMode && pendingMode.bomb);
+  const flame = !!(pendingMode && pendingMode.flame);
+  const bombTimeSaved = (pendingMode && pendingMode.bombTime) || BOMB_TIME;
+  cancelQuickplay();
+  teardownNet();
+  pendingMode = {
+    vsAI: true, aiLevel: 1, mode2v2: false,
+    bomb: bomb, flame: flame && !bomb, bombTime: bombTimeSaved
+  };
+  online = false;
+  vsAI = true;
+  aiLevel = 1;
+  bombMode = bomb;
+  bombTime = bombTimeSaved;
+  flameMode = !!(flame && !bomb);
+  mapEventsQuiet = false;
+  setMode("1v1");
+  if (typeof metaUseEquippedBall === "function") metaUseEquippedBall();
+  blobL.charId = blobL.charId | 0;
+  blobR.charId = randomCharacterIdx([blobL.charId]);
+  terrain = (Math.random() * TERRAINS.length) | 0;
+  newGame();
+}
+
+/** Après choix perso hôte en quickplay : terrain auto, attendre le guest. */
+function quickplayHostAfterChar() {
+  terrain = (Math.random() * TERRAINS.length) | 0;
+  if (typeof metaUseEquippedBall === "function") metaUseEquippedBall();
+  bombMode = !!(pendingMode && pendingMode.bomb);
+  bombTime = (pendingMode && pendingMode.bombTime) || BOMB_TIME;
+  flameMode = !!(pendingMode && pendingMode.flame) && !bombMode;
+  sendRel({ t: "taken", a: [blobL.charId] });
+  if (mmPendingGuestChar != null) {
+    let a = clampCharacterIdx(mmPendingGuestChar);
+    if (a === blobL.charId) a = randomCharacterIdx([blobL.charId]);
+    blobR.charId = a;
+    mmPendingGuestChar = null;
+    hostStartMatch();
+    return;
+  }
+  state = "hostWait";
+}
+
 // En-tête commun aux écrans en ligne (= menus cartoon + décor aléatoire).
 function netScreenBase(title, kicker, subtitle) {
   menuScreenBase({
@@ -1214,16 +1429,52 @@ function netScreenBase(title, kicker, subtitle) {
 }
 
 function drawOnlineMenu() {
-  netScreenBase("En ligne", "Multijoueur · Créer ou rejoindre",
-                "Connexion directe entre navigateurs (WebRTC)");
-  // "Créer une partie" amène au même écran de format que le solo (1v1/en
-  // équipes/Bombe, voir drawGameModeSelect) — plus de doublons à plat ici.
+  netScreenBase("En ligne", "Multijoueur · Partie rapide ou code",
+                "WebRTC · matchmaking ou entre amis");
   const opts = [
-    "1  —  Créer une partie",
-    "2  —  Rejoindre avec un code"
+    "1  —  Partie rapide",
+    "2  —  Créer une partie",
+    "3  —  Rejoindre avec un code"
   ];
-  drawOptionList(opts, 224, 44);
-  uiLabel("L'hôte partage son code · en équipes : places libres tenues par l'IA", UI.mx, H - 70, 10, UI.muted, 1);
+  drawOptionList(opts, 210, 42);
+  uiLabel("Partie rapide : 1v1 · bot si personne en ~15 s", UI.mx, H - 70, 10, UI.muted, 1);
+}
+
+function drawMatchmaking() {
+  const sec = Math.max(0, ((performance.now() - mmStartedAt) / 1000) | 0);
+  const modeLabel = pendingMode && pendingMode.flame ? "Ballon enflammé"
+    : pendingMode && pendingMode.bomb ? "Bombe" : "Classique";
+  netScreenBase("Partie rapide", "En ligne · " + modeLabel,
+                "Recherche d'un adversaire…");
+  const mx = UI.mx;
+  const dots = ".".repeat(1 + Math.floor(performance.now() / 400) % 3);
+  let line = "Recherche" + dots + "  (" + sec + " s)";
+  if (mmStatus === "hosting") line = "Salon créé — en attente d'un joueur" + dots;
+  if (mmStatus === "matched") line = "Adversaire trouvé — connexion" + dots;
+  if (mmStatus === "error") line = "Matchmaker injoignable — joue contre un bot ?";
+  if (mmStatus === "bot_ready") line = "Toujours personne — lance un bot ou patiente.";
+  ctx.textAlign = "left";
+  ctx.fillStyle = UI.ink;
+  ctx.font = "600 18px " + UI.sans;
+  ctx.fillText(line, mx, 230);
+
+  const showBot = mmStatus === "bot_ready" || mmStatus === "error" || sec >= 15;
+  if (showBot) {
+    hit(W / 2, 310, 280, 40, "MmBot");
+    const sel = (typeof padConnected !== "undefined" && padConnected && navIdx === 0) ||
+      (typeof isHover === "function" && isHover("MmBot"));
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(W / 2 - 140, 290, 280, 40, 12); else ctx.rect(W / 2 - 140, 290, 280, 40);
+    ctx.fillStyle = sel ? "rgba(255,216,74,0.95)" : "rgba(255,246,232,0.92)";
+    ctx.fill();
+    ctx.strokeStyle = UI.stroke; ctx.lineWidth = 2.5; ctx.stroke();
+    ctx.textAlign = "center";
+    ctx.fillStyle = UI.stroke;
+    ctx.font = "700 16px " + UI.sans;
+    ctx.fillText("Jouer contre un bot", W / 2, 316);
+  }
+  hit(mx + 70, H - 28, 160, 28, "MmCancel");
+  uiLabel("Échap — Annuler", mx, H - 20, 12, UI.muted, 0.3);
 }
 
 // gros code de partie, calé à gauche sous l'en-tête

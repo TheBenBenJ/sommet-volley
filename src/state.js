@@ -18,11 +18,89 @@ const TERRAINS = [
 ];
 let terrain = 0;
 
-// Ballon unique : cartoon PNG (volley violet / crème).
+// Ballons cosmétiques (PNG Codex) — débloqués via victoires tournoi.
 const BALL_SKINS = [
-  { key: "purple", name: "Cartoon", sprite: "ballPurple" },
+  { key: "purple", name: "Cartoon", sprite: "ballPurple", unlockWins: 0 },
+  { key: "gold",   name: "Or",      sprite: "ballGold",   unlockWins: 1 },
+  { key: "night",  name: "Nuit",    sprite: "ballNight",  unlockWins: 2 },
+  { key: "cream",  name: "Crème",   sprite: "ballCream",  unlockWins: 3 }
 ];
 let ballSkin = 0;
+
+// Méta persistée (palmarès tournoi + skins ballon).
+const META_KEY = "sommetMeta";
+let meta = { tournamentWins: 0, ballUnlocked: [0], ballSkin: 0 };
+
+function metaDefault() {
+  return { tournamentWins: 0, ballUnlocked: [0], ballSkin: 0 };
+}
+function metaLoad() {
+  try {
+    const raw = localStorage.getItem(META_KEY);
+    if (!raw) { meta = metaDefault(); return meta; }
+    const s = JSON.parse(raw);
+    meta = metaDefault();
+    if (typeof s.tournamentWins === "number") meta.tournamentWins = Math.max(0, s.tournamentWins | 0);
+    if (Array.isArray(s.ballUnlocked) && s.ballUnlocked.length) {
+      meta.ballUnlocked = [...new Set(s.ballUnlocked.map(i => i | 0).filter(i => i >= 0 && i < BALL_SKINS.length))];
+    }
+    if (!meta.ballUnlocked.length) meta.ballUnlocked = [0];
+    if (typeof s.ballSkin === "number") meta.ballSkin = s.ballSkin | 0;
+    metaUnlockForWins();
+    metaApplyBallSkin();
+  } catch (e) { meta = metaDefault(); }
+  return meta;
+}
+function metaSave() {
+  try {
+    localStorage.setItem(META_KEY, JSON.stringify({
+      tournamentWins: meta.tournamentWins | 0,
+      ballUnlocked: meta.ballUnlocked.slice(),
+      ballSkin: meta.ballSkin | 0
+    }));
+  } catch (e) { /* ignore */ }
+}
+function metaIsUnlocked(i) {
+  return meta.ballUnlocked.indexOf(i | 0) >= 0;
+}
+function metaUnlockForWins() {
+  const wins = meta.tournamentWins | 0;
+  for (let i = 0; i < BALL_SKINS.length; i++) {
+    if ((BALL_SKINS[i].unlockWins | 0) <= wins && !metaIsUnlocked(i)) meta.ballUnlocked.push(i);
+  }
+}
+function metaApplyBallSkin() {
+  let id = meta.ballSkin | 0;
+  if (!metaIsUnlocked(id)) id = 0;
+  meta.ballSkin = id;
+  ballSkin = id;
+}
+/** Applique le skin méta (clamp débloqué) avant un match. */
+function metaUseEquippedBall() {
+  metaApplyBallSkin();
+  return ballSkin;
+}
+function metaCycleBallSkin(dir) {
+  const unlocked = meta.ballUnlocked.slice().sort((a, b) => a - b);
+  if (!unlocked.length) return 0;
+  let idx = unlocked.indexOf(meta.ballSkin | 0);
+  if (idx < 0) idx = 0;
+  idx = (idx + (dir >= 0 ? 1 : -1) + unlocked.length) % unlocked.length;
+  meta.ballSkin = unlocked[idx];
+  metaSave();
+  metaApplyBallSkin();
+  return ballSkin;
+}
+function metaOnTournamentWin() {
+  meta.tournamentWins = (meta.tournamentWins | 0) + 1;
+  metaUnlockForWins();
+  // Auto-équiper le meilleur skin débloqué
+  let best = 0;
+  for (const id of meta.ballUnlocked) if (id > best) best = id;
+  meta.ballSkin = best;
+  metaSave();
+  metaApplyBallSkin();
+}
 
 const CHARACTERS = [
   // Casting satirique Sommet Volley — fiches docs/chars/*.yaml

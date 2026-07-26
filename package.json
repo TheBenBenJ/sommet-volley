@@ -4,8 +4,9 @@
   "description": "Sommet Volley — volley satirique HTML5 Canvas (solo, local, en ligne WebRTC/PeerJS).",
   "type": "commonjs",
   "scripts": {
-    "test": "node tests/game.test.js",
-    "start": "python3 -m http.server 8000"
+    "test": "node tests/game.test.js && node matchmaker/server.test.js",
+    "start": "python3 -m http.server 8000",
+    "mm": "node matchmaker/server.js"
   },
   "keywords": [
     "game",

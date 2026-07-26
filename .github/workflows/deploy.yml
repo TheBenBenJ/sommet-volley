@@ -33,7 +33,9 @@ jobs:
         with:
           node-version: 20
       - name: Tests (filet de sécurité)
-        run: npm test
+        run: |
+          (cd matchmaker && npm ci)
+          npm test
 
   deploy:
     if: ${{ !contains(github.event.head_commit.message || '', '[skip ci]') }}
@@ -103,10 +105,10 @@ jobs:
         run: |
           rsync -az --delete \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            index.html src assets \
+            index.html src assets matchmaker \
             "$DEPLOY_USER@$DEPLOY_HOST:/home/$DEPLOY_USER/sommet-deploy/"
 
-      - name: Publier dans la racine web
+      - name: Publier dans la racine web + matchmaker
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             "$DEPLOY_USER@$DEPLOY_HOST" \
@@ -115,7 +117,15 @@ jobs:
              sudo cp /home/$DEPLOY_USER/sommet-deploy/index.html '$WEB_ROOT/index.html'; \
              sudo rsync -a --delete /home/$DEPLOY_USER/sommet-deploy/src/ '$WEB_ROOT/src/'; \
              sudo rsync -a --delete /home/$DEPLOY_USER/sommet-deploy/assets/ '$WEB_ROOT/assets/'; \
-             sudo chown -R www-data:www-data '$WEB_ROOT/index.html' '$WEB_ROOT/src' '$WEB_ROOT/assets'"
+             sudo chown -R www-data:www-data '$WEB_ROOT/index.html' '$WEB_ROOT/src' '$WEB_ROOT/assets'; \
+             mkdir -p /home/$DEPLOY_USER/sommet-matchmaker; \
+             rsync -a --delete --exclude node_modules /home/$DEPLOY_USER/sommet-deploy/matchmaker/ /home/$DEPLOY_USER/sommet-matchmaker/; \
+             cd /home/$DEPLOY_USER/sommet-matchmaker && npm ci --omit=dev; \
+             if systemctl is-enabled sommet-mm >/dev/null 2>&1 || systemctl cat sommet-mm >/dev/null 2>&1; then \
+               sudo systemctl restart sommet-mm || true; \
+             else \
+               echo 'sommet-mm unit not installed yet — see matchmaker/systemd/sommet-mm.service'; \
+             fi"
 
       - name: Vérifier que le site répond
         run: |

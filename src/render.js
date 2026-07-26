@@ -100,6 +100,7 @@ function render() {
   if (state === "menu") { drawMenu(); return; }
   if (state === "soloMenu") { drawSoloMenu(); return; }
   if (state === "multiMenu") { drawMultiMenu(); return; }
+  if (state === "options") { drawOptions(); return; }
   if (state === "aiDifficulty") { drawAiDifficulty(); return; }
   if (state === "gameModeSelect") { drawGameModeSelect(); return; }
   if (state === "teamFormat" || state === "bombFormat" || state === "flameFormat") {
@@ -112,6 +113,7 @@ function render() {
   if (state === "selectCharacter") { drawSelectCharacter(); return; }
   if (state === "selectTerrain") { drawSelectTerrain(); return; }
   if (state === "onlineMenu") { drawOnlineMenu(); return; }
+  if (state === "matchmaking") { drawMatchmaking(); return; }
   if (state === "joinEntry") { drawJoinEntry(); return; }
   if (state === "hostWait") { drawHostWait(); return; }
   if (state === "hostLobby") { drawHostLobby(); return; }

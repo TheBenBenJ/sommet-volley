@@ -483,7 +483,8 @@ function storyStartMatch() {
   const duo = ch.mode === "2v2";
   setMode(duo ? "2v2" : "1v1");
   terrain = ch.terrain;
-  ballSkin = 0;
+  if (typeof metaUseEquippedBall === "function") metaUseEquippedBall();
+  else ballSkin = 0;
   // dopage → IA impitoyable ; sinon niveau du chapitre
   aiLevel = ch.doped === "R" ? 3 : ch.ai;
   blobL.charId = storyCharIdx(ch.left);

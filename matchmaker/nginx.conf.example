@@ -1,0 +1,16 @@
+# À fusionner dans le vhost HTTPS du site Sommet Volley.
+# Le matchmaker écoute en local sur 127.0.0.1:8787 (path /mm).
+
+location /mm {
+    proxy_pass http://127.0.0.1:8787/mm;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_read_timeout 86400;
+}
+
+location = /mm/health {
+    proxy_pass http://127.0.0.1:8787/health;
+}

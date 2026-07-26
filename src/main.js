@@ -6,6 +6,7 @@
 // cohérent avec les préférences du joueur.
 loadSettings();
 if (typeof loadTutorialDone === "function") loadTutorialDone();
+if (typeof metaLoad === "function") metaLoad();
 
 // ---------- Boucle à pas fixe (60 Hz) ----------
 // La simulation avance par ticks constants, découplés du framerate :

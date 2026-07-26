@@ -1432,10 +1432,13 @@ test("menu : Solo / Multijoueur puis sous-menus", () => {
   const g = loadGame();
   g.setState("menu");
   assert.deepStrictEqual(g.navOptions().slice(0, 2), ["Digit1", "Digit2"]);
+  assert.ok(g.navOptions().includes("KeyO"), "Options au menu");
   g.setState("soloMenu");
   assert.deepStrictEqual(g.navOptions(), ["Digit1", "Digit2", "Digit3"]);
   g.setState("multiMenu");
   assert.deepStrictEqual(g.navOptions(), ["Digit1", "Digit2"]);
+  g.setState("options");
+  assert.ok(g.navOptions().includes("OptQuiet"));
 });
 
 test("menu terrain : navOptions couvre tous les terrains (Digit1..N)", () => {
@@ -2130,6 +2133,62 @@ test("tournoi : défaite joueur → écran fin (éliminé)", () => {
   assert.notStrictEqual(g.tournamentChampion(), 0);
   // Pas de match joueur suivant
   assert.strictEqual(g.tournamentPlayerMatchIndex(), -1);
+});
+
+// ---------- Polish Steam : options / méta / skins ----------
+test("options : ouverture depuis le menu", () => {
+  const g = loadGame();
+  g.setState("menu");
+  g.openOptions(false);
+  assert.strictEqual(g.getState(), "options");
+  g.leaveOptions();
+  assert.strictEqual(g.getState(), "menu");
+});
+
+test("meta : victoire finale tournoi débloque un skin", () => {
+  const g = loadGame();
+  const before = g.getMeta().tournamentWins | 0;
+  g.tournamentBuildBracket(0, 1, 33);
+  g.tournamentSimPendingAi();
+  // Quarts → demis → finale
+  for (let round = 0; round < 3; round++) {
+    assert.ok(g.tournamentStartNextMatch(), "match joueur tour " + round);
+    g.setScores(7, 1);
+    g.tournamentOnMatchEnd();
+  }
+  assert.strictEqual(g.getState(), "tournamentEnding");
+  assert.strictEqual(g.getTournament()._eliminated, false);
+  assert.ok(g.getMeta().tournamentWins > before, "compteur couronnes");
+  assert.ok(g.getMeta().ballUnlocked.indexOf(1) >= 0, "skin Or débloqué");
+  assert.ok(g.getBallSkin() >= 1, "skin équipé");
+});
+
+test("meta : commitSetup conserve le ballon équipé", () => {
+  const g = loadGame();
+  g.metaOnTournamentWin();
+  const equipped = g.getBallSkin();
+  assert.ok(equipped >= 1, "skin non-cartoon après couronne");
+  g.setPendingMode({ vsAI: true, aiLevel: 0, mode2v2: false, bomb: false, flame: false });
+  g.commitSetup();
+  assert.strictEqual(g.getBallSkin(), equipped, "commitSetup ne force pas 0");
+});
+
+// ---------- Quickplay / matchmaking ----------
+test("online menu : Partie rapide exposée", () => {
+  const g = loadGame();
+  g.setState("onlineMenu");
+  assert.deepStrictEqual(g.navOptions(), ["Digit1", "Digit2", "Digit3"]);
+});
+
+test("quickplay bot-backfill → partie vs IA", () => {
+  const g = loadGame();
+  g.setPendingMode({ online: true, quickplay: true, o2v2: false, bomb: false, flame: false });
+  g.setState("matchmaking");
+  assert.ok(g.startQuickplayBot, "startQuickplayBot exposé");
+  g.startQuickplayBot();
+  assert.strictEqual(g.getOnline(), false);
+  assert.strictEqual(g.getVsAI(), true);
+  assert.ok(g.getState() === "serve" || g.getState() === "play", "partie locale lancée");
 });
 
 console.log("\n" + pass + " réussis, " + fail + " échoués");

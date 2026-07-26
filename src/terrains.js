@@ -1711,13 +1711,19 @@ function drawBall() {
   ctx.save();
   ctx.translate(ball.x, ball.y);
   ctx.rotate(ball.angle);
-  const spr = SPRITES.ballPurple;
+  const skin = (typeof BALL_SKINS !== "undefined" && BALL_SKINS[ballSkin]) || null;
+  const sprName = (skin && skin.sprite) || "ballPurple";
+  let spr = SPRITES[sprName] || SPRITES.ballPurple;
+  if (!spriteReady(spr)) spr = SPRITES.ballPurple;
   if (spriteReady(spr)) {
     const d = BALL_R * 2.15; // léger débord pour que le trait noir du PNG colle au rayon physique
     ctx.drawImage(spr, -d / 2, -d / 2, d, d);
   } else {
     // Fallback minimal si le PNG n'est pas encore chargé
-    ctx.fillStyle = "#c9a0ff";
+    ctx.fillStyle = skin && skin.key === "gold" ? "#e6c35a"
+      : skin && skin.key === "night" ? "#5a6abf"
+      : skin && skin.key === "cream" ? "#f0e6d0"
+      : "#c9a0ff";
     ctx.beginPath(); ctx.arc(0, 0, BALL_R, 0, Math.PI * 2); ctx.fill();
   }
   ctx.restore();
@@ -2103,7 +2109,9 @@ function drawHUD() {
     ctx.fillText(label, NET_X, H / 2 + 22 + bounce);
   }
 
-  if (paused) {
+  if (paused && typeof drawPauseMenu === "function") {
+    drawPauseMenu();
+  } else if (paused) {
     overlay("PAUSE", "Appuyez sur P pour reprendre");
   }
 }
