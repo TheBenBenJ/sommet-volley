@@ -306,6 +306,86 @@ def apply_cutout(im: Image.Image, prop: bool = False) -> Image.Image:
     return out
 
 
+def cutout_white_on_white(im: Image.Image, max_dist: int = 200) -> Image.Image:
+    """Détourage sujet clair sur fond blanc (ex. bonhomme de neige).
+
+    Le flood classique mange le corps (même blanc que le fond). Ici :
+    1) graines = pixels non blancs (traits, ombres, accessoires) ;
+    2) BFS limité dans le blanc pour remplir les volumes ;
+    3) on retire le blanc encore relié au bord (= fond).
+    """
+    from collections import deque
+
+    rgba = im.convert("RGBA")
+    w, h = rgba.size
+    px = rgba.load()
+    near_white = [[False] * w for _ in range(h)]
+    seed = []
+    for y in range(h):
+        for x in range(w):
+            r, g, b, _a = px[x, y]
+            nw = r >= 246 and g >= 246 and b >= 246
+            near_white[y][x] = nw
+            if not nw:
+                seed.append((x, y))
+
+    keep = [[False] * w for _ in range(h)]
+    dist: dict[tuple[int, int], int] = {}
+    q: deque[tuple[int, int]] = deque()
+    for x, y in seed:
+        keep[y][x] = True
+        dist[(x, y)] = 0
+        q.append((x, y))
+
+    dirs = ((1, 0), (-1, 0), (0, 1), (0, -1))
+    while q:
+        x, y = q.popleft()
+        d = dist[(x, y)]
+        if d >= max_dist:
+            continue
+        for dx, dy in dirs:
+            nx, ny = x + dx, y + dy
+            if nx < 0 or ny < 0 or nx >= w or ny >= h or (nx, ny) in dist:
+                continue
+            if not near_white[ny][nx]:
+                continue
+            dist[(nx, ny)] = d + 1
+            keep[ny][nx] = True
+            q.append((nx, ny))
+
+    # blanc connecté au bord = fond → transparent
+    bq: deque[tuple[int, int]] = deque()
+    seen = [[False] * w for _ in range(h)]
+    for x in range(w):
+        for y in (0, h - 1):
+            if keep[y][x] and near_white[y][x]:
+                bq.append((x, y))
+                seen[y][x] = True
+    for y in range(h):
+        for x in (0, w - 1):
+            if keep[y][x] and near_white[y][x] and not seen[y][x]:
+                bq.append((x, y))
+                seen[y][x] = True
+    while bq:
+        x, y = bq.popleft()
+        keep[y][x] = False
+        for dx, dy in dirs:
+            nx, ny = x + dx, y + dy
+            if nx < 0 or ny < 0 or nx >= w or ny >= h or seen[ny][nx]:
+                continue
+            if keep[ny][nx] and near_white[ny][nx]:
+                seen[ny][nx] = True
+                bq.append((nx, ny))
+
+    out = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    op = out.load()
+    for y in range(h):
+        for x in range(w):
+            if keep[y][x]:
+                op[x, y] = px[x, y]
+    return out
+
+
 def process_prop(src: Path, dst: Path, target_h: int = 720, preserve_white: bool = False):
     """Détourage prop (drapeau…) : pas d'ancrage pieds.
 
@@ -315,6 +395,30 @@ def process_prop(src: Path, dst: Path, target_h: int = 720, preserve_white: bool
     """
     im = Image.open(src).convert("RGBA")
     chroma = is_chroma_bg(im)
+    # Bonhomme de neige (et props blanc-sur-blanc) : pipeline dédié
+    if src.stem == "snowman" and not chroma:
+        cut = cutout_white_on_white(im)
+        bb = content_bbox(cut)
+        if not bb:
+            print(f"  ! {src.name}: masque vide — skip")
+            return
+        cropped = cut.crop(bb)
+        mw = max(4, int(cropped.width * 0.02))
+        mh = max(4, int(cropped.height * 0.02))
+        padded = Image.new(
+            "RGBA",
+            (cropped.width + 2 * mw, cropped.height + 2 * mh),
+            (0, 0, 0, 0),
+        )
+        padded.paste(cropped, (mw, mh), cropped)
+        scale = target_h / padded.height
+        nw, nh = max(1, int(padded.width * scale)), target_h
+        norm = padded.resize((nw, nh), Image.Resampling.LANCZOS)
+        norm = remove_orphan_blobs(norm, min_keep=40)
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        norm.save(dst)
+        print(f"  {src.name} → {dst.name} (snowman white-on-white)")
+        return
     if chroma:
         # Fond magenta : chroma key propre (le blanc des drapeaux est préservé
         # nativement → plus besoin de preserve_white / FLAG_KEEP_WHITE_MAPS).
@@ -695,6 +799,7 @@ def main():
         dst = out_dir / src.name
         stem = src.stem
         if stem in PROP_NAMES or src.name in {n + ".png" for n in PROP_NAMES}:
+            # flag à bandes blanches ; snowman = cutout_white_on_white (dans process_prop)
             keep_w = stem == "flag" and raw_dir.name in FLAG_KEEP_WHITE_MAPS
             process_prop(src, dst, preserve_white=keep_w)
         else:
