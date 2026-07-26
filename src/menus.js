@@ -610,6 +610,8 @@ function commitSetup() {
 }
 
 function newGame(seed) {
+  // Coupe la démo menu pour ne pas polluer le vrai match
+  if (typeof menuDemo !== "undefined") menuDemo.live = false;
   // graine partagée : en ligne, l'hôte l'enverra à l'invité (voir MULTIJOUEUR.md)
   setSeed(seed !== undefined ? seed : (Math.random() * 2 ** 31) | 0);
   tick = 0;
@@ -672,9 +674,24 @@ const UI = {
 };
 function uiAccent() { return UI.accent; }
 
-// Décor de menu : terrain + 2 persos aléatoires (distincts), animés en fond.
-const menuBg = { init: false, terrain: 0, t0: 0, ballX: W * 0.5, ballY: 120, ballVy: 0 };
+// Décor de menu : vraie démo 1v1 IA vs IA (balle + échanges), sinon marche.
+const menuBg = {
+  init: false, terrain: 0, t0: 0, charL: 0, charR: 1,
+  ballX: W * 0.5, ballY: 120, ballVy: 0
+};
 let menuActors = { L: null, R: null };
+const menuDemo = { live: false, matchState: "serve" };
+/** Menus où tourne la démo IA (pas la sélection perso/terrain — elle écrit charId). */
+const MENU_DEMO_STATES = {
+  menu: 1, soloMenu: 1, multiMenu: 1,
+  options: 1, optionsBinds: 1, optionsComfort: 1,
+  aiDifficulty: 1, gameModeSelect: 1,
+  teamFormat: 1, bombFormat: 1, flameFormat: 1, bombDuration: 1,
+  rules: 1, tutorialHelp: 1, credits: 1, onlineMenu: 1
+};
+function menuDemoWanted() {
+  return !!(MENU_DEMO_STATES[state]);
+}
 
 function goMenu() {
   tutorialMode = false;
@@ -713,12 +730,59 @@ function startTutorial() {
   ballSkin = 0;
   paused = false;
   newGame(42);
-  // newGame tire le serveur au sort — seed 42 = camp droit (IA).
-  // Le coach exige le service du joueur (étape 2) → toujours donner la balle à gauche.
-  tutorialGivePlayerServe();
+  // Scénario en dur dès l'étape 0 (Déplacement) — PAS de service au départ.
+  tutorialApplyScenario(0);
+  tutorialStepShownAt = typeof tick === "number" ? tick : 0;
 }
 
-/** Remet un service propre au joueur (camp gauche) pendant le tutoriel. */
+/** true = étapes guidées (0..avant-dernier) : pas de score ni d'IA. */
+function tutorialPracticeActive() {
+  return !!tutorialMode && tutorialStep < TUTORIAL_STEPS.length - 1;
+}
+
+/** Remet les joueurs en place neutre (camp gauche / droite). */
+function tutorialResetBlobs() {
+  for (const b of activeBlobs) {
+    if (typeof b.reset === "function") b.reset();
+  }
+  if (blobL) {
+    blobL.x = W * 0.25;
+    blobL.y = GROUND_Y;
+    blobL.vx = 0; blobL.vy = 0;
+    blobL.onGround = true;
+  }
+  if (blobR) {
+    blobR.x = W * 0.75;
+    blobR.y = GROUND_Y;
+    blobR.vx = 0; blobR.vy = 0;
+    blobR.onGround = true;
+  }
+}
+
+/** Balle figée hors jeu (côté IA, haut) — Déplacement / Saut sans service. */
+function tutorialParkBall() {
+  if (!tutorialMode) return;
+  servingSide = 0;
+  state = "play";
+  serveCountdown = 0;
+  if (typeof powerWindup !== "undefined") powerWindup = null;
+  if (typeof clearBallHold === "function") clearBallHold();
+  ball.frozen = true;
+  ball.inHands = false;
+  ball.tossGrace = 0;
+  ball.serveAimLock = false;
+  ball.serveFlight = false;
+  ball.popped = false;
+  ball.smash = 0;
+  ball.vx = 0; ball.vy = 0; ball.spin = 0;
+  ball.x = W * 0.82;
+  ball.y = 56;
+  ball.touches = [0, 0];
+  ball.lastTouchSide = -1;
+  if (typeof clearNextTouchers === "function") clearNextTouchers();
+}
+
+/** Service propre au joueur (camp gauche) — uniquement à l'étape Service. */
 function tutorialGivePlayerServe() {
   if (!tutorialMode) return;
   servingSide = 0;
@@ -730,6 +794,112 @@ function tutorialGivePlayerServe() {
     ball.reset(0);
     state = "serve";
     serveCountdown = 0;
+  }
+}
+
+/**
+ * Feed scripté pour Cloche / Smash / SUPER / Super Smash.
+ * kind: "lob" | "smash" | "super" | "power"
+ */
+function tutorialFeedBall(kind) {
+  if (!tutorialMode) return;
+  state = "play";
+  serveCountdown = 0;
+  servingSide = 0;
+  if (typeof powerWindup !== "undefined") powerWindup = null;
+  if (typeof clearBallHold === "function") clearBallHold();
+  // Garde le joueur dans son camp, sous la trajectoire
+  const px = Math.min(Math.max(blobL.x || W * 0.28, 110), NET_X - 90);
+  blobL.x = px;
+  blobL.y = GROUND_Y;
+  blobL.vx = 0; blobL.vy = 0;
+  blobL.onGround = true;
+  blobL.jumpsUsed = 0;
+  ball.frozen = false;
+  ball.inHands = false;
+  ball.tossGrace = 0;
+  ball.serveAimLock = false;
+  ball.serveFlight = false;
+  ball.popped = false;
+  ball.smash = 0;
+  ball.spin = 0;
+  ball.touches = [0, 0];
+  ball.lastTouchSide = -1;
+  ball.lastTouchTick = -999;
+  ball.lastHitTick = -999;
+  if (typeof clearNextTouchers === "function") clearNextTouchers();
+  if (kind === "lob" || kind === "super") {
+    // Cloche / SUPER : balle qui descend au-dessus du joueur (réception sol)
+    ball.x = px;
+    ball.y = GROUND_Y - 200;
+    ball.vx = 0;
+    ball.vy = 2.2;
+  } else {
+    // Smash / Super Smash : balle un peu plus haute, légèrement décalée
+    ball.x = px + 8;
+    ball.y = GROUND_Y - 210;
+    ball.vx = 0.4;
+    ball.vy = 1.6;
+  }
+}
+
+/** Applique le scénario en dur de l'étape coach (entrée d'étape). */
+function tutorialApplyScenario(step) {
+  if (!tutorialMode) return;
+  const s = step | 0;
+  if (s === 0) {
+    // Déplacement — terrain libre, PAS de service
+    tutorialResetBlobs();
+    tutorialParkBall();
+  } else if (s === 1) {
+    // Saut — toujours pas de service (on garde la position du joueur)
+    tutorialParkBall();
+  } else if (s === 2) {
+    // Service — balle dans les mains du joueur
+    tutorialGivePlayerServe();
+  } else if (s === 3) {
+    tutorialFeedBall("lob");
+  } else if (s === 4) {
+    tutorialFeedBall("smash");
+  } else if (s === 5) {
+    if (typeof superCharge !== "undefined") superCharge[0] = 1;
+    tutorialFeedBall("super");
+  } else if (s === 6) {
+    if (typeof powerGauge !== "undefined" && typeof POWER_GAUGE_MAX === "number") {
+      powerGauge[0] = POWER_GAUGE_MAX;
+    }
+    tutorialFeedBall("power");
+  } else {
+    // Objectif — match libre, service joueur
+    tutorialGivePlayerServe();
+  }
+}
+
+/** Maintient le scénario pendant l'étape (balle perdue / trop loin). */
+function tickTutorialScenario() {
+  if (!tutorialMode) return;
+  if (state !== "serve" && state !== "play") return;
+  const s = tutorialStep | 0;
+  if (s === 0 || s === 1) {
+    // Toujours hors service pendant Déplacement / Saut
+    const parked = ball.frozen && !ball.inHands && state === "play";
+    if (!parked) tutorialParkBall();
+    return;
+  }
+  if (s === 2) {
+    const playerHolding = servingSide === 0 && ball.inHands && ball.frozen;
+    const playerTossing = servingSide === 0 && (
+      (ball.tossGrace | 0) > 0 || (ball.serveAimLock && !ball.inHands)
+    );
+    if (!playerHolding && !playerTossing) tutorialGivePlayerServe();
+    return;
+  }
+  if (s >= 3 && s <= 6) {
+    // Feed mort / parti trop loin → renvoi scripté (sans point)
+    const onGround = ball.y + (typeof BALL_R === "number" ? BALL_R : 14) >= GROUND_Y - 1;
+    const lost = ball.popped || ball.inHands || ball.frozen || onGround ||
+      ball.x < 20 || ball.x > W - 20 || ball.y < -80;
+    if (lost) tutorialApplyScenario(s);
   }
 }
 
@@ -771,7 +941,7 @@ function buildTutorialSteps() {
     {
       title: "Super Smash",
       bodyK: "Jauge orange → maintiens [[K:" + F + "]] en l'air, dose, relâche",
-      bodyP: "Jauge orange → maintiens [[X:X]] en l'air, dose, relâche"
+      bodyP: "Jauge orange → maintiens [[X:Y]] en l'air, dose, relâche"
     },
     {
       title: "Objectif",
@@ -790,9 +960,18 @@ function tutorialStepBody(tip) {
   return tip.bodyK || tip.body || "";
 }
 
+const TUTORIAL_STEP_MIN_T = 300; // 5 s @ 60 Hz — durée mini d'affichage par étape
+let tutorialStepShownAt = 0;     // tick où l'étape courante a été affichée
+
+function tutorialStepMinElapsed() {
+  const t = typeof tick === "number" ? tick : 0;
+  return (t - tutorialStepShownAt) >= TUTORIAL_STEP_MIN_T;
+}
+
 function tutorialStepCanSkip() {
-  // Entrée pour passer ; pas Espace (évite les skips accidentels)
-  return tutorialStep >= 0 && tutorialStep < TUTORIAL_STEPS.length - 1;
+  // Entrée / Select pour passer — seulement après le délai mini d'affichage
+  return tutorialStep >= 0 && tutorialStep < TUTORIAL_STEPS.length - 1 &&
+    tutorialStepMinElapsed();
 }
 
 function tutorialCoachComplete() {
@@ -821,22 +1000,17 @@ function tutorialStepConditionMet(me) {
 
 function advanceTutorialStep() {
   if (!tutorialMode) return;
+  // Garde aussi le skip clavier / Select (handleMenuKeys → ici)
+  if (!tutorialStepMinElapsed()) return;
   if (tutorialStep < TUTORIAL_STEPS.length - 1) {
     tutorialStep++;
-    tutorialAdvanceLock = (typeof tick === "number" ? tick : 0) + 40;
+    const now = typeof tick === "number" ? tick : 0;
+    tutorialStepShownAt = now;
+    tutorialAdvanceLock = now + 40;
     // Tant que la condition est déjà vraie (ex. encore en l'air après un saut
     // anticipé), on n'arme pas : il faudra la relâcher puis la refaire.
     tutorialStepArmed = false;
-    // Étape Service : s'assurer que c'est bien au joueur (pas à l'IA)
-    if (tutorialStep === 2) tutorialGivePlayerServe();
-    // Offrir les jauges pour les étapes techniques (sinon trop long à charger)
-    if (tutorialStep === 5 && typeof superCharge !== "undefined") {
-      superCharge[0] = 1;
-    }
-    if (tutorialStep === 6 && typeof powerGauge !== "undefined" &&
-        typeof POWER_GAUGE_MAX === "number") {
-      powerGauge[0] = POWER_GAUGE_MAX;
-    }
+    tutorialApplyScenario(tutorialStep);
     beep(520, 0.04, "square", 0.06);
     // Si le score est déjà bon et qu'on arrive à l'objectif → terminer
     if (typeof maybeFinishTutorialMatch === "function") maybeFinishTutorialMatch();
@@ -847,15 +1021,9 @@ function advanceTutorialStep() {
 function tickTutorialCoach() {
   if (!tutorialMode) return;
   if (state !== "serve" && state !== "play") return;
+  if (typeof tickTutorialScenario === "function") tickTutorialScenario();
   if (typeof tick === "number" && tick < tutorialAdvanceLock) return;
-  // Service coach : si l'IA a la balle ou qu'on est en échange, rendre le service
-  if (tutorialStep === 2) {
-    const playerHolding = servingSide === 0 && ball.inHands && ball.frozen;
-    const playerTossing = servingSide === 0 && (
-      (ball.tossGrace | 0) > 0 || (ball.serveAimLock && !ball.inHands)
-    );
-    if (!playerHolding && !playerTossing) tutorialGivePlayerServe();
-  }
+  if (!tutorialStepMinElapsed()) return; // 5 s mini avant auto-avance / skip
   const me = blobL;
   const met = tutorialStepConditionMet(me);
   if (!tutorialStepArmed) {
@@ -889,6 +1057,8 @@ function shuffleMenuBackdrop() {
   const a = Math.floor(Math.random() * nA);
   let b = Math.floor(Math.random() * nA);
   if (nA > 1) while (b === a) b = Math.floor(Math.random() * nA);
+  menuBg.charL = a;
+  menuBg.charR = b;
   menuActors.L = makeMenuActor(0, a);
   menuActors.R = makeMenuActor(1, b);
   menuBg.ballX = W * 0.42 + Math.random() * W * 0.16;
@@ -896,6 +1066,8 @@ function shuffleMenuBackdrop() {
   menuBg.ballVy = -2.2;
   menuBg.init = true;
   menuBg.t0 = performance.now();
+  if (menuDemoWanted()) startMenuDemoMatch(false);
+  else menuDemo.live = false;
 }
 
 function makeMenuActor(side, charIdx) {
@@ -919,18 +1091,170 @@ function makeMenuActor(side, charIdx) {
   };
 }
 
+/** Lance / relance le match fantôme IA vs IA derrière les menus. */
+function startMenuDemoMatch(reshuffleChars) {
+  if (reshuffleChars !== false) {
+    const nA = CHARACTERS.length, nT = TERRAINS.length;
+    menuBg.terrain = Math.floor(Math.random() * nT);
+    const a = Math.floor(Math.random() * nA);
+    let b = Math.floor(Math.random() * nA);
+    if (nA > 1) while (b === a) b = Math.floor(Math.random() * nA);
+    menuBg.charL = a;
+    menuBg.charR = b;
+    menuActors.L = makeMenuActor(0, a);
+    menuActors.R = makeMenuActor(1, b);
+  }
+  menuBg.init = true;
+  menuBg.t0 = performance.now();
+
+  const uiState = state;
+  const savedNoFx = noFx;
+  if (typeof setMode === "function") setMode("1v1");
+  else { mode = "1v1"; activeBlobs = [blobL, blobR]; }
+  vsAI = true;
+  online = false;
+  tutorialMode = false;
+  bombMode = false;
+  flameMode = false;
+  mapEventsQuiet = true;
+  paused = false;
+  if (typeof setSeed === "function") setSeed((Math.random() * 2 ** 31) | 0);
+
+  const applyChar = (blob, idx) => {
+    const ch = CHARACTERS[idx];
+    blob.charId = idx;
+    if (ch) { blob.color = ch.color; blob.darkColor = ch.darkColor; }
+    blob.speedMul = 1;
+    blob.kitSpeed = undefined;
+    blob.kitPower = undefined;
+    blob._aiErr1 = 0; blob._aiRush = false; blob._aiErrT = 0;
+  };
+  applyChar(blobL, menuBg.charL);
+  applyChar(blobR, menuBg.charR);
+  scores[0] = 0; scores[1] = 0;
+  streak[0] = 0; streak[1] = 0;
+  superCharge[0] = 0; superCharge[1] = 0;
+  if (typeof powerGauge !== "undefined") { powerGauge[0] = 0; powerGauge[1] = 0; }
+  powerWindup = null;
+  battle.active = false; battle.t = 0; battle.cooldown = 0;
+  superFlash = ""; superFlashSub = ""; superFlashT = 0;
+  servingSide = Math.random() < 0.5 ? 0 : 1;
+
+  noFx = true;
+  if (typeof startRally === "function") {
+    startRally();
+    serveCountdown = 0;
+  }
+  menuDemo.matchState = state; // "serve" après startRally
+  menuDemo.live = true;
+  state = uiState;
+  noFx = savedNoFx;
+}
+
 function ensureMenuBackdrop() {
   if (!menuBg.init) shuffleMenuBackdrop();
-  else if (state === "menu" && performance.now() - menuBg.t0 > 14000) shuffleMenuBackdrop();
+  else if (menuDemoWanted() && performance.now() - menuBg.t0 > 22000) {
+    startMenuDemoMatch(true);
+  } else if (!menuDemoWanted()) {
+    menuDemo.live = false;
+    if (!menuActors.L || !menuActors.R) {
+      menuActors.L = makeMenuActor(0, menuBg.charL | 0);
+      menuActors.R = makeMenuActor(1, menuBg.charR | 0);
+    }
+  } else if (!menuDemo.live) {
+    startMenuDemoMatch(false);
+  }
+}
+
+/**
+ * Simu 60 Hz : deux IA en 1v1. Préserve l'état UI (menus) autour du tick.
+ * Muet (noFx) pour ne pas spammer les SFX.
+ */
+function tickMenuDemo() {
+  if (!menuDemoWanted()) {
+    menuDemo.live = false;
+    return;
+  }
+  ensureMenuBackdrop();
+  if (!menuDemo.live) return;
+
+  const uiState = state;
+  const saved = {
+    noFx, mapEventsQuiet, bombMode, flameMode, vsAI, mode, online,
+    tutorialMode, paused, aiLevel, terrain, weather, shake
+  };
+
+  noFx = true;
+  mapEventsQuiet = true;
+  bombMode = false;
+  flameMode = false;
+  online = false;
+  tutorialMode = false;
+  vsAI = true;
+  paused = false;
+  aiLevel = 2; // Difficile — échanges lisibles
+  if (typeof setMode === "function") setMode("1v1");
+  terrain = menuBg.terrain;
+  weather = "clear";
+  state = menuDemo.matchState;
+
+  if (state === "point") {
+    if (typeof settleAirborneBlobs === "function") settleAirborneBlobs();
+    if (typeof tickCelebration === "function") tickCelebration();
+    pointTimer--;
+    if (pointTimer <= 24) {
+      startRally();
+      serveCountdown = 0;
+    }
+  } else if (state === "gameover") {
+    scores[0] = 0; scores[1] = 0;
+    streak[0] = 0; streak[1] = 0;
+    superCharge[0] = 0; superCharge[1] = 0;
+    startRally();
+    serveCountdown = 0;
+  } else if (state === "serve" || state === "play") {
+    // Cap score démo : relance avant fin de match officielle
+    if (scores[0] >= 3 || scores[1] >= 3) {
+      scores[0] = 0; scores[1] = 0;
+      streak[0] = 0; streak[1] = 0;
+    }
+    const lvl = AI_LEVELS[Math.min(2, AI_LEVELS.length - 1)];
+    const inL = typeof aiInput === "function" ? aiInput(0, lvl) : {
+      left: false, right: false, jump: false, smash: false, super: false
+    };
+    const inR = typeof aiInput === "function" ? aiInput(1, lvl) : {
+      left: false, right: false, jump: false, smash: false, super: false
+    };
+    if (typeof stepGame === "function") stepGame(inL, inR);
+  }
+
+  menuDemo.matchState = state;
+
+  state = uiState;
+  noFx = saved.noFx;
+  mapEventsQuiet = saved.mapEventsQuiet;
+  bombMode = saved.bombMode;
+  flameMode = saved.flameMode;
+  vsAI = saved.vsAI;
+  online = saved.online;
+  tutorialMode = saved.tutorialMode;
+  paused = saved.paused;
+  aiLevel = saved.aiLevel;
+  terrain = saved.terrain;
+  weather = saved.weather;
+  // Pas de tremblement caméra sur les écrans menu
+  shake = typeof saved.shake === "number" ? saved.shake : 0;
+  if (saved.mode && typeof setMode === "function") setMode(saved.mode);
+  else mode = saved.mode;
 }
 
 function tickMenuActors() {
-  // ~16 px par frame d'anim → ~64 px / cycle (4 frames) : foulée lisible
+  // ~16 px par frame rendu → foulée lisible (fallback hors démo IA)
   const STRIDE = 16;
   for (const b of [menuActors.L, menuActors.R]) {
     if (!b) continue;
     b._menuActor = true;
-    b.scramble = 0; // jamais de patinage décoratif (ex. Dorf slip)
+    b.scramble = 0;
     const spd = Math.max(1.2, Math.abs(b.dispVx) || 1.4);
     let dir = b.dispVx >= 0 ? 1 : -1;
     b.hopT--;
@@ -938,7 +1262,6 @@ function tickMenuActors() {
       b.vy = -3.4; b.onGround = false; b.hopT = 200 + Math.floor(Math.random() * 220);
     }
     if (!b.onGround) {
-      // Saut : déplacement aérien + anim jump (pas de cycle walk)
       b.x += dir * spd;
       if (b.x <= b.minX) { b.x = b.minX; dir = 1; }
       if (b.x >= b.maxX) { b.x = b.maxX; dir = -1; }
@@ -947,7 +1270,6 @@ function tickMenuActors() {
       b._walking = false;
       b._walkAcc = 0;
     } else {
-      // Marche au sol : avance synchro avec walkPhase
       b.x += dir * spd;
       if (b.x <= b.minX) { b.x = b.minX; dir = 1; }
       if (b.x >= b.maxX) { b.x = b.maxX; dir = -1; }
@@ -964,7 +1286,6 @@ function tickMenuActors() {
     b._faceRight = dir > 0;
     b._faceLock = 0;
   }
-  // Ballon qui rebondit doucement au-dessus du filet
   menuBg.ballVy += 0.06;
   menuBg.ballY += menuBg.ballVy;
   if (menuBg.ballY > GROUND_Y - 160) {
@@ -976,14 +1297,18 @@ function tickMenuActors() {
 
 function drawMenuWorld() {
   ensureMenuBackdrop();
-  tickMenuActors();
+  const useDemo = menuDemo.live && menuDemoWanted();
+  if (!useDemo) tickMenuActors();
   const savedT = terrain, savedW = weather;
   terrain = menuBg.terrain;
   weather = "clear";
   drawBackground();
   drawNet();
-  // ballon déco = vrai sprite de jeu (pas un cercle canvas)
-  {
+  if (useDemo) {
+    if (typeof drawBall === "function") drawBall();
+    drawCharacter(blobL);
+    drawCharacter(blobR);
+  } else {
     const bx = menuBg.ballX, by = menuBg.ballY;
     const shScale = Math.max(0.35, 1 - (GROUND_Y - by) / 400);
     ctx.fillStyle = "rgba(0,0,0," + (0.22 * shScale) + ")";
@@ -992,7 +1317,6 @@ function drawMenuWorld() {
     ctx.fill();
     ctx.save();
     ctx.translate(bx, by);
-    // légère rotation liée au rebond
     ctx.rotate((menuBg.ballVy || 0) * 0.08 + performance.now() / 900);
     const skin = (typeof BALL_SKINS !== "undefined" && BALL_SKINS[ballSkin]) || null;
     const sprName = (skin && skin.sprite) || "ballPurple";
@@ -1006,9 +1330,9 @@ function drawMenuWorld() {
       ctx.beginPath(); ctx.arc(0, 0, BALL_R, 0, Math.PI * 2); ctx.fill();
     }
     ctx.restore();
+    if (menuActors.L) drawCharacter(menuActors.L);
+    if (menuActors.R) drawCharacter(menuActors.R);
   }
-  if (menuActors.L) drawCharacter(menuActors.L);
-  if (menuActors.R) drawCharacter(menuActors.R);
   terrain = savedT;
   weather = savedW;
 }
@@ -1158,7 +1482,7 @@ function drawXboxPicto(x, y, btn, size) {
   if (isPill) {
     ctx.font = "800 " + Math.max(8, s - 3) + "px " + UI.sans;
     const tw = ctx.measureText(label).width;
-    const w = tw + 12, h = s + 2;
+    const w = tw + 14, h = s + 2; // pad un peu plus large (SELECT / START…)
     const bx = x, by = y - h + 3;
     ctx.beginPath();
     if (ctx.roundRect) ctx.roundRect(bx, by, w, h, h / 2); else ctx.rect(bx, by, w, h);
@@ -1209,13 +1533,48 @@ function parseControlMarkup(str) {
   return parts.length ? parts : [{ text: s }];
 }
 
+/** Largeur estimée d'un markup (pour centrage) — pictos inclus. */
+function measureControlMarkup(markup, size) {
+  const parts = parseControlMarkup(markup);
+  const s = size || 12;
+  let w = 0;
+  const gap = 6;
+  ctx.save();
+  ctx.font = Math.max(10, s) + "px " + UI.sans;
+  for (const p of parts) {
+    if (p.text) {
+      w += ctx.measureText(p.text).width;
+    } else if (p.key) {
+      const txt = String(p.key || "?");
+      ctx.font = "800 " + Math.max(9, s - 2) + "px " + UI.sans;
+      const tw = ctx.measureText(txt).width;
+      w += Math.max(s + 6, tw + 12) + gap;
+      ctx.font = Math.max(10, s) + "px " + UI.sans;
+    } else if (p.xbox) {
+      const xl = String(p.xbox || "?").toUpperCase();
+      if (xl === "LS" || xl === "STICK" || xl === "L3" || xl === "JOY" ||
+          xl === "DPAD" || xl === "CROIX" || xl === "PAD") {
+        w += s + 8 + gap;
+      } else if (xl.length > 1) {
+        ctx.font = "800 " + Math.max(8, s - 3) + "px " + UI.sans;
+        w += ctx.measureText(xl).width + 14 + gap;
+        ctx.font = Math.max(10, s) + "px " + UI.sans;
+      } else {
+        w += s + 4 + gap;
+      }
+    }
+  }
+  ctx.restore();
+  return w;
+}
+
 function drawControlMarkup(x, y, markup, maxW, size) {
   const parts = parseControlMarkup(markup);
   const s = size || 12;
   let cx = x, cy = y;
-  const gap = 4;
+  const gap = 6;
   ctx.save();
-  ctx.font = "12px " + UI.sans;
+  ctx.font = Math.max(10, s) + "px " + UI.sans;
   ctx.fillStyle = "rgba(255,255,255,0.88)";
   ctx.textAlign = "left";
   for (const p of parts) {
@@ -1231,16 +1590,18 @@ function drawControlMarkup(x, y, markup, maxW, size) {
         cx += tw;
       }
     } else if (p.key) {
+      if (cx > x) cx += gap; // air avant le picto (évite chevauchement texte)
       const approx = Math.max(s + 4, String(p.key).length * 8 + 12);
-      if (cx > x && cx + approx > x + maxW) { cy += s + 6; cx = x; }
+      if (cx > x + gap && cx + approx > x + maxW) { cy += s + 6; cx = x; }
       const w = drawKeyPicto(cx, cy, p.key, s + 2);
       cx += w + gap;
     } else if (p.xbox) {
+      if (cx > x) cx += gap;
       const xl = String(p.xbox).toUpperCase();
       const isStick = xl === "LS" || xl === "STICK" || xl === "L3" || xl === "JOY";
       const isDpad = xl === "DPAD" || xl === "CROIX" || xl === "PAD";
-      const approx = isStick || isDpad ? s + 8 : (p.xbox.length > 1 ? 32 : s + 4);
-      if (cx > x && cx + approx > x + maxW) { cy += s + 6; cx = x; }
+      const approx = isStick || isDpad ? s + 8 : (p.xbox.length > 1 ? 56 : s + 4);
+      if (cx > x + gap && cx + approx > x + maxW) { cy += s + 6; cx = x; }
       const w = drawXboxPicto(cx, cy, p.xbox, s + 2);
       cx += w + gap;
     }
@@ -1955,7 +2316,7 @@ function drawTutorialControls(dev, x, y, maxW) {
       ["Saut", "[[X:A]]  (double saut en l'air)"],
       ["Cloche / smash", "[[X:X]] / [[X:Y]]  —  sol = cloche · air = smash"],
       ["SUPER (jauge or)", "[[X:B]]  (ou [[X:RB]]) — technique du perso"],
-      ["Super Smash", "Jauge orange → maintiens [[X:X]]/[[X:Y]] en l'air, relâche"],
+      ["Super Smash", "Jauge orange → maintiens [[X:Y]] en l'air, relâche"],
       ["Pause", "[[X:START]]"],
       ["Menus", "[[X:LS]] · [[X:A]] valider · [[X:B]] retour"]
     ],
@@ -2253,16 +2614,16 @@ function drawTutorialCoach() {
   ctx.font = "800 12px " + UI.sans;
   ctx.fillText(
     "Tutoriel · " + (tutorialStep + 1) + "/" + TUTORIAL_STEPS.length + "  —  " + tip.title,
-    W / 2, py + 16
+    W / 2, py + 14
   );
 
   const textW = pw - 20;
-  const bodyY = py + 36;
+  // Avec « Passer », laisser de l'air vertical entre body et pictos skip
+  const bodyY = canSkip ? py + 32 : py + 36;
   if (typeof drawControlMarkup === "function" && body.indexOf("[[") >= 0) {
-    // Centrer approximativement la ligne de pictos
-    const plain = body.replace(/\[\[[KkXx]:([^\]]+)\]\]/g, "••");
-    ctx.font = "12px " + UI.sans;
-    const est = Math.min(textW, ctx.measureText(plain).width + 36);
+    const est = typeof measureControlMarkup === "function"
+      ? Math.min(textW, measureControlMarkup(body, 12))
+      : Math.min(textW, 200);
     drawControlMarkup(px + (pw - est) / 2, bodyY, body, textW, 12);
   } else {
     ctx.fillStyle = "rgba(255,246,232,0.95)";
@@ -2275,10 +2636,10 @@ function drawTutorialCoach() {
     const skip = pad ? "Passer [[X:SELECT]]" : "Passer [[K:Entrée]]";
     if (typeof drawControlMarkup === "function") {
       ctx.globalAlpha = 0.85;
-      const plain = skip.replace(/\[\[[KkXx]:([^\]]+)\]\]/g, "••");
-      ctx.font = "11px " + UI.sans;
-      const est = Math.min(textW, ctx.measureText(plain).width + 28);
-      drawControlMarkup(px + (pw - est) / 2, py + ph - 12, skip, textW, 10);
+      const est = typeof measureControlMarkup === "function"
+        ? Math.min(textW, measureControlMarkup(skip, 10))
+        : Math.min(textW, 120);
+      drawControlMarkup(px + (pw - est) / 2, py + ph - 9, skip, textW, 10);
     }
   }
   ctx.restore();
@@ -2364,7 +2725,7 @@ function drawRules() {
   y += 4;
   h("⚡ SUPER SMASH", "#ff6a2a");
   y = drawControlMarkup(lx, y,
-    "Jauge orange pleine → maintiens [[K:" + bindLabel("smash") + "]] / [[X:X]] en l'air, relâche.",
+    "Jauge orange pleine → maintiens [[K:" + bindLabel("smash") + "]] / [[X:Y]] en l'air, relâche.",
     leftW, 12);
   y += 4;
   h("Smash Battle", "#ff8a65");

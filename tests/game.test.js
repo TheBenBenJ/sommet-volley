@@ -2689,23 +2689,86 @@ test("aide commandes : Escape / TutBack reviennent au menu", () => {
   assert.strictEqual(g.getState(), "menu");
 });
 
-test("tutoriel : le joueur sert toujours (pas l'IA)", () => {
+test("tutoriel : scénario en dur (pas de service avant l'étape Service)", () => {
   const g = loadGame();
   assert.ok(g.startTutorial, "startTutorial exposé");
   g.startTutorial();
   assert.ok(g.getTutorialMode(), "mode tutoriel");
-  assert.strictEqual(g.getServingSide(), 0, "service camp joueur au départ");
-  assert.ok(g.ball.inHands && g.ball.frozen, "balle dans les mains du joueur");
-  // Même si on simule un échange IA, l'étape Service rend la balle
-  g.setTutorialStep(1);
-  g.setServingSide(1);
-  g.ball.frozen = false;
-  g.ball.inHands = false;
-  g.setState("play");
-  g.advanceTutorialStep(); // → étape 2 Service
+  assert.strictEqual(g.getTutorialStep(), 0, "départ Déplacement");
+  assert.strictEqual(g.getState(), "play", "pas d'état service au départ");
+  assert.ok(!g.ball.inHands, "balle hors des mains (étape 0)");
+  assert.ok(g.ball.frozen, "balle garée figée");
+  assert.ok(g.tutorialPracticeActive(), "pratique guidée");
+
+  // Étape Saut (index 1) : toujours pas de service
+  g.setTick(1000);
+  g.setTutorialStepShownAt(1000 - g.TUTORIAL_STEP_MIN_T);
+  g.advanceTutorialStep();
+  assert.strictEqual(g.getTutorialStep(), 1);
+  assert.ok(!g.ball.inHands, "pas de service à l'étape Saut");
+  assert.strictEqual(g.getState(), "play");
+
+  // Étape Service (index 2) : balle dans les mains du joueur
+  g.setTick(2000);
+  g.setTutorialStepShownAt(2000 - g.TUTORIAL_STEP_MIN_T);
+  g.advanceTutorialStep();
   assert.strictEqual(g.getTutorialStep(), 2);
-  assert.strictEqual(g.getServingSide(), 0, "étape Service → service joueur");
+  assert.strictEqual(g.getServingSide(), 0, "service camp joueur");
   assert.ok(g.ball.inHands && g.ball.frozen, "balle rendue au joueur");
+  assert.strictEqual(g.getState(), "serve");
+});
+
+test("menus : démo 1v1 IA vs IA en fond", () => {
+  const g = loadGame();
+  assert.ok(g.goMenu && g.tickMenuDemo && g.menuDemoWanted);
+  g.goMenu();
+  assert.ok(g.menuDemoWanted(), "menu principal veut la démo");
+  assert.ok(g.getMenuDemo().live, "démo démarrée");
+  const ui = g.getState();
+  assert.strictEqual(ui, "menu");
+  const x0 = g.blobL.x;
+  for (let i = 0; i < 90; i++) g.update();
+  assert.strictEqual(g.getState(), "menu", "UI menu préservée");
+  assert.ok(g.getMenuDemo().live, "démo toujours live");
+  // La simu a avancé (balle ou joueur a bougé, ou service/play interne)
+  const moved = g.blobL.x !== x0 || !g.ball.frozen || g.ball.tossGrace > 0 ||
+    g.getMenuDemo().matchState === "play";
+  assert.ok(moved, "IA a joué un peu");
+  g.newGame(1);
+  assert.ok(!g.getMenuDemo().live, "newGame coupe la démo");
+});
+
+test("tutoriel : chaque étape reste au moins 5 s", () => {
+  const g = loadGame();
+  g.startTutorial();
+  assert.ok(g.TUTORIAL_STEP_MIN_T >= 300, "mini ≥ 5 s @ 60 Hz");
+  g.setTick(100);
+  g.setTutorialStepShownAt(100);
+  assert.ok(!g.tutorialStepCanSkip(), "pas de skip avant 5 s");
+  g.advanceTutorialStep();
+  assert.strictEqual(g.getTutorialStep(), 0, "avance bloquée trop tôt");
+  g.setTick(100 + g.TUTORIAL_STEP_MIN_T);
+  assert.ok(g.tutorialStepCanSkip(), "skip OK après 5 s");
+  g.advanceTutorialStep();
+  assert.strictEqual(g.getTutorialStep(), 1, "avance après délai");
+});
+
+test("tutoriel : feeds Cloche/Smash + pas de point en pratique", () => {
+  const g = loadGame();
+  g.startTutorial();
+  g.setTutorialStep(3);
+  g.tutorialApplyScenario(3);
+  assert.strictEqual(g.getState(), "play");
+  assert.ok(!g.ball.inHands && !g.ball.frozen, "feed cloche en jeu");
+  assert.ok(g.ball.y < g.consts.GROUND_Y - 80, "balle en l'air");
+  const s0 = g.scores[0], s1 = g.scores[1];
+  // Simule un point au sol → absorbé, scénario renvoyé
+  g.ball.y = g.consts.GROUND_Y;
+  g.ball.vy = 4;
+  g.awardPoint(1, "test");
+  assert.strictEqual(g.scores[0], s0, "pas de score en pratique");
+  assert.strictEqual(g.scores[1], s1, "pas de score adverse");
+  assert.ok(!g.ball.frozen && g.ball.y < g.consts.GROUND_Y - 40, "feed relancé");
 });
 
 test("pictos commandes : markup K / X / stick parsé", () => {

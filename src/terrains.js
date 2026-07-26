@@ -1894,7 +1894,7 @@ function drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph) {
       if (typeof powerGauge !== "undefined" && typeof POWER_GAUGE_MAX !== "undefined" &&
           (powerGauge[s] | 0) >= POWER_GAUGE_MAX) {
         title = "Super Smash prêt — " + sideLabel(s);
-        sub = "Smash aérien [[K:F]] / [[X:X]] : dose puis relâche";
+        sub = "Smash aérien [[K:F]] / [[X:Y]] : dose puis relâche";
         fill = "#ff6a2a";
         break;
       }

@@ -4,6 +4,11 @@
 // ---------- Points / score ----------
 function awardPoint(side, reason) {
   if (state !== "play" && state !== "serve") return;
+  // Tutoriel guidé : pas de point — on renvoie le feed / scénario de l'étape.
+  if (typeof tutorialPracticeActive === "function" && tutorialPracticeActive()) {
+    if (typeof tutorialApplyScenario === "function") tutorialApplyScenario(tutorialStep);
+    return;
+  }
   // Invité soft-owner : ne touche pas au score local — l'hôte valide via `pt`.
   if (netDeferScore) {
     if (!pendingNetPoint) pendingNetPoint = { side, reason: reason || "", seq: ++netPtSeq };

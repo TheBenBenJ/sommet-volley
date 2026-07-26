@@ -7,6 +7,8 @@ function canStartBattle() {
   // avec la latence, ça se lit comme un « blocage réseau » (balle coincée).
   // Hors-ligne / même clavier : le duel reste actif (c'est le fun du mode local).
   if (typeof online !== "undefined" && online) return false;
+  // Tutoriel guidé : pas de duel (scénario scripté)
+  if (typeof tutorialPracticeActive === "function" && tutorialPracticeActive()) return false;
   return !bombMode && // pas de duel au filet en mode bombe (la mèche tourne !)
          state === "play" && !ball.frozen && !ball.popped && ball.heldBy < 0 &&
          battle.cooldown === 0 &&
@@ -337,6 +339,13 @@ function update() {
   if (online) { netUpdate(); return; }
   if (paused) return;
 
+  // Fond des menus : démo 1v1 IA vs IA (muette), à 60 Hz
+  if (typeof menuDemoWanted === "function" && menuDemoWanted() &&
+      typeof tickMenuDemo === "function") {
+    tickMenuDemo();
+    return;
+  }
+
   if (state === "point" || state === "gameover") {
     settleAirborneBlobs();
     if (typeof tickCelebration === "function") tickCelebration();
@@ -358,7 +367,13 @@ function update() {
     return;
   }
   const inL = localInputs(0);
-  const inR = vsAI ? aiInput() : localInputs(1);
+  const tutIdle = typeof tutorialPracticeActive === "function" && tutorialPracticeActive();
+  const inR = vsAI
+    ? (tutIdle
+      ? { left: false, right: false, jump: false, smash: false, super: false,
+          up: false, down: false, ax: 0, ay: 0 }
+      : aiInput())
+    : localInputs(1);
   stepGame(inL, inR);
   if (typeof tickTutorialCoach === "function") tickTutorialCoach();
 }
