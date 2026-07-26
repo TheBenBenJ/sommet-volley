@@ -11,7 +11,9 @@ function drawCharacter(b) {
   const key = A.key;
   drawSuperAura(b);
   const menu = b.groundY != null;
+  const ghost = !menu && typeof isBallGhostBlob === "function" && isBallGhostBlob(b);
   const charred = !menu && (b.charredT | 0) > 0;
+  if (ghost) { ctx.save(); ctx.globalAlpha *= 0.42; }
   if (charred) {
     ctx.save();
     ctx.filter = "brightness(0)";
@@ -27,10 +29,32 @@ function drawCharacter(b) {
     else drawGenericChar(b);
   }
   if (charred) ctx.restore();
+  if (ghost) ctx.restore();
   if (!menu && typeof drawFlameOverlay === "function") drawFlameOverlay(b);
   drawSuperOverlay(b);
   drawCharSuperFX(b);
   drawEmote(b);
+  if (!menu) draw2v2TouchCue(b, ghost);
+}
+
+/** 2v2 : anneau sur le joueur autorisé à frapper ; rien de plus sur le ghost. */
+function draw2v2TouchCue(b, ghost) {
+  if (typeof mode === "undefined" || mode !== "2v2") return;
+  if (typeof state === "undefined" || state !== "play") return;
+  if (ghost) return;
+  if (typeof ball === "undefined" || !ball.nextToucher) return;
+  const nt = ball.nextToucher[b.side];
+  if (nt == null || nt < 0) return;
+  if (typeof activeBlobs === "undefined" || activeBlobs.indexOf(b) !== nt) return;
+  const t = (typeof tick === "number" ? tick : 0) / 8;
+  ctx.save();
+  ctx.globalAlpha = 0.55 + Math.sin(t) * 0.15;
+  ctx.strokeStyle = (typeof UI !== "undefined" && UI.gold) ? UI.gold : "#ffd27a";
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(b.x, b.y - 40, 28 + Math.sin(t) * 2, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
 }
 
 /** Overlays feu (pieds / corps / tête) selon les PV restants en mode flamme. */

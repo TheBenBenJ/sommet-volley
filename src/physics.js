@@ -16,6 +16,9 @@ const ball = {
   lastTouchTick: -999, // tick du dernier contact (anti double-comptage)
   lastHitTick: -999,   // tick de la dernière frappe active (anti double-hit 2v2)
   touches: [0, 0], // touches consécutives par équipe
+  // 2v2 : index dans activeBlobs autorisé pour la prochaine frappe normale
+  // (null = libre). Après une touche, seul le coéquipier peut impacter la balle.
+  nextToucher: [null, null],
   trail: [],
   // Gameplay V2
   heldBy: -1,
@@ -40,6 +43,7 @@ const ball = {
     this.lastTouchTick = -999;
     this.lastHitTick = -999;
     this.touches = [0, 0];
+    this.nextToucher = [null, null];
     this.trail = [];
     this.heldBy = -1;
     this.holdT = 0;
@@ -48,6 +52,44 @@ const ball = {
     this.aimAngle = side === 0 ? -0.45 : Math.PI + 0.45;
   }
 };
+
+/** 2v2 : ce blob peut-il dig/smash/cloche normalement ? (supers gérés à part) */
+function canNormalHit2v2(blob) {
+  if (typeof mode === "undefined" || mode !== "2v2") return true;
+  if (typeof state !== "undefined" && state !== "play") return true;
+  if (typeof isServeHit === "function" && isServeHit(blob)) return true;
+  const nt = ball.nextToucher[blob.side];
+  if (nt == null || nt < 0) return true;
+  return activeBlobs.indexOf(blob) === nt;
+}
+
+/** 2v2 : blob en « ghost » (bouge OK, pas d'impact balle hors super). */
+function isBallGhostBlob(blob) {
+  return typeof mode !== "undefined" && mode === "2v2" &&
+    typeof state !== "undefined" && state === "play" &&
+    !canNormalHit2v2(blob);
+}
+
+function clearNextTouchers() {
+  ball.nextToucher[0] = null;
+  ball.nextToucher[1] = null;
+}
+
+/** Après une frappe normale en 2v2 : seul l'allié pourra retoucher. */
+function setNextToucherAfterHit(blob) {
+  if (typeof mode === "undefined" || mode !== "2v2") return;
+  // Service : pas de verrou (la balle doit partir de l'autre côté)
+  if (typeof isServeHit === "function" && isServeHit(blob)) {
+    ball.nextToucher[blob.side] = null;
+    return;
+  }
+  if (typeof state !== "undefined" && state !== "play") {
+    ball.nextToucher[blob.side] = null;
+    return;
+  }
+  const mate = activeBlobs.find(b => b !== blob && b.side === blob.side);
+  ball.nextToucher[blob.side] = mate ? activeBlobs.indexOf(mate) : null;
+}
 
 // ---------- Gameplay V2 : helpers ----------
 function clearBallHold() {
@@ -71,6 +113,7 @@ function registerTouch(blob) {
   }
   ball.lastTouchSide = blob.side;
   ball.lastTouchTick = tick;
+  if (newContact) setNextToucherAfterHit(blob);
   if (ball.touches[blob.side] > MAX_TOUCHES) {
     awardPoint(1 - blob.side, `Plus de ${MAX_TOUCHES} touches !`);
     return;
@@ -754,6 +797,7 @@ function wantSmash(blob) {
 
 /** Contact simple = cloche automatique vers l'adversaire. */
 function tryLobBall(blob) {
+  if (!canNormalHit2v2(blob)) return false;
   if (ball.inHands && ball.frozen) return false;
   if (ball.tossGrace > 0 && blob.side === servingSide) return false;
   if (ballPathDistToBlob(blob) > receiveHitRadius()) return false;
@@ -787,9 +831,11 @@ function trySmashBall(blob) {
   if (ballPathDistToBlob(blob) > RECEIVE_R) return false;
   if (!canActiveHit(blob)) return false;
   // Super Smash : jauge pleine + maintien smash uniquement (pas le contact auto)
+  // Autorisé même en « ghost » 2v2 (seul impact balle hors tour normal).
   if (canStartPowerSmash(blob) && wantsPowerSmashHold(blob)) {
     if (startPowerWindup(blob)) return true;
   }
+  if (!canNormalHit2v2(blob)) return false;
   const serving = isServeHit(blob);
   // Service aérien « smash » seulement si la balle est assez haute ;
   // un petit hop au sol garde la cloche sûre (évite filet).
@@ -970,6 +1016,18 @@ function ballBlobCollision(blob) {
   if (ball.lastHitTick === tick) return;
   const a = charOf(blob);
 
+  // 2v2 ghost : pas d'impact balle sauf Super Smash (jauge) plus bas via trySmashBall
+  if (isBallGhostBlob(blob)) {
+    if (GAMEPLAY_V2 && state === "play" &&
+        canStartPowerSmash(blob) && wantsPowerSmashHold(blob)) {
+      const near = ballPathDistToBlob(blob) <= receiveHitRadius();
+      if (near && trySmashBall(blob)) {
+        if (!powerWindup) applyHitExtras(blob, a);
+      }
+    }
+    return;
+  }
+
   // Gameplay V2 :
   // - Manette : X/Y près de la balle → smash (air) sinon cloche
   // - Clavier : contact AUTO en échange — sol = cloche, air = smash
@@ -1118,6 +1176,7 @@ function updateBall() {
   const sideNow = ball.x < NET_X ? 0 : 1;
   if (ball.lastTouchSide !== -1 && sideNow !== ball.lastTouchSide) {
     ball.touches[sideNow] = 0;
+    clearNextTouchers(); // nouveau camp : tout le monde peut frapper
   }
 
   if (ball.y + BALL_R >= GROUND_Y) {

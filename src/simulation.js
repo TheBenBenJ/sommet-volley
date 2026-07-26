@@ -60,6 +60,7 @@ function stepBattle(inL, inR) {
   ball.lastTouchTick = tick;
   ball.touches[winner] = 1;
   ball.touches[1 - winner] = 0;
+  if (typeof clearNextTouchers === "function") clearNextTouchers();
 
   // le perdant est projeté au fond de son camp + stun (pas de dig)
   const winnerBlob = winner === 0 ? blobL : blobR;
@@ -264,6 +265,12 @@ function stepGame(inL, inR, ins, opts) {
 }
 
 function localInputs(side) {
+  if (paused) {
+    return {
+      left: false, right: false, jump: false, kbdJump: false,
+      smash: false, super: false, up: false, down: false, ax: 0, ay: 0
+    };
+  }
   // 1v1 local à DEUX humains : la manette va au côté assigné (padForSide —
   // clavier vs manette, ou une manette chacun). Sinon (solo vs IA, 2v2 local),
   // comportement historique : manette n° i → joueur i (l'humain est en 0).

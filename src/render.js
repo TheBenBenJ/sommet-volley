@@ -205,6 +205,10 @@ function render() {
     drawGameoverCeleb();
     if (typeof storyDrawGameoverTag === "function") storyDrawGameoverTag();
   }
+
+  // Menu pause au-dessus de tout le HUD (solo, histoire, tournoi, en ligne).
+  if (paused && typeof drawPauseMenu === "function") drawPauseMenu();
+  else if (paused) overlay("PAUSE", "P / Échap pour reprendre");
 }
 
 /** Bandeau de point : message + indices Gagné / Perdu + hint skip. */

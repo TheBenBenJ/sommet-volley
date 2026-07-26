@@ -157,6 +157,13 @@ function sendRel(m)  { if (connRel  && connRel.open)  connRel.send(m); }
 function sendFast(m) { if (connFast && connFast.open) connFast.send(m); }
 
 function onlineLocalInput() {
+  // Menu pause local : on ne pilote plus le blob (la simu réseau continue).
+  if (paused) {
+    return {
+      left: false, right: false, jump: false, kbdJump: false,
+      smash: false, super: false, up: false, down: false, ax: 0, ay: 0
+    };
+  }
   // en ligne, chacun est seul devant son écran : tous les mappings clavier
   // marchent, et n'importe quelle manette branchée pilote le joueur local
   let pl = false, pr = false, pj = false, psm = false, ps = false, pu = false, pd = false;
@@ -580,6 +587,12 @@ function guestSeedBallFromSnap() {
   if (b.serveFlight !== undefined) ball.serveFlight = !!b.serveFlight;
   ball.lastTouchSide = b.lastTouchSide;
   ball.touches = [b.touches[0], b.touches[1]];
+  if (b.nextToucher) {
+    ball.nextToucher = [
+      (b.nextToucher[0] == null || b.nextToucher[0] < 0) ? null : (b.nextToucher[0] | 0),
+      (b.nextToucher[1] == null || b.nextToucher[1] < 0) ? null : (b.nextToucher[1] | 0)
+    ];
+  }
   if (b.heldBy !== undefined) ball.heldBy = b.heldBy;
   if (b.holdT !== undefined) ball.holdT = b.holdT;
   if (b.chargeT !== undefined) ball.chargeT = b.chargeT;
@@ -1015,6 +1028,12 @@ function applyDiscrete(d) {
     ball.smash = d.ball.smash || 0;
     ball.lastTouchSide = d.ball.lastTouchSide;
     ball.touches = [d.ball.touches[0], d.ball.touches[1]];
+    if (d.ball.nextToucher) {
+      ball.nextToucher = [
+        (d.ball.nextToucher[0] == null || d.ball.nextToucher[0] < 0) ? null : (d.ball.nextToucher[0] | 0),
+        (d.ball.nextToucher[1] == null || d.ball.nextToucher[1] < 0) ? null : (d.ball.nextToucher[1] | 0)
+      ];
+    }
     ball.trail.length = 0;
     if (d.serveCountdown !== undefined) serveCountdown = d.serveCountdown;
     if (d.state === "point" || d.state === "gameover") {
@@ -1033,6 +1052,12 @@ function applyDiscrete(d) {
     ball.smash = d.ball.smash || 0;
     ball.lastTouchSide = d.ball.lastTouchSide;
     ball.touches = [d.ball.touches[0], d.ball.touches[1]];
+    if (d.ball.nextToucher) {
+      ball.nextToucher = [
+        (d.ball.nextToucher[0] == null || d.ball.nextToucher[0] < 0) ? null : (d.ball.nextToucher[0] | 0),
+        (d.ball.nextToucher[1] == null || d.ball.nextToucher[1] < 0) ? null : (d.ball.nextToucher[1] | 0)
+      ];
+    }
   }
   // Reprise hôte confirmée par snap (balle hors zone) → lâcher l'autorité
   if (guestBallAuthority && d.ball && !ballInGuestOwnZone(d.ball.x) &&
@@ -1264,12 +1289,13 @@ function drawNetHUD() {
   ctx.fillStyle = "rgba(255,255,255,0.9)";
   ctx.fillText(netRole === "host" ? "Tu joues à gauche" : "Tu joues à droite", W - 14, 44);
 
-  // Confirmation d'abandon (Échap ×2)
-  if (typeof quitArmed === "function" && quitArmed()) {
+  // Confirmation d'abandon hors match (lobby) : Échap ×2
+  if (typeof quitArmed === "function" && quitArmed() &&
+      state !== "serve" && state !== "play" && state !== "point") {
     ctx.textAlign = "center";
     ctx.font = "700 15px " + (typeof UI !== "undefined" ? UI.sans : "sans-serif");
     ctx.fillStyle = "#ffb84d";
-    ctx.fillText("Encore Échap pour abandonner le match", W / 2, 66);
+    ctx.fillText("Encore Échap pour quitter", W / 2, 66);
   }
 
   // pause automatique si l'autre ne donne plus signe de vie

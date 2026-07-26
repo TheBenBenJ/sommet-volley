@@ -413,8 +413,9 @@ function aiInput2v2(me, lvlOverride) {
   }
 
   const land = predictLandingX();
+  const ghost = typeof isBallGhostBlob === "function" && isBallGhostBlob(me);
   let chaser = me;
-  if (mate && (onMySide || ball.frozen || aiBallLandsMySide(side))) {
+  if (!ghost && mate && (onMySide || ball.frozen || aiBallLandsMySide(side))) {
     const dMe = Math.abs(land - me.x), dMate = Math.abs(land - mate.x);
     if (dMate < dMe - 4) chaser = mate;
     else if (Math.abs(dMate - dMe) <= 4) {
@@ -423,7 +424,8 @@ function aiInput2v2(me, lvlOverride) {
       chaser = (meFront === landFront) ? me : mate;
     }
   }
-  const iChase = chaser === me;
+  // Ghost 2v2 : ne chase pas pour digger (peut encore se repositionner / super)
+  const iChase = !ghost && chaser === me;
 
   let targetX;
   if (ball.frozen && servingSide === side) {
@@ -478,13 +480,17 @@ function aiInput2v2(me, lvlOverride) {
     aiGameplayV2(side, lvl, me, opp, input);
   }
 
+  // Super perso OK même en ghost (pas d'impact dig, mais effet de camp)
   if (!(typeof tutorialMode !== "undefined" && tutorialMode) &&
-      iChase && superCharge[side] === 1 && me.superT <= 0 && !ball.frozen && state === "play") {
+      (iChase || ghost) && superCharge[side] === 1 && me.superT <= 0 &&
+      !ball.frozen && state === "play") {
     const key = charOf(me).key;
     const nearHit = Math.abs(ball.x - me.x) < 72 && ball.y > me.y - 210 && ball.vy > -1;
     if (key === "volkoi" || key === "dorf" || key === "cygne") {
       if (onMySide && nearHit) input.super = true;
     } else if (onMySide && (side === 0 ? ball.vx < 0 : ball.vx > 0)) {
+      input.super = true;
+    } else if (ghost && onMySide) {
       input.super = true;
     }
   }

@@ -66,9 +66,25 @@ function handleMenuKeys(code, key) {
   if (musMatch) { musicOn = true; setMusicVolume(Number(musMatch[1]) / 5); return; }
 
   // Pause actionable (hitboxes dessinées par drawPauseMenu).
-  if (code === "PauseResume") { paused = false; pauseNavIdx = 0; return; }
+  if (code === "PauseResume") { resumeFromPause(); return; }
   if (code === "PauseOptions") { openOptions(true); return; }
-  if (code === "PauseQuit") { paused = false; pauseNavIdx = 0; goMenu(); return; }
+  if (code === "PauseQuit") { quitFromPause(); return; }
+
+  // Navigation clavier du menu pause (tous modes, y compris en ligne).
+  if (paused && canOpenPauseMenu()) {
+    if (code === "ArrowUp" || code === "KeyW") {
+      pauseNavIdx = (pauseNavIdx - 1 + 3) % 3;
+      return;
+    }
+    if (code === "ArrowDown" || code === "KeyS") {
+      pauseNavIdx = (pauseNavIdx + 1) % 3;
+      return;
+    }
+    if (code === "Enter" || code === "Space") {
+      handleMenuKeys(["PauseResume", "PauseOptions", "PauseQuit"][pauseNavIdx | 0], "");
+      return;
+    }
+  }
 
   if (state === "menu") {
     // Invitation 1ʳᵉ visite : bloque le reste du menu
@@ -458,20 +474,23 @@ function handleMenuKeys(code, key) {
     if (tutorialStepCanSkip()) advanceTutorialStep();
 
   } else if (code === "KeyP") {
-    if (!online && (state === "serve" || state === "play" || state === "point")) {
-      paused = !paused;
-      pauseNavIdx = 0;
-    }
-  } else if (code === "KeyO" && paused && !online) {
+    if (canOpenPauseMenu()) togglePauseMenu();
+  } else if (code === "KeyO" && paused && canOpenPauseMenu()) {
     openOptions(true);
   } else if (code === "Escape") {
-    if (online) {
-      // En match en ligne : un appui accidentel ne doit pas abandonner.
+    if (canOpenPauseMenu()) {
+      // Match (solo / local / histoire / tournoi / en ligne) : Échap ouvre
+      // ou ferme le menu pause — jamais d'abandon immédiat.
+      if (paused) resumeFromPause();
+      else openPauseMenu();
+    } else if (online) {
+      // Hors match (lobby / attente) : Échap ×2 pour abandonner.
       if (quitArmed()) { quitArmAt = 0; quitOnline(); }
       else quitArmAt = performance.now();
+    } else {
+      paused = false;
+      goMenu();
     }
-    else if (paused) { paused = false; pauseNavIdx = 0; goMenu(); }
-    else { paused = false; goMenu(); }
   }
 }
 
@@ -480,11 +499,59 @@ let optionsReturnState = "menu";
 let optionsFromPause = false;
 let pauseNavIdx = 0;
 
-// Abandon en ligne : Échap ×2 dans la fenêtre (anti appui accidentel).
+// Abandon en ligne hors match : Échap ×2 (anti appui accidentel).
 let quitArmAt = 0;
 const QUIT_CONFIRM_MS = 2500;
 function quitArmed() {
   return performance.now() - quitArmAt < QUIT_CONFIRM_MS;
+}
+
+/** Match en cours où le menu pause a du sens (tous modes). */
+function canOpenPauseMenu() {
+  return state === "serve" || state === "play" || state === "point";
+}
+
+function openPauseMenu() {
+  if (!canOpenPauseMenu()) return;
+  paused = true;
+  pauseNavIdx = 0;
+  quitArmAt = 0;
+}
+
+function resumeFromPause() {
+  paused = false;
+  pauseNavIdx = 0;
+  quitArmAt = 0;
+}
+
+function togglePauseMenu() {
+  if (paused) resumeFromPause();
+  else openPauseMenu();
+}
+
+/** Quitter depuis le menu pause : retour contextuel selon le mode. */
+function quitFromPause() {
+  paused = false;
+  pauseNavIdx = 0;
+  quitArmAt = 0;
+  if (online) {
+    if (typeof quitOnline === "function") quitOnline();
+    return;
+  }
+  if (typeof storyActive !== "undefined" && storyActive && storyInMatch) {
+    storyInMatch = false;
+    storyScene = null;
+    if (typeof storyOpenHub === "function") storyOpenHub();
+    else goMenu();
+    return;
+  }
+  if (typeof tournamentInMatch !== "undefined" && tournamentInMatch) {
+    tournamentInMatch = false;
+    state = "tournamentBracket";
+    navIdx = 0;
+    return;
+  }
+  goMenu();
 }
 
 function openOptions(fromPause) {
@@ -611,6 +678,8 @@ let menuActors = { L: null, R: null };
 function goMenu() {
   tutorialMode = false;
   tutorialStep = 0;
+  paused = false;
+  pauseNavIdx = 0;
   // sortie complète du flux histoire (ex. Échap pendant un match d'histoire)
   if (typeof storyActive !== "undefined") { storyActive = false; storyInMatch = false; storyScene = null; }
   if (typeof tournamentReset === "function") tournamentReset();
@@ -1348,7 +1417,7 @@ function drawOptionsBinds() {
 function drawPauseMenu() {
   ctx.fillStyle = "rgba(12, 20, 42, 0.72)";
   ctx.fillRect(0, 0, W, H);
-  const pw = 360, ph = 240;
+  const pw = 360, ph = online ? 268 : 240;
   const px = (W - pw) / 2, py = (H - ph) / 2 - 8;
   ctx.fillStyle = "rgba(255,246,232,0.97)";
   ctx.beginPath();
@@ -1360,16 +1429,23 @@ function drawPauseMenu() {
   ctx.fillStyle = UI.stroke;
   ctx.font = "800 28px " + UI.display;
   ctx.fillText("PAUSE", W / 2, py + 42);
+  if (online) {
+    ctx.font = "600 12px " + UI.sans;
+    ctx.fillStyle = "rgba(27,23,48,0.62)";
+    ctx.fillText("Menu local — la partie continue en ligne", W / 2, py + 66);
+  }
 
   const btns = [
     { code: "PauseResume", label: "Reprendre" },
     { code: "PauseOptions", label: "Options" },
-    { code: "PauseQuit", label: "Quitter" }
+    { code: "PauseQuit", label: online ? "Abandonner" : "Quitter" }
   ];
   if (pauseNavIdx < 0 || pauseNavIdx >= btns.length) pauseNavIdx = 0;
+  const btnTop = online ? 96 : 88;
   btns.forEach((b, i) => {
-    const y = py + 88 + i * 42;
-    const sel = (padConnected && pauseNavIdx === i) || isHover(b.code);
+    const y = py + btnTop + i * 42;
+    const sel = pauseNavIdx === i || isHover(b.code);
+    if (isHover(b.code)) pauseNavIdx = i;
     hit(W / 2, y, 220, 34, b.code);
     ctx.beginPath();
     if (ctx.roundRect) ctx.roundRect(W / 2 - 110, y - 16, 220, 34, 12);
@@ -1383,7 +1459,7 @@ function drawPauseMenu() {
   });
   ctx.font = "600 11px " + UI.sans;
   ctx.fillStyle = "rgba(27,23,48,0.55)";
-  ctx.fillText("P reprendre  ·  Échap quitter", W / 2, py + ph - 16);
+  ctx.fillText("P / Échap reprendre  ·  ↑↓ Entrée", W / 2, py + ph - 16);
 }
 
 function drawTutorialInvite() {
@@ -1614,7 +1690,7 @@ function drawTutorialControls(dev, x, y, maxW) {
       ["Super Smash (jauge orange)", "Plein → MAINTIENS " + kF + " longtemps en l'air, puis relâche (sinon smash normal)"],
       ["Smash Battle", "Les deux au filet en l'air + balle proche → duel de sauts"],
       ["Camp droite (local 1v1)", "← →  ·  ↑ saut  ·  ↓ ou / frappe  ·  Shift dr. SUPER"],
-      ["Pause / son", "P pause · M son · N musique · Échap menu"]
+      ["Pause / son", "P ou Échap pause · M son · N musique"]
     ],
     pad: [
       ["Déplacement", "Stick gauche ou croix directionnelle"],
@@ -1988,7 +2064,7 @@ function drawRules() {
   p("Clavier : contact auto — sol = cloche, air = smash (selon ta position).");
   p("Manette : stick viser · A saut · X/Y frappe · B SUPER (inchangé).");
   p("Droite local : ← → · ↑ · ↓ ou / frappe · Shift dr. SUPER");
-  p("P pause · M son · N musique · Échap menu");
+  p("P / Échap pause · M son · N musique");
   y += 4;
   h("Gameplay");
   p("Au sol, balle sur toi = cloche auto. En l'air = smash auto au contact.");

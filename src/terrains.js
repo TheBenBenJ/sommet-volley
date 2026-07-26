@@ -2114,11 +2114,6 @@ function drawHUD() {
     ctx.fillText(label, NET_X, H / 2 + 22 + bounce);
   }
 
-  if (paused && typeof drawPauseMenu === "function") {
-    drawPauseMenu();
-  } else if (paused) {
-    overlay("PAUSE", "Appuyez sur P pour reprendre");
-  }
 }
 
 function overlay(title, subtitle) {

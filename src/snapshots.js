@@ -21,6 +21,9 @@ function packBallState(owning) {
     lts: ball.lastTouchSide, ltt: ball.lastTouchTick,
     lh: ball.lastHitTick | 0,
     t0: ball.touches[0], t1: ball.touches[1],
+    // 2v2 alternance : -1 = libre
+    nt0: ball.nextToucher[0] == null ? -1 : (ball.nextToucher[0] | 0),
+    nt1: ball.nextToucher[1] == null ? -1 : (ball.nextToucher[1] | 0),
     hb: ball.heldBy | 0, ht: ball.holdT | 0, ch: ball.chargeT | 0,
     aa: ball.aimAngle || 0, sa: ball.shotArmed ? 1 : 0,
     rs: rngSeed,
@@ -47,6 +50,12 @@ function applyBallState(b) {
   ball.lastTouchTick = b.ltt !== undefined ? b.ltt : -999;
   ball.lastHitTick = b.lh !== undefined ? b.lh : -999;
   ball.touches = [b.t0 | 0, b.t1 | 0];
+  if (b.nt0 !== undefined || b.nt1 !== undefined) {
+    ball.nextToucher = [
+      (b.nt0 == null || b.nt0 < 0) ? null : (b.nt0 | 0),
+      (b.nt1 == null || b.nt1 < 0) ? null : (b.nt1 | 0)
+    ];
+  }
   if (b.hb !== undefined) ball.heldBy = b.hb;
   if (b.ht !== undefined) ball.holdT = b.ht;
   if (b.ch !== undefined) ball.chargeT = b.ch;
@@ -97,6 +106,10 @@ function getSnapshot() {
       lastTouchSide: ball.lastTouchSide, lastTouchTick: ball.lastTouchTick,
       lastHitTick: ball.lastHitTick | 0,
       touches: [ball.touches[0], ball.touches[1]],
+      nextToucher: [
+        ball.nextToucher[0] == null ? -1 : (ball.nextToucher[0] | 0),
+        ball.nextToucher[1] == null ? -1 : (ball.nextToucher[1] | 0)
+      ],
       heldBy: ball.heldBy, holdT: ball.holdT, chargeT: ball.chargeT,
       aimAngle: ball.aimAngle, shotArmed: !!ball.shotArmed
     },
@@ -174,6 +187,12 @@ function applySnapshot(s) {
   ball.lastTouchTick = s.ball.lastTouchTick !== undefined ? s.ball.lastTouchTick : -999;
   ball.lastHitTick = s.ball.lastHitTick !== undefined ? s.ball.lastHitTick : -999;
   ball.touches = [s.ball.touches[0], s.ball.touches[1]];
+  if (s.ball.nextToucher) {
+    ball.nextToucher = [
+      (s.ball.nextToucher[0] == null || s.ball.nextToucher[0] < 0) ? null : (s.ball.nextToucher[0] | 0),
+      (s.ball.nextToucher[1] == null || s.ball.nextToucher[1] < 0) ? null : (s.ball.nextToucher[1] | 0)
+    ];
+  }
   if (s.ball.heldBy !== undefined) ball.heldBy = s.ball.heldBy;
   if (s.ball.holdT !== undefined) ball.holdT = s.ball.holdT;
   if (s.ball.chargeT !== undefined) ball.chargeT = s.ball.chargeT;

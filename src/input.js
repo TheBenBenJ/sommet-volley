@@ -291,7 +291,8 @@ function readPad(gp) {
     down:    rawAy >  0.5 || b(13),
     ax, ay,                 // stick analog (visée à l'appui)
     confirm: b(0),          // A / Croix
-    back:    b(1) || b(8)   // B / Rond, ou Select
+    back:    b(1) || b(8),  // B / Rond, ou Select
+    start:   b(9)           // Start → menu pause en match
   };
 }
 
@@ -478,7 +479,7 @@ function handlePadMenu() {
     if (padEdge("back")) handleMenuKeys("Escape", "");
   } else if (state === "rules" || state === "tutorialHelp" || state === "netError" || state === "credits") {
     if (padEdge("confirm") || padEdge("back")) handleMenuKeys("Escape", "");
-  } else if (paused && !online && (state === "serve" || state === "play" || state === "point")) {
+  } else if (paused && (state === "serve" || state === "play" || state === "point")) {
     if (padEdge("up")) {
       pauseNavIdx = (pauseNavIdx - 1 + 3) % 3;
       beep(500, 0.03, "square", 0.05);
@@ -490,7 +491,10 @@ function handlePadMenu() {
     if (padEdge("confirm")) {
       handleMenuKeys(["PauseResume", "PauseOptions", "PauseQuit"][pauseNavIdx | 0], "");
     }
-    if (padEdge("back")) handleMenuKeys("PauseQuit", "");
+    // B / Start ferme la pause (reprise) — Quitter reste un choix explicite.
+    if (padEdge("back") || padEdge("start")) handleMenuKeys("PauseResume", "");
+  } else if ((state === "serve" || state === "play" || state === "point") && !paused) {
+    if (padEdge("start")) handleMenuKeys("Escape", "");
   } else if ((state === "serve" || state === "play") && tutorialMode) {
     if (padEdge("confirm")) handleMenuKeys("Enter", "");
     if (padEdge("back")) handleMenuKeys("Escape", "");

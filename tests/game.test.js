@@ -799,6 +799,95 @@ test("2v2 : coéquipiers empilés → une seule réception (pas de téléport)",
   assert.ok(g.ball.x < g.consts.NET_X, "balle reste côté réception");
 });
 
+test("2v2 : alternance — après touche, ghost ne peut plus digger (allié oui)", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.setMode("2v2");
+  g.newGame(701);
+  g.setState("play"); g.setServeCountdown(0);
+  const gy = g.consts.GROUND_Y;
+  g.blobL.x = 220; g.blobL.y = gy; g.blobL.onGround = true;
+  g.blob2L.x = 320; g.blob2L.y = gy; g.blob2L.onGround = true;
+  g.blobR.x = 750; g.blob2R.x = 700;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+  g.ball.serveAimLock = false; g.ball.serveFlight = false;
+  g.ball.lastTouchSide = 1; g.ball.lastTouchTick = -999; g.ball.touches = [0, 0];
+  g.ball.nextToucher = [null, null];
+  g.blobL.lastActiveHitTick = -999;
+  g.blob2L.lastActiveHitTick = -999;
+  // 1) blobL dig
+  g.ball.x = 220; g.ball.y = gy - 64; g.ball.vx = 0; g.ball.vy = 2;
+  g.stepGame(null, null, [{ ...N0, smash: true }, N0, N0, N0]);
+  assert.strictEqual(g.ball.touches[0], 1, "1ère touche blobL");
+  assert.strictEqual(g.ball.nextToucher[0], 1, "prochain = blob2L (idx 1)");
+  assert.ok(g.isBallGhostBlob(g.blobL), "blobL devient ghost");
+  assert.ok(!g.isBallGhostBlob(g.blob2L), "blob2L peut frapper");
+  // 2) ghost peut encore bouger (balle reste côté gauche — sinon reset nextToucher)
+  const xGhost0 = g.blobL.x;
+  g.ball.x = 400; g.ball.y = 80;
+  g.stepGame(null, null, [{ ...N0, right: true }, N0, N0, N0]);
+  assert.ok(g.blobL.x > xGhost0, "ghost se déplace encore");
+  assert.ok(g.isBallGhostBlob(g.blobL), "toujours ghost après déplacement");
+  // 3) ghost ne dig plus
+  g.blobL.lastActiveHitTick = -999;
+  g.blob2L.lastActiveHitTick = -999;
+  g.setTick(g.getTick() + 20); // hors cooldown touche
+  g.ball.x = g.blobL.x; g.ball.y = gy - 64; g.ball.vx = 0; g.ball.vy = 2;
+  g.ball.lastHitTick = -999;
+  g.ball.lastTouchSide = 0; // toujours notre camp
+  const tGhost = g.ball.touches[0];
+  g.stepGame(null, null, [{ ...N0, smash: true }, N0, N0, N0]);
+  assert.strictEqual(g.ball.touches[0], tGhost, "ghost n'augmente pas les touches");
+  // 4) allié dig → touche 2, rôles inversés
+  g.blob2L.lastActiveHitTick = -999;
+  g.ball.x = g.blob2L.x; g.ball.y = gy - 64; g.ball.vx = 0; g.ball.vy = 2;
+  g.ball.lastHitTick = -999;
+  g.stepGame(null, null, [N0, { ...N0, smash: true }, N0, N0]);
+  assert.strictEqual(g.ball.touches[0], 2, "2ᵉ touche = allié");
+  assert.strictEqual(g.ball.nextToucher[0], 0, "prochain redevient blobL");
+  assert.ok(g.isBallGhostBlob(g.blob2L) && !g.isBallGhostBlob(g.blobL), "rôles inversés");
+});
+
+test("2v2 : alternance — nextToucher sync snapshot / packBall", () => {
+  const g = loadGame();
+  g.setMode("2v2");
+  g.newGame(702);
+  g.setState("play");
+  g.ball.nextToucher = [1, null];
+  const packed = g.packBallState(true);
+  assert.strictEqual(packed.nt0, 1);
+  assert.strictEqual(packed.nt1, -1);
+  g.ball.nextToucher = [null, null];
+  g.applyBallState(packed);
+  assert.strictEqual(g.ball.nextToucher[0], 1);
+  assert.strictEqual(g.ball.nextToucher[1], null);
+  const snap = g.getSnapshot();
+  g.ball.nextToucher = [null, 3];
+  g.applySnapshot(JSON.parse(JSON.stringify(snap)));
+  assert.strictEqual(g.ball.nextToucher[0], 1);
+  assert.strictEqual(g.ball.nextToucher[1], null);
+});
+
+test("2v2 : alternance — passage du filet libère les deux", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.setMode("2v2");
+  g.newGame(703);
+  g.setState("play"); g.setServeCountdown(0);
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+  g.ball.serveAimLock = false; g.ball.serveFlight = false;
+  g.ball.lastTouchSide = 0;
+  g.ball.nextToucher = [1, null];
+  g.ball.touches = [2, 0];
+  // Balle traverse le filet vers la droite
+  g.ball.x = g.consts.NET_X - 20; g.ball.y = 120;
+  g.ball.vx = 8; g.ball.vy = -2;
+  for (let i = 0; i < 12; i++) g.stepGame(null, null, [N0, N0, N0, N0]);
+  assert.ok(g.ball.x > g.consts.NET_X, "balle côté droit");
+  assert.strictEqual(g.ball.nextToucher[0], null, "nextToucher gauche reset");
+  assert.strictEqual(g.ball.nextToucher[1], null, "nextToucher droit reset");
+});
+
 test("V2 : smash dirigé sans ralenti", () => {
   const g = freshRally(45);
   g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y - 80;
@@ -2392,6 +2481,37 @@ test("quickplay bot-backfill → partie vs IA", () => {
   assert.strictEqual(g.getOnline(), false);
   assert.strictEqual(g.getVsAI(), true);
   assert.ok(g.getState() === "serve" || g.getState() === "play", "partie locale lancée");
+});
+
+test("pause : Échap ouvre le menu, Reprendre ferme, Quitter revient au menu", () => {
+  const g = loadGame();
+  g.setMode("1v1");
+  g.setVsAI(true);
+  g.newGame(7);
+  assert.ok(g.getState() === "serve" || g.getState() === "play");
+  assert.strictEqual(g.getPaused(), false);
+  g.handleMenuKeys("Escape", "");
+  assert.strictEqual(g.getPaused(), true, "Échap ouvre la pause");
+  g.handleMenuKeys("PauseResume", "");
+  assert.strictEqual(g.getPaused(), false, "Reprendre ferme la pause");
+  g.handleMenuKeys("KeyP", "");
+  assert.strictEqual(g.getPaused(), true, "P ouvre la pause");
+  g.handleMenuKeys("PauseQuit", "");
+  assert.strictEqual(g.getPaused(), false);
+  assert.strictEqual(g.getState(), "menu", "Quitter → menu principal");
+});
+
+test("pause : inputs gelés tant que le menu est ouvert", () => {
+  const g = loadGame();
+  g.setMode("1v1");
+  g.setVsAI(true);
+  g.newGame(8);
+  g.keys.KeyA = true;
+  assert.ok(g.localInputs(0).left, "gauche actif hors pause");
+  g.setPaused(true);
+  assert.ok(!g.localInputs(0).left, "gauche ignoré en pause");
+  g.keys.KeyA = false;
+  g.setPaused(false);
 });
 
 console.log("\n" + pass + " réussis, " + fail + " échoués");
