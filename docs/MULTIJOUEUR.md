@@ -33,7 +33,12 @@ Hôte ◀─────────── serveur de signalisation ────
 - **Soft ownership 1v1** : l'invité simule la balle seulement si elle est
   clairement dans son camp (`x > NET_X + GUEST_BALL_MARGIN`). Zone filet,
   camp hôte, score, service/point → toujours l'hôte.
-- Hors zone : l'invité interpole les snapshots + prédit son perso.
+- Hors zone : l'invité **affiche la balle en dead-reckoning live** depuis le
+  dernier snap (âge + RTT/2, même `predictBallMotion` que la physique), avec
+  correction douce si l'écart est petit — pas un lerp retardé au fond de court.
+  Les **corps** adverses gardent l'interpolation retardée (`interpDelay`).
+- Handoff filet : coast local + blend X plus lent ; hôte soft-blend les paquets
+  `own:1` (anti micro-stutter RTT).
 - Près du filet, cadence de snapshots portée à 60 Hz pour un passage fluide.
 - Signalisation via **PeerJS** ; TURN de secours pour les NAT stricts.
 - **Plus** : hits collants côté invité dans son camp ; pas de handoff bilatéral

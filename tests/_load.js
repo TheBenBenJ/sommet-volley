@@ -123,6 +123,36 @@ const EPILOGUE = `
   MAP_EVENT_WARN_T: typeof MAP_EVENT_WARN_T !== "undefined" ? MAP_EVENT_WARN_T : 120,
   updateBall,
   ballInGuestOwnZone, packBallState, applyBallState,
+  predictBallMotion: typeof predictBallMotion === "function" ? predictBallMotion : null,
+  guestLiveBallFromSnap: typeof guestLiveBallFromSnap === "function" ? guestLiveBallFromSnap : null,
+  hostApplyGuestBallSoft: typeof hostApplyGuestBallSoft === "function" ? hostApplyGuestBallSoft : null,
+  getHostBallSmooth: () => [
+    typeof hostBallSmoothX !== "undefined" ? hostBallSmoothX : 0,
+    typeof hostBallSmoothY !== "undefined" ? hostBallSmoothY : 0
+  ],
+  setHostBallSmooth: (x, y) => {
+    if (typeof hostBallSmoothX !== "undefined") hostBallSmoothX = +x || 0;
+    if (typeof hostBallSmoothY !== "undefined") hostBallSmoothY = +y || 0;
+  },
+  guestTestPushSnap: (d) => {
+    if (typeof snapBuf === "undefined") return;
+    snapBuf.push(d);
+    if (snapBuf.length > 12) snapBuf.shift();
+    lastSnapArrival = performance.now();
+    lastSnapTime = lastSnapArrival;
+  },
+  guestTestClearSnaps: () => {
+    if (typeof snapBuf !== "undefined") snapBuf.length = 0;
+    if (typeof guestCoast !== "undefined") { guestCoast = null; guestCoastLeft = 0; }
+  },
+  getGuestCoastLeft: () => (typeof guestCoastLeft !== "undefined" ? guestCoastLeft | 0 : 0),
+  setGuestCoast: (coast, left) => {
+    if (typeof guestCoast !== "undefined") guestCoast = coast;
+    if (typeof guestCoastLeft !== "undefined") guestCoastLeft = left | 0;
+  },
+  BALL_SOFT_CORRECT: typeof BALL_SOFT_CORRECT !== "undefined" ? BALL_SOFT_CORRECT : 36,
+  GUEST_COAST_TICKS: typeof GUEST_COAST_TICKS !== "undefined" ? GUEST_COAST_TICKS : 18,
+  guestApplyBallView: typeof guestApplyBallView === "function" ? guestApplyBallView : null,
   simulateArc, aimAngleFromInput, clearBallHold,
   canActiveHit, setTick: v => { tick = v | 0; },
   canNormalHit2v2: typeof canNormalHit2v2 === "function" ? canNormalHit2v2 : () => true,

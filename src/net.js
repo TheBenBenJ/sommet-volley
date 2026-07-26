@@ -9,6 +9,8 @@
 //    clairement dans son camp (x > NET_X + GUEST_BALL_MARGIN). Zone filet,
 //    camp hôte, scoring, service/point → toujours l'hôte. Pas de handoff
 //    bilatéral (évite les deadlocks poteau de l'ancien ownership 0↔1).
+//  - BALLE HORS CAMP : dead-reckoning live (âge + RTT/2), pas lerp retardé ;
+//    corps adverses restent en interpolation adaptative.
 //  - CORPS : chacun prédit son perso ; snaps pour le monde distant.
 //  - 2v2 : hôte pleinement autoritaire.
 // La signalisation passe par le cloud PeerJS ; ensuite WebRTC en direct.
@@ -21,10 +23,11 @@ const INTERP_MIN = 2;          // plancher du délai (bonne connexion)
 const INTERP_MAX = 7;          // plafond du délai (connexion instable)
 const EXTRAP_MAX = 8;          // ticks d'extrapolation max quand un snapshot tarde
 const NET_TIMEOUT = 2500;      // ms de silence → pause "connexion instable"
-const RECONCILE_SNAP = 60;     // px d'écart au-delà desquels on téléporte
+const RECONCILE_SNAP = 60;     // px d'écart corps → téléport
+const BALL_SOFT_CORRECT = 36;  // px — blend doux balle distante ; au-delà = snap
 const BALL_STALE_MS = 200;     // sans paquet balle invité → l'hôte reprend
 const GUEST_BALL_HOLD = 8;     // ticks de renvoi balle après sortie de zone
-const GUEST_COAST_TICKS = 14;  // après sortie : dead-reckoning local avant snaps
+const GUEST_COAST_TICKS = 18;  // après sortie : dead-reckoning local avant snaps
 const CODE_LEN = 5;
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sans I/O/0/1
 const PEER_PREFIX = "vda26-";  // espace de noms sur le cloud PeerJS
@@ -115,6 +118,9 @@ let guestBallSmoothX = 0, guestBallSmoothY = 0; // lissage visuel handoff filet
 // instant au lieu de sauter sur l'interp retardée (= gros freeze au filet).
 let guestCoast = null;         // {x,y,vx,vy,angle} | null
 let guestCoastLeft = 0;
+// Hôte : lissage visuel quand un paquet own:1 « saute » ou reprise d'autorité
+let hostBallSmoothX = 0, hostBallSmoothY = 0;
+let hostWasUsingGuestBall = false;
 
 // --- 2v2 en ligne ---
 // L'hôte accepte jusqu'à 3 invités. Chaque joueur occupe un « slot » = son
@@ -490,6 +496,8 @@ function hostStartMatch() {
   netFrame = 0;
   guestBall = null; lastGuestBallAt = 0; lastGuestPtSeq = 0;
   guestBallGen = 0; appliedGuestBallGen = -1;
+  hostBallSmoothX = hostBallSmoothY = 0;
+  hostWasUsingGuestBall = false;
   const seed = (Math.random() * 2 ** 31) | 0;
   sendRel({ t: "start", m: matchId, seed, terrain, ballSkin, a: [blobL.charId, blobR.charId],
             bomb: bombMode ? 1 : 0, bt: bombTime, flame: flameMode ? 1 : 0,
@@ -516,6 +524,8 @@ function guestResetMatch() {
   guestBallAuthority = false;
   guestBallSmoothX = guestBallSmoothY = 0;
   guestCoast = null; guestCoastLeft = 0;
+  hostBallSmoothX = hostBallSmoothY = 0;
+  hostWasUsingGuestBall = false;
   ballScoreLock = false;
 }
 
@@ -535,7 +545,7 @@ function guestCanAcquireBall() {
   return b && !b.popped && ballInGuestOwnZone(b.x);
 }
 
-// Balle « live » depuis le dernier snap (âge + RTT/2), pour le passage filet.
+// Balle « live » depuis le dernier snap (âge + RTT/2) — vue hors camp entière.
 function guestLiveBallFromSnap() {
   const n = snapBuf.length;
   if (!n) return null;
@@ -548,6 +558,24 @@ function guestLiveBallFromSnap() {
   const dt = Math.max(0, Math.min(EXTRAP_MAX, age + rttHalf));
   const pb = predictBallMotion(last.ball.x, last.ball.y, last.ball.vx, last.ball.vy, dt);
   return { x: pb.x, y: pb.y, vx: pb.vx, vy: pb.vy, angle: last.ball.angle + pb.vx * 0.03 * dt };
+}
+
+/** Hôte : applique un paquet balle invité avec correction douce (anti micro-stutter RTT). */
+function hostApplyGuestBallSoft(b) {
+  if (!b) return;
+  const ox = ball.x, oy = ball.y;
+  applyBallState(b);
+  const dx = ball.x - ox, dy = ball.y - oy;
+  const dist = Math.hypot(dx, dy);
+  if (dist > 0.5 && dist < BALL_SOFT_CORRECT) {
+    // Blend ~45 % vers le paquet — vitesses = autorité invité
+    ball.x = ox + dx * 0.45;
+    ball.y = oy + dy * 0.45;
+  } else if (dist >= BALL_SOFT_CORRECT) {
+    // Gros saut : lissage visuel (affichage reste près de l'ancienne pose)
+    hostBallSmoothX += ox - ball.x;
+    hostBallSmoothY += oy - ball.y;
+  }
 }
 
 // Hôte : n'applique la balle invité QUE si l'invité revendique explicitement
@@ -567,6 +595,14 @@ function hostInvalidateGuestBall() {
   guestBall = null;
   lastGuestBallAt = 0;
   appliedGuestBallGen = -1;
+}
+
+/** Hôte : decay du lissage balle + reprise d'autorité après own:1. */
+function hostTickBallSmooth() {
+  hostBallSmoothX *= 0.78;
+  hostBallSmoothY *= 0.78;
+  if (Math.abs(hostBallSmoothX) < 0.15) hostBallSmoothX = 0;
+  if (Math.abs(hostBallSmoothY) < 0.15) hostBallSmoothY = 0;
 }
 
 // Au moment où l'invité prend la balle : partir du DERNIER snap hôte
@@ -842,9 +878,11 @@ function netUpdate() {
         if (gameoverTimer > 0) gameoverTimer--;
       } else if (state === "play" || state === "serve") {
         // Soft ownership : invité revendique (own:1) + balle déjà à droite.
-        if (hostUsesGuestBall()) {
+        const usingGuest = hostUsesGuestBall();
+        if (usingGuest) {
+          hostWasUsingGuestBall = true;
           if (appliedGuestBallGen !== guestBallGen) {
-            applyBallState(guestBall);
+            hostApplyGuestBallSoft(guestBall);
             appliedGuestBallGen = guestBallGen;
           } else {
             // Même paquet (trou RTT après sortie / jitter) : avancer 1 tick
@@ -857,10 +895,24 @@ function netUpdate() {
           // skipBall : la balle a déjà été posée / avancée ci-dessus
           stepGame(onlineLocalInput(), guestIn, null, { skipBall: true });
         } else {
-          if (ball.x <= NET_X + GUEST_BALL_MARGIN) hostInvalidateGuestBall();
-          stepGame(onlineLocalInput(), guestIn);
+          // Reprise d'autorité : lisser le micro-saut simu hôte vs dernière pose guest
+          if (hostWasUsingGuestBall) {
+            hostWasUsingGuestBall = false;
+            const ox = ball.x, oy = ball.y;
+            if (ball.x <= NET_X + GUEST_BALL_MARGIN) hostInvalidateGuestBall();
+            stepGame(onlineLocalInput(), guestIn);
+            const dist = Math.hypot(ball.x - ox, ball.y - oy);
+            if (dist >= 2 && dist < RECONCILE_SNAP) {
+              hostBallSmoothX += ox - ball.x;
+              hostBallSmoothY += oy - ball.y;
+            }
+          } else {
+            if (ball.x <= NET_X + GUEST_BALL_MARGIN) hostInvalidateGuestBall();
+            stepGame(onlineLocalInput(), guestIn);
+          }
           if (ball.x <= NET_X + 24) hostInvalidateGuestBall();
         }
+        hostTickBallSmooth();
         hostTakeGuestBallPoint(); // y compris pt arrivé avec own:0
       }
     }
@@ -883,7 +935,10 @@ function netUpdate() {
                             Math.min(renderTick, latestTick + EXTRAP_MAX));
     }
     guestSmoothX *= 0.75; guestSmoothY *= 0.75;
-    guestBallSmoothX *= 0.7; guestBallSmoothY *= 0.7;
+    // Handoff : X se résorbe plus lentement (composante qui « saute » au filet)
+    guestBallSmoothX *= 0.84; guestBallSmoothY *= 0.72;
+    if (Math.abs(guestBallSmoothX) < 0.12) guestBallSmoothX = 0;
+    if (Math.abs(guestBallSmoothY) < 0.12) guestBallSmoothY = 0;
 
     if (state === "play" || state === "serve") {
       const input = onlineLocalInput();
@@ -902,6 +957,10 @@ function netUpdate() {
         guestSeedBallFromSnap();
         guestBallSmoothX = ox - ball.x;
         guestBallSmoothY = oy - ball.y;
+        // Trop gros (reset) : pas de blend, snap franc
+        if (Math.hypot(guestBallSmoothX, guestBallSmoothY) > RECONCILE_SNAP) {
+          guestBallSmoothX = guestBallSmoothY = 0;
+        }
       }
 
       if (guestBallAuthority) {
@@ -1172,19 +1231,30 @@ function reconcileGuest(d, ack) {
   }
 }
 
-// Pose la balle vue invité hors ownership : côte locale et/ou live-extrap
-// du dernier snap (jamais l'interp retardée près du filet → freeze).
+// Pose la balle vue invité hors ownership.
+// Toujours dead-reckoning live (pas lerp retardé au fond de court) +
+// correction temporelle douce ; corps adverses gardent interpDelay.
 function guestApplyBallView(s0, s1, a, last) {
   const L = (u, v) => u + (v - u) * a;
-  const nearNet = last.ball && Math.abs(last.ball.x - NET_X) < NET_SNAP_ZONE;
-  const live = (nearNet || guestCoastLeft > 0) ? guestLiveBallFromSnap() : null;
+  const live = guestLiveBallFromSnap();
 
   let sx, sy, sa;
   if (live) {
     sx = live.x; sy = live.y; sa = live.angle;
+    // Soft-correct vs pose affichée précédente (anti micro-sauts RTT)
+    if (!guestCoast || guestCoastLeft <= 0) {
+      const err = Math.hypot(sx - ball.x, sy - ball.y);
+      if (err > 0.5 && err < BALL_SOFT_CORRECT) {
+        const k = 0.55;
+        sx = ball.x + (sx - ball.x) * k;
+        sy = ball.y + (sy - ball.y) * k;
+        sa = ball.angle + (sa - ball.angle) * k;
+      }
+      // err >= BALL_SOFT_CORRECT : snap franc vers live (hit distant, etc.)
+    }
   } else {
+    // frozen / crevée / hors play : lerp snapshots + garde filet
     const x0 = s0.ball.x, y0 = s0.ball.y, x1 = s1.ball.x, y1 = s1.ball.y;
-    // Même seuil que resolveNetBall (pas NET_TOP+1 trop permissif)
     const clearY = NET_TOP - BALL_R;
     let yAtNet = null;
     if ((x0 - NET_X) * (x1 - NET_X) < 0 && Math.abs(x1 - x0) > 1e-6) {
@@ -1210,13 +1280,14 @@ function guestApplyBallView(s0, s1, a, last) {
     }
   }
 
-  // Blend côte locale → snap live pendant le handoff
+  // Blend côte locale → live pendant le handoff (X plus lent que Y)
   if (guestCoast && guestCoastLeft > 0) {
     const k = 1 - (guestCoastLeft / GUEST_COAST_TICKS); // 0 → 1
-    const ease = k * k; // ease-in vers le snap
-    ball.x = guestCoast.x + (sx - guestCoast.x) * ease;
-    ball.y = guestCoast.y + (sy - guestCoast.y) * ease;
-    ball.angle = guestCoast.angle + (sa - guestCoast.angle) * ease;
+    const easeY = k * k;
+    const easeX = k * k * k;
+    ball.x = guestCoast.x + (sx - guestCoast.x) * easeX;
+    ball.y = guestCoast.y + (sy - guestCoast.y) * easeY;
+    ball.angle = guestCoast.angle + (sa - guestCoast.angle) * easeY;
   } else {
     ball.x = sx; ball.y = sy; ball.angle = sa;
   }

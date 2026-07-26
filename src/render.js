@@ -166,10 +166,18 @@ function render() {
   // SUPER : voiles de camp sous les joueurs (glace / ralenti / anti-saut)
   if (typeof drawSuperCourtBack === "function") drawSuperCourtBack();
   const drawBallLayer = () => {
+    let sx = 0, sy = 0;
     if (online && netRole === "guest" && (guestBallSmoothX || guestBallSmoothY)) {
-      ball.x += guestBallSmoothX; ball.y += guestBallSmoothY;
+      sx = guestBallSmoothX; sy = guestBallSmoothY;
+    } else if (online && netRole === "host" &&
+               typeof hostBallSmoothX !== "undefined" &&
+               (hostBallSmoothX || hostBallSmoothY)) {
+      sx = hostBallSmoothX; sy = hostBallSmoothY;
+    }
+    if (sx || sy) {
+      ball.x += sx; ball.y += sy;
       drawBall();
-      ball.x -= guestBallSmoothX; ball.y -= guestBallSmoothY;
+      ball.x -= sx; ball.y -= sy;
     } else {
       drawBall();
     }

@@ -756,6 +756,89 @@ test("soft ownership : pack/applyBallState round-trip", () => {
   assert.deepStrictEqual(g.ball.touches, [1, 2]);
 });
 
+test("multi fluidité : constantes coast / soft-correct", () => {
+  const g = loadGame();
+  assert.ok(g.BALL_SOFT_CORRECT >= 24 && g.BALL_SOFT_CORRECT <= 48, "seuil blend balle");
+  assert.ok(g.GUEST_COAST_TICKS >= 14, "coast handoff assez long");
+  assert.ok(g.hostApplyGuestBallSoft && g.guestLiveBallFromSnap && g.predictBallMotion);
+});
+
+test("multi fluidité : hostApplyGuestBallSoft blend si petit écart", () => {
+  const g = loadGame();
+  g.newGame(4);
+  g.setState("play"); g.setServeCountdown(0);
+  g.ball.frozen = false;
+  g.ball.x = 600; g.ball.y = 200; g.ball.vx = 0; g.ball.vy = 0; g.ball.angle = 0;
+  g.setHostBallSmooth(0, 0);
+  g.hostApplyGuestBallSoft({
+    x: 620, y: 210, vx: -2, vy: 3, a: 0.5,
+    f: 0, p: 0, sm: 0, t0: 0, t1: 1, lts: 1, ltt: -999, lh: -999
+  });
+  assert.ok(g.ball.x > 600 && g.ball.x < 620, "position blendée (x=" + g.ball.x + ")");
+  assert.ok(g.ball.y > 200 && g.ball.y < 210, "y blendé");
+  assert.strictEqual(g.ball.vx, -2, "vx = autorité paquet");
+  assert.strictEqual(g.ball.vy, 3);
+  const sm = g.getHostBallSmooth();
+  assert.ok(Math.abs(sm[0]) < 0.01 && Math.abs(sm[1]) < 0.01, "pas de smooth sur petit écart");
+});
+
+test("multi fluidité : hostApplyGuestBallSoft snap + smooth si gros écart", () => {
+  const g = loadGame();
+  g.newGame(5);
+  g.setState("play"); g.setServeCountdown(0);
+  g.ball.frozen = false;
+  g.ball.x = 500; g.ball.y = 180; g.ball.vx = 0; g.ball.vy = 0;
+  g.setHostBallSmooth(0, 0);
+  g.hostApplyGuestBallSoft({
+    x: 700, y: 220, vx: 1, vy: -1, a: 0,
+    f: 0, p: 0, sm: 0, t0: 0, t1: 0, lts: 1, ltt: -999, lh: -999
+  });
+  assert.strictEqual(g.ball.x, 700, "gros écart → apply franc");
+  const sm = g.getHostBallSmooth();
+  assert.ok(Math.abs(sm[0]) > 10, "smooth visuel hôte non nul");
+});
+
+test("multi fluidité : guestLiveBallFromSnap + predict respecte le filet", () => {
+  const g = loadGame();
+  const C = g.consts;
+  g.newGame(8);
+  g.setState("play"); g.setServeCountdown(0);
+  g.guestTestClearSnaps();
+  // Balle basse vers le filet — le live DR ne doit pas traverser le poteau
+  g.guestTestPushSnap({
+    tick: 100, state: "play",
+    ball: {
+      x: C.NET_X - 30, y: C.NET_TOP + 70, vx: 14, vy: 0, angle: 0,
+      frozen: false, popped: false
+    }
+  });
+  const live = g.guestLiveBallFromSnap();
+  assert.ok(live, "live produit");
+  assert.ok(live.x < C.NET_X + C.NET_W, "pas de téléport à travers le filet (x=" + live.x + ")");
+  // Predict long sous le bandeau → rebond (vx négatif ou reste à gauche)
+  const pb = g.predictBallMotion(C.NET_X - 25, C.NET_TOP + 80, 16, 0, 6);
+  assert.ok(pb.x < C.NET_X || pb.vx <= 0, "predict filet cohérent");
+});
+
+test("multi fluidité : handoff coast non nul après lâcher zone", () => {
+  const g = loadGame();
+  g.newGame(9);
+  g.setGuestCoast({ x: 700, y: 160, vx: -4, vy: 2, angle: 0 }, g.GUEST_COAST_TICKS);
+  assert.strictEqual(g.getGuestCoastLeft(), g.GUEST_COAST_TICKS);
+  // Vue hors ownership avec coast : ne doit pas planter
+  g.ball.x = 680; g.ball.y = 170; g.ball.angle = 0;
+  g.guestTestClearSnaps();
+  g.guestTestPushSnap({
+    tick: 50, state: "play",
+    ball: { x: 640, y: 180, vx: -3, vy: 1, angle: 0.1, frozen: false, popped: false }
+  });
+  // Remettre coast après clear
+  g.setGuestCoast({ x: 700, y: 160, vx: -4, vy: 2, angle: 0 }, g.GUEST_COAST_TICKS);
+  const last = { tick: 50, state: "play", ball: { x: 640, y: 180, vx: -3, vy: 1, angle: 0.1, frozen: false, popped: false } };
+  g.guestApplyBallView(last, last, 1, last);
+  assert.ok(g.ball.x <= 700 && g.ball.x >= 640, "blend coast→live (x=" + g.ball.x + ")");
+});
+
 test("soft ownership : cooldown frappe avance avec tick (smash post-réception invité)", () => {
   // Régression : sans tick++ pendant guestBallAuthority, lastActiveHitTick
   // restait égal à tick → canActiveHit faux pour toute la possession.
