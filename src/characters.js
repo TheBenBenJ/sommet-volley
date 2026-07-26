@@ -32,7 +32,8 @@ function drawCharacter(b) {
   if (ghost) ctx.restore();
   if (!menu && typeof drawFlameOverlay === "function") drawFlameOverlay(b);
   drawSuperOverlay(b);
-  drawCharSuperFX(b);
+  // Zones de cour : drawSuperCourtFX() (appel unique depuis render)
+  if (b.superT > 0 && charOf(b).key === "cygne") drawCygneForceAura(b);
   drawEmote(b);
   if (!menu) draw2v2TouchCue(b, ghost);
 }
@@ -145,27 +146,31 @@ function drawSuperAura(b) {
   if (!isLiveBlob(b)) return;
   const t = performance.now() / 1000;
   if (b.superT > 0) {
-    const pulse = 0.22 + Math.sin(t * 5) * 0.06;
+    const pulse = 0.45 + Math.sin(t * 6) * 0.12;
     ctx.save();
     ctx.globalAlpha = pulse;
-    const g = ctx.createRadialGradient(b.x, b.y - 36, 8, b.x, b.y - 36, 52);
-    g.addColorStop(0, "rgba(255,230,140,0.55)");
-    g.addColorStop(0.55, "rgba(255,200,80,0.12)");
+    const g = ctx.createRadialGradient(b.x, b.y - 36, 6, b.x, b.y - 36, 68);
+    g.addColorStop(0, "rgba(255,230,140,0.75)");
+    g.addColorStop(0.45, "rgba(255,200,80,0.28)");
     g.addColorStop(1, "rgba(255,200,60,0)");
     ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(b.x, b.y - 36, 52, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(b.x, b.y - 36, 68, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 0.7;
+    ctx.strokeStyle = "rgba(255,230,120,0.95)";
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(b.x, b.y - 36, 48 + Math.sin(t * 5) * 4, 0, Math.PI * 2); ctx.stroke();
     ctx.restore();
   } else if (superCharge[b.side] === 1) {
     ctx.save();
-    ctx.globalAlpha = 0.35 + Math.sin(t * 4) * 0.1;
-    ctx.strokeStyle = "rgba(255,220,90,0.85)";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.arc(b.x, b.y - 38, 40, 0, Math.PI * 2); ctx.stroke();
-    ctx.fillStyle = "rgba(255,240,180,0.7)";
-    for (let i = 0; i < 3; i++) {
-      const a = t * 1.8 + i * (Math.PI * 2 / 3);
+    ctx.globalAlpha = 0.55 + Math.sin(t * 5) * 0.15;
+    ctx.strokeStyle = "rgba(255,220,90,0.95)";
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(b.x, b.y - 38, 44, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = "rgba(255,240,180,0.9)";
+    for (let i = 0; i < 5; i++) {
+      const a = t * 2.2 + i * (Math.PI * 2 / 5);
       ctx.beginPath();
-      ctx.arc(b.x + Math.cos(a) * 40, b.y - 38 + Math.sin(a) * 40, 2.2, 0, Math.PI * 2);
+      ctx.arc(b.x + Math.cos(a) * 44, b.y - 38 + Math.sin(a) * 44, 3.2, 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.restore();
@@ -313,82 +318,192 @@ function drawBebe(b) {
   });
 }
 
-/** FX de zone pendant un SUPER actif (voile, mur, bande AA…). */
-function drawCharSuperFX(b) {
-  if (!b.superT || b.superT <= 0) return;
-  const key = charOf(b).key;
-  const fade = Math.min(1, b.superT / 40);
-  const x0 = b.side === 0 ? NET_X : 0;
-  const x1 = b.side === 0 ? W : NET_X;
-  const span = Math.max(1, x1 - x0);
+/** Aura Cygne (buff soi) — anneaux bleus bien visibles. */
+function drawCygneForceAura(b) {
+  if (!b || b.superT <= 0) return;
+  const fade = Math.min(1, b.superT / 50);
+  const t = (typeof tick === "number" ? tick : 0) / 8;
+  const pulse = 0.55 + 0.25 * Math.sin(t * 2.2);
+  ctx.save();
+  ctx.globalAlpha = 0.55 * fade * pulse;
+  for (let r = 28; r <= 62; r += 17) {
+    ctx.strokeStyle = "rgba(80,140,255,0.95)";
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y - 40, r + Math.sin(t + r) * 2, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  const g = ctx.createRadialGradient(b.x, b.y - 40, 6, b.x, b.y - 40, 70);
+  g.addColorStop(0, "rgba(120,180,255,0.45)");
+  g.addColorStop(1, "rgba(60,120,255,0)");
+  ctx.globalAlpha = 0.5 * fade;
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(b.x, b.y - 40, 70, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
 
-  if (key === "volkoi") {
-    ctx.save();
-    ctx.globalAlpha = 0.22 * fade;
-    const wash = ctx.createLinearGradient(x0, GROUND_Y, x0, GROUND_Y - 140);
-    wash.addColorStop(0, "rgba(180,220,255,0.55)");
-    wash.addColorStop(0.55, "rgba(180,220,255,0.12)");
-    wash.addColorStop(1, "rgba(180,220,255,0)");
-    ctx.fillStyle = wash;
-    ctx.fillRect(x0, GROUND_Y - 140, span, 140);
-    ctx.globalAlpha = 0.35 * fade;
-    for (let i = 0; i < 10; i++) {
-      const fx = x0 + ((tick * 1.6 + i * 73) % span);
-      const fy = 50 + ((tick * 1.2 + i * 41) % (GROUND_Y - 100));
-      const g = ctx.createRadialGradient(fx, fy, 0, fx, fy, 3.5);
-      g.addColorStop(0, "rgba(240,250,255,0.7)");
-      g.addColorStop(1, "rgba(200,230,255,0)");
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(fx, fy, 3.5, 0, Math.PI * 2); ctx.fill();
+function superZoneBounds(side) {
+  const x0 = side === 0 ? 0 : NET_X;
+  const x1 = side === 0 ? NET_X : W;
+  return { x0, x1, span: Math.max(1, x1 - x0), mid: (x0 + x1) / 2 };
+}
+
+function drawSuperZoneLabel(mid, text, color, fade) {
+  const bounce = Math.sin((typeof tick === "number" ? tick : 0) / 10) * 3;
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, 0.85 * fade);
+  ctx.textAlign = "center";
+  ctx.font = "800 22px " + (typeof UI !== "undefined" ? UI.display : "sans-serif");
+  ctx.lineJoin = "round";
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = "rgba(12,20,42,0.85)";
+  ctx.fillStyle = color;
+  const y = 78 + bounce;
+  ctx.strokeText(text, mid, y);
+  ctx.fillText(text, mid, y);
+  ctx.restore();
+}
+
+/** Couche sol / voile — sous les joueurs. */
+function drawSuperCourtBack() {
+  if (typeof superEffects === "undefined") return;
+  for (const e of superEffects) {
+    if (!e || e.t <= 0) continue;
+    const fade = Math.min(1, e.t / 50);
+    const { x0, x1, span, mid } = superZoneBounds(e.side | 0);
+    if (e.kind === "ice") {
+      ctx.save();
+      ctx.globalAlpha = 0.42 * fade;
+      const wash = ctx.createLinearGradient(x0, 0, x0, GROUND_Y);
+      wash.addColorStop(0, "rgba(160,210,255,0.15)");
+      wash.addColorStop(0.55, "rgba(180,230,255,0.35)");
+      wash.addColorStop(1, "rgba(220,245,255,0.55)");
+      ctx.fillStyle = wash;
+      ctx.fillRect(x0, 0, span, GROUND_Y + 4);
+      // Plaque de glace au sol
+      ctx.globalAlpha = 0.55 * fade;
+      const ice = ctx.createLinearGradient(x0, GROUND_Y - 28, x0, GROUND_Y + 6);
+      ice.addColorStop(0, "rgba(200,235,255,0)");
+      ice.addColorStop(0.4, "rgba(200,235,255,0.45)");
+      ice.addColorStop(1, "rgba(255,255,255,0.65)");
+      ctx.fillStyle = ice;
+      ctx.fillRect(x0, GROUND_Y - 28, span, 34);
+      ctx.globalAlpha = 0.7 * fade;
+      for (let i = 0; i < 16; i++) {
+        const fx = x0 + ((tick * 2.2 + i * 61) % span);
+        const fy = 40 + ((tick * 1.4 + i * 47) % (GROUND_Y - 80));
+        ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.beginPath();
+        ctx.moveTo(fx, fy - 4); ctx.lineTo(fx + 3, fy); ctx.lineTo(fx, fy + 4); ctx.lineTo(fx - 3, fy);
+        ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+      drawSuperZoneLabel(mid, "❄ GLACE", "#b8e0ff", fade);
+    } else if (e.kind === "slow") {
+      ctx.save();
+      ctx.globalAlpha = 0.4 * fade;
+      const wash = ctx.createLinearGradient(x0, 0, x1, GROUND_Y);
+      wash.addColorStop(0, "rgba(255,200,80,0.2)");
+      wash.addColorStop(0.5, "rgba(255,170,40,0.4)");
+      wash.addColorStop(1, "rgba(255,220,120,0.25)");
+      ctx.fillStyle = wash;
+      ctx.fillRect(x0, 0, span, GROUND_Y + 4);
+      ctx.globalAlpha = 0.35 * fade;
+      for (let i = 0; i < 8; i++) {
+        const yy = 60 + i * 42 + Math.sin(tick / 20 + i) * 6;
+        ctx.strokeStyle = "rgba(255,220,100,0.55)";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([10, 14]);
+        ctx.beginPath(); ctx.moveTo(x0 + 8, yy); ctx.lineTo(x1 - 8, yy); ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.restore();
+      drawSuperZoneLabel(mid, "⏱ RALENTI", "#ffd060", fade);
+    } else if (e.kind === "noground") {
+      ctx.save();
+      const pulse = 0.55 + 0.45 * Math.sin(tick / 8);
+      ctx.globalAlpha = 0.5 * fade * pulse;
+      const band = ctx.createLinearGradient(x0, GROUND_Y, x0, GROUND_Y - 110);
+      band.addColorStop(0, "rgba(220,40,40,0.65)");
+      band.addColorStop(0.55, "rgba(220,40,40,0.25)");
+      band.addColorStop(1, "rgba(220,40,40,0)");
+      ctx.fillStyle = band;
+      ctx.fillRect(x0, GROUND_Y - 110, span, 114);
+      // Hachures d’alerte
+      ctx.globalAlpha = 0.35 * fade;
+      ctx.strokeStyle = "rgba(255,80,60,0.8)";
+      ctx.lineWidth = 3;
+      for (let i = -2; i < span / 28 + 2; i++) {
+        const bx = x0 + i * 28 + (tick % 28);
+        ctx.beginPath();
+        ctx.moveTo(bx, GROUND_Y);
+        ctx.lineTo(bx + 18, GROUND_Y - 40);
+        ctx.stroke();
+      }
+      ctx.restore();
+      drawSuperZoneLabel(mid, "⬇ PLUS DE SAUT", "#ff6a5a", fade);
     }
-    ctx.restore();
-  } else if (key === "dorf") {
-    // Aligné sur Blob.update (mur plus près du filet côté victime)
-    const wallX = b.side === 0 ? NET_X + (W - NET_X) * 0.42 : NET_X * 0.58;
-    const top = GROUND_Y - 108;
+  }
+}
+
+/** Murs + labels devant — après les joueurs. */
+function drawSuperCourtFront() {
+  if (typeof superEffects === "undefined") return;
+  for (const e of superEffects) {
+    if (!e || e.t <= 0 || e.kind !== "wall") continue;
+    const fade = Math.min(1, e.t / 50);
+    const side = e.side | 0;
+    // Aligné Blob.update : mur dans le camp victime
+    const wallX = side === 0 ? NET_X * 0.58 : NET_X + (W - NET_X) * 0.42;
+    const top = GROUND_Y - 130;
+    const pulse = 0.7 + 0.3 * Math.sin(tick / 9);
+    // Variante forêt si un Capitaine a cast (cherche superKind sur adversaire)
+    let forest = false;
+    for (const b of activeBlobs) {
+      if (b.superT > 0 && b.superKind === "capitaine" && b.side !== side) forest = true;
+    }
     ctx.save();
-    ctx.globalAlpha = 0.55 * fade;
-    const glow = ctx.createLinearGradient(wallX - 28, 0, wallX + 28, 0);
-    glow.addColorStop(0, "rgba(255,210,80,0)");
-    glow.addColorStop(0.45, "rgba(255,210,80,0.18)");
-    glow.addColorStop(0.5, "rgba(255,230,140,0.42)");
-    glow.addColorStop(0.55, "rgba(255,210,80,0.18)");
-    glow.addColorStop(1, "rgba(255,210,80,0)");
-    ctx.fillStyle = glow;
-    ctx.fillRect(wallX - 28, top, 56, GROUND_Y - top);
-    const core = ctx.createLinearGradient(wallX - 5, top, wallX + 5, top);
-    core.addColorStop(0, "rgba(220,170,40,0)");
-    core.addColorStop(0.5, "rgba(255,220,120,0.55)");
-    core.addColorStop(1, "rgba(220,170,40,0)");
-    ctx.fillStyle = core;
-    ctx.fillRect(wallX - 5, top + 8, 10, GROUND_Y - top - 12);
-    const base = ctx.createRadialGradient(wallX, GROUND_Y, 2, wallX, GROUND_Y, 36);
-    base.addColorStop(0, "rgba(255,220,100,0.35)");
-    base.addColorStop(1, "rgba(255,200,60,0)");
-    ctx.fillStyle = base;
-    ctx.beginPath(); ctx.ellipse(wallX, GROUND_Y + 2, 36, 8, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
-  } else if (key === "bebe") {
-    ctx.save();
-    ctx.globalAlpha = 0.4 * fade;
-    const band = ctx.createLinearGradient(x0, GROUND_Y, x0, GROUND_Y - 70);
-    band.addColorStop(0, "rgba(180,40,40,0.35)");
-    band.addColorStop(1, "rgba(180,40,40,0)");
-    ctx.fillStyle = band;
-    ctx.fillRect(x0, GROUND_Y - 70, span, 70);
-    ctx.globalAlpha = 0.28 * fade;
-    for (let i = 0; i < 5; i++) {
-      const fx = x0 + 30 + ((tick * 0.8 + i * 89) % Math.max(1, span - 60));
-      const pulse = 0.5 + 0.5 * Math.sin(tick / 14 + i);
-      const g = ctx.createRadialGradient(fx, GROUND_Y - 18, 1, fx, GROUND_Y - 18, 10);
-      g.addColorStop(0, "rgba(255,120,100," + (0.35 * pulse).toFixed(2) + ")");
-      g.addColorStop(1, "rgba(255,80,60,0)");
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(fx, GROUND_Y - 18, 10, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 0.75 * fade * pulse;
+    if (forest) {
+      for (let i = -2; i <= 2; i++) {
+        const tx = wallX + i * 14;
+        ctx.fillStyle = "#5d4037";
+        ctx.fillRect(tx - 5, top + 20, 10, GROUND_Y - top - 20);
+        ctx.fillStyle = "#2e7d32";
+        ctx.beginPath();
+        ctx.moveTo(tx, top); ctx.lineTo(tx + 16, top + 40); ctx.lineTo(tx - 16, top + 40);
+        ctx.closePath(); ctx.fill();
+      }
+      ctx.fillStyle = "rgba(80,200,100,0.35)";
+      ctx.beginPath(); ctx.ellipse(wallX, GROUND_Y + 2, 48, 10, 0, 0, Math.PI * 2); ctx.fill();
+      drawSuperZoneLabel(wallX, "🌲 FORÊT", "#7ed957", fade);
+    } else {
+      const glow = ctx.createLinearGradient(wallX - 40, 0, wallX + 40, 0);
+      glow.addColorStop(0, "rgba(255,210,80,0)");
+      glow.addColorStop(0.45, "rgba(255,210,80,0.35)");
+      glow.addColorStop(0.5, "rgba(255,240,160,0.75)");
+      glow.addColorStop(0.55, "rgba(255,210,80,0.35)");
+      glow.addColorStop(1, "rgba(255,210,80,0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(wallX - 40, top, 80, GROUND_Y - top);
+      ctx.fillStyle = "rgba(255,230,120,0.9)";
+      ctx.fillRect(wallX - 7, top + 6, 14, GROUND_Y - top - 10);
+      ctx.strokeStyle = "rgba(255,255,200,0.95)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(wallX - 7, top + 6, 14, GROUND_Y - top - 10);
+      const base = ctx.createRadialGradient(wallX, GROUND_Y, 2, wallX, GROUND_Y, 50);
+      base.addColorStop(0, "rgba(255,230,120,0.55)");
+      base.addColorStop(1, "rgba(255,200,60,0)");
+      ctx.fillStyle = base;
+      ctx.beginPath(); ctx.ellipse(wallX, GROUND_Y + 2, 50, 12, 0, 0, Math.PI * 2); ctx.fill();
+      drawSuperZoneLabel(wallX, "🧱 MUR", "#ffe14d", fade);
     }
     ctx.restore();
   }
 }
+
+/** @deprecated — zones via drawSuperCourtBack/Front */
+function drawCharSuperFX(_b) {}
 
 function hasSuperEffect(kind, side) {
   for (const e of superEffects) if (e.kind === kind && e.side === side && e.t > 0) return e;

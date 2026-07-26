@@ -101,12 +101,14 @@ function maybeActivateSuper(blob, input) {
   superCharge[blob.side] = 0;
   blob.superKind = a.key;
   blob.superT = SUPER_DUR[a.key] || 50;
-  superFlash = a.superName || (a.name + " !");
-  superFlashSub = a.superDesc || "";
+  // Bandeau court : nom + tag action (lisible en 1 coup d'œil)
+  superFlash = "★ " + (a.superName || "SUPER");
+  superFlashSub = a.superTag || a.superDesc || "";
   superFlashT = SUPER_FLASH_T;
-  shake = Math.max(shake, 7);
-  crowdHype = Math.max(crowdHype, 45);
+  shake = Math.max(shake, 10);
+  crowdHype = Math.max(crowdHype, 55);
   spawnSuperBurst(blob);
+  if (typeof spawnSuperZoneBurst === "function") spawnSuperZoneBurst(1 - blob.side, a.key);
   superSound(a.key);
   if (a.key === "volkoi" || a.key === "gourou") {
     // Hiver Général / Méditation : gèle le camp adverse
@@ -272,10 +274,12 @@ function localInputs(side) {
     };
   }
   // 1v1 local à DEUX humains : la manette va au côté assigné (padForSide —
-  // clavier vs manette, ou une manette chacun). Sinon (solo vs IA, 2v2 local),
-  // comportement historique : manette n° i → joueur i (l'humain est en 0).
+  // clavier vs manette, ou une manette chacun). Sinon (solo vs IA, 2v2 local) :
+  // toute manette branchée pilote le joueur humain (slot 0), comme en ligne.
   const twoHumans = !vsAI && !online && mode === "1v1";
-  const pad = twoHumans ? padForSide(side) : padGameInput(side);
+  const pad = twoHumans
+    ? padForSide(side)
+    : (side === 0 && typeof padMergeGameInput === "function" ? padMergeGameInput() : padGameInput(side));
   // Clavier : binds J1 (gauche) / J2 (droite) — voir Options → Contrôles.
   // Manette : inchangée (stick = visée, X/Y = frappe).
   // En solo / 2v2 : ↑ J2 peut aussi sauter (confort 1 clavier).

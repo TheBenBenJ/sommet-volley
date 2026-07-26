@@ -59,15 +59,13 @@ function awardPoint(side, reason) {
       superCharge[side] = 1;
       beep(700, 0.12, "square", 0.16, 0, 1050);
       beep(1050, 0.16, "square", 0.14, 0.1, 1500);
-      superFlash = "SUPER PRÊT — " + sideLabel(side) + " !";
+      superFlash = "SUPER PRÊT";
       const readyBlob = activeBlobs.find(b => b.side === side);
-      if (readyBlob) {
-        const a = charOf(readyBlob);
-        superFlashSub = "Appuie sur SUPER (E) — " + (a.superName || "technique") + " : " + (a.superDesc || "");
-      } else {
-        superFlashSub = "Appuie sur SUPER (E) pour lancer ta technique.";
-      }
-      superFlashT = typeof SUPER_READY_FLASH_T !== "undefined" ? SUPER_READY_FLASH_T : 180;
+      const a = readyBlob ? charOf(readyBlob) : null;
+      const kSuper = (typeof bindLabel === "function") ? bindLabel("super") : "E";
+      superFlashSub = "[[K:" + kSuper + "]] / [[X:B]]" +
+        (a && a.superTag ? "  ·  " + a.superTag : "");
+      superFlashT = typeof SUPER_READY_FLASH_T !== "undefined" ? SUPER_READY_FLASH_T : 90;
     }
   }
   const name = sideLabel(side);

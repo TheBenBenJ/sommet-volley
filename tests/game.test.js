@@ -181,6 +181,44 @@ test("filet : une balle très rapide ne traverse pas le poteau (anti-tunnel)", (
   assert.ok(g.ball.vx < 0, "la balle doit avoir rebondi (vx inversée)");
 });
 
+test("filet : pas de touche à travers le filet (service collé)", () => {
+  const g = loadGame();
+  const C = g.consts;
+  const N0 = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  g.setVsAI(false); g.setMode("1v1");
+  g.newGame(42);
+  g.setState("play"); g.setServeCountdown(0);
+  g.setServingSide(0);
+  // Serveur loin ; adversaire collé au filet ; balle encore côté serveur
+  g.blobL.x = 200; g.blobL.y = C.GROUND_Y; g.blobL.onGround = true;
+  g.blobR.x = C.NET_X + C.NET_W / 2 + 34 - 6;
+  g.blobR.y = C.GROUND_Y - 50; g.blobR.onGround = false;
+  g.blobR.lastActiveHitTick = -999;
+  g.ball.x = C.NET_X - 18; g.ball.y = g.blobR.y - 50;
+  g.ball.vx = 0; g.ball.vy = 1;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
+  g.ball.serveAimLock = false; g.ball.serveFlight = true;
+  g.ball.lastTouchSide = 0; g.ball.lastTouchTick = -999;
+  g.ball.touches[0] = 1; g.ball.touches[1] = 0;
+  assert.ok(g.ball.x < C.NET_X, "balle encore à gauche");
+  assert.ok(!g.canHitBallThroughNet(g.blobR), "adversaire ne peut pas traverser le filet");
+  g.stepGame(N0, { ...N0, smash:true });
+  assert.strictEqual(g.ball.touches[1], 0, "pas de touche adverse à travers le filet");
+  assert.strictEqual(g.ball.lastTouchSide, 0, "dernier toucheur = serveur");
+  assert.ok(g.ball.x < C.NET_X, "balle reste côté serveur");
+});
+
+test("filet : contestation OK si balle entièrement au-dessus du bandeau", () => {
+  const g = loadGame();
+  const C = g.consts;
+  g.setVsAI(false); g.setMode("1v1");
+  g.newGame(43);
+  g.blobR.x = C.NET_X + 40;
+  g.ball.x = C.NET_X - 10; // encore « côté gauche » en X
+  g.ball.y = C.NET_TOP - C.BALL_R - 2; // tout le ballon au-dessus
+  assert.ok(g.canHitBallThroughNet(g.blobR), "au-dessus du filet = contestable");
+});
+
 test("service : contact filet = faute (pas de rebond qui sauve)", () => {
   const g = loadGame();
   const C = g.consts;
@@ -623,6 +661,25 @@ test("filet : un lob qui frôle le sommet passe (pas de rejet latéral)", () => 
   assert.ok(g.ball.vx > 0, "vx reste vers la droite (pas de rebond poteau)");
 });
 
+test("filet : frôle TOP_SLACK pousse de l'autre côté (pas flip vx mi-court)", () => {
+  // Régression multi : frôle sommet → balle restait dans le poteau →
+  // anti-stick inversait vx → retombée à mi-terrain au lieu de traverser.
+  const g = loadGame();
+  const C = g.consts;
+  const clearY = C.NET_TOP - C.BALL_R;
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(13);
+  g.setState("play"); g.setServeCountdown(0);
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.serveFlight = false;
+  g.ball.x = C.NET_X - C.NET_W / 2 - C.BALL_R - 1;
+  g.ball.y = clearY + 3; // dans la bande de frôle (TOP_SLACK = 5)
+  g.ball.vx = 9; g.ball.vy = 0.5;
+  for (let i = 0; i < 20; i++) g.updateBall();
+  assert.ok(g.ball.x > C.NET_X + 20,
+    "frôle doit finir à droite (x=" + g.ball.x + ")");
+  assert.ok(g.ball.vx > 0, "vx reste vers la droite (pas de rebond mi-court)");
+});
+
 test("filet : une balle trop basse ne passe pas (anti sous-filet)", () => {
   const g = loadGame();
   const C = g.consts;
@@ -965,7 +1022,7 @@ test("V2 : service — balle dans les mains, lancer vertical (smash/X)", () => {
   assert.ok(g.ball.y < y0, "la balle a quitté les mains vers le haut");
 });
 
-test("V2 : au service, Espace clavier sert en un appui ; manette A ne sert pas", () => {
+test("V2 : au service, Espace / A ne servent plus au sol (il faut lancer + sauter)", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(1);
   g.newGame(51);
@@ -974,14 +1031,10 @@ test("V2 : au service, Espace clavier sert en un appui ; manette A ne sert pas",
   g.ball.reset(0);
   g.stepGame(N0, N0); // pose
   assert.ok(g.ball.inHands, "balle en mains");
-  // Manette : A (jump sans kbdJump) + stick → pas de service one-shot
   g.stepGame({ ...N0, jump:true, ax:0.5 }, N0);
-  assert.ok(g.ball.inHands && g.ball.frozen, "saut manette ≠ service direct");
-  // Clavier : Espace (kbdJump) → cloche directe
+  assert.ok(g.ball.inHands && g.ball.frozen, "saut manette ≠ service");
   g.stepGame({ ...N0, jump:true, kbdJump:true }, N0);
-  assert.strictEqual(g.ball.inHands, false, "Espace sert en un appui");
-  assert.ok(!g.ball.frozen, "balle en jeu");
-  assert.ok(g.ball.vx > 0, "vers l'adversaire");
+  assert.ok(g.ball.inHands && g.ball.frozen, "Espace ≠ service direct au sol");
 });
 
 test("V2 : au service, F lance encore verticalement (2 temps)", () => {
@@ -1018,7 +1071,7 @@ test("V2 : service — se retourner déplace la balle avec les mains", () => {
     "même écart aux mains (face=" + dxFace + " back=" + dxBack + ")");
 });
 
-test("V2 : service — pas de cloche auto après lancer (il faut F)", () => {
+test("V2 : service — pas de frappe au sol (il faut sauter)", () => {
   const g = loadGame();
   g.setVsAI(true); g.setAiLevel(1);
   g.newGame(57);
@@ -1036,10 +1089,16 @@ test("V2 : service — pas de cloche auto après lancer (il faut F)", () => {
   g.blobL.lastActiveHitTick = -999;
   g.ball.y = g.blobL.y - 58; g.ball.vy = 3;
   g.stepGame({ ...N0, smash:true }, N0);
-  assert.strictEqual(g.ball.touches[0], 1, "F = frappe de service");
+  assert.strictEqual(g.ball.touches[0], 0, "F au sol ≠ service");
+  assert.strictEqual(g.ball.serveAimLock, true, "lock encore actif au sol");
+  // En l'air + F → service OK
+  g.blobL.y = g.consts.GROUND_Y - 70; g.blobL.onGround = false;
+  g.blobL.lastActiveHitTick = -999;
+  g.ball.y = g.blobL.y - 50; g.ball.vy = 2;
+  g.stepGame({ ...N0, smash:true }, N0);
+  assert.strictEqual(g.ball.touches[0], 1, "F en l'air = frappe de service");
   assert.strictEqual(g.ball.serveAimLock, false, "lock levé");
   assert.ok(g.ball.vx > 0, "vers l'adversaire");
-  assert.ok(g.ball.vy < 0, "cloche");
 });
 
 test("V2 : service — sauter DANS la balle en l'air = smash auto (clavier), pas la manette", () => {
@@ -1093,11 +1152,18 @@ test("V2 : service — X manette maintenu après lancer ne sert pas tout seul", 
   // Relâche
   g.stepGame({ ...N0, ax: 0.4, ay: -0.2 }, N0);
   assert.strictEqual(g.blobL._serveAwaitRelease, false, "relâché");
-  // Nouvel appui
+  // Nouvel appui au sol → toujours refusé
   g.blobL.lastActiveHitTick = -999;
   g.ball.y = g.blobL.y - 64; g.ball.vy = 2; g.ball.serveAimLock = true;
   g.stepGame({ ...N0, smash:true, ax: 0.4, ay: -0.2 }, N0);
-  assert.strictEqual(g.ball.serveAimLock, false, "nouvel appui X sert");
+  assert.strictEqual(g.ball.serveAimLock, true, "X au sol ne sert pas");
+  // Relâche puis en l'air + X → sert
+  g.stepGame({ ...N0, ax: 0.4, ay: -0.2 }, N0);
+  g.blobL.y = g.consts.GROUND_Y - 70; g.blobL.onGround = false;
+  g.blobL.lastActiveHitTick = -999;
+  g.ball.y = g.blobL.y - 50; g.ball.vy = 2; g.ball.serveAimLock = true;
+  g.stepGame({ ...N0, smash:true, ax: 0.4, ay: -0.2 }, N0);
+  assert.strictEqual(g.ball.serveAimLock, false, "X en l'air sert");
   assert.ok(g.ball.vx > 0, "vers l'adversaire");
 });
 
@@ -1127,12 +1193,13 @@ test("V2 : service — double-tap X pendant la grâce ne sert pas tout seul", ()
   }
   assert.strictEqual(g.ball.serveAimLock, true, "maintien après double-tap ≠ service auto");
   assert.strictEqual(g.ball.touches[0], 0, "pas de touche auto");
-  // Il faut un NOUVEAU front X pour servir
+  // Il faut un NOUVEAU front X EN L'AIR pour servir
   g.stepGame({ ...N0, ax: 0.4, ay: -0.2 }, N0);
+  g.blobL.y = g.consts.GROUND_Y - 70; g.blobL.onGround = false;
   g.blobL.lastActiveHitTick = -999;
-  g.ball.y = g.blobL.y - 64; g.ball.vy = 2; g.ball.serveAimLock = true;
+  g.ball.y = g.blobL.y - 50; g.ball.vy = 2; g.ball.serveAimLock = true;
   g.stepGame(pad, N0);
-  assert.strictEqual(g.ball.serveAimLock, false, "vrai 2ᵉ appui (après grâce) sert");
+  assert.strictEqual(g.ball.serveAimLock, false, "vrai 2ᵉ appui en l'air sert");
 });
 
 test("V2 : service — X tenu pendant le décompte ne lance pas au GO", () => {
@@ -1207,9 +1274,10 @@ test("V2 : service — passe le filet depuis près du filet (tous persos)", () =
     g.setServingSide(0);
     g.setState("play"); g.setServeCountdown(0);
     g.blobL.charId = animal;
-    g.blobL.x = 330; g.blobL.y = C.GROUND_Y; g.blobL.onGround = true;
+    // Service en l'air obligatoire
+    g.blobL.x = 330; g.blobL.y = C.GROUND_Y - 70; g.blobL.onGround = false;
     g.blobL.lastActiveHitTick = -999;
-    g.ball.x = 335; g.ball.y = g.blobL.y - 70; g.ball.vx = 0; g.ball.vy = 1;
+    g.ball.x = 335; g.ball.y = g.blobL.y - 50; g.ball.vx = 0; g.ball.vy = 1;
     g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
     g.ball.serveAimLock = true; g.ball.serveFlight = false;
     g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
@@ -1253,27 +1321,27 @@ test("V2 : service aérien (smash) — passe aussi le filet", () => {
   assert.strictEqual(g.scores[1], 0, "pas de faute filet en smash de service");
 });
 
-test("V2 : service aérien — plus de punch qu'au sol (Gourou)", () => {
+test("V2 : service aérien — smash haut plus de punch qu'une cloche basse (Gourou)", () => {
   const g = loadGame();
   const C = g.consts;
   const N0 = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
   const gourouIdx = g.CHARACTERS.findIndex(c => c.key === "gourou");
   assert.ok(gourouIdx >= 0, "Gourou présent");
 
-  function hit(aerial) {
+  function hit(highSmash) {
     g.setVsAI(true); g.setAiLevel(1);
     g.newGame(77);
     g.setServingSide(0);
     g.setState("play"); g.setServeCountdown(0);
     g.blobL.charId = gourouIdx;
     g.blobL.x = 280;
-    // Assez haut pour le vrai smash de service (balle proche du bandeau)
-    g.blobL.y = aerial ? C.GROUND_Y - 120 : C.GROUND_Y;
-    g.blobL.onGround = !aerial;
+    // Les deux en l'air (service au sol interdit) : haut = vrai smash, bas = cloche
+    g.blobL.y = highSmash ? C.GROUND_Y - 120 : C.GROUND_Y - 55;
+    g.blobL.onGround = false;
     g.blobL.lastActiveHitTick = -999;
     g.blobR.x = C.W - 40; g.blobR.y = C.GROUND_Y; g.blobR.onGround = true;
     g.ball.x = 285;
-    g.ball.y = aerial ? C.NET_TOP - 10 : g.blobL.y - 70;
+    g.ball.y = highSmash ? C.NET_TOP - 10 : g.blobL.y - 40;
     g.ball.vx = 0; g.ball.vy = 1;
     g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
     g.ball.serveAimLock = true; g.ball.serveFlight = false;
@@ -1285,10 +1353,10 @@ test("V2 : service aérien — plus de punch qu'au sol (Gourou)", () => {
       vx: Math.abs(g.ball.vx),
     };
   }
-  const ground = hit(false);
-  const air = hit(true);
-  assert.ok(air.spd > ground.spd + 0.4, "smash aérien plus rapide que cloche sol");
-  assert.ok(air.vx > ground.vx + 2, "smash aérien plus de composante avant");
+  const lob = hit(false);
+  const smash = hit(true);
+  assert.ok(smash.spd > lob.spd + 0.4, "smash haut plus rapide que cloche basse");
+  assert.ok(smash.vx > lob.vx + 2, "smash haut plus de composante avant");
   assert.ok(g.CHARACTERS[gourouIdx].power >= 1.06, "Gourou n'est plus sous-puissance");
 });
 
@@ -1329,9 +1397,9 @@ test("V2 : service — cloche forcée vers l'adversaire", () => {
   g.newGame(55);
   g.setState("play"); g.setServeCountdown(0);
   g.setServingSide(0);
-  g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y; g.blobL.onGround = true;
+  g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y - 60; g.blobL.onGround = false;
   g.blobL.lastActiveHitTick = -999;
-  g.ball.x = 250; g.ball.y = g.blobL.y - 70; g.ball.vx = 0; g.ball.vy = 1;
+  g.ball.x = 250; g.ball.y = g.blobL.y - 40; g.ball.vx = 0; g.ball.vy = 1;
   g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
   g.ball.serveAimLock = true;
   g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
@@ -2070,7 +2138,7 @@ test("story : le premier chapitre est débloqué, les suivants verrouillés", ()
   assert.strictEqual(g.getState(), "storyMenu", "chapitre verrouillé non jouable");
 });
 
-test("story 2v2 : balle reste en mains ; Espace clavier sert ; IA adverse sert aussi", () => {
+test("story 2v2 : balle reste en mains ; F lance ; IA adverse sert aussi", () => {
   const g = loadGame();
   const idx = g.STORY.findIndex(c => c.mode === "2v2");
   assert.ok(idx >= 0, "au moins un chapitre 2v2");
@@ -2090,14 +2158,21 @@ test("story 2v2 : balle reste en mains ; Espace clavier sert ; IA adverse sert a
     g.stepGame(null, null, ins);
   }
   assert.ok(g.ball.inHands && g.ball.frozen, "balle toujours en mains du joueur");
-  // Espace = service clavier
+  // Espace ≠ service ; F = lancer
   {
     const ins = g.getActiveBlobs().map((b, j) => (
       j === 0 ? { ...N, jump:true, kbdJump:true } : g.aiInput2v2(b)
     ));
     g.stepGame(null, null, ins);
   }
-  assert.strictEqual(g.ball.inHands, false, "Espace envoie la balle");
+  assert.ok(g.ball.inHands && g.ball.frozen, "Espace ne sert plus au sol");
+  {
+    const ins = g.getActiveBlobs().map((b, j) => (
+      j === 0 ? { ...N, smash:true } : g.aiInput2v2(b)
+    ));
+    g.stepGame(null, null, ins);
+  }
+  assert.strictEqual(g.ball.inHands, false, "F lance la balle");
 
   // Service camp IA : le porteur adverse lance malgré le chaser
   g.setServingSide(1);
@@ -2499,6 +2574,63 @@ test("pause : Échap ouvre le menu, Reprendre ferme, Quitter revient au menu", (
   g.handleMenuKeys("PauseQuit", "");
   assert.strictEqual(g.getPaused(), false);
   assert.strictEqual(g.getState(), "menu", "Quitter → menu principal");
+});
+
+test("manette : SUPER lit superT (B), pas le champ super", () => {
+  const g = loadGame();
+  assert.ok(g.padMergeGameInput, "padMergeGameInput exposé");
+  g.setPadsNow([{
+    left: false, right: false, jump: false, smash: false,
+    superT: true, up: false, down: false, ax: 0, ay: 0
+  }]);
+  const m = g.padMergeGameInput();
+  assert.strictEqual(m.super, true, "B/superT → input.super");
+  g.setPadsNow([{
+    left: false, right: false, jump: false, smash: false,
+    super: true, superT: false, up: false, down: false, ax: 0, ay: 0
+  }]);
+  assert.strictEqual(g.padMergeGameInput().super, false, "ancien champ .super ignoré");
+  g.setPadsNow([]);
+});
+
+test("aide commandes : Escape / TutBack reviennent au menu", () => {
+  const g = loadGame();
+  g.setState("tutorialHelp");
+  assert.ok(g.navOptions().indexOf("TutBack") >= 0, "nav manette expose Retour");
+  g.handleMenuKeys("Escape", "");
+  assert.strictEqual(g.getState(), "menu");
+  g.setState("tutorialHelp");
+  g.handleMenuKeys("TutBack", "");
+  assert.strictEqual(g.getState(), "menu");
+});
+
+test("tutoriel : le joueur sert toujours (pas l'IA)", () => {
+  const g = loadGame();
+  assert.ok(g.startTutorial, "startTutorial exposé");
+  g.startTutorial();
+  assert.ok(g.getTutorialMode(), "mode tutoriel");
+  assert.strictEqual(g.getServingSide(), 0, "service camp joueur au départ");
+  assert.ok(g.ball.inHands && g.ball.frozen, "balle dans les mains du joueur");
+  // Même si on simule un échange IA, l'étape Service rend la balle
+  g.setTutorialStep(1);
+  g.setServingSide(1);
+  g.ball.frozen = false;
+  g.ball.inHands = false;
+  g.setState("play");
+  g.advanceTutorialStep(); // → étape 2 Service
+  assert.strictEqual(g.getTutorialStep(), 2);
+  assert.strictEqual(g.getServingSide(), 0, "étape Service → service joueur");
+  assert.ok(g.ball.inHands && g.ball.frozen, "balle rendue au joueur");
+});
+
+test("pictos commandes : markup K / X / stick parsé", () => {
+  const g = loadGame();
+  assert.ok(g.parseControlMarkup);
+  const parts = g.parseControlMarkup("Appuie [[K:E]] ou [[X:B]] · [[X:LS]] [[X:DPAD]]");
+  assert.ok(parts.some(p => p.key === "E"));
+  assert.ok(parts.some(p => p.xbox === "B"));
+  assert.ok(parts.some(p => p.xbox === "LS"), "stick LS");
+  assert.ok(parts.some(p => p.xbox === "DPAD"), "croix DPAD");
 });
 
 test("pause : inputs gelés tant que le menu est ouvert", () => {

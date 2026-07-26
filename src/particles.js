@@ -74,18 +74,44 @@ function spawnBoom(x, y) {
 // gerbe d'étoiles à l'activation d'un SUPER
 function spawnSuperBurst(blob) {
   if (noFx) return;
-  const n = fxCount(22);
+  const n = fxCount(40);
   if (n <= 0) return;
-  const cols = ["#ffe14d", "#ffffff", "#ffa23e", blob.color];
+  const cols = ["#ffe14d", "#ffffff", "#ffa23e", blob.color, "#7ec8ff"];
   for (let i = 0; i < n; i++) {
     const ang = (i / n) * Math.PI * 2;
-    const sp = 3 + Math.random() * 4;
+    const sp = 4 + Math.random() * 6;
     particles.push({
       type: "star",
       x: blob.x, y: blob.y - 40,
-      vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - 1,
-      life: 26 + Math.random() * 16, maxLife: 42,
-      size: 3 + Math.random() * 3, color: cols[i % cols.length],
+      vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - 1.5,
+      life: 32 + Math.random() * 22, maxLife: 54,
+      size: 4 + Math.random() * 4, color: cols[i % cols.length],
+      rot: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.5
+    });
+  }
+}
+
+/** Burst sur le camp VICTIME à l'activation (repère immédiat). */
+function spawnSuperZoneBurst(side, key) {
+  if (noFx) return;
+  const n = fxCount(28);
+  if (n <= 0) return;
+  const x0 = side === 0 ? 40 : NET_X + 40;
+  const x1 = side === 0 ? NET_X - 40 : W - 40;
+  let cols = ["#ffe14d", "#ffffff"];
+  if (key === "volkoi" || key === "gourou") cols = ["#c8e8ff", "#ffffff", "#7ec8ff"];
+  else if (key === "safran") cols = ["#ffd060", "#ffa23e", "#fff0c0"];
+  else if (key === "bebe" || key === "sultan" || key === "faucon") cols = ["#ff6a5a", "#ff3030", "#ffb0a0"];
+  else if (key === "capitaine") cols = ["#7ed957", "#2e7d32", "#c8e6c9"];
+  else if (key === "dorf" || key === "timonier") cols = ["#ffe14d", "#ffb000", "#fff8d0"];
+  for (let i = 0; i < n; i++) {
+    const x = x0 + Math.random() * Math.max(20, x1 - x0);
+    particles.push({
+      type: "star",
+      x, y: GROUND_Y - 10 - Math.random() * 80,
+      vx: (Math.random() - 0.5) * 3, vy: -2 - Math.random() * 4,
+      life: 28 + Math.random() * 20, maxLife: 48,
+      size: 3 + Math.random() * 4, color: cols[i % cols.length],
       rot: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.4
     });
   }

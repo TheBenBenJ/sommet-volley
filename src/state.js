@@ -113,7 +113,8 @@ const CHARACTERS = [
     coldProof: true,
     trait: "Sang froid : insensible au gel / ralentissement.",
     superName: "Hiver Général",
-    superDesc: "Gèle le camp adverse ~5 s : ils glissent sur la glace. Visuel : voile bleu glacial + flocons sur leur moitié."
+    superTag: "GLACE — ils glissent",
+    superDesc: "Gèle le camp adverse ~5 s : ils glissent sur la glace."
   },
   {
     key: "dorf", name: "Baron Dorf", nation: "Doria",
@@ -123,7 +124,8 @@ const CHARACTERS = [
     egoCharge: true, slip: true,
     trait: "Ego en béton : la jauge SUPER monte aussi quand il perd un point.",
     superName: "Le Mur",
-    superDesc: "Mur doré dans le camp adverse ~5,3 s : bloque les courses au sol (il faut sauter pour passer). Visuel : colonne d’or + halo au pied."
+    superTag: "MUR — saute pour passer",
+    superDesc: "Mur doré dans le camp adverse ~5,3 s : bloque les courses au sol."
   },
   {
     key: "cygne", name: "Le Cygne", nation: "Gallardie",
@@ -133,7 +135,8 @@ const CHARACTERS = [
     swapStats: true,
     trait: "Double jeu : après chaque point, échange vitesse ↔ puissance.",
     superName: "Passage en Force",
-    superDesc: "~5 s : tes frappes ne peuvent plus être smashées, et partent plus franchement vers l’adversaire. Visuel : aura bleue."
+    superTag: "FORCE — smashs protégés",
+    superDesc: "~5 s : tes frappes ne peuvent plus être smashées."
   },
   {
     key: "bebe", name: "Maréchal Bébé", nation: "Ryonganie",
@@ -142,7 +145,8 @@ const CHARACTERS = [
     speed: 1.06, jump: 0.94, power: 1.18, control: 0.82,
     trait: "Discipline : puissance solide, jeu au sol privilégié.",
     superName: "Batterie AA",
-    superDesc: "Interdit de sauter au camp adverse ~3,7 s — collés au sol. Visuel : bande rouge + pulses d’alerte."
+    superTag: "SOL — plus de saut",
+    superDesc: "Interdit de sauter au camp adverse ~3,7 s."
   },
   {
     key: "timonier", name: "Le Grand Timonier", nation: "Panguo",
@@ -151,7 +155,8 @@ const CHARACTERS = [
     speed: 1.06, jump: 1.06, power: 1.06, control: 1.0,
     trait: "Mur invisible : contrôle max, placements précis.",
     superName: "Le Rempart",
-    superDesc: "Mur dans le camp adverse ~6 s : coupe le terrain (durée longue). Visuel : rempart doré lumineux."
+    superTag: "REMPART — saute pour passer",
+    superDesc: "Mur dans le camp adverse ~6 s : coupe le terrain."
   },
   {
     key: "sultan", name: "Le Sultan", nation: "Bosforie",
@@ -160,7 +165,8 @@ const CHARACTERS = [
     speed: 1.06, jump: 1.18, power: 1.06, control: 0.82,
     trait: "Séisme : détente élevée, bons smashs aériens.",
     superName: "Séisme",
-    superDesc: "Interdit de sauter au camp adverse ~3,7 s. Visuel : tremblement d’écran + bande rouge au sol."
+    superTag: "SOL — plus de saut",
+    superDesc: "Interdit de sauter au camp adverse ~3,7 s."
   },
   {
     key: "gourou", name: "Le Gourou", nation: "Bharatie",
@@ -169,7 +175,8 @@ const CHARACTERS = [
     speed: 1.18, jump: 1.06, power: 1.06, control: 0.91,
     trait: "Ashram : rapide et technique, smashs dans la moyenne.",
     superName: "Méditation",
-    superDesc: "Gèle le camp adverse ~4,7 s (glisse). Visuel : voile clair + particules, façon Hiver zen."
+    superTag: "GLACE — ils glissent",
+    superDesc: "Gèle le camp adverse ~4,7 s (glisse)."
   },
   {
     key: "capitaine", name: "Le Capitaine", nation: "Tropicalia",
@@ -179,7 +186,8 @@ const CHARACTERS = [
     egoCharge: true,
     trait: "Tronçonneuse : puissance max, SUPER aussi en perdant un point.",
     superName: "Déforestation",
-    superDesc: "Mur de troncs au camp adverse ~5,3 s : bloque les courses. Visuel : mur forêt + lueur verte."
+    superTag: "FORÊT — saute pour passer",
+    superDesc: "Mur de troncs au camp adverse ~5,3 s : bloque les courses."
   },
   {
     key: "faucon", name: "Le Faucon", nation: "Levantie",
@@ -188,7 +196,8 @@ const CHARACTERS = [
     speed: 1.06, jump: 1.06, power: 1.18, control: 0.82,
     trait: "Raid : puissance correcte, pression aérienne.",
     superName: "Raid Éclair",
-    superDesc: "Interdit de sauter au camp adverse ~3,7 s — collés au sol. Visuel : bande d’alerte au sol."
+    superTag: "SOL — plus de saut",
+    superDesc: "Interdit de sauter au camp adverse ~3,7 s."
   },
   {
     key: "safran", name: "Le Safran", nation: "Safranie",
@@ -197,7 +206,8 @@ const CHARACTERS = [
     speed: 1.06, jump: 1.06, power: 1.06, control: 0.91,
     trait: "Safran : contrôle élevé, jeu posé.",
     superName: "Voile d’Or",
-    superDesc: "Ralentit fortement le camp adverse ~4,7 s (courses au ralenti, pas de glisse). Visuel : voile doré."
+    superTag: "RALENTI — courses lentes",
+    superDesc: "Ralentit fortement le camp adverse ~4,7 s."
   },
 ];
 function charOf(b) { return CHARACTERS[b.charId]; }
@@ -355,8 +365,8 @@ const battle = {
 //   Volkoï → Hiver Général · Dorf → Le Mur · Cygne → Passage en Force · Bébé → Batterie AA
 //   Timonier → Le Rempart · Sultan → Séisme · Gourou → Méditation · Capitaine → Déforestation
 const SUPER_NEED = 3;
-const SUPER_FLASH_T = 240;      // ~4 s pour lire nom + description
-const SUPER_READY_FLASH_T = 180; // ~3 s quand la jauge est prête
+const SUPER_FLASH_T = 100;       // ~1,7 s — tag court, pas un pavé
+const SUPER_READY_FLASH_T = 90;  // ~1,5 s quand la jauge est prête
 const streak = [0, 0];        // points d'affilée par camp
 const superCharge = [0, 0];   // 0 = vide, 1 = super prête
 // Super Smash (tous persos) : jauge 0..POWER_GAUGE_MAX, indépendante du SUPER perso
@@ -532,8 +542,7 @@ class Blob {
       !ball.inHands && ball.serveAimLock && (ball.tossGrace | 0) > 0;
     const serveNoJump = serveHands || serveTossLock;
     const holdingJump = !!(input && input.jump);
-    // Front de saut CLAVIER (touche réelle, non bloqué par serveNoJump ni par le
-    // drift d'une manette au repos) : sert au service clavier (keyboardJumpServe).
+    // Front de saut CLAVIER (touche réelle) — distinct du stick manette.
     const kbdJumpNow = !!(input && input.kbdJump);
     this._kbdJumpEdge = kbdJumpNow && !this._kbdPrevJump;
     this._kbdPrevJump = kbdJumpNow;

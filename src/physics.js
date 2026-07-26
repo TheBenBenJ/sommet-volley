@@ -171,9 +171,9 @@ function startPowerWindup(blob) {
   ball.x = h.x + dir * 10;
   ball.y = h.y - 8;
   if (!noFx) {
-    superFlash = "SUPER SMASH — dose !";
-    superFlashSub = "Maintiens longtemps — vise — relâche pour frapper";
-    superFlashT = Math.max(superFlashT, 110);
+    superFlash = "SUPER SMASH";
+    superFlashSub = "Maintiens · vise · relâche";
+    superFlashT = Math.max(superFlashT, 90);
     shake = Math.max(shake, 5);
     beep(660, 0.06, "square", 0.12, 0, 900);
   }
@@ -241,8 +241,8 @@ function firePowerSmash(blob, charge, ang) {
     spawnBoom(ball.x + (blob.side === 0 ? 12 : -12), ball.y - 6);
     sfxBallSmash();
     superFlash = "SUPER SMASH !";
-    superFlashSub = sideLabel(blob.side) + " — frappe chargée";
-    superFlashT = Math.max(superFlashT, 100);
+    superFlashSub = sideLabel(blob.side);
+    superFlashT = Math.max(superFlashT, 80);
     beep(220, 0.1, "sawtooth", 0.16);
     beep(480, 0.12, "square", 0.14, 0.06, 720);
   }
@@ -618,6 +618,19 @@ function ballDistToBlob(blob) {
   return Math.hypot(ball.x - h.x, ball.y - h.y);
 }
 
+/**
+ * Interdit de toucher la balle À TRAVERS le filet.
+ * Camp gauche (0) : balle encore à droite → non (sauf au-dessus du bandeau).
+ * Contestation aérienne OK si tout le ballon est au-dessus de NET_TOP.
+ */
+function canHitBallThroughNet(blob) {
+  if (!blob) return false;
+  const ballSide = ball.x < NET_X ? 0 : 1;
+  if (ballSide === blob.side) return true;
+  // Au-dessus du filet : les deux camps peuvent contester (Smash Battle / block)
+  return (ball.y + BALL_R) <= NET_TOP;
+}
+
 /** Distance mini balle↔tête sur le segment du tick (anti-tunneling). */
 function ballPathDistToBlob(blob) {
   const h = blob.headCircle;
@@ -741,48 +754,6 @@ function tryTossServe(blob) {
   return tossServeBall(blob);
 }
 
-/** Clavier : Espace / Z avec balle en mains → service en un appui (cloche). */
-function tryKeyboardJumpServe(blob) {
-  if (!GAMEPLAY_V2 || !ball.inHands || !ball.frozen || ball.popped) return false;
-  if (blob.side !== servingSide) return false;
-  if (!blob._kbdJumpEdge) return false;
-  if (!isKeyboardStyleAim(blob._input)) return false;
-  // Uniquement le porteur (1er du camp) — pas l'allié 2v2
-  if (typeof serverBlob === "function" && blob !== serverBlob()) return false;
-  return keyboardJumpServe(blob);
-}
-
-/** CLAVIER uniquement : le SAUT sert directement (cloche par-dessus le filet)
- *  en un seul appui. La manette garde le service en 2 temps (X lancer + X frapper). */
-function keyboardJumpServe(blob) {
-  const p = serveHandsPos(blob);
-  ball.x = p.x;
-  ball.y = p.y - 18;
-  ball.spin = 0;
-  ball.smash = 0;
-  ball.frozen = false;
-  ball.inHands = false;
-  ball.tossGrace = 0;
-  clearBallHold();
-  const dir = blob.side === 0 ? 1 : -1;
-  const ang = dir > 0 ? -1.12 : Math.PI + 1.12;   // cloche haute vers l'adversaire
-  ball.vx = Math.cos(ang) * HOLD_LOB_SPD;
-  ball.vy = Math.sin(ang) * HOLD_LOB_SPD;
-  ball.aimAngle = ang;
-  if (ball.serveAimLock) {
-    ball.serveAimLock = false;
-    ball.serveFlight = true;
-  }
-  forceServeClearsNet(blob);                        // garantit le passage du filet
-  registerTouch(blob);
-  markActiveHit(blob);
-  blob._serveAwaitRelease = false;
-  if (typeof setCharPose === "function") setCharPose(blob, "aim", 30);
-  beep(520, 0.08, "sine", 0.1, 0, 820);
-  if (flameMode) applyFlameBurn(blob);
-  return true;
-}
-
 function canActiveHit(blob) {
   return tick - (blob.lastActiveHitTick || -999) >= ACTIVE_HIT_COOLDOWN;
 }
@@ -798,8 +769,11 @@ function wantSmash(blob) {
 /** Contact simple = cloche automatique vers l'adversaire. */
 function tryLobBall(blob) {
   if (!canNormalHit2v2(blob)) return false;
+  if (!canHitBallThroughNet(blob)) return false;
   if (ball.inHands && ball.frozen) return false;
   if (ball.tossGrace > 0 && blob.side === servingSide) return false;
+  // Service : pas de frappe au sol — il faut sauter dans la balle.
+  if (isServeHit(blob) && blob.onGround) return false;
   if (ballPathDistToBlob(blob) > receiveHitRadius()) return false;
   if (!canActiveHit(blob)) return false;
   const a = charOf(blob);
@@ -818,6 +792,7 @@ function tryLobBall(blob) {
 function trySmashBall(blob) {
   // Pas de smash tant que la balle est dans les mains (il faut d'abord lancer)
   if (ball.inHands && ball.frozen) return false;
+  if (!canHitBallThroughNet(blob)) return false;
   if (ball.tossGrace > 0 && blob.side === servingSide) return false;
   if (blob.onGround) return false;
   // Passage en Force (Cygne / cygne) : frappes immunisées au smash adverse
@@ -880,6 +855,15 @@ function resolveNetBall(prevX, prevY, x, y, vx, vy) {
   }
   if (clearsOver) return { x, y, vx, vy, hit: false };
 
+  // Sortie du volume poteau dans le sens du trajet (évite anti-stick → flip vx).
+  const pushPastPost = () => {
+    if (x > leftC && x < rightC) {
+      if (vx > 0.05) x = rightC + 0.5;
+      else if (vx < -0.05) x = leftC - 0.5;
+      else x = x < NET_X ? leftC - 0.5 : rightC + 0.5;
+    }
+  };
+
   const tryFace = (dir) => {
     const face = dir > 0 ? leftC : rightC;
     const crossing = dir > 0
@@ -889,10 +873,13 @@ function resolveNetBall(prevX, prevY, x, y, vx, vy) {
     const yHit = yAlong(face);
     // Entièrement au-dessus du sommet : pas de face latérale
     if (yHit <= clearY) return false;
-    // Frôle le bord supérieur du filet → petit rebond vers le haut.
+    // Frôle le bord supérieur → aide à PASSER (pas un mur qui renvoie).
+    // Avant : on remontait vy sans sortir du poteau → tick suivant anti-stick
+    // inversait vx → balle « rebond filet » qui retombe à mi-court (multi).
     if (yHit <= clearY + TOP_SLACK) {
-      if (y > clearY) y = clearY;
+      if (y > clearY - 2) y = clearY - 2;
       if (vy > -1.5) vy = -Math.max(2.5, Math.abs(vy) * 0.5 + 1.2);
+      pushPastPost();
       hit = true;
       return true;
     }
@@ -908,8 +895,10 @@ function resolveNetBall(prevX, prevY, x, y, vx, vy) {
     else { x = rightC; vx = Math.max(2.5, Math.abs(vx) * 0.85); }
     hit = true;
   } else if (x > leftC && x < rightC && y > clearY && y <= clearY + TOP_SLACK) {
-    y = clearY;
+    // Déjà dans le volume en zone de frôle : pousser de l'autre côté
+    y = clearY - 2;
     if (vy > -1.5) vy = -2.5;
+    pushPastPost();
     hit = true;
   }
   return { x, y, vx, vy, hit };
@@ -1011,6 +1000,8 @@ function applyHitExtras(blob, a) {
 function ballBlobCollision(blob) {
   if (ball.heldBy >= 0) return; // balle contrôlée : pas de collision passive
   if (blob.battleStunT > 0) return; // perdant du Smash Battle : ne digue pas
+  // Pas de dig / smash à travers le filet (service au filet, bras qui passent…)
+  if (!canHitBallThroughNet(blob)) return;
   // 2v2 : coéquipiers se traversent → sans ça, 2 frappes le même tick
   // (auto-cloche + dig IA) et applyDirectedHit téléporte la balle.
   if (ball.lastHitTick === tick) return;
@@ -1035,8 +1026,8 @@ function ballBlobCollision(blob) {
   if (GAMEPLAY_V2) {
     if (ball.inHands && ball.frozen) {
       if (tryTossServe(blob)) return; // F/X = lancer vertical
-      if (tryKeyboardJumpServe(blob)) return; // Espace = service clavier 1 appui
-      return; // collée aux mains tant qu'on n'a pas lancé / servi
+      // Espace = saut normal (balle reste en mains) — plus de service 1 appui au sol
+      return; // collée aux mains tant qu'on n'a pas lancé
     }
     // Grace post-lancer : pas de cloche accidentelle sur le serveur
     if (ball.tossGrace > 0 && blob.side === servingSide) return;
@@ -1046,15 +1037,13 @@ function ballBlobCollision(blob) {
     const padHuman = !aiBlob && !kbHuman;
     const servingNow = isServeHit(blob);
 
-    // Service : après le lancer (F), on saute (Espace) DANS la balle → smash auto
-    // au contact (clavier). La manette garde la frappe explicite (X).
+    // Service : après le lancer (F/X), frappe UNIQUEMENT en l'air.
     if (servingNow) {
       if (blob._serveAwaitRelease) {
         if (!(blob._input && blob._input.smash)) blob._serveAwaitRelease = false;
         else return; // encore le maintien du lancer
       }
-      // CLAVIER : sauter (Espace) DANS la balle → smash AUTO au contact en l'air.
-      // (Au sol, pas d'auto : il faut sauter ou appuyer F.)
+      // CLAVIER : sauter DANS la balle → smash/cloche AUTO au contact en l'air.
       if (kbHuman && !blob.onGround) {
         const d = ballPathDistToBlob(blob);
         const aligned = Math.abs(ball.x - blob.x) < 44;

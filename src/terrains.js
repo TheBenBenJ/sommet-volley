@@ -1894,7 +1894,7 @@ function drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph) {
       if (typeof powerGauge !== "undefined" && typeof POWER_GAUGE_MAX !== "undefined" &&
           (powerGauge[s] | 0) >= POWER_GAUGE_MAX) {
         title = "Super Smash prêt — " + sideLabel(s);
-        sub = "Smash aérien (F / X) : dose puis relâche";
+        sub = "Smash aérien [[K:F]] / [[X:X]] : dose puis relâche";
         fill = "#ff6a2a";
         break;
       }
@@ -1908,7 +1908,7 @@ function drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph) {
     }
     if (!title && state === "serve") {
       title = "Service : " + sideLabel(servingSide);
-      sub = "X lancer, puis X frapper (pas le saut)";
+      sub = "[[K:F]] / [[X:X]] lancer, puis saute et frappe";
       fill = "#ffcc00";
     }
   }
@@ -1920,8 +1920,11 @@ function drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph) {
   const titleFont = "700 13px " + DISP;
   const subFont = "700 10px " + SANS;
   const titleLines = wrapLines(title, textW, titleFont);
-  const subLines = wrapLines(sub, textW, subFont);
-  const boxH = Math.min(ph - 4, 18 + titleLines.length * 14 + (subLines.length ? 2 + subLines.length * 12 : 0));
+  const subHasMarkup = sub.indexOf("[[") >= 0;
+  const subPlain = subHasMarkup ? sub.replace(/\[\[[KkXx]:([^\]]+)\]\]/g, "$1") : sub;
+  const subLines = subHasMarkup ? [] : wrapLines(subPlain, textW, subFont);
+  const subExtra = subHasMarkup ? 16 : (subLines.length ? 2 + subLines.length * 12 : 0);
+  const boxH = Math.min(ph - 4, 18 + titleLines.length * 14 + subExtra);
   const bx = NET_X - boxW / 2;
   const by = py + Math.max(2, (ph - boxH) / 2);
 
@@ -1947,7 +1950,11 @@ function drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph) {
     ctx.fillText(ln, NET_X, ty);
     ty += 14;
   }
-  if (subLines.length) {
+  if (subHasMarkup && typeof drawControlMarkup === "function") {
+    ty += 2;
+    ctx.globalAlpha = alpha;
+    drawControlMarkup(bx + 10, ty, sub, textW, 10);
+  } else if (subLines.length) {
     ty += 2;
     ctx.font = subFont;
     ctx.fillStyle = "rgba(255,246,232,0.95)";

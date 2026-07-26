@@ -281,17 +281,25 @@ function readPad(gp) {
   // isKeyboardStyleAim (≥0.18) → plus de smash/cloche auto au clavier.
   const ax = Math.abs(rawAx) < PAD_DEADZONE ? 0 : rawAx;
   const ay = Math.abs(rawAy) < PAD_DEADZONE ? 0 : rawAy;
+  // Triggers analogiques : .pressed peut rester false → seuil sur .value
+  const t = i => {
+    const btn = gp.buttons[i];
+    if (!btn) return false;
+    return !!(btn.pressed || (typeof btn.value === "number" && btn.value > 0.35));
+  };
   return {
     left:    rawAx < -PAD_DEADZONE || b(14),
     right:   rawAx >  PAD_DEADZONE || b(15),
     jump:    b(0) || b(12),                             // A / croix-haut
     smash:   b(2) || b(3),                              // X ou Y → smash
-    superT:  b(1) || b(4) || b(5) || b(6) || b(7),      // B / gâchettes → SUPER
+    // SUPER : B (prioritaire) + LB/RB + LT/RT — pas Select (réservé menus)
+    superT:  b(1) || b(4) || b(5) || t(6) || t(7),
     up:      rawAy < -0.5 || b(12),
     down:    rawAy >  0.5 || b(13),
     ax, ay,                 // stick analog (visée à l'appui)
     confirm: b(0),          // A / Croix
-    back:    b(1) || b(8),  // B / Rond, ou Select
+    // Menus : B retour ; Select aussi. En match, B est lu via superT (pas back).
+    back:    b(1) || b(8),
     start:   b(9)           // Start → menu pause en match
   };
 }
@@ -322,6 +330,29 @@ function padGameInput(i) {
   return p
     ? { left: p.left, right: p.right, jump: p.jump, smash: p.smash, super: p.superT, up: p.up, down: p.down, ax: p.ax, ay: p.ay }
     : { left: false, right: false, jump: false, smash: false, super: false, up: false, down: false, ax: 0, ay: 0 };
+}
+
+/** Fusionne toutes les manettes branchées (solo / 2v2 humain / online). */
+function padMergeGameInput() {
+  const out = {
+    left: false, right: false, jump: false, smash: false, super: false,
+    up: false, down: false, ax: 0, ay: 0
+  };
+  for (const p of padsNow) {
+    if (!p) continue;
+    out.left = out.left || p.left;
+    out.right = out.right || p.right;
+    out.jump = out.jump || p.jump;
+    out.smash = out.smash || p.smash;
+    out.super = out.super || !!p.superT;
+    out.up = out.up || p.up;
+    out.down = out.down || p.down;
+    if (Math.hypot(p.ax || 0, p.ay || 0) > Math.hypot(out.ax, out.ay)) {
+      out.ax = p.ax || 0;
+      out.ay = p.ay || 0;
+    }
+  }
+  return out;
 }
 
 // ---------- Assignation manette en 1v1 local (clavier VS manette) ----------
@@ -385,6 +416,7 @@ function navOptions() {
     case "gameModeSelect": return ["Digit1", "Digit2", "Digit3"];
     case "onlineMenu":    return ["Digit1", "Digit2", "Digit3"];
     case "matchmaking":   return ["MmBot", "MmCancel"];
+    case "tutorialHelp":  return ["TutBack", "TutPlay"];
     case "selectCharacter": {
       const vis = characterIndices();
       return vis.map((_, slot) => "Digit" + (slot + 1));
@@ -477,7 +509,15 @@ function handlePadMenu() {
   } else if (state === "tournamentBracket" || state === "tournamentEnding") {
     if (padEdge("confirm")) handleMenuKeys("Enter", "");
     if (padEdge("back")) handleMenuKeys("Escape", "");
-  } else if (state === "rules" || state === "tutorialHelp" || state === "netError" || state === "credits") {
+  } else if (state === "tutorialHelp") {
+    // Stick/A navigue Retour ↔ Jouer ; B / Select = retour menu (pas SUPER ici).
+    if (padEdge("left") || padEdge("up")) { navIdx = 0; beep(500, 0.03, "square", 0.05); }
+    if (padEdge("right") || padEdge("down")) { navIdx = 1; beep(500, 0.03, "square", 0.05); }
+    if (padEdge("confirm")) {
+      handleMenuKeys(navIdx === 1 ? "TutPlay" : "TutBack", "");
+    }
+    if (padEdge("back") || padEdge("start")) handleMenuKeys("TutBack", "");
+  } else if (state === "rules" || state === "netError" || state === "credits") {
     if (padEdge("confirm") || padEdge("back")) handleMenuKeys("Escape", "");
   } else if (paused && (state === "serve" || state === "play" || state === "point")) {
     if (padEdge("up")) {
@@ -494,10 +534,10 @@ function handlePadMenu() {
     // B / Start ferme la pause (reprise) — Quitter reste un choix explicite.
     if (padEdge("back") || padEdge("start")) handleMenuKeys("PauseResume", "");
   } else if ((state === "serve" || state === "play" || state === "point") && !paused) {
+    // Start = pause. B reste SUPER (ne pas mapper back → Escape ici).
     if (padEdge("start")) handleMenuKeys("Escape", "");
-  } else if ((state === "serve" || state === "play") && tutorialMode) {
-    if (padEdge("confirm")) handleMenuKeys("Enter", "");
-    if (padEdge("back")) handleMenuKeys("Escape", "");
+    // Tutoriel : A / Entrée passe l'étape — jamais B (SUPER)
+    if (tutorialMode && padEdge("confirm")) handleMenuKeys("Enter", "");
   } else if (state === "gameover") {
     if (padEdge("confirm") && gameoverTimer <= 0) handleMenuKeys(online ? "KeyR" : "Space", "");
     if (padEdge("back")) handleMenuKeys("Escape", "");

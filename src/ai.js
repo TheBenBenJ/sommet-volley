@@ -165,10 +165,17 @@ function aiGameplayV2(side, lvl, me, opp, input) {
     }
   }
 
-  // Service : cloche au sol de préférence
+  // Service : obligé de sauter — pas de frappe au sol
   if (servingHit) {
-    tryJumpForBall();
-    if (canReachHit && aiCommitHit(2)) input.smash = true;
+    if (me.onGround) {
+      if (aligned && descending && (tooHighToStand || canReachHit ||
+          (dist < RECEIVE_R + 48 && ball.y < me.y - 40))) {
+        input.jump = true;
+      }
+    } else {
+      tryDoubleJumpSmash();
+      if (canReachHit && aiCommitHit(2)) input.smash = true;
+    }
     return false;
   }
 
@@ -457,7 +464,7 @@ function aiInput2v2(me, lvlOverride) {
 
   // Service « balle en mains » : le porteur IA (serverBlob) doit pouvoir lancer
   // même s'il n'est pas « chaser ». Pas l'allié à la place de l'humain — la
-  // balle reste en mains jusqu'à F / Espace (service clavier 1 appui).
+  // balle reste en mains jusqu'à F/X (puis saut + frappe).
   const servingInHands = !!(GAMEPLAY_V2 && ball.inHands && ball.frozen &&
     servingSide === side && (state === "serve" || state === "play"));
   const server = servingInHands && typeof serverBlob === "function" ? serverBlob() : null;

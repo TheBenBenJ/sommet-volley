@@ -163,6 +163,8 @@ function render() {
   }
   drawBackground();
   drawNet();
+  // SUPER : voiles de camp sous les joueurs (glace / ralenti / anti-saut)
+  if (typeof drawSuperCourtBack === "function") drawSuperCourtBack();
   const drawBallLayer = () => {
     if (online && netRole === "guest" && (guestBallSmoothX || guestBallSmoothY)) {
       ball.x += guestBallSmoothX; ball.y += guestBallSmoothY;
@@ -186,6 +188,8 @@ function render() {
   }
   // Mode Histoire : aura rouge « dopé » autour des blobs concernés (repère caméra)
   if (typeof storyDrawAuras === "function") storyDrawAuras();
+  // SUPER : murs / labels devant les joueurs
+  if (typeof drawSuperCourtFront === "function") drawSuperCourtFront();
   // Service inclus : balle au premier plan (sur les bras receive)
   drawBallLayer();
   if (typeof drawTutorialAimPreview === "function") drawTutorialAimPreview();

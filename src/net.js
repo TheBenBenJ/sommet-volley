@@ -171,7 +171,8 @@ function onlineLocalInput() {
   for (const p of padsNow) {
     pl = pl || p.left; pr = pr || p.right; pj = pj || p.jump;
     psm = psm || p.smash;
-    ps = ps || p.super; pu = pu || p.up; pd = pd || p.down;
+    // readPad expose `superT` (B / gâchettes) — pas `super`
+    ps = ps || p.superT; pu = pu || p.up; pd = pd || p.down;
     if (Math.hypot(p.ax || 0, p.ay || 0) > Math.hypot(pax, pay)) {
       pax = p.ax || 0; pay = p.ay || 0;
     }
@@ -851,6 +852,9 @@ function netUpdate() {
             const pb = predictBallMotion(ball.x, ball.y, ball.vx, ball.vy, 1);
             ball.x = pb.x; ball.y = pb.y; ball.vx = pb.vx; ball.vy = pb.vy;
           }
+          // Predict / paquet a ramené la balle près du filet → autorité hôte
+          if (ball.x <= NET_X + GUEST_BALL_MARGIN) hostInvalidateGuestBall();
+          // skipBall : la balle a déjà été posée / avancée ci-dessus
           stepGame(onlineLocalInput(), guestIn, null, { skipBall: true });
         } else {
           if (ball.x <= NET_X + GUEST_BALL_MARGIN) hostInvalidateGuestBall();
@@ -1109,10 +1113,13 @@ function guestDetectEvents(prev, d) {
       crowdHype = Math.max(crowdHype, 45);
       superSound(cb.superKind || charOf(activeBlobs[i]).key);
       const ch = CHARACTERS[cb.charId];
-      superFlash = (ch && ch.superName) || ((ch && ch.name) ? ch.name + " !" : "SUPER !");
-      superFlashSub = (ch && ch.superDesc) || "";
-      superFlashT = typeof SUPER_FLASH_T !== "undefined" ? SUPER_FLASH_T : 240;
+      superFlash = "★ " + ((ch && ch.superName) || "SUPER");
+      superFlashSub = (ch && ch.superTag) || (ch && ch.superDesc) || "";
+      superFlashT = typeof SUPER_FLASH_T !== "undefined" ? SUPER_FLASH_T : 100;
       spawnSuperBurst(activeBlobs[i]);
+      if (typeof spawnSuperZoneBurst === "function") {
+        spawnSuperZoneBurst(1 - activeBlobs[i].side, (ch && ch.key) || "");
+      }
     }
   }
   for (const s of [0, 1]) {
@@ -1177,12 +1184,14 @@ function guestApplyBallView(s0, s1, a, last) {
     sx = live.x; sy = live.y; sa = live.angle;
   } else {
     const x0 = s0.ball.x, y0 = s0.ball.y, x1 = s1.ball.x, y1 = s1.ball.y;
+    // Même seuil que resolveNetBall (pas NET_TOP+1 trop permissif)
+    const clearY = NET_TOP - BALL_R;
     let yAtNet = null;
     if ((x0 - NET_X) * (x1 - NET_X) < 0 && Math.abs(x1 - x0) > 1e-6) {
       yAtNet = y0 + ((NET_X - x0) / (x1 - x0)) * (y1 - y0);
     }
-    const clearsOver = yAtNet !== null && yAtNet <= NET_TOP + 1;
-    const throughPost = yAtNet !== null && yAtNet > NET_TOP + 1;
+    const clearsOver = yAtNet !== null && yAtNet <= clearY;
+    const throughPost = yAtNet !== null && yAtNet > clearY;
     if (throughPost && s0.tick !== s1.tick &&
         s0.state === "play" && !s0.ball.frozen && !s0.ball.popped) {
       const dt = Math.max(0, renderTick - s0.tick);
@@ -1193,7 +1202,7 @@ function guestApplyBallView(s0, s1, a, last) {
       sa = L(s0.ball.angle, s1.ball.angle);
     } else {
       sx = L(x0, x1); sy = L(y0, y1); sa = L(s0.ball.angle, s1.ball.angle);
-      if (!clearsOver && sy > NET_TOP + 2) {
+      if (!clearsOver && sy > clearY) {
         const leftC = NET_X - NET_W / 2 - BALL_R;
         const rightC = NET_X + NET_W / 2 + BALL_R;
         if (sx > leftC && sx < rightC) sx = sx < NET_X ? leftC : rightC;
@@ -1498,12 +1507,14 @@ function quickplayHostAfterChar() {
 }
 
 // En-tête commun aux écrans en ligne (= menus cartoon + décor aléatoire).
-function netScreenBase(title, kicker, subtitle) {
+// opts.noEscHint : quand l'écran dessine déjà son propre pied « Échap… ».
+function netScreenBase(title, kicker, subtitle, opts) {
   menuScreenBase({
     title,
     kicker: kicker || "En ligne · WebRTC",
     subtitle,
-    titleSize: title.length > 20 ? 34 : 42
+    titleSize: title.length > 20 ? 34 : 42,
+    noEscHint: !!(opts && opts.noEscHint)
   });
 }
 
@@ -1524,7 +1535,7 @@ function drawMatchmaking() {
   const modeLabel = pendingMode && pendingMode.flame ? "Ballon enflammé"
     : pendingMode && pendingMode.bomb ? "Bombe" : "Classique";
   netScreenBase("Partie rapide", "En ligne · " + modeLabel,
-                "Recherche d'un adversaire…");
+                "Recherche d'un adversaire…", { noEscHint: true });
   const mx = UI.mx;
   const dots = ".".repeat(1 + Math.floor(performance.now() / 400) % 3);
   let line = "Recherche" + dots + "  (" + sec + " s)";
@@ -1645,12 +1656,11 @@ function drawNetScreen(title, sub) {
 
 function drawNetError() {
   hit(W / 2, H / 2, W, H, "Enter"); // clic n'importe où = retour au menu
-  netScreenBase("Oups", "En ligne · Erreur");
+  netScreenBase("Oups", "En ligne · Erreur", null, { noEscHint: true });
   ctx.textAlign = "left"; ctx.fillStyle = "#ff8a8a"; ctx.font = "600 20px " + UI.sans;
   ctx.fillText(netErrorMsg, UI.mx, 236);
   // diagnostic technique (état des canaux/ICE) : à remonter tel quel si
   // le problème persiste — évite de deviner où ça bloque.
-  let hintY = 272;
   if (netErrorDetail) {
     ctx.fillStyle = "rgba(255,255,255,0.45)";
     ctx.font = "12px " + UI.mono;
@@ -1663,10 +1673,10 @@ function drawNetError() {
         ctx.fillText(line, UI.mx, y); y += 16; line = w;
       } else line = test;
     }
-    if (line) { ctx.fillText(line, UI.mx, y); y += 16; }
-    hintY = y + 16;
+    if (line) { ctx.fillText(line, UI.mx, y); }
   }
-  uiLabel("Entrée / Échap — retour au menu", UI.mx, hintY, 10, UI.muted, 1);
+  // Un seul pied (évite le doublon avec menuScreenBase « Échap ← Retour »)
+  uiLabel("Entrée / Échap — retour au menu", UI.mx, H - 24, 12, UI.muted, 0.3);
 }
 
 
