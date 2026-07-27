@@ -58,27 +58,60 @@ function turnCredsUrl() {
 }
 
 // Rafraîchit les serveurs ICE avec des credentials TURN frais (ttl 12 h côté
-// serveur, on redemande au plus toutes les heures). Fire-and-forget : les
-// Peer créés ensuite lisent ICE_CONFIG au moment de leur création.
+// serveur). Retourne une Promise : on attend le TURN avant new Peer (sinon la
+// 1ʳᵉ tentative reste en STUN seul → timeout fréquent en NAT strict / 4G).
 let turnFetchedAt = 0;
+let turnFetchPromise = null;
 function refreshTurnCredentials() {
-  if (typeof fetch !== "function") return;
+  if (typeof fetch !== "function") return Promise.resolve(false);
   const now = Date.now();
-  if (now - turnFetchedAt < 60 * 60 * 1000) return;
-  turnFetchedAt = now;
-  fetch(turnCredsUrl(), { cache: "no-store" })
+  if (now - turnFetchedAt < 60 * 60 * 1000 && ICE_CONFIG.iceServers.length > 1) {
+    return Promise.resolve(true);
+  }
+  if (turnFetchPromise) return turnFetchPromise;
+  turnFetchPromise = fetch(turnCredsUrl(), { cache: "no-store" })
     .then(r => (r && r.ok ? r.json() : null))
     .then(j => {
-      if (!j || !Array.isArray(j.urls) || !j.urls.length || !j.username || !j.credential) return;
+      turnFetchedAt = Date.now();
+      turnFetchPromise = null;
+      if (!j || !Array.isArray(j.urls) || !j.urls.length || !j.username || !j.credential) {
+        return false;
+      }
       ICE_CONFIG.iceServers = [
         { urls: "stun:stun.l.google.com:19302" },
         { urls: j.urls, username: String(j.username), credential: String(j.credential) },
       ];
+      return true;
     })
-    .catch(() => { /* STUN seul */ });
+    .catch(() => {
+      turnFetchPromise = null;
+      return false; /* STUN seul */
+    });
+  return turnFetchPromise;
 }
 // premier fetch dès le chargement (le lobby online arrive bien après)
 if (typeof window !== "undefined") refreshTurnCredentials();
+
+/** Attente courte du TURN avant new Peer (max ~2,5 s). */
+function withIceReady(fn) {
+  const p = refreshTurnCredentials();
+  const timeout = new Promise(resolve => setTimeout(resolve, 2500));
+  Promise.race([p, timeout]).then(() => {
+    try { fn(); } catch (e) { /* ignore */ }
+  });
+}
+
+/** Détruit un Peer éventuel avant d'en créer un nouveau (évite les fantômes). */
+function destroyPeerQuiet() {
+  const p = peer;
+  peer = null;
+  peerReady = false;
+  connRel = null;
+  connFast = null;
+  if (p) {
+    try { p.destroy(); } catch (e) { /* ignore */ }
+  }
+}
 
 let online = false;            // mode en ligne actif (dès le lobby)
 let netRole = null;            // "host" | "guest"
@@ -200,64 +233,91 @@ function onlineLocalInput() {
 
 // ---------- Connexion ----------
 function initHostPeer() {
-  refreshTurnCredentials();
   online = true; netRole = "host";
   netConnected = false; peerReady = false;
-  netCode = makeCode();
-  peer = new Peer(PEER_PREFIX + netCode, { config: ICE_CONFIG });
-  peer.on("open", () => { peerReady = true; });
-  peer.on("connection", c => {
-    // n'accepter que les 2 canaux d'un seul et même invité
-    if ((c.label !== "rel" && c.label !== "fast") ||
-        (connRel && connRel.peer !== c.peer) ||
-        (connFast && connFast.peer !== c.peer)) {
-      setTimeout(() => { try { c.close(); } catch (e) {} }, 500);
-      return;
-    }
-    hookConn(c);
+  netCode = makeCode(); // immédiat pour l'UI / matchmaker ready
+  withIceReady(() => {
+    // Ne pas destroyPeerQuiet ici : ça nullifierait peer en cours ; on remplace.
+    const old = peer;
+    peer = null;
+    peerReady = false;
+    connRel = null;
+    connFast = null;
+    if (old) { try { old.destroy(); } catch (e) { /* ignore */ } }
+    online = true; netRole = "host";
+    netConnected = false;
+    peer = new Peer(PEER_PREFIX + netCode, { config: ICE_CONFIG });
+    peer.on("open", () => { peerReady = true; });
+    peer.on("connection", c => hostAcceptConn1v1(c));
+    peer.on("error", onPeerError);
+    peer.on("disconnected", () => { if (peer && !peer.destroyed) peer.reconnect(); });
   });
-  peer.on("error", onPeerError);
-  peer.on("disconnected", () => { if (peer && !peer.destroyed) peer.reconnect(); });
+}
+
+/** Accepte rel/fast ; pendant la négociation, remplace un canal périmé (retry ICE). */
+function hostAcceptConn1v1(c) {
+  if (c.label !== "rel" && c.label !== "fast") {
+    setTimeout(() => { try { c.close(); } catch (e) {} }, 500);
+    return;
+  }
+  if (!netConnected) {
+    const prev = c.label === "rel" ? connRel : connFast;
+    // Nouvel invité (autre peer id) alors que d'anciens canaux traînent → purge
+    if (prev && prev.peer && prev.peer !== c.peer) {
+      try { if (connRel) connRel.close(); } catch (e) {}
+      try { if (connFast) connFast.close(); } catch (e) {}
+      connRel = null;
+      connFast = null;
+    } else if (prev && prev !== c) {
+      try { prev.close(); } catch (e) {}
+      if (c.label === "rel") connRel = null; else connFast = null;
+    }
+  } else if ((connRel && connRel.peer !== c.peer) || (connFast && connFast.peer !== c.peer)) {
+    setTimeout(() => { try { c.close(); } catch (e) {} }, 500);
+    return;
+  }
+  hookConn(c);
 }
 
 function initGuestPeer(code) {
-  refreshTurnCredentials();
+  const clean = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   online = true; netRole = "guest";
   netConnected = false;
-  peer = new Peer(undefined, { config: ICE_CONFIG }); // id aléatoire pour l'invité
-  peer.on("open", () => {
-    hookConn(peer.connect(PEER_PREFIX + code, { label: "rel",  reliable: true,  serialization: "json" }));
-    hookConn(peer.connect(PEER_PREFIX + code, { label: "fast", reliable: false, serialization: "json" }));
+  withIceReady(() => {
+    destroyPeerQuiet();
+    online = true; netRole = "guest";
+    netConnected = false;
+    peer = new Peer({ config: ICE_CONFIG }); // id aléatoire
+    peer.on("open", () => {
+      hookConn(peer.connect(PEER_PREFIX + clean, { label: "rel",  reliable: true,  serialization: "json" }));
+      hookConn(peer.connect(PEER_PREFIX + clean, { label: "fast", reliable: false, serialization: "json" }));
+    });
+    peer.on("error", onPeerError);
+    peer.on("disconnected", () => { if (peer && !peer.destroyed) peer.reconnect(); });
+    // garde-fou : si la négociation WebRTC n'aboutit jamais (NAT strict…),
+    // on évite de rester bloqué sur "Recherche de la partie…".
+    clearTimeout(connectTimer);
+    connectTimer = setTimeout(() => {
+      if (!netConnected) {
+        netFail("Connexion impossible — vérifie le code, ou la connexion réseau de ton ami.",
+                "code: connect-timeout · " + netDiag());
+      }
+    }, CONNECT_TIMEOUT);
   });
-  peer.on("error", onPeerError);
-  peer.on("disconnected", () => { if (peer && !peer.destroyed) peer.reconnect(); });
-  // garde-fou : si la négociation WebRTC directe n'aboutit jamais (NAT strict,
-  // pare-feu…), le code peut être valide (pas de "peer-unavailable") mais la
-  // connexion réelle ne s'établit jamais — sans ça, l'écran restait bloqué
-  // sur "Recherche de la partie…" indéfiniment, sans aucun message.
-  clearTimeout(connectTimer);
-  connectTimer = setTimeout(() => {
-    if (!netConnected) {
-      netFail("Connexion impossible — vérifie le code, ou la connexion réseau de ton ami.",
-              "code: connect-timeout · " + netDiag());
-    }
-  }, CONNECT_TIMEOUT);
 }
 
 function hookConn(c) {
-  if (c.label === "rel") connRel = c; else connFast = c;
+  if (!c) return;
+  if (c.label === "rel") connRel = c;
+  else if (c.label === "fast") connFast = c;
+  else return;
   c.on("data", onNetData);
   c.on("open", checkBothOpen);
-  c.on("close", onConnClosed);
-  // un échec explicite du canal ne doit pas être avalé en silence : sans
-  // connexion établie, on abandonne tout de suite (au lieu d'attendre le
-  // garde-fou CONNECT_TIMEOUT) ; déjà connecté, "close" gère la déconnexion.
-  c.on("error", (err) => {
-    if (!netConnected) {
-      netFail("Connexion impossible — vérifie le code, ou la connexion réseau de ton ami.",
-              "code: " + (c.label || "?") + "-channel-error (" + ((err && err.type) || (err && err.message) || "?") + ") · " + netDiag());
-    }
-  });
+  c.on("close", () => onConnClosed(c));
+  // Pendant la négociation, une erreur de canal est fréquente (ICE/TURN) :
+  // ne pas tuer la session ici — close + CONNECT_TIMEOUT suffisent.
+  // (Le 2v2 ignore déjà ces erreurs ; le 1v1 était trop agressif.)
+  c.on("error", () => { /* ignore */ });
   if (c.open) checkBothOpen();
 }
 
@@ -321,8 +381,19 @@ function onPeerError(err) {
   netFail(msg, "code: " + (t || "inconnu"));
 }
 
-function onConnClosed() {
+function onConnClosed(c) {
   if (!online || state === "netError" || state === "menu") return;
+  // Pendant la négociation : un canal qui drop ne doit PAS tuer le lobby hôte
+  // (sinon 1ʳᵉ tentative ICE flaky → "Adversaire déconnecté" / invité en timeout).
+  if (!netConnected) {
+    if (c && c.label === "rel" && connRel === c) connRel = null;
+    if (c && c.label === "fast" && connFast === c) connFast = null;
+    if (!c) {
+      if (connRel && !connRel.open) connRel = null;
+      if (connFast && !connFast.open) connFast = null;
+    }
+    return;
+  }
   netFail("Adversaire déconnecté.", "code: connection-closed · " + netDiag());
 }
 
@@ -681,18 +752,30 @@ function hostSnapCadence() {
 // apprennent juste leur slot via le message "start".
 
 function initHostPeer2v2() {
-  refreshTurnCredentials();
   online = true; netRole = "host";
   netConnected = false; peerReady = false;
   guests = []; lobbyStarted = false;
   setMode("2v2"); mySlot = 0;
   aiLevel = 1; vsAI = false;
   netCode = makeCode();
-  peer = new Peer(PEER_PREFIX + netCode, { config: ICE_CONFIG });
-  peer.on("open", () => { peerReady = true; });
-  peer.on("connection", c => hostAcceptConn(c));
-  peer.on("error", onPeerError);
-  peer.on("disconnected", () => { if (peer && !peer.destroyed) peer.reconnect(); });
+  withIceReady(() => {
+    const old = peer;
+    peer = null;
+    peerReady = false;
+    connRel = null;
+    connFast = null;
+    if (old) { try { old.destroy(); } catch (e) { /* ignore */ } }
+    online = true; netRole = "host";
+    netConnected = false;
+    guests = []; lobbyStarted = false;
+    setMode("2v2"); mySlot = 0;
+    aiLevel = 1; vsAI = false;
+    peer = new Peer(PEER_PREFIX + netCode, { config: ICE_CONFIG });
+    peer.on("open", () => { peerReady = true; });
+    peer.on("connection", c => hostAcceptConn(c));
+    peer.on("error", onPeerError);
+    peer.on("disconnected", () => { if (peer && !peer.destroyed) peer.reconnect(); });
+  });
 }
 
 function hostAcceptConn(c) {
@@ -1509,8 +1592,9 @@ function startQuickplay() {
 
 function mmWaitPeerReadyThenReady() {
   const trySend = () => {
-    if (!mmQuickplay || !peer) return;
-    if (peerReady && netCode && !mmHostReadySent) {
+    if (!mmQuickplay) return;
+    // peer peut être null le temps que TURN soit prêt (withIceReady)
+    if (peerReady && peer && netCode && !mmHostReadySent) {
       mmHostReadySent = true;
       mmSend({ t: "ready", code: netCode });
       return;

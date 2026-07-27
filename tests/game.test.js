@@ -2831,6 +2831,18 @@ test("menus : démo ne coupe pas online (sélection perso en ligne)", () => {
   g.setOnline(false);
 });
 
+test("online : close canal pendant négociation ne tue pas le lobby", () => {
+  const g = loadGame();
+  assert.ok(g.onConnClosed, "onConnClosed exporté");
+  g.setOnline(true);
+  g.setNetConnected(false);
+  g.setState("hostWait");
+  g.onConnClosed({ label: "rel" });
+  assert.ok(g.getOnline(), "reste online");
+  assert.strictEqual(g.getState(), "hostWait", "lobby intact");
+  assert.ok(!g.getNetErrorMsg(), "pas d'erreur net");
+});
+
 test("tutoriel : chaque étape reste au moins 5 s", () => {
   const g = loadGame();
   g.startTutorial();
