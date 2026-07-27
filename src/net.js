@@ -153,12 +153,11 @@ function refreshTurnCredentials() {
         return false;
       }
       // Un iceServer par URL (meilleure compat WebRTC que urls:[...]).
-      // IMPORTANT : on enregistre chaque URL SANS auth PUIS avec auth.
-      // Coturn prod accepte aujourd'hui les Allocate ouverts ; si le secret
-      // matchmaker ≠ coturn, Chrome n'obtient JAMAIS de candidat relay avec
-      // les credentials seuls (host/srflx only → ICE failed). Le fallback
-      // sans auth débloque le multi ; l'entrée authentifiée restera utile
-      // quand le secret sera aligné.
+      // Chrome EXIGE username+credential dès que le schéma est turn/turns
+      // (sinon RTCPeerConnection refuse de se construire).
+      // On pousse : 1) credentials API ; 2) credentials factices (coturn
+      // actuellement ouvert / secret désaligné — les vrais HMAC cassent
+      // l'Allocate côté Chrome) ; 3) TURN PeerJS en secours.
       const stun = { urls: "stun:stun.l.google.com:19302" };
       const user = String(j.username);
       const cred = String(j.credential);
@@ -167,9 +166,11 @@ function refreshTurnCredentials() {
       const pushUrl = (u) => {
         const s = String(u);
         if (!s) return;
+        // Factices EN PREMIER : si le secret matchmaker ≠ coturn, Chrome
+        // n'obtient aucun relay avec les HMAC API seuls.
         if (!seen["open:" + s]) {
           seen["open:" + s] = 1;
-          turns.push({ urls: s });
+          turns.push({ urls: s, username: "sommet", credential: "sommet" });
         }
         if (!seen["auth:" + s]) {
           seen["auth:" + s] = 1;
@@ -184,7 +185,6 @@ function refreshTurnCredentials() {
           pushUrl("turn:" + host + ":3478?transport=tcp");
         }
       } catch (e) { /* ignore */ }
-      // Secours PeerJS (si notre coturn est injoignable depuis le client)
       turns.push({
         urls: ["turn:eu-0.turn.peerjs.com:3478", "turn:us-0.turn.peerjs.com:3478"],
         username: "peerjs",
@@ -192,7 +192,7 @@ function refreshTurnCredentials() {
       });
       ICE_CONFIG.iceServers = [stun].concat(turns);
       ICE_CONFIG.iceCandidatePoolSize = 2;
-      netLog("TURN OK", { n: turns.length, urls: j.urls, openFallback: true });
+      netLog("TURN OK", { n: turns.length, urls: j.urls, openFallback: "dummy-creds" });
       probeTurnRelay();
       return true;
     })
