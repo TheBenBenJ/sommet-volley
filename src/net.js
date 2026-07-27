@@ -57,6 +57,45 @@ function turnCredsUrl() {
   }
 }
 
+/** Journal multi visible (console + overlay écrans net). */
+const NET_LOG_MAX = 14;
+const netLogLines = [];
+function netLog(msg, extra) {
+  const t = (typeof performance !== "undefined" ? performance.now() : Date.now()) | 0;
+  let line = String(msg);
+  if (extra != null) {
+    try {
+      line += " | " + (typeof extra === "string" ? extra : JSON.stringify(extra));
+    } catch (e) {
+      line += " | [extra]";
+    }
+  }
+  const stamped = ((t / 1000) % 1000).toFixed(1) + "s  " + line;
+  netLogLines.push(stamped);
+  while (netLogLines.length > NET_LOG_MAX) netLogLines.shift();
+  try {
+    if (typeof console !== "undefined" && console.log) console.log("[SV-NET]", line, extra != null ? extra : "");
+  } catch (e) { /* ignore */ }
+}
+function netLogClear() { netLogLines.length = 0; }
+function drawNetLogPanel(x, y, maxW) {
+  if (!netLogLines.length) return;
+  ctx.save();
+  ctx.textAlign = "left";
+  ctx.font = "11px " + (typeof UI !== "undefined" && UI.mono ? UI.mono : "monospace");
+  let yy = y;
+  for (let i = 0; i < netLogLines.length; i++) {
+    const raw = netLogLines[i];
+    ctx.fillStyle = i === netLogLines.length - 1 ? "#9fef9f" : "rgba(255,255,255,0.55)";
+    let s = raw;
+    while (s.length > 2 && ctx.measureText(s).width > maxW) s = s.slice(0, -2);
+    if (s !== raw) s += "…";
+    ctx.fillText(s, x, yy);
+    yy += 13;
+  }
+  ctx.restore();
+}
+
 // Rafraîchit les serveurs ICE avec des credentials TURN frais (ttl 12 h côté
 // serveur). Retourne une Promise : on attend le TURN avant new Peer (sinon la
 // 1ʳᵉ tentative reste en STUN seul → timeout fréquent en NAT strict / 4G).
@@ -69,22 +108,30 @@ function refreshTurnCredentials() {
     return Promise.resolve(true);
   }
   if (turnFetchPromise) return turnFetchPromise;
-  turnFetchPromise = fetch(turnCredsUrl(), { cache: "no-store" })
-    .then(r => (r && r.ok ? r.json() : null))
+  const url = turnCredsUrl();
+  netLog("TURN fetch…", url);
+  turnFetchPromise = fetch(url, { cache: "no-store" })
+    .then(r => {
+      netLog("TURN HTTP " + (r && r.status));
+      return (r && r.ok ? r.json() : null);
+    })
     .then(j => {
       turnFetchedAt = Date.now();
       turnFetchPromise = null;
       if (!j || !Array.isArray(j.urls) || !j.urls.length || !j.username || !j.credential) {
+        netLog("TURN absent → STUN seul");
         return false;
       }
       ICE_CONFIG.iceServers = [
         { urls: "stun:stun.l.google.com:19302" },
         { urls: j.urls, username: String(j.username), credential: String(j.credential) },
       ];
+      netLog("TURN OK", { n: j.urls.length, urls: j.urls });
       return true;
     })
-    .catch(() => {
+    .catch(err => {
       turnFetchPromise = null;
+      netLog("TURN fail → STUN", String(err && err.message || err));
       return false; /* STUN seul */
     });
   return turnFetchPromise;
@@ -94,10 +141,12 @@ if (typeof window !== "undefined") refreshTurnCredentials();
 
 /** Attente courte du TURN avant new Peer (max ~2,5 s). */
 function withIceReady(fn) {
+  netLog("ICE wait (TURN≤2.5s, servers=" + ICE_CONFIG.iceServers.length + ")");
   const p = refreshTurnCredentials();
   const timeout = new Promise(resolve => setTimeout(resolve, 2500));
   Promise.race([p, timeout]).then(() => {
-    try { fn(); } catch (e) { /* ignore */ }
+    netLog("ICE go", { stunTurn: ICE_CONFIG.iceServers.length, hasTurn: ICE_CONFIG.iceServers.length > 1 });
+    try { fn(); } catch (e) { netLog("ICE fn error", String(e && e.message || e)); }
   });
 }
 
@@ -124,6 +173,7 @@ let netCode = "";              // code de la partie (hôte)
 let joinCode = "";             // saisie du code (invité)
 let netErrorMsg = "";
 let netErrorDetail = "";       // diagnostic technique (état ICE/canaux) affiché en petit sous l'erreur
+
 let matchId = 0;               // n° de manche : ignore les paquets périmés
 // ms max pour établir les 2 canaux avant d'abandonner. 20s (pas moins) : une
 // négociation ICE qui doit basculer sur le relais TURN (direct/STUN en échec)
@@ -233,9 +283,15 @@ function onlineLocalInput() {
 
 // ---------- Connexion ----------
 function initHostPeer() {
+  netLogClear();
   online = true; netRole = "host";
   netConnected = false; peerReady = false;
   netCode = makeCode(); // immédiat pour l'UI / matchmaker ready
+  netLog("HOST init", { code: netCode, id: PEER_PREFIX + netCode, Peer: typeof Peer });
+  if (typeof Peer === "undefined") {
+    netFail("PeerJS n'a pas pu être chargé — le mode en ligne nécessite Internet.", "code: no-Peer");
+    return;
+  }
   withIceReady(() => {
     // Ne pas destroyPeerQuiet ici : ça nullifierait peer en cours ; on remplace.
     const old = peer;
@@ -246,17 +302,27 @@ function initHostPeer() {
     if (old) { try { old.destroy(); } catch (e) { /* ignore */ } }
     online = true; netRole = "host";
     netConnected = false;
-    peer = new Peer(PEER_PREFIX + netCode, { config: ICE_CONFIG });
-    peer.on("open", () => { peerReady = true; });
-    peer.on("connection", c => hostAcceptConn1v1(c));
+    peer = new Peer(PEER_PREFIX + netCode, { config: ICE_CONFIG, debug: 2 });
+    peer.on("open", id => {
+      peerReady = true;
+      netLog("HOST peer open", id);
+    });
+    peer.on("connection", c => {
+      netLog("HOST incoming", { label: c && c.label, from: c && c.peer });
+      hostAcceptConn1v1(c);
+    });
     peer.on("error", onPeerError);
-    peer.on("disconnected", () => { if (peer && !peer.destroyed) peer.reconnect(); });
+    peer.on("disconnected", () => {
+      netLog("HOST signaling disconnected → reconnect");
+      if (peer && !peer.destroyed) peer.reconnect();
+    });
   });
 }
 
 /** Accepte rel/fast ; pendant la négociation, remplace un canal périmé (retry ICE). */
 function hostAcceptConn1v1(c) {
   if (c.label !== "rel" && c.label !== "fast") {
+    netLog("HOST reject label", c && c.label);
     setTimeout(() => { try { c.close(); } catch (e) {} }, 500);
     return;
   }
@@ -264,15 +330,18 @@ function hostAcceptConn1v1(c) {
     const prev = c.label === "rel" ? connRel : connFast;
     // Nouvel invité (autre peer id) alors que d'anciens canaux traînent → purge
     if (prev && prev.peer && prev.peer !== c.peer) {
+      netLog("HOST purge old peer", { old: prev.peer, neu: c.peer });
       try { if (connRel) connRel.close(); } catch (e) {}
       try { if (connFast) connFast.close(); } catch (e) {}
       connRel = null;
       connFast = null;
     } else if (prev && prev !== c) {
+      netLog("HOST replace channel", c.label);
       try { prev.close(); } catch (e) {}
       if (c.label === "rel") connRel = null; else connFast = null;
     }
   } else if ((connRel && connRel.peer !== c.peer) || (connFast && connFast.peer !== c.peer)) {
+    netLog("HOST reject (already connected)");
     setTimeout(() => { try { c.close(); } catch (e) {} }, 500);
     return;
   }
@@ -281,52 +350,95 @@ function hostAcceptConn1v1(c) {
 
 function initGuestPeer(code) {
   const clean = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  netLogClear();
   online = true; netRole = "guest";
   netConnected = false;
+  netLog("GUEST init", { code: clean, target: PEER_PREFIX + clean, Peer: typeof Peer });
+  if (typeof Peer === "undefined") {
+    netFail("PeerJS n'a pas pu être chargé — le mode en ligne nécessite Internet.", "code: no-Peer");
+    return;
+  }
   withIceReady(() => {
     destroyPeerQuiet();
     online = true; netRole = "guest";
     netConnected = false;
-    peer = new Peer({ config: ICE_CONFIG }); // id aléatoire
-    peer.on("open", () => {
-      hookConn(peer.connect(PEER_PREFIX + clean, { label: "rel",  reliable: true,  serialization: "json" }));
-      hookConn(peer.connect(PEER_PREFIX + clean, { label: "fast", reliable: false, serialization: "json" }));
+    peer = new Peer({ config: ICE_CONFIG, debug: 2 });
+    peer.on("open", id => {
+      netLog("GUEST peer open", id);
+      const target = PEER_PREFIX + clean;
+      netLog("GUEST connect rel+fast → " + target);
+      hookConn(peer.connect(target, { label: "rel",  reliable: true,  serialization: "json" }));
+      hookConn(peer.connect(target, { label: "fast", reliable: false, serialization: "json" }));
     });
     peer.on("error", onPeerError);
-    peer.on("disconnected", () => { if (peer && !peer.destroyed) peer.reconnect(); });
+    peer.on("disconnected", () => {
+      netLog("GUEST signaling disconnected → reconnect");
+      if (peer && !peer.destroyed) peer.reconnect();
+    });
     // garde-fou : si la négociation WebRTC n'aboutit jamais (NAT strict…),
     // on évite de rester bloqué sur "Recherche de la partie…".
     clearTimeout(connectTimer);
     connectTimer = setTimeout(() => {
       if (!netConnected) {
+        netLog("GUEST TIMEOUT 20s", netDiag());
         netFail("Connexion impossible — vérifie le code, ou la connexion réseau de ton ami.",
-                "code: connect-timeout · " + netDiag());
+                "code: connect-timeout · " + netDiag() + " · logs: " + netLogLines.slice(-4).join(" · "));
       }
     }, CONNECT_TIMEOUT);
   });
 }
 
+function hookIceWatch(c) {
+  try {
+    const pc = c && c.peerConnection;
+    if (!pc || pc._svIceHooked) return;
+    pc._svIceHooked = true;
+    pc.addEventListener("iceconnectionstatechange", () => {
+      netLog("ICE " + (c.label || "?"), pc.iceConnectionState);
+    });
+    pc.addEventListener("connectionstatechange", () => {
+      netLog("PC " + (c.label || "?"), pc.connectionState);
+    });
+  } catch (e) { /* ignore */ }
+}
+
 function hookConn(c) {
-  if (!c) return;
+  if (!c) { netLog("hookConn null"); return; }
   if (c.label === "rel") connRel = c;
   else if (c.label === "fast") connFast = c;
-  else return;
+  else { netLog("hookConn bad label", c.label); return; }
+  netLog("hook " + c.label, { open: !!c.open, peer: c.peer });
+  hookIceWatch(c);
   c.on("data", onNetData);
-  c.on("open", checkBothOpen);
-  c.on("close", () => onConnClosed(c));
+  c.on("open", () => {
+    netLog("channel OPEN " + c.label);
+    checkBothOpen();
+  });
+  c.on("close", () => {
+    netLog("channel CLOSE " + c.label);
+    onConnClosed(c);
+  });
   // Pendant la négociation, une erreur de canal est fréquente (ICE/TURN) :
   // ne pas tuer la session ici — close + CONNECT_TIMEOUT suffisent.
-  // (Le 2v2 ignore déjà ces erreurs ; le 1v1 était trop agressif.)
-  c.on("error", () => { /* ignore */ });
+  c.on("error", err => {
+    netLog("channel ERR " + c.label, (err && (err.type || err.message)) || err);
+  });
   if (c.open) checkBothOpen();
 }
 
 function checkBothOpen() {
+  netLog("checkBothOpen", {
+    connected: netConnected,
+    rel: !!(connRel && connRel.open),
+    fast: !!(connFast && connFast.open),
+    role: netRole, state
+  });
   if (netConnected || !connRel || !connRel.open || !connFast || !connFast.open) return;
   netConnected = true;
   clearTimeout(connectTimer); connectTimer = null;
   lastPeerMsg = lastSnapTime = performance.now();
   startPinging();
+  netLog("CONNECTED ✓", { role: netRole, state });
   if (netRole === "guest") {
     // connecté : l'invité choisit son personnage (le vert), puis enverra "hello"
     if (!pendingMode) pendingMode = { online: true };
@@ -363,9 +475,11 @@ function netDiag() {
 
 function onPeerError(err) {
   const t = err && err.type;
+  netLog("peer error", { type: t, message: err && err.message });
   if (netRole === "host" && t === "unavailable-id" &&
       (state === "hostWait" || state === "matchmaking")) {
     // collision de code (rarissime) : on en retire un autre
+    netLog("HOST id collision → new code");
     const p = peer; peer = null;
     try { p.destroy(); } catch (e) {}
     mmHostReadySent = false;
@@ -378,7 +492,7 @@ function onPeerError(err) {
   if (t === "network" || t === "server-error" || t === "socket-error") {
     msg = "Impossible de joindre le serveur de mise en relation.";
   }
-  netFail(msg, "code: " + (t || "inconnu"));
+  netFail(msg, "code: " + (t || "inconnu") + " · " + netDiag());
 }
 
 function onConnClosed(c) {
@@ -386,6 +500,7 @@ function onConnClosed(c) {
   // Pendant la négociation : un canal qui drop ne doit PAS tuer le lobby hôte
   // (sinon 1ʳᵉ tentative ICE flaky → "Adversaire déconnecté" / invité en timeout).
   if (!netConnected) {
+    netLog("close during nego (keep lobby)", c && c.label);
     if (c && c.label === "rel" && connRel === c) connRel = null;
     if (c && c.label === "fast" && connFast === c) connFast = null;
     if (!c) {
@@ -398,9 +513,12 @@ function onConnClosed(c) {
 }
 
 function netFail(msg, detail) {
+  netLog("FAIL: " + msg, detail);
   teardownNet();
   netErrorMsg = msg;
-  netErrorDetail = detail || "";
+  netErrorDetail = (detail || "") + (netLogLines.length
+    ? "\n" + netLogLines.slice(-6).join(" · ")
+    : "");
   state = "netError";
 }
 
@@ -1524,6 +1642,7 @@ function cancelQuickplay() {
 /** Démarre la recherche d'adversaire (pendingMode déjà posé : bomb/flame/online/quickplay). */
 function startQuickplay() {
   cancelQuickplay();
+  netLogClear();
   mmQuickplay = true;
   mmStatus = "waiting";
   mmStartedAt = performance.now();
@@ -1537,14 +1656,17 @@ function startQuickplay() {
   navIdx = 0;
 
   const url = matchmakerUrl();
+  netLog("MM connect", url);
   let ws;
   try { ws = new WebSocket(url); } catch (e) {
+    netLog("MM WebSocket ctor fail", String(e && e.message || e));
     mmStatus = "error";
     scheduleQuickplayBot(1200);
     return;
   }
   mmWs = ws;
   ws.onopen = () => {
+    netLog("MM open → hello");
     mmSend({ t: "hello", mode: quickplayModeKey() });
     mmBotTimer = setTimeout(() => {
       if (state === "matchmaking" && !netConnected) offerOrStartBotHint();
@@ -1554,6 +1676,7 @@ function startQuickplay() {
     let m;
     try { m = JSON.parse(ev.data); } catch (e) { return; }
     if (!m || !m.t) return;
+    netLog("MM << " + m.t, m.code ? { code: m.code } : undefined);
     if (m.t === "waiting") { mmStatus = "waiting"; return; }
     if (m.t === "host") {
       mmStatus = "hosting";
@@ -1580,12 +1703,14 @@ function startQuickplay() {
     }
   };
   ws.onerror = () => {
+    netLog("MM error");
     if (state === "matchmaking") {
       mmStatus = "error";
       scheduleQuickplayBot(800);
     }
   };
   ws.onclose = () => {
+    netLog("MM close");
     if (mmWs === ws) mmWs = null;
   };
 }
@@ -1596,6 +1721,7 @@ function mmWaitPeerReadyThenReady() {
     // peer peut être null le temps que TURN soit prêt (withIceReady)
     if (peerReady && peer && netCode && !mmHostReadySent) {
       mmHostReadySent = true;
+      netLog("MM >> ready", netCode);
       mmSend({ t: "ready", code: netCode });
       return;
     }
@@ -1702,24 +1828,25 @@ function drawMatchmaking() {
   ctx.fillStyle = UI.ink;
   ctx.font = "600 18px " + UI.sans;
   ctx.fillText(line, mx, 230);
+  drawNetLogPanel(mx, 250, W - mx * 2);
 
   const showBot = mmStatus === "bot_ready" || mmStatus === "error" || sec >= 15;
   if (showBot) {
-    hit(W / 2, 310, 280, 40, "MmBot");
+    hit(W / 2, 360, 280, 40, "MmBot");
     const sel = (typeof padConnected !== "undefined" && padConnected && navIdx === 0) ||
       (typeof isHover === "function" && isHover("MmBot"));
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(W / 2 - 140, 290, 280, 40, 12); else ctx.rect(W / 2 - 140, 290, 280, 40);
+    if (ctx.roundRect) ctx.roundRect(W / 2 - 140, 340, 280, 40, 12); else ctx.rect(W / 2 - 140, 340, 280, 40);
     ctx.fillStyle = sel ? "rgba(255,216,74,0.95)" : "rgba(255,246,232,0.92)";
     ctx.fill();
     ctx.strokeStyle = UI.stroke; ctx.lineWidth = 2.5; ctx.stroke();
     ctx.textAlign = "center";
     ctx.fillStyle = UI.stroke;
     ctx.font = "700 16px " + UI.sans;
-    ctx.fillText("Jouer contre un bot", W / 2, 316);
+    ctx.fillText("Jouer contre un bot", W / 2, 366);
   }
   hit(mx + 70, H - 28, 160, 28, "MmCancel");
-  uiLabel("Échap — Annuler", mx, H - 20, 12, UI.muted, 0.3);
+  uiLabel("Échap — Annuler  ·  logs [SV-NET] aussi en console (F12)", mx, H - 20, 11, UI.muted, 0.3);
 }
 
 // gros code de partie, calé à gauche sous l'en-tête
@@ -1732,15 +1859,16 @@ function drawHostCode(size, y) {
 
 function drawHostWait() {
   netScreenBase("Partie 1v1 en ligne", "En ligne · Hôte · Tu joues à gauche");
-  drawHostCode(60, 258);
+  drawHostCode(52, 230);
   const dots = ".".repeat(1 + Math.floor(performance.now() / 400) % 3);
-  ctx.textAlign = "left"; ctx.fillStyle = UI.ink; ctx.font = "500 18px " + UI.sans;
+  ctx.textAlign = "left"; ctx.fillStyle = UI.ink; ctx.font = "500 16px " + UI.sans;
   ctx.fillText(
     netConnected ? "Joueur connecté ! Il choisit son personnage" + dots
     : peerReady  ? "En attente d'un joueur — envoie-lui ce code"
     :              "Création de la partie" + dots,
-    UI.mx, 306);
-  uiLabel("Bouger Q/D ou ← →   ·   Sauter Z ↑ Espace", UI.mx, H - 70, 10, UI.muted, 1);
+    UI.mx, 268);
+  drawNetLogPanel(UI.mx, 290, W - UI.mx * 2);
+  uiLabel("F12 = console [SV-NET]  ·  Échap = annuler", UI.mx, H - 24, 11, UI.muted, 0.3);
 }
 
 function drawHostLobby() {
@@ -1806,32 +1934,37 @@ function drawNetScreen(title, sub) {
   netScreenBase(title, "En ligne · Connexion");
   const dots = ".".repeat(1 + Math.floor(performance.now() / 400) % 3);
   ctx.textAlign = "left"; ctx.fillStyle = UI.ink; ctx.font = "500 20px " + UI.sans;
-  ctx.fillText(sub + dots, UI.mx, 236);
+  ctx.fillText(sub + dots, UI.mx, 220);
+  drawNetLogPanel(UI.mx, 250, W - UI.mx * 2);
+  uiLabel("F12 = console [SV-NET]", UI.mx, H - 24, 11, UI.muted, 0.3);
 }
 
 function drawNetError() {
   hit(W / 2, H / 2, W, H, "Enter"); // clic n'importe où = retour au menu
   netScreenBase("Oups", "En ligne · Erreur", null, { noEscHint: true });
-  ctx.textAlign = "left"; ctx.fillStyle = "#ff8a8a"; ctx.font = "600 20px " + UI.sans;
-  ctx.fillText(netErrorMsg, UI.mx, 236);
+  ctx.textAlign = "left"; ctx.fillStyle = "#ff8a8a"; ctx.font = "600 18px " + UI.sans;
+  ctx.fillText(netErrorMsg, UI.mx, 210);
   // diagnostic technique (état des canaux/ICE) : à remonter tel quel si
   // le problème persiste — évite de deviner où ça bloque.
   if (netErrorDetail) {
-    ctx.fillStyle = "rgba(255,255,255,0.45)";
-    ctx.font = "12px " + UI.mono;
+    ctx.fillStyle = "rgba(255,255,255,0.5)";
+    ctx.font = "11px " + UI.mono;
     const maxW = W - UI.mx * 2;
     const words = String(netErrorDetail).split(" ");
-    let line = "", y = 268;
+    let line = "", y = 238;
     for (const w of words) {
       const test = line ? line + " " + w : w;
       if (ctx.measureText(test).width > maxW && line) {
-        ctx.fillText(line, UI.mx, y); y += 16; line = w;
+        ctx.fillText(line, UI.mx, y); y += 14; line = w;
       } else line = test;
     }
-    if (line) { ctx.fillText(line, UI.mx, y); }
+    if (line) { ctx.fillText(line, UI.mx, y); y += 18; }
+    drawNetLogPanel(UI.mx, Math.min(y + 8, H - 160), maxW);
+  } else {
+    drawNetLogPanel(UI.mx, 250, W - UI.mx * 2);
   }
   // Un seul pied (évite le doublon avec menuScreenBase « Échap ← Retour »)
-  uiLabel("Entrée / Échap — retour au menu", UI.mx, H - 24, 12, UI.muted, 0.3);
+  uiLabel("Entrée / Échap — retour  ·  copie les lignes vertes / F12", UI.mx, H - 24, 11, UI.muted, 0.3);
 }
 
 
