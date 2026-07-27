@@ -18,16 +18,16 @@
 const SNAP_EVERY = 2;          // cadence de base (~30 Hz)
 const SNAP_NEAR_NET = 1;       // près du filet : 60 Hz (passage de balle fluide)
 const NET_SNAP_ZONE = 160;     // px autour de NET_X → snaps accélérés
-const INTERP_DELAY = 3;        // délai d'interpolation de base (~50 ms), adaptatif
-const INTERP_MIN = 2;          // plancher du délai (bonne connexion)
-const INTERP_MAX = 7;          // plafond du délai (connexion instable)
+const INTERP_DELAY = 2;        // délai d'interpolation de base (~33 ms), adaptatif
+const INTERP_MIN = 1;          // plancher (bonne connexion / TURN OK)
+const INTERP_MAX = 5;          // plafond (évite la « bouillie » sous gigue)
 const EXTRAP_MAX = 8;          // ticks d'extrapolation max quand un snapshot tarde
 const NET_TIMEOUT = 2500;      // ms de silence → pause "connexion instable"
 const RECONCILE_SNAP = 60;     // px d'écart corps → téléport
-const BALL_SOFT_CORRECT = 36;  // px — blend doux balle distante ; au-delà = snap
-const BALL_STALE_MS = 200;     // sans paquet balle invité → l'hôte reprend
+const BALL_SOFT_CORRECT = 40;  // px — blend doux balle distante ; au-delà = snap
+const BALL_STALE_MS = 350;     // sans paquet balle invité → l'hôte reprend (RTT TURN)
 const GUEST_BALL_HOLD = 8;     // ticks de renvoi balle après sortie de zone
-const GUEST_COAST_TICKS = 18;  // après sortie : dead-reckoning local avant snaps
+const GUEST_COAST_TICKS = 14;  // après sortie : dead-reckoning local avant snaps
 const CODE_LEN = 5;
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sans I/O/0/1
 const PEER_PREFIX = "vda26-";  // espace de noms sur le cloud PeerJS
@@ -836,7 +836,22 @@ function guestCanAcquireBall() {
   if (!n) return false;
   const b = snapBuf[n - 1].ball;
   // frozen OK (notre service) ; refuser seulement crevée / hors zone
-  return b && !b.popped && ballInGuestOwnZone(b.x);
+  if (!b || b.popped) return false;
+  // Acquisition tôt (GUEST_BALL_ACQUIRE) — sous latence TURN, attendre
+  // GUEST_BALL_MARGIN faisait traverser la balle affichée sans collision.
+  if (ballInGuestAcquireZone(b.x)) return true;
+  // Secours feeling : balle live déjà sur moi dans mon camp
+  return guestOverlapsLiveBall();
+}
+
+/** Invité : la balle affichée (live) me touche-t-elle déjà à droite du filet ? */
+function guestOverlapsLiveBall() {
+  const live = guestLiveBallFromSnap();
+  if (!live || live.x <= NET_X + 8) return false;
+  const me = activeBlobs[mySlot];
+  if (!me) return false;
+  const hitR = (me.r || 36) + BALL_R + 14;
+  return Math.hypot(live.x - me.x, live.y - me.y) < hitR;
 }
 
 // Balle « live » depuis le dernier snap (âge + RTT/2) — vue hors camp entière.
@@ -877,7 +892,8 @@ function hostApplyGuestBallSoft(b) {
 // paquet périmé du rally / de la sortie précédente téléportait la balle
 // vers le sol → « tombe toute seule à l'arrivée dans le camp adverse ».
 function hostUsesGuestBall() {
-  const HOST_ACCEPT = NET_X + 24;
+  // Accepter dès que l'invité claim + balle à droite (aligné sur acquire tôt)
+  const HOST_ACCEPT = NET_X + GUEST_BALL_ACQUIRE;
   return mode === "1v1" && !battle.active &&
          guestBall && guestBall.own === 1 &&
          (performance.now() - lastGuestBallAt) < BALL_STALE_MS &&
@@ -899,15 +915,21 @@ function hostTickBallSmooth() {
   if (Math.abs(hostBallSmoothY) < 0.15) hostBallSmoothY = 0;
 }
 
-// Au moment où l'invité prend la balle : partir du DERNIER snap hôte
-// (présent), pas de l'interpolation retardée (sinon la balle « chute » d'un coup).
+// Au moment où l'invité prend la balle : partir du live extrapolé (âge+RTT),
+// pas du snap brut ni de l'interp retardée (sinon chute / ghosting au handoff).
 function guestSeedBallFromSnap() {
   const n = snapBuf.length;
   if (!n) return;
   const b = snapBuf[n - 1].ball;
   if (!b) return;
-  ball.x = b.x; ball.y = b.y; ball.vx = b.vx; ball.vy = b.vy;
-  ball.angle = b.angle;
+  const live = guestLiveBallFromSnap();
+  if (live && !b.frozen && !b.popped) {
+    ball.x = live.x; ball.y = live.y; ball.vx = live.vx; ball.vy = live.vy;
+    ball.angle = live.angle;
+  } else {
+    ball.x = b.x; ball.y = b.y; ball.vx = b.vx; ball.vy = b.vy;
+    ball.angle = b.angle;
+  }
   ball.frozen = b.frozen; ball.popped = !!b.popped;
   ball.smash = b.smash || 0;
   if (b.inHands !== undefined) ball.inHands = !!b.inHands;

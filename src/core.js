@@ -113,9 +113,10 @@ const BOMB_TIME = 600;      // 10 s à 60 Hz : durée de la mèche avant explosi
 const FLAME_HP_MAX = 9; // ×3 vs V1 (3) — rallies plus longs
 
 // --- Soft ownership balle (1v1 en ligne, camp invité) ---
-// L'invité ne simule la balle que si elle est CLAIREMENT dans son camp
-// (hors zone filet). Pas de handoff bilatéral → pas de deadlock poteau.
-const GUEST_BALL_MARGIN = 48; // px à droite de NET_X (hors poteau, handoff plus tardif)
+// Hystérésis : on ACQUIERT tôt (sous latence TURN, sinon on traverse la balle
+// affichée sans collision) et on RELÂCHE plus loin du filet (anti-deadlock).
+const GUEST_BALL_ACQUIRE = 18; // px à droite de NET_X → invité prend la simu
+const GUEST_BALL_MARGIN = 44;  // px → invité rend l'autorité à l'hôte
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");

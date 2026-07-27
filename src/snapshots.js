@@ -5,8 +5,10 @@
 // L'hôte envoie périodiquement getSnapshot() ; l'invité applique les champs
 // discrets + interpole les poses (voir net.js). Voir MULTIJOUEUR.md.
 
-// Soft ownership : la balle est-elle assez profondément dans le camp droit
-// pour que l'invité la simule ? (hôte exclusive près du filet)
+// Soft ownership : zone d'ACQUISITION (tôt) vs zone de DÉTENTION (plus large).
+function ballInGuestAcquireZone(x) {
+  return x > NET_X + GUEST_BALL_ACQUIRE;
+}
 function ballInGuestOwnZone(x) {
   return x > NET_X + GUEST_BALL_MARGIN;
 }

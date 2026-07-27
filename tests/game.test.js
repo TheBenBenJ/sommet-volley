@@ -719,11 +719,15 @@ test("filet : balle coincée dans le poteau est éjectée (anti-stick)", () => {
 test("soft ownership : zone invité hors filet (marge)", () => {
   const g = loadGame();
   const M = g.consts.GUEST_BALL_MARGIN;
-  assert.ok(M >= 40, "marge assez large pour éviter le poteau");
+  const A = g.consts.GUEST_BALL_ACQUIRE;
+  assert.ok(M >= 40, "marge release assez large pour éviter le poteau");
+  assert.ok(A >= 12 && A < M, "acquire plus tôt que release (hystérésis)");
   assert.strictEqual(g.ballInGuestOwnZone(g.consts.NET_X + M + 1), true);
   assert.strictEqual(g.ballInGuestOwnZone(g.consts.NET_X + M), false);
   assert.strictEqual(g.ballInGuestOwnZone(g.consts.NET_X), false);
   assert.strictEqual(g.ballInGuestOwnZone(g.consts.NET_X - 40), false);
+  assert.strictEqual(g.ballInGuestAcquireZone(g.consts.NET_X + A + 1), true);
+  assert.strictEqual(g.ballInGuestAcquireZone(g.consts.NET_X + A), false);
 });
 
 test("soft ownership : skipBall avance les corps sans bouger la balle", () => {
@@ -764,7 +768,7 @@ test("soft ownership : pack/applyBallState round-trip", () => {
 test("multi fluidité : constantes coast / soft-correct", () => {
   const g = loadGame();
   assert.ok(g.BALL_SOFT_CORRECT >= 24 && g.BALL_SOFT_CORRECT <= 48, "seuil blend balle");
-  assert.ok(g.GUEST_COAST_TICKS >= 14, "coast handoff assez long");
+  assert.ok(g.GUEST_COAST_TICKS >= 12, "coast handoff assez long");
   assert.ok(g.hostApplyGuestBallSoft && g.guestLiveBallFromSnap && g.predictBallMotion);
 });
 

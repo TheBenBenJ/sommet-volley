@@ -123,7 +123,7 @@ const EPILOGUE = `
   quitFromPause: typeof quitFromPause === "function" ? quitFromPause : null,
   MAP_EVENT_WARN_T: typeof MAP_EVENT_WARN_T !== "undefined" ? MAP_EVENT_WARN_T : 120,
   updateBall,
-  ballInGuestOwnZone, packBallState, applyBallState,
+  ballInGuestOwnZone, ballInGuestAcquireZone, packBallState, applyBallState,
   predictBallMotion: typeof predictBallMotion === "function" ? predictBallMotion : null,
   guestLiveBallFromSnap: typeof guestLiveBallFromSnap === "function" ? guestLiveBallFromSnap : null,
   hostApplyGuestBallSoft: typeof hostApplyGuestBallSoft === "function" ? hostApplyGuestBallSoft : null,
@@ -321,7 +321,7 @@ const EPILOGUE = `
   getStreak: () => [streak[0], streak[1]],
   CHAR_BASE_H: typeof CHAR_BASE_H !== "undefined" ? CHAR_BASE_H : 110,
   PROP_H: typeof PROP_H !== "undefined" ? PROP_H : null,
-  consts: { W, H, NET_X, NET_W, NET_TOP, GROUND_Y, BALL_R, MAX_BALL_SPEED, GUEST_BALL_MARGIN, HOLD_LOB_SPD: typeof HOLD_LOB_SPD !== "undefined" ? HOLD_LOB_SPD : 0 }
+  consts: { W, H, NET_X, NET_W, NET_TOP, GROUND_Y, BALL_R, MAX_BALL_SPEED, GUEST_BALL_MARGIN, GUEST_BALL_ACQUIRE: typeof GUEST_BALL_ACQUIRE !== "undefined" ? GUEST_BALL_ACQUIRE : 18, HOLD_LOB_SPD: typeof HOLD_LOB_SPD !== "undefined" ? HOLD_LOB_SPD : 0 }
 };`;
 
 function srcConcat() {
