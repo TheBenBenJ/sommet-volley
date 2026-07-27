@@ -1,6 +1,6 @@
 {
   "name": "sommet-volley",
-  "version": "1.1.38",
+  "version": "1.1.39",
   "description": "Sommet Volley — volley satirique HTML5 Canvas (solo, local, en ligne WebRTC/PeerJS).",
   "type": "commonjs",
   "scripts": {
