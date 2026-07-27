@@ -122,11 +122,32 @@ function refreshTurnCredentials() {
         netLog("TURN absent → STUN seul");
         return false;
       }
-      ICE_CONFIG.iceServers = [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: j.urls, username: String(j.username), credential: String(j.credential) },
-      ];
-      netLog("TURN OK", { n: j.urls.length, urls: j.urls });
+      // Un iceServer par URL (meilleure compat WebRTC que urls:[...]).
+      // Si le serveur donne une IP, on ajoute aussi le hostname de la page
+      // (certains NAT/pare-feu résolvent mieux le DNS que l'IP brute).
+      const stun = { urls: "stun:stun.l.google.com:19302" };
+      const user = String(j.username);
+      const cred = String(j.credential);
+      const turns = [];
+      const seen = Object.create(null);
+      const pushTurn = (u) => {
+        const s = String(u);
+        if (!s || seen[s]) return;
+        seen[s] = 1;
+        turns.push({ urls: s, username: user, credential: cred });
+      };
+      j.urls.forEach(pushTurn);
+      try {
+        const host = (typeof location !== "undefined" && location.hostname) || "";
+        if (host && !/^\d+\.\d+\.\d+\.\d+$/.test(host)) {
+          pushTurn("turn:" + host + ":3478?transport=udp");
+          pushTurn("turn:" + host + ":3478?transport=tcp");
+        }
+      } catch (e) { /* ignore */ }
+      ICE_CONFIG.iceServers = [stun].concat(turns);
+      // Aide certains NAT : pool de candidats avant l'offre
+      ICE_CONFIG.iceCandidatePoolSize = 2;
+      netLog("TURN OK", { n: turns.length, urls: j.urls });
       return true;
     })
     .catch(err => {
@@ -164,7 +185,7 @@ function destroyPeerQuiet() {
 
 let online = false;            // mode en ligne actif (dès le lobby)
 let netRole = null;            // "host" | "guest"
-let netConnected = false;      // les deux canaux WebRTC sont ouverts
+let netConnected = false;      // canal fiable WebRTC ouvert (fast optionnel)
 let peer = null;               // objet Peer (PeerJS)
 let connRel = null;            // canal fiable : hello/start/rematch/bye
 let connFast = null;           // canal non fiable : inputs/snapshots/ping
@@ -243,7 +264,11 @@ function makeCode() {
 }
 
 function sendRel(m)  { if (connRel  && connRel.open)  connRel.send(m); }
-function sendFast(m) { if (connFast && connFast.open) connFast.send(m); }
+function sendFast(m) {
+  // Prefer le canal non fiable ; sinon tout passe sur rel (fast optionnel).
+  const c = (connFast && connFast.open) ? connFast : (connRel && connRel.open ? connRel : null);
+  if (c) try { c.send(m); } catch (e) { /* ignore */ }
+}
 
 function onlineLocalInput() {
   // Menu pause local : on ne pilote plus le blob (la simu réseau continue).
@@ -365,18 +390,13 @@ function initGuestPeer(code) {
     peer = new Peer({ config: ICE_CONFIG, debug: 2 });
     peer.on("open", id => {
       netLog("GUEST peer open", id);
-      const target = PEER_PREFIX + clean;
-      netLog("GUEST connect rel+fast → " + target);
-      hookConn(peer.connect(target, { label: "rel",  reliable: true,  serialization: "json" }));
-      hookConn(peer.connect(target, { label: "fast", reliable: false, serialization: "json" }));
+      guestConnectChannels(PEER_PREFIX + clean);
     });
     peer.on("error", onPeerError);
     peer.on("disconnected", () => {
       netLog("GUEST signaling disconnected → reconnect");
       if (peer && !peer.destroyed) peer.reconnect();
     });
-    // garde-fou : si la négociation WebRTC n'aboutit jamais (NAT strict…),
-    // on évite de rester bloqué sur "Recherche de la partie…".
     clearTimeout(connectTimer);
     connectTimer = setTimeout(() => {
       if (!netConnected) {
@@ -388,11 +408,51 @@ function initGuestPeer(code) {
   });
 }
 
+/**
+ * Ouvre d'abord le canal fiable. Le canal fast est optionnel (après coup) :
+ * 2 négociations ICE en parallèle faisaient échouer les deux (checking→failed).
+ */
+function guestConnectChannels(target) {
+  netLog("GUEST connect rel → " + target);
+  const rel = peer.connect(target, { label: "rel", reliable: true, serialization: "json" });
+  hookConn(rel);
+  const tryFast = () => {
+    if (!peer || peer.destroyed) return;
+    if (connFast) return;
+    netLog("GUEST connect fast (optionnel) → " + target);
+    try {
+      hookConn(peer.connect(target, { label: "fast", reliable: false, serialization: "json" }));
+    } catch (e) {
+      netLog("GUEST fast skip", String(e && e.message || e));
+    }
+  };
+  if (rel) {
+    // Fast seulement après que rel soit UP (évite double ICE)
+    rel.on("open", () => setTimeout(tryFast, 400));
+  }
+}
+
 function hookIceWatch(c) {
   try {
     const pc = c && c.peerConnection;
     if (!pc || pc._svIceHooked) return;
     pc._svIceHooked = true;
+    const counts = { host: 0, srflx: 0, relay: 0, other: 0 };
+    pc.addEventListener("icecandidate", ev => {
+      const cand = ev.candidate && ev.candidate.candidate;
+      if (!cand) {
+        netLog("ICE " + (c.label || "?") + " gather done", counts);
+        return;
+      }
+      let kind = "other";
+      if (/\styp host\b/.test(cand)) kind = "host";
+      else if (/\styp srflx\b/.test(cand)) kind = "srflx";
+      else if (/\styp relay\b/.test(cand)) kind = "relay";
+      counts[kind]++;
+      if (kind === "relay" || counts[kind] <= 1) {
+        netLog("ICE cand " + (c.label || "?") + " " + kind);
+      }
+    });
     pc.addEventListener("iceconnectionstatechange", () => {
       netLog("ICE " + (c.label || "?"), pc.iceConnectionState);
     });
@@ -427,20 +487,20 @@ function hookConn(c) {
 }
 
 function checkBothOpen() {
+  const relOk = !!(connRel && connRel.open);
+  const fastOk = !!(connFast && connFast.open);
   netLog("checkBothOpen", {
-    connected: netConnected,
-    rel: !!(connRel && connRel.open),
-    fast: !!(connFast && connFast.open),
-    role: netRole, state
+    connected: netConnected, rel: relOk, fast: fastOk, role: netRole, state
   });
-  if (netConnected || !connRel || !connRel.open || !connFast || !connFast.open) return;
+  if (netConnected) return;
+  // Suffit que le canal fiable soit ouvert (fast est un bonus).
+  if (!relOk) return;
   netConnected = true;
   clearTimeout(connectTimer); connectTimer = null;
   lastPeerMsg = lastSnapTime = performance.now();
   startPinging();
-  netLog("CONNECTED ✓", { role: netRole, state });
+  netLog("CONNECTED ✓", { role: netRole, state, fast: fastOk });
   if (netRole === "guest") {
-    // connecté : l'invité choisit son personnage (le vert), puis enverra "hello"
     if (!pendingMode) pendingMode = { online: true };
     pendingMode.online = true;
     if (mmQuickplay) pendingMode.quickplay = true;
@@ -449,18 +509,15 @@ function checkBothOpen() {
     state = "selectCharacter";
   } else if (netRole === "host") {
     if (mmQuickplay) {
-      // Partie rapide : l'hôte choisit son perso après le matchmaking
       if (!pendingMode) pendingMode = { online: true, quickplay: true };
       pendingMode.online = true;
       pendingMode.quickplay = true;
       selPlayer = 0;
       state = "selectCharacter";
     } else {
-      // hôte 1v1 classique : prévenir l'invité des persos déjà pris
       sendRel({ t: "taken", a: [blobL.charId] });
     }
   }
-  // côté hôte (créer) : l'écran hostWait affiche "joueur connecté…" jusqu'au hello
 }
 
 // diagnostic technique (état des 2 canaux + de la négociation ICE sous-jacente)
@@ -497,6 +554,12 @@ function onPeerError(err) {
 
 function onConnClosed(c) {
   if (!online || state === "netError" || state === "menu") return;
+  // Canal fast optionnel : sa fermeture ne coupe jamais la session.
+  if (c && c.label === "fast") {
+    netLog("fast closed (ok, rel only)", { connected: netConnected });
+    if (connFast === c) connFast = null;
+    return;
+  }
   // Pendant la négociation : un canal qui drop ne doit PAS tuer le lobby hôte
   // (sinon 1ʳᵉ tentative ICE flaky → "Adversaire déconnecté" / invité en timeout).
   if (!netConnected) {
