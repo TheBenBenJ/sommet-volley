@@ -1,5 +1,7 @@
 # Exemple coturn pour Sommet Volley — installer UNE FOIS (ou via apply-infra.sh --coturn).
-# Remplacer CHANGE_ME par le même secret que systemd sommet-mm turn.conf.
+# Remplacer CHANGE_ME par le MÊME secret que systemd sommet-mm turn.conf
+# (GitHub secret TURN_SECRET). Si les secrets divergent, Chrome n'obtient
+# aucun candidat ICE « relay » et le multi échoue (host/srflx only → failed).
 # Ne PAS committer le secret réel.
 
 listening-port=3478

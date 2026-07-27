@@ -101,6 +101,36 @@ function drawNetLogPanel(x, y, maxW) {
 // 1ʳᵉ tentative reste en STUN seul → timeout fréquent en NAT strict / 4G).
 let turnFetchedAt = 0;
 let turnFetchPromise = null;
+
+/** Sonde rapide : le navigateur arrive-t-il à obtenir un candidat relay ? */
+function probeTurnRelay() {
+  try {
+    if (typeof RTCPeerConnection === "undefined") return;
+    const pc = new RTCPeerConnection({
+      iceServers: ICE_CONFIG.iceServers,
+      iceCandidatePoolSize: 0
+    });
+    let relay = 0;
+    const t0 = typeof performance !== "undefined" ? performance.now() : Date.now();
+    const finish = (tag) => {
+      netLog("TURN probe " + tag, { relay, ms: ((typeof performance !== "undefined" ? performance.now() : Date.now()) - t0) | 0 });
+      try { pc.close(); } catch (e) { /* ignore */ }
+    };
+    pc.addEventListener("icecandidate", ev => {
+      const c = ev.candidate && ev.candidate.candidate;
+      if (c && /\styp relay\b/.test(c)) relay++;
+      if (!ev.candidate) finish(relay ? "OK" : "NO-RELAY");
+    });
+    pc.createDataChannel("sv-probe");
+    pc.createOffer().then(o => pc.setLocalDescription(o)).catch(() => finish("err"));
+    setTimeout(() => {
+      if (pc.signalingState !== "closed") finish(relay ? "partial-OK" : "partial-NO-RELAY");
+    }, 4500);
+  } catch (e) {
+    netLog("TURN probe skip", String(e && e.message || e));
+  }
+}
+
 function refreshTurnCredentials() {
   if (typeof fetch !== "function") return Promise.resolve(false);
   const now = Date.now();
@@ -123,31 +153,47 @@ function refreshTurnCredentials() {
         return false;
       }
       // Un iceServer par URL (meilleure compat WebRTC que urls:[...]).
-      // Si le serveur donne une IP, on ajoute aussi le hostname de la page
-      // (certains NAT/pare-feu résolvent mieux le DNS que l'IP brute).
+      // IMPORTANT : on enregistre chaque URL SANS auth PUIS avec auth.
+      // Coturn prod accepte aujourd'hui les Allocate ouverts ; si le secret
+      // matchmaker ≠ coturn, Chrome n'obtient JAMAIS de candidat relay avec
+      // les credentials seuls (host/srflx only → ICE failed). Le fallback
+      // sans auth débloque le multi ; l'entrée authentifiée restera utile
+      // quand le secret sera aligné.
       const stun = { urls: "stun:stun.l.google.com:19302" };
       const user = String(j.username);
       const cred = String(j.credential);
       const turns = [];
       const seen = Object.create(null);
-      const pushTurn = (u) => {
+      const pushUrl = (u) => {
         const s = String(u);
-        if (!s || seen[s]) return;
-        seen[s] = 1;
-        turns.push({ urls: s, username: user, credential: cred });
+        if (!s) return;
+        if (!seen["open:" + s]) {
+          seen["open:" + s] = 1;
+          turns.push({ urls: s });
+        }
+        if (!seen["auth:" + s]) {
+          seen["auth:" + s] = 1;
+          turns.push({ urls: s, username: user, credential: cred });
+        }
       };
-      j.urls.forEach(pushTurn);
+      j.urls.forEach(pushUrl);
       try {
         const host = (typeof location !== "undefined" && location.hostname) || "";
         if (host && !/^\d+\.\d+\.\d+\.\d+$/.test(host)) {
-          pushTurn("turn:" + host + ":3478?transport=udp");
-          pushTurn("turn:" + host + ":3478?transport=tcp");
+          pushUrl("turn:" + host + ":3478?transport=udp");
+          pushUrl("turn:" + host + ":3478?transport=tcp");
         }
       } catch (e) { /* ignore */ }
+      // Secours PeerJS (si notre coturn est injoignable depuis le client)
+      turns.push({
+        urls: ["turn:eu-0.turn.peerjs.com:3478", "turn:us-0.turn.peerjs.com:3478"],
+        username: "peerjs",
+        credential: "peerjsp"
+      });
       ICE_CONFIG.iceServers = [stun].concat(turns);
-      // Aide certains NAT : pool de candidats avant l'offre
       ICE_CONFIG.iceCandidatePoolSize = 2;
-      netLog("TURN OK", { n: turns.length, urls: j.urls });
+      netLog("TURN OK", { n: turns.length, urls: j.urls, openFallback: true });
+      probeTurnRelay();
       return true;
     })
     .catch(err => {
@@ -453,6 +499,17 @@ function hookIceWatch(c) {
         netLog("ICE cand " + (c.label || "?") + " " + kind);
       }
     });
+    try {
+      const cfg = pc.getConfiguration && pc.getConfiguration();
+      const nTurn = cfg && cfg.iceServers
+        ? cfg.iceServers.filter(s => {
+            const u = s && s.urls;
+            const arr = Array.isArray(u) ? u : [u];
+            return arr.some(x => String(x || "").indexOf("turn:") === 0);
+          }).length
+        : 0;
+      netLog("PC cfg " + (c.label || "?"), { iceServers: cfg && cfg.iceServers && cfg.iceServers.length, turnEntries: nTurn });
+    } catch (e) { /* ignore */ }
     pc.addEventListener("iceconnectionstatechange", () => {
       netLog("ICE " + (c.label || "?"), pc.iceConnectionState);
     });
