@@ -3,13 +3,18 @@
 # (GitHub secret TURN_SECRET). Si les secrets divergent, Chrome n'obtient
 # aucun candidat ICE « relay » et le multi échoue (host/srflx only → failed).
 # Ne PAS committer le secret réel.
+#
+# IMPORTANT : binder l'IP publique (pas seulement lo/docker), sinon le
+# navigateur ne peut pas joindre le TURN.
 
 listening-port=3478
-listening-ip=0.0.0.0
+listening-ip=37.187.139.122
+relay-ip=37.187.139.122
 external-ip=37.187.139.122
 realm=sommet
 server-name=sommet
 fingerprint
+lt-cred-mech
 use-auth-secret
 static-auth-secret=CHANGE_ME
 min-port=49160
@@ -18,14 +23,7 @@ no-multicast-peers
 no-cli
 no-tlsv1
 no-tlsv1_1
-denied-peer-ip=0.0.0.0-0.255.255.255
-denied-peer-ip=10.0.0.0-10.255.255.255
-denied-peer-ip=100.64.0.0-100.127.255.255
-denied-peer-ip=127.0.0.0-127.255.255.255
-denied-peer-ip=169.254.0.0-169.254.255.255
-denied-peer-ip=172.16.0.0-172.31.255.255
-denied-peer-ip=192.168.0.0-192.168.255.255
+stale-nonce=600
 total-quota=100
 user-quota=12
 max-bps=1500000
-stale-nonce=600
