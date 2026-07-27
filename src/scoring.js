@@ -4,8 +4,25 @@
 // ---------- Points / score ----------
 function awardPoint(side, reason) {
   if (state !== "play" && state !== "serve") return;
-  // Tutoriel guidé : pas de point — on renvoie le feed / scénario de l'étape.
+  // Tutoriel guidé : pas de point. Si une frappe réussie est en cours, on laisse
+  // le payoff (balle qui tombe) — pas de re-feed qui coupe la trajectoire.
   if (typeof tutorialPracticeActive === "function" && tutorialPracticeActive()) {
+    if (typeof tutorialHoldPayoff === "function" && tutorialHoldPayoff()) {
+      if (typeof tutorialMarkPayoffSeen === "function") tutorialMarkPayoffSeen();
+      if (typeof tutorialServeLanded !== "undefined") tutorialServeLanded = true;
+      return;
+    }
+    // Atterrissage adverse juste après frappe (pending pas encore posé ce tick)
+    const kind = typeof tutorialStepKind === "function"
+      ? tutorialStepKind(tutorialStep) : "";
+    const strike = kind === "serve" || kind === "receive" || kind === "smash" ||
+      kind === "battle" || kind === "super" || kind === "power";
+    if (strike && side === 0 && typeof tutorialPayoffPending !== "undefined" &&
+        tutorialPayoffPending) {
+      if (typeof tutorialMarkPayoffSeen === "function") tutorialMarkPayoffSeen();
+      if (typeof tutorialServeLanded !== "undefined") tutorialServeLanded = true;
+      return;
+    }
     if (typeof tutorialApplyScenario === "function") tutorialApplyScenario(tutorialStep);
     return;
   }

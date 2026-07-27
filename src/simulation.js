@@ -83,6 +83,16 @@ function stepBattle(inL, inR) {
 
   shake = 14;
   sfxBattleEnd();
+
+  // Tutoriel Smash Battle : succès si le joueur (camp 0) gagne le duel
+  if (typeof tutorialMode !== "undefined" && tutorialMode &&
+      typeof tutorialStepKind === "function" &&
+      tutorialStepKind(typeof tutorialStep !== "undefined" ? tutorialStep : -1) === "battle") {
+    if (winner === 0) {
+      if (typeof tutorialBattleOk !== "undefined") tutorialBattleOk = true;
+      if (typeof tutorialPayoffPending !== "undefined") tutorialPayoffPending = true;
+    }
+  }
 }
 
 // ---------- Simulation ----------
@@ -272,7 +282,8 @@ function localInputs(side) {
   if (paused) {
     return {
       left: false, right: false, jump: false, kbdJump: false,
-      smash: false, super: false, up: false, down: false, ax: 0, ay: 0
+      smash: false, smashX: false, smashY: false, padFace: false,
+      super: false, up: false, down: false, ax: 0, ay: 0
     };
   }
   // 1v1 local à DEUX humains : la manette va au côté assigné (padForSide —
@@ -291,12 +302,16 @@ function localInputs(side) {
   const kbdR = keyHeldPlayer("p2", "left") || keyHeldPlayer("p2", "right") ||
     keyHeldPlayer("p2", "jump") || keyHeldPlayer("p2", "smash") || keyHeldPlayer("p2", "super");
   // Clavier actif sur ce côté → ignore stick (dérive manette branchée).
+  // Manette : X/Y distincts au service (padFace). Clavier : F = les deux.
   const raw = side === 0 ? {
     left:  keyHeldPlayer("p1", "left") || pad.left,
     right: keyHeldPlayer("p1", "right") || pad.right,
     jump:  jl || pad.jump,
     kbdJump: jl,
     smash: keyHeldPlayer("p1", "smash") || !!pad.smash,
+    smashX: kbdL ? keyHeldPlayer("p1", "smash") : !!pad.smashX,
+    smashY: kbdL ? keyHeldPlayer("p1", "smash") : !!pad.smashY,
+    padFace: !kbdL && !!pad.padFace,
     super: keyHeldPlayer("p1", "super") || pad.super,
     up:    kbdL ? false : !!pad.up,
     down:  kbdL ? false : !!pad.down,
@@ -308,12 +323,27 @@ function localInputs(side) {
     jump:  keyHeldPlayer("p2", "jump") || pad.jump,
     kbdJump: keyHeldPlayer("p2", "jump"),
     smash: keyHeldPlayer("p2", "smash") || !!pad.smash,
+    smashX: kbdR ? keyHeldPlayer("p2", "smash") : !!pad.smashX,
+    smashY: kbdR ? keyHeldPlayer("p2", "smash") : !!pad.smashY,
+    padFace: !kbdR && !!pad.padFace,
     super: keyHeldPlayer("p2", "super") || pad.super,
     up:    kbdR ? false : !!pad.up,
     down:  kbdR ? false : !!pad.down,
     ax:    kbdR ? 0 : (pad.ax || 0),
     ay:    kbdR ? 0 : (pad.ay || 0)
   };
+  // Tutoriel manette : forcer X/Y distincts (sinon stick au repos = « clavier »
+  // et X relance un service lobbé au lieu de seulement lancer).
+  if (typeof tutorialMode !== "undefined" && tutorialMode &&
+      typeof tutorialUsesPad === "function" && tutorialUsesPad() && side === 0) {
+    raw.padFace = true;
+    raw.smashX = !!pad.smashX;
+    raw.smashY = !!pad.smashY;
+    raw.smash = !!pad.smash;
+    raw.ax = pad.ax || 0;
+    raw.ay = pad.ay || 0;
+    raw.kbdJump = false;
+  }
   return xInput(side, activeBlobs[side], raw);
 }
 

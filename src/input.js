@@ -212,6 +212,11 @@ if (typeof canvas.addEventListener === "function") { // absent en environnement 
     const code = hitTestIn(menuHitboxesPrev, p.x, p.y);
     if (code) handleMenuKeys(code, "");
   });
+  canvas.addEventListener("wheel", e => {
+    if (typeof state === "undefined" || state !== "rules") return;
+    e.preventDefault();
+    if (typeof rulesScrollBy === "function") rulesScrollBy(e.deltaY > 0 ? 40 : -40);
+  }, { passive: false });
 
   // ---------- Contrôles tactiles (mobile) ----------
   // Pilotent directement `keys{}`, exactement comme le clavier : aucun
@@ -291,7 +296,9 @@ function readPad(gp) {
     left:    rawAx < -PAD_DEADZONE || b(14),
     right:   rawAx >  PAD_DEADZONE || b(15),
     jump:    b(0) || b(12),                             // A / croix-haut
-    smash:   b(2) || b(3),                              // X ou Y → smash
+    smash:   b(2) || b(3),                              // X ou Y → frappe (échange)
+    smashX:  b(2),                                      // X seul — lancer au service
+    smashY:  b(3),                                      // Y seul — frappe au service
     // SUPER : B (prioritaire) + LB/RB + LT/RT — pas Select (réservé menus)
     superT:  b(1) || b(4) || b(5) || t(6) || t(7),
     up:      rawAy < -0.5 || b(12),
@@ -301,7 +308,8 @@ function readPad(gp) {
     // Menus : B retour ; Select aussi. En match, B est lu via superT (pas back).
     back:    b(1) || b(8),
     select:  b(8),          // View/Select — passer étape tutoriel (pas A = saut)
-    start:   b(9)           // Start → menu pause en match
+    start:   b(9),          // Start → menu pause en match
+    padFace: true           // X/Y distincts (service : X lance, Y frappe)
   };
 }
 
@@ -329,15 +337,24 @@ function padEdge(field) {
 function padGameInput(i) {
   const p = padsNow[i];
   return p
-    ? { left: p.left, right: p.right, jump: p.jump, smash: p.smash, super: p.superT, up: p.up, down: p.down, ax: p.ax, ay: p.ay }
-    : { left: false, right: false, jump: false, smash: false, super: false, up: false, down: false, ax: 0, ay: 0 };
+    ? {
+        left: p.left, right: p.right, jump: p.jump, smash: p.smash,
+        smashX: !!p.smashX, smashY: !!p.smashY, padFace: true,
+        super: p.superT, up: p.up, down: p.down, ax: p.ax, ay: p.ay
+      }
+    : {
+        left: false, right: false, jump: false, smash: false,
+        smashX: false, smashY: false, padFace: false,
+        super: false, up: false, down: false, ax: 0, ay: 0
+      };
 }
 
 /** Fusionne toutes les manettes branchées (solo / 2v2 humain / online). */
 function padMergeGameInput() {
   const out = {
-    left: false, right: false, jump: false, smash: false, super: false,
-    up: false, down: false, ax: 0, ay: 0
+    left: false, right: false, jump: false, smash: false,
+    smashX: false, smashY: false, padFace: false,
+    super: false, up: false, down: false, ax: 0, ay: 0
   };
   for (const p of padsNow) {
     if (!p) continue;
@@ -345,6 +362,9 @@ function padMergeGameInput() {
     out.right = out.right || p.right;
     out.jump = out.jump || p.jump;
     out.smash = out.smash || p.smash;
+    out.smashX = out.smashX || !!p.smashX;
+    out.smashY = out.smashY || !!p.smashY;
+    out.padFace = out.padFace || !!p.padFace;
     out.super = out.super || !!p.superT;
     out.up = out.up || p.up;
     out.down = out.down || p.down;
@@ -419,7 +439,7 @@ function navOptions() {
     case "matchmaking":   return ["MmBot", "MmCancel"];
     case "tutorialHelp":  return ["TutBack", "TutPlay"];
     case "selectCharacter": {
-      const vis = characterIndices();
+      const vis = menuCharacterIndices();
       return vis.map((_, slot) => "Digit" + (slot + 1));
     }
     case "selectTerrain": {
@@ -518,7 +538,11 @@ function handlePadMenu() {
       handleMenuKeys(navIdx === 1 ? "TutPlay" : "TutBack", "");
     }
     if (padEdge("back") || padEdge("start")) handleMenuKeys("TutBack", "");
-  } else if (state === "rules" || state === "netError" || state === "credits") {
+  } else if (state === "rules") {
+    if (padEdge("up")) { rulesScrollBy(-36); }
+    if (padEdge("down")) { rulesScrollBy(36); }
+    if (padEdge("confirm") || padEdge("back")) handleMenuKeys("Escape", "");
+  } else if (state === "netError" || state === "credits") {
     if (padEdge("confirm") || padEdge("back")) handleMenuKeys("Escape", "");
   } else if (paused && (state === "serve" || state === "play" || state === "point")) {
     if (padEdge("up")) {

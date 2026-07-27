@@ -1850,32 +1850,55 @@ function drawBombHUD() {
 }
 
 /**
- * Tutoriel : libellés sur le camp gauche.
- * ●●● = touches (faute à 4) · orange = Super Smash · or = SUPER perso.
+ * Tutoriel : légende compacte (étape « Score & barres » seulement).
+ * Dans la bande score — jamais sur le terrain (évite pigeon / pieds).
  */
 function drawTutorialHudLegend(SANS, STROKE, py, ph) {
-  const cx = W * 0.22;
-  const bw = 100, bx = cx - bw / 2;
-  const bySuper = py + ph - 12;   // barre or (SUPER)
-  const byPower = bySuper - 8;    // barre orange (Super Smash)
-  const touchY = GROUND_Y + 8;
+  if (typeof tutorialStepKind !== "function" || typeof tutorialStep === "undefined") return;
+  if (tutorialStepKind(tutorialStep) !== "hud") return;
+
+  const panelW = 156, panelH = Math.min(56, ph - 4);
+  // Entre pastille gauche et coach central
+  const panelX = Math.min(W * 0.22 + 72, NET_X - panelW - 10);
+  const panelY = py + (ph - panelH) / 2;
+
   ctx.save();
-  ctx.font = "800 9px " + SANS;
+  ctx.fillStyle = "rgba(12,20,42,0.94)";
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(panelX, panelY, panelW, panelH, 8);
+  else ctx.rect(panelX, panelY, panelW, panelH);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,216,74,0.55)";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.font = "700 10px " + SANS;
   ctx.textAlign = "left";
-  ctx.lineWidth = 2.5;
-  ctx.lineJoin = "round";
-  const label = (txt, x, y, col) => {
-    ctx.strokeStyle = "rgba(12,20,42,0.85)";
-    ctx.strokeText(txt, x, y);
-    ctx.fillStyle = col;
-    ctx.fillText(txt, x, y);
-  };
-  // Pastilles touches — à droite des 3 points
-  label("touches", cx + 30, touchY + 3, "rgba(255,246,232,0.92)");
-  // Barre orange
-  label("Super Smash", bx + bw + 6, byPower + 4, "#ff8a4a");
-  // Barre or
-  label("SUPER", bx + bw + 6, bySuper + 5, "#ffd84a");
+  const rows = [
+    { sw: null, dots: true, txt: "touches (max " + MAX_TOUCHES + ")", col: "rgba(255,246,232,0.92)" },
+    { sw: "#ff8a4a", txt: "Super Smash", col: "#ff8a4a" },
+    { sw: "#ffd84a", txt: "SUPER perso", col: "#ffd84a" }
+  ];
+  let y = panelY + 14;
+  for (const r of rows) {
+    const ix = panelX + 8;
+    if (r.dots) {
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.arc(ix + 4 + i * 9, y - 3, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = i === 0 ? "#5b8def" : "rgba(255,255,255,0.25)";
+        ctx.fill();
+      }
+      ctx.fillStyle = r.col;
+      ctx.fillText(r.txt, ix + 34, y);
+    } else {
+      ctx.fillStyle = r.sw;
+      ctx.fillRect(ix, y - 8, 12, 5);
+      ctx.fillStyle = r.col;
+      ctx.fillText(r.txt, ix + 18, y);
+    }
+    y += 15;
+  }
   ctx.restore();
 }
 
@@ -1913,7 +1936,7 @@ function drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph) {
     title = superFlash;
     sub = superFlashSub || "";
     fill = /SUPER SMASH/i.test(superFlash) ? "#ff6a2a" : "#ffd84a";
-    alpha = Math.min(1, superFlashT / 36);
+    alpha = Math.min(1, superFlashT / 60); // fade sur ~1 s en fin d'affichage
   } else if (powerWindup) {
     title = "SUPER SMASH";
     sub = "Dose… " + Math.round((powerWindup.charge || 0) * 100) + "%";
@@ -1924,7 +1947,8 @@ function drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph) {
       if (typeof powerGauge !== "undefined" && typeof POWER_GAUGE_MAX !== "undefined" &&
           (powerGauge[s] | 0) >= POWER_GAUGE_MAX) {
         title = "Super Smash prêt — " + sideLabel(s);
-        sub = "Smash aérien [[K:F]] / [[X:Y]] : dose puis relâche";
+        // Touches collées sur UNE ligne (pas de wrap entre F et Y)
+        sub = "Smash aérien  [[K:F]] / [[X:Y]]  ·  dose puis relâche";
         fill = "#ff6a2a";
         break;
       }
@@ -1938,22 +1962,29 @@ function drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph) {
     }
     if (!title && state === "serve") {
       title = "Service : " + sideLabel(servingSide);
-      sub = "[[K:F]] / [[X:X]] lancer, puis saute et [[X:Y]] frappe";
+      sub = "[[K:F]] / [[X:X]] lancer → saute / [[X:Y]]";
       fill = "#ffcc00";
     }
   }
 
   if (!title) return false;
 
-  const boxW = Math.min(340, W * 0.36);
-  const textW = boxW - 20;
   const titleFont = "700 13px " + DISP;
   const subFont = "700 10px " + SANS;
-  const titleLines = wrapLines(title, textW, titleFont);
   const subHasMarkup = sub.indexOf("[[") >= 0;
+  // Mesurer le markup d'abord pour élargir la boîte si besoin (garde F / Y sur 1 ligne)
+  let subMarkupW = 0;
+  if (subHasMarkup && typeof measureControlMarkup === "function") {
+    ctx.save();
+    subMarkupW = measureControlMarkup(sub, 10);
+    ctx.restore();
+  }
+  const boxW = Math.min(Math.max(340, subMarkupW + 28), W * 0.52);
+  const textW = boxW - 20;
+  const titleLines = wrapLines(title, textW, titleFont);
   const subPlain = subHasMarkup ? sub.replace(/\[\[[KkXx]:([^\]]+)\]\]/g, "$1") : sub;
   const subLines = subHasMarkup ? [] : wrapLines(subPlain, textW, subFont);
-  const subExtra = subHasMarkup ? 16 : (subLines.length ? 2 + subLines.length * 12 : 0);
+  const subExtra = subHasMarkup ? 18 : (subLines.length ? 2 + subLines.length * 12 : 0);
   const boxH = Math.min(ph - 4, 18 + titleLines.length * 14 + subExtra);
   const bx = NET_X - boxW / 2;
   const by = py + Math.max(2, (ph - boxH) / 2);
@@ -1983,7 +2014,9 @@ function drawHudInfoBetweenScores(DISP, SANS, STROKE, py, ph) {
   if (subHasMarkup && typeof drawControlMarkup === "function") {
     ty += 2;
     ctx.globalAlpha = alpha;
-    drawControlMarkup(bx + 10, ty, sub, textW, 10);
+    // Une seule ligne centrée : maxW = largeur mesurée → pas de wrap entre les touches
+    const mw = subMarkupW || measureControlMarkup(sub, 10);
+    drawControlMarkup(NET_X - mw / 2, ty, sub, mw + 2, 10);
   } else if (subLines.length) {
     ty += 2;
     ctx.font = subFont;
@@ -2055,14 +2088,15 @@ function drawHUD() {
     ctx.fillText(String(scores[s]), cx, py + 40);
     if (scorePop[s] > 0) scorePop[s]--;
   }
-  // touches (pastilles) dans la bande score, sous la ligne de terrain
+  // touches (pastilles) — bande score, juste sous la ligne de fond (pas dans le sable)
   // = compteur de contacts (max MAX_TOUCHES), PAS une jauge de pouvoir
   for (const side of [0, 1]) {
     const baseX = side === 0 ? W * 0.22 - 24 : W * 0.78 - 24;
+    const touchY = GROUND_Y + 8;
     for (let i = 0; i < MAX_TOUCHES; i++) {
       const on = i < ball.touches[side];
       ctx.beginPath();
-      ctx.arc(baseX + i * 24, GROUND_Y + 8, 5, 0, Math.PI * 2);
+      ctx.arc(baseX + i * 24, touchY, 5, 0, Math.PI * 2);
       ctx.fillStyle = on ? sideColor(side) : "rgba(255,255,255,0.2)";
       ctx.fill();
       ctx.strokeStyle = STROKE; ctx.lineWidth = 1.5; ctx.stroke();
@@ -2112,11 +2146,8 @@ function drawHUD() {
     }
   }
 
-  // Tutoriel : légendes sur le camp joueur pour lever l'ambiguïté des 3 éléments
-  if (typeof tutorialMode !== "undefined" && tutorialMode &&
-      (state === "serve" || state === "play")) {
-    drawTutorialHudLegend(SANS, STROKE, py, ph);
-  }
+  // Pas de panneau légende à côté du coach (superposition). L'étape HUD
+  // explique déjà les 3 éléments dans le bandeau central.
 
   // Infos de match (SUPER, event map, balle de match, service) entre les 2 scores.
   // Pendant le tutoriel : le coach occupe ce créneau (évite superposition Service/tuto).

@@ -18,9 +18,130 @@ function charFramePath(key, anim, n) {
   return "assets/" + key + "/" + anim + "_" + n + ".png";
 }
 
+function charVideoPath(key, file) {
+  const v = (typeof GAME_VERSION === "string" && GAME_VERSION) ? GAME_VERSION : "dev";
+  const base = "assets/" + key + "/" + file;
+  return base + (base.indexOf("?") >= 0 ? "&" : "?") + "v=" + encodeURIComponent(v);
+}
+
+/** WebM VP9+alpha OK dans Chromium ; sinon on garde les PNG. */
+function charVideosSupported() {
+  if (typeof document === "undefined" || typeof document.createElement !== "function")
+    return false;
+  const probe = document.createElement("video");
+  if (!probe || typeof probe.canPlayType !== "function") return false;
+  const ok = probe.canPlayType('video/webm; codecs="vp9"') ||
+    probe.canPlayType("video/webm");
+  return !!ok && ok !== "no";
+}
+
+function loadCharVideos(key, pack, videos) {
+  if (!videos || !charVideosSupported()) return;
+  pack.videos = {};
+  for (const anim of Object.keys(videos)) {
+    const file = videos[anim];
+    if (!file) continue;
+    const vid = document.createElement("video");
+    vid.muted = true;
+    vid.loop = true;
+    vid.playsInline = true;
+    vid.preload = "auto";
+    vid.setAttribute("muted", "");
+    vid.setAttribute("playsinline", "");
+    vid.src = charVideoPath(key, file);
+    try { vid.load(); } catch (_) { /* ignore */ }
+    pack.videos[anim] = vid;
+  }
+}
+
+function charVideoReady(key, anim) {
+  const p = charPack(key);
+  if (!p || !p.videos) return false;
+  const vid = p.videos[anim];
+  return !!(vid && vid.readyState >= 2 && vid.videoWidth > 0);
+}
+
+function charWalkSpeed(b) {
+  if (!b) return 0;
+  const a = typeof charOf === "function" ? charOf(b) : null;
+  const disp = (a && a.slip && typeof b.dispVx === "number") ? b.dispVx : (b.vx || 0);
+  const raw = Math.abs(disp);
+  if (a && a.slip) return Math.max(raw, Math.abs(b.vx || 0) * 0.85);
+  return raw;
+}
+
+/** playbackRate walk vidéo : lent → marche, rapide → course. */
+function charWalkPlaybackRate(b) {
+  const spd = charWalkSpeed(b);
+  const a = typeof charOf === "function" ? charOf(b) : null;
+  const kit = (b && b.kitSpeed != null) ? b.kitSpeed : ((a && a.speed) || 1);
+  const maxSp = (typeof BLOB_SPEED === "number" ? BLOB_SPEED : 5.2) * kit;
+  const t = maxSp > 0.01 ? Math.max(0, Math.min(1, spd / maxSp)) : 0;
+  // ~0.6 (presque à l'arrêt) → ~2.35 (plein gaz)
+  return 0.6 + t * 1.75;
+}
+
+/** Lance la vidéo d'anim active ; pause + rewind les autres du pack. */
+function charSyncAnimVideo(key, activeAnim, blob) {
+  const p = charPack(key);
+  if (!p || !p.videos) return null;
+  let active = null;
+  const switched = p._videoAnim !== activeAnim;
+  p._videoAnim = activeAnim || null;
+  const walkIntro = (p.manifest && +p.manifest.walkIntroSec) || 0;
+  for (const anim of Object.keys(p.videos)) {
+    const vid = p.videos[anim];
+    if (!vid) continue;
+    if (anim === activeAnim && charVideoReady(key, anim)) {
+      active = vid;
+      // Course : rythme = vitesse du perso (marche lente ↔ sprint)
+      try {
+        vid.playbackRate = (anim === "walk")
+          ? charWalkPlaybackRate(blob)
+          : 1;
+      } catch (_) { /* ignore */ }
+      // Dorf etc. : walk.webm = intro (ex. idle 0–2s) + course ; boucle après l'intro
+      if (anim === "walk" && walkIntro > 0 && !vid._walkIntroHooked) {
+        vid._walkIntroHooked = true;
+        vid.addEventListener("timeupdate", () => {
+          if (p._videoAnim !== "walk") return;
+          // Après une vraie boucle HTML5 (retour à ~0), sauter l'intro
+          if (p._walkPastIntro && vid.currentTime < 0.12) {
+            try { vid.currentTime = walkIntro; } catch (_) { /* ignore */ }
+          }
+          if (vid.currentTime >= walkIntro) p._walkPastIntro = true;
+        });
+      }
+      if (switched) {
+        p._walkPastIntro = false;
+        try { vid.currentTime = 0; } catch (_) { /* ignore */ }
+      }
+      if (vid.paused) {
+        try {
+          const playP = vid.play();
+          if (playP && typeof playP.catch === "function") playP.catch(() => {});
+        } catch (_) { /* autoplay policy */ }
+      }
+    } else if (!vid.paused || vid.currentTime > 0) {
+      try { vid.pause(); } catch (_) { /* ignore */ }
+      try { vid.currentTime = 0; } catch (_) { /* ignore */ }
+    }
+  }
+  return active;
+}
+
+/** @deprecated alias */
+function charSyncCelebVideo(key, activeAnim) {
+  return charSyncAnimVideo(key, activeAnim);
+}
+
 function loadCharSprites(key, manifest) {
   const anims = (manifest && manifest.anims) || CHAR_ANIM_DEFAULTS;
-  const pack = { manifest: manifest || { baseH: CHAR_BASE_H, footPad: 2 }, frames: {} };
+  const pack = {
+    manifest: manifest || { baseH: CHAR_BASE_H, footPad: 2 },
+    frames: {},
+    videos: null
+  };
   for (const anim of Object.keys(anims)) {
     const n = anims[anim] | 0;
     pack.frames[anim] = [];
@@ -28,6 +149,7 @@ function loadCharSprites(key, manifest) {
       pack.frames[anim].push(loadSprite(charFramePath(key, anim, i)));
     }
   }
+  if (manifest && manifest.videos) loadCharVideos(key, pack, manifest.videos);
   SPRITES.chars[key] = pack;
   return pack;
 }
@@ -94,8 +216,12 @@ function charPickAnim(b) {
 
   // Décor de menu : uniquement marche (sol) ou saut (air) — pas de slip / idle en glisse.
   if (b._menuActor) {
-    if (!b.onGround && charAnimReady(key, "jump")) return "jump";
-    if (b.onGround && charAnimReady(key, "walk")) return "walk";
+    if (!b.onGround) {
+      if (charAnimReady(key, "jump")) return "jump";
+      if (charAnimReady(key, "idle")) return "idle";
+      return null;
+    }
+    if (charAnimReady(key, "walk")) return "walk";
     if (charAnimReady(key, "idle")) return "idle";
     if (charAnimReady(key, "idle_face")) return "idle_face";
     return null;
@@ -128,18 +254,22 @@ function charPickAnim(b) {
   const held = typeof ball !== "undefined" && ball.heldBy >= 0 &&
     activeBlobs[ball.heldBy] === b;
   if (b.superT > 0 && charAnimReady(key, "super")) return "super";
-  if (!b.onGround && charAnimReady(key, "jump")) return "jump";
+  if (!b.onGround) {
+    // Jamais de marche en l'air (évite « course dans le vide » si jump pas prêt)
+    if (charAnimReady(key, "jump")) return "jump";
+    if (charAnimReady(key, "idle")) return "idle";
+    return null;
+  }
   if (held && charAnimReady(key, "aim")) return "aim";
   if (typeof ball !== "undefined" && !ball.frozen && !ball.inHands &&
-      Math.hypot(ball.x - b.x, ball.y - (b.y - 64)) < RECEIVE_R + 10 &&
+      Math.hypot(ball.x - b.x, ball.y - (b.y - 46)) < RECEIVE_R + 10 &&
       charAnimReady(key, "receive")) {
     return "receive";
   }
   if (charWantPanic(b) && charAnimReady(key, "panic")) return "panic";
   // Marche avec hystérésis collante — évite idle↔walk qui clignote.
+  const spd = charWalkSpeed(b);
   const a = charOf(b);
-  const disp = (a.slip && typeof b.dispVx === "number") ? b.dispVx : (b.vx || 0);
-  const spd = Math.max(Math.abs(disp), a.slip ? Math.abs(b.vx || 0) * 0.85 : 0);
   const enter = a.slip ? 0.30 : 0.55;
   const exit = a.slip ? 0.06 : 0.15;
   if (b._walking) {
@@ -226,8 +356,23 @@ function drawSpriteChar(b) {
   if (!charAnyReady(key)) return false;
   const anim = charPickAnim(b);
   if (!anim) return false;
-  const img = charPickFrame(b, anim);
-  if (!spriteReady(img)) return false;
+
+  // WebM VP9+alpha si dispo (Cygne), sinon PNG.
+  let media = null;
+  let mw = 0, mh = 0;
+  if (charVideoReady(key, anim)) {
+    media = charSyncAnimVideo(key, anim, b);
+    if (media) { mw = media.videoWidth; mh = media.videoHeight; }
+  } else {
+    charSyncAnimVideo(key, null);
+  }
+  if (!media) {
+    const img = charPickFrame(b, anim);
+    if (!spriteReady(img)) return false;
+    media = img;
+    mw = img.naturalWidth;
+    mh = img.naturalHeight;
+  }
 
   const pack = charPack(key);
   const baseH = (pack.manifest && pack.manifest.baseH) || CHAR_BASE_H;
@@ -239,15 +384,15 @@ function drawSpriteChar(b) {
   const h = baseH * (b.squash > 0 ? 1 - b.squash * 0.02 : 1);
   // Largeur stable (évite le « pulse » quand les PNG walk ont des largeurs différentes)
   const lockAsp = pack.manifest && pack.manifest.lockAspect;
-  const aspect = lockAsp || (img.naturalWidth / img.naturalHeight);
+  const aspect = lockAsp || (mw / mh);
   const w = h * aspect * scaleX;
 
   ctx.save();
   ctx.translate(b.x, footY);
   if (!faceRight) ctx.scale(-1, 1);
-  const natW = h * (img.naturalWidth / img.naturalHeight) * scaleX;
+  const natW = h * (mw / mh) * scaleX;
   const ox = -w / 2 + (w - natW) / 2;
-  ctx.drawImage(img, ox, -h + footPad, natW, h);
+  ctx.drawImage(media, ox, -h + footPad, natW, h);
   ctx.restore();
   return true;
 }

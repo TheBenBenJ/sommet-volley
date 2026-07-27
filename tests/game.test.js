@@ -444,7 +444,7 @@ test("V2 : balle rapide + smash touche malgré la vitesse", () => {
   g.blobR.x = 650; g.blobR.y = g.consts.GROUND_Y; g.blobR.onGround = true;
   g.blobR.lastActiveHitTick = -999;
   // Segment du tick croise encore la tête malgré vx élevé (anti-tunnel)
-  g.ball.x = 610; g.ball.y = g.blobR.y - 64; g.ball.vx = 14; g.ball.vy = 1;
+  g.ball.x = 610; g.ball.y = g.blobR.y - 46; g.ball.vx = 14; g.ball.vy = 1;
   g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
   g.ball.serveAimLock = false;
   g.ball.lastTouchSide = 0; g.ball.lastTouchTick = -999; g.ball.touches = [1, 0];
@@ -568,36 +568,39 @@ test("IA : speedMul reste 1 (pas de buff vitesse selon la difficulté)", () => {
   assert.strictEqual(g.blob2L.speedMul, 1, "2v2 coéquipier");
 });
 
-test("IA : le niveau Impitoyable bat un adversaire scripté moyen", () => {
+test("IA : profil compétent bat un adversaire scripté moyen (garde-fou placement)", () => {
   const NET_X = 450; // W/2
   const g = loadGame();
-  // Garde-fou placement IA écrit pour la physique V1 (bounce passif).
+  // Garde-fou placement IA (physique V1). Le profil JEU Impitoyable est volontairement
+  // plus faible / bruité — on utilise ici un profil dédié « compétent ».
   g.setGameplayV2(false);
-  g.setVsAI(true); g.setAiLevel(3); // Impitoyable (IA = joueur droit)
-  g.newGame(3); // seed où Impitoyable (grille assouplie) bat encore le bot moyen
-  // adversaire GAUCHE piloté par un bot « moyen » : se met sous la balle, sert,
-  // saute pour renvoyer. Sert de garde-fou : si l'IA se remet à rater ses renvois
-  // (ex. bug de placement hors du rayon de frappe), elle ne gagnera plus.
-  function driveLeft() {
-    const me = g.blobL, b = g.ball, serving = g.getServing?.() === 0;
-    let target = me.x;
-    if (b.frozen) target = b.x;
-    else if (b.x < NET_X + 40) target = Math.min(b.x, NET_X - 45);
-    const dx = target - me.x;
-    g.keys.KeyA = dx < -6; g.keys.KeyD = dx > 6;
-    const close = Math.abs(b.x - me.x) < 46 && b.y < me.y - 34 && b.y > me.y - 150;
-    g.keys.KeyW = (!b.frozen && b.x < NET_X && close && me.onGround) ||
-                  (b.frozen && Math.abs(b.x - me.x) < 20 && me.onGround);
-    // Gameplay V2 : se placer sous la balle (contact = cloche) ; F = smash parfois
-    if (!b.frozen && b.x < NET_X && Math.hypot(b.x - me.x, b.y - (me.y - 64)) < 70) {
-      g.keys.KeyD = b.x > me.x + 6; g.keys.KeyA = b.x < me.x - 6;
+  g.setVsAI(true); g.setAiLevel(3);
+  const levels = g.AI_LEVELS;
+  const prev = levels[3];
+  levels[3] = { name: "Guard", err: 36, rush: 0.04, attack: 10, react: 0.62, dbl: false, aim: 0 };
+  try {
+    g.newGame(3);
+    function driveLeft() {
+      const me = g.blobL, b = g.ball;
+      let target = me.x;
+      if (b.frozen) target = b.x;
+      else if (b.x < NET_X + 40) target = Math.min(b.x, NET_X - 45);
+      const dx = target - me.x;
+      g.keys.KeyA = dx < -6; g.keys.KeyD = dx > 6;
+      const close = Math.abs(b.x - me.x) < 46 && b.y < me.y - 34 && b.y > me.y - 150;
+      g.keys.KeyW = (!b.frozen && b.x < NET_X && close && me.onGround) ||
+                    (b.frozen && Math.abs(b.x - me.x) < 20 && me.onGround);
+      if (!b.frozen && b.x < NET_X && Math.hypot(b.x - me.x, b.y - (me.y - 64)) < 70) {
+        g.keys.KeyD = b.x > me.x + 6; g.keys.KeyA = b.x < me.x - 6;
+      }
     }
+    for (let f = 0; f < 300000 && g.getState() !== "gameover"; f++) { driveLeft(); g.update(); }
+    assert.strictEqual(g.getState(), "gameover", "le match doit se terminer");
+    assert.ok(g.scores[1] > g.scores[0],
+      "l'IA compétente (" + g.scores[1] + ") doit battre le bot (" + g.scores[0] + ")");
+  } finally {
+    levels[3] = prev;
   }
-  let f = 0;
-  for (; f < 300000 && g.getState() !== "gameover"; f++) { driveLeft(); g.update(); }
-  assert.strictEqual(g.getState(), "gameover", "le match doit se terminer");
-  assert.ok(g.scores[1] > g.scores[0],
-    "l'IA Impitoyable (" + g.scores[1] + ") doit battre le bot (" + g.scores[0] + ")");
 });
 
 test("bombe : fonctionne en 2v2 (mèche à zéro → point à l'autre équipe)", () => {
@@ -897,7 +900,7 @@ test("V2 : smash/X au sol = cloche dirigée", () => {
   const g = freshRally(42);
   assert.ok(g.getGameplayV2(), "Gameplay V2 actif par défaut");
   g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y; g.blobL.onGround = true;
-  g.ball.x = 250; g.ball.y = g.blobL.y - 64; g.ball.vx = 0; g.ball.vy = 0;
+  g.ball.x = 250; g.ball.y = g.blobL.y - 46; g.ball.vx = 0; g.ball.vy = 0;
   g.ball.inHands = false; g.ball.tossGrace = 0;
   g.stepGame({ ...N0, smash:true }, N0);
   assert.strictEqual(g.ball.heldBy, -1, "pas de phase de contrôle");
@@ -908,6 +911,9 @@ test("V2 : smash/X au sol = cloche dirigée", () => {
   assert.strictEqual(g.ball.slowMo, 0, "pas de ralenti");
   assert.strictEqual(g.blobL.poseAnim, "receive", "pose réception après cloche");
   assert.ok(g.blobL.poseT >= 35, "réception tenue assez longtemps (poseT=" + g.blobL.poseT + ")");
+  // Contact ancré au milieu du corps (pas sur le crâne y-64)
+  assert.ok(g.ball.y > g.blobL.y - 58, "balle sous la tête après dig (y=" + g.ball.y + ")");
+  assert.ok(g.ball.y < g.blobL.y - 20, "balle au-dessus du sol (y=" + g.ball.y + ")");
 });
 
 test("2v2 : coéquipiers empilés → une seule réception (pas de téléport)", () => {
@@ -924,7 +930,7 @@ test("2v2 : coéquipiers empilés → une seule réception (pas de téléport)",
   g.blob2L.x = 258; g.blob2L.y = gy; g.blob2L.onGround = true;
   g.blob2L.vx = 0; g.blob2L.vy = 0;
   g.blobR.x = 750; g.blob2R.x = 700;
-  g.ball.x = 254; g.ball.y = gy - 64; g.ball.vx = 0; g.ball.vy = 2;
+  g.ball.x = 254; g.ball.y = gy - 46; g.ball.vx = 0; g.ball.vy = 2;
   g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
   g.ball.serveAimLock = false; g.ball.serveFlight = false;
   g.ball.lastTouchSide = 1; // échange, pas service
@@ -958,7 +964,7 @@ test("2v2 : alternance — après touche, ghost ne peut plus digger (allié oui)
   g.blobL.lastActiveHitTick = -999;
   g.blob2L.lastActiveHitTick = -999;
   // 1) blobL dig
-  g.ball.x = 220; g.ball.y = gy - 64; g.ball.vx = 0; g.ball.vy = 2;
+  g.ball.x = 220; g.ball.y = gy - 46; g.ball.vx = 0; g.ball.vy = 2;
   g.stepGame(null, null, [{ ...N0, smash: true }, N0, N0, N0]);
   assert.strictEqual(g.ball.touches[0], 1, "1ère touche blobL");
   assert.strictEqual(g.ball.nextToucher[0], 1, "prochain = blob2L (idx 1)");
@@ -974,7 +980,7 @@ test("2v2 : alternance — après touche, ghost ne peut plus digger (allié oui)
   g.blobL.lastActiveHitTick = -999;
   g.blob2L.lastActiveHitTick = -999;
   g.setTick(g.getTick() + 20); // hors cooldown touche
-  g.ball.x = g.blobL.x; g.ball.y = gy - 64; g.ball.vx = 0; g.ball.vy = 2;
+  g.ball.x = g.blobL.x; g.ball.y = gy - 46; g.ball.vx = 0; g.ball.vy = 2;
   g.ball.lastHitTick = -999;
   g.ball.lastTouchSide = 0; // toujours notre camp
   const tGhost = g.ball.touches[0];
@@ -982,7 +988,7 @@ test("2v2 : alternance — après touche, ghost ne peut plus digger (allié oui)
   assert.strictEqual(g.ball.touches[0], tGhost, "ghost n'augmente pas les touches");
   // 4) allié dig → touche 2, rôles inversés
   g.blob2L.lastActiveHitTick = -999;
-  g.ball.x = g.blob2L.x; g.ball.y = gy - 64; g.ball.vx = 0; g.ball.vy = 2;
+  g.ball.x = g.blob2L.x; g.ball.y = gy - 46; g.ball.vx = 0; g.ball.vy = 2;
   g.ball.lastHitTick = -999;
   g.stepGame(null, null, [N0, { ...N0, smash: true }, N0, N0]);
   assert.strictEqual(g.ball.touches[0], 2, "2ᵉ touche = allié");
@@ -1034,7 +1040,7 @@ test("V2 : smash dirigé sans ralenti", () => {
   const g = freshRally(45);
   g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y - 80;
   g.blobL.onGround = false; g.blobL.vy = -2;
-  g.ball.x = 250; g.ball.y = g.blobL.y - 70; g.ball.vx = 0; g.ball.vy = 1;
+  g.ball.x = 250; g.ball.y = g.blobL.y - 46; g.ball.vx = 0; g.ball.vy = 1;
   g.stepGame({ ...N0, smash:true, ax:0.8, ay:0.5 }, N0);
   assert.strictEqual(g.ball.heldBy, -1, "smash ne fige pas la balle");
   assert.ok(g.ball.vx > 0, "smash vers l'adversaire");
@@ -1045,7 +1051,7 @@ test("V2 : smash dirigé sans ralenti", () => {
 test("V2 : snapshots round-trip (heldBy reste -1)", () => {
   const g = freshRally(46);
   g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y;
-  g.ball.x = 250; g.ball.y = g.blobL.y - 64;
+  g.ball.x = 250; g.ball.y = g.blobL.y - 46;
   g.ball.inHands = false; g.ball.tossGrace = 0;
   g.stepGame({ ...N0, smash:true }, N0); // X = cloche
   const s1 = g.getSnapshot();
@@ -1220,36 +1226,75 @@ test("V2 : service — X manette maintenu après lancer ne sert pas tout seul", 
   g.setState("serve"); g.setServeCountdown(0);
   g.setServingSide(0);
   g.ball.reset(0);
-  // Stick légèrement poussé = style manette (pas clavier)
-  const pad = { ...N0, smash:true, ax: 0.4, ay: -0.2 };
-  g.stepGame(pad, N0);
+  // Manette : X/Y distincts (padFace)
+  const padX = {
+    ...N0, smash: true, smashX: true, smashY: false, padFace: true, ax: 0.4, ay: -0.2
+  };
+  g.stepGame(padX, N0);
   assert.strictEqual(g.ball.inHands, false, "X lance");
   assert.strictEqual(g.blobL._serveAwaitRelease, true, "attente relâchement");
-  // Place la balle à portée tout de suite, X toujours maintenu
   g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y; g.blobL.onGround = true;
   g.blobL.lastActiveHitTick = -999;
   g.ball.x = 250; g.ball.y = g.blobL.y - 64; g.ball.vx = 0; g.ball.vy = 2;
   g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
   g.ball.serveAimLock = true;
-  g.stepGame(pad, N0);
+  g.stepGame(padX, N0);
   assert.strictEqual(g.ball.serveAimLock, true, "maintenir X ne sert pas");
   assert.strictEqual(g.ball.touches[0], 0, "pas de touche");
-  // Relâche
-  g.stepGame({ ...N0, ax: 0.4, ay: -0.2 }, N0);
+  g.stepGame({ ...N0, padFace: true, ax: 0.4, ay: -0.2 }, N0);
   assert.strictEqual(g.blobL._serveAwaitRelease, false, "relâché");
-  // Nouvel appui au sol → toujours refusé
+  // X au sol → toujours refusé
   g.blobL.lastActiveHitTick = -999;
   g.ball.y = g.blobL.y - 64; g.ball.vy = 2; g.ball.serveAimLock = true;
-  g.stepGame({ ...N0, smash:true, ax: 0.4, ay: -0.2 }, N0);
+  g.stepGame(padX, N0);
   assert.strictEqual(g.ball.serveAimLock, true, "X au sol ne sert pas");
-  // Relâche puis en l'air + X → sert
-  g.stepGame({ ...N0, ax: 0.4, ay: -0.2 }, N0);
+  // En l'air + X → ne sert PAS (il faut Y)
+  g.stepGame({ ...N0, padFace: true, ax: 0.4, ay: -0.2 }, N0);
   g.blobL.y = g.consts.GROUND_Y - 70; g.blobL.onGround = false;
   g.blobL.lastActiveHitTick = -999;
   g.ball.y = g.blobL.y - 50; g.ball.vy = 2; g.ball.serveAimLock = true;
-  g.stepGame({ ...N0, smash:true, ax: 0.4, ay: -0.2 }, N0);
-  assert.strictEqual(g.ball.serveAimLock, false, "X en l'air sert");
+  g.stepGame(padX, N0);
+  assert.strictEqual(g.ball.serveAimLock, true, "X en l'air ≠ frappe");
+  // Y en l'air → sert (smash, pas lob forcé)
+  g.blobL.lastActiveHitTick = -999;
+  g.ball.y = g.blobL.y - 50; g.ball.vy = 2; g.ball.serveAimLock = true;
+  const padY = {
+    ...N0, smash: true, smashX: false, smashY: true, padFace: true, ax: 0.4, ay: -0.2
+  };
+  g.stepGame(padY, N0);
+  assert.strictEqual(g.ball.serveAimLock, false, "Y en l'air sert");
   assert.ok(g.ball.vx > 0, "vers l'adversaire");
+});
+
+test("V2 : service manette — Y lance pas, X frappe pas", () => {
+  const g = loadGame();
+  g.setVsAI(true); g.setAiLevel(1);
+  g.newGame(63);
+  g.setState("serve"); g.setServeCountdown(0);
+  g.setServingSide(0);
+  g.ball.reset(0);
+  const base = { ...N0, padFace: true, ax: 0.5, ay: 0 };
+  // Y seul pendant les mains → pas de lancer
+  g.stepGame({ ...base, smash: true, smashY: true }, N0);
+  assert.ok(g.ball.inHands && g.ball.frozen, "Y ne lance pas");
+  // X → lance
+  g.stepGame({ ...base, smash: true, smashX: true }, N0);
+  assert.ok(!g.ball.inHands, "X lance");
+  g.stepGame(base, N0); // relâche
+  // Après lancer : X en l'air ne frappe pas
+  g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y - 80; g.blobL.onGround = false;
+  g.blobL.lastActiveHitTick = -999;
+  g.ball.x = 250; g.ball.y = g.blobL.y - 48; g.ball.vx = 0; g.ball.vy = 1;
+  g.ball.frozen = false; g.ball.tossGrace = 0; g.ball.serveAimLock = true;
+  g.stepGame({ ...base, smash: true, smashX: true }, N0);
+  assert.strictEqual(g.ball.serveAimLock, true, "X ne frappe pas au service");
+  assert.strictEqual(g.ball.touches[0], 0);
+  // Y en l'air frappe en smash (vx soutenu)
+  g.blobL.lastActiveHitTick = -999;
+  g.ball.y = g.blobL.y - 48; g.ball.serveAimLock = true;
+  g.stepGame({ ...base, smash: true, smashY: true }, N0);
+  assert.strictEqual(g.ball.serveAimLock, false, "Y frappe");
+  assert.ok(g.ball.vx > 3, "smash de service, pas lob mou");
 });
 
 test("V2 : service — double-tap X pendant la grâce ne sert pas tout seul", () => {
@@ -1259,32 +1304,38 @@ test("V2 : service — double-tap X pendant la grâce ne sert pas tout seul", ()
   g.setState("serve"); g.setServeCountdown(0);
   g.setServingSide(0);
   g.ball.reset(0);
-  const pad = { ...N0, smash:true, ax: 0.4, ay: -0.2 };
-  // 1er X = lancer
-  g.stepGame(pad, N0);
+  const padX = {
+    ...N0, smash: true, smashX: true, smashY: false, padFace: true, ax: 0.4, ay: -0.2
+  };
+  const idle = { ...N0, padFace: true, ax: 0.4, ay: -0.2 };
+  g.stepGame(padX, N0);
   assert.ok(!g.ball.inHands, "lancé");
-  // Micro-relâche + 2ᵉ X pendant tossGrace (le front est « mangé » par la grâce)
-  g.stepGame({ ...N0, ax: 0.4, ay: -0.2 }, N0);
-  g.stepGame(pad, N0);
+  g.stepGame(idle, N0);
+  g.stepGame(padX, N0);
   assert.ok((g.ball.tossGrace | 0) > 0 || g.ball.serveAimLock, "encore phase service");
-  // Maintien X jusqu'après la grâce, balle ramenée à portée
   const grace = g.consts.SERVE_TOSS_GRACE || 10;
   for (let i = 0; i < grace + 2; i++) {
     g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y; g.blobL.onGround = true;
     g.ball.x = 250; g.ball.y = g.blobL.y - 64; g.ball.vx = 0; g.ball.vy = 2;
     g.ball.frozen = false; g.ball.inHands = false;
     g.ball.serveAimLock = true;
-    g.stepGame(pad, N0);
+    g.stepGame(padX, N0);
   }
   assert.strictEqual(g.ball.serveAimLock, true, "maintien après double-tap ≠ service auto");
   assert.strictEqual(g.ball.touches[0], 0, "pas de touche auto");
-  // Il faut un NOUVEAU front X EN L'AIR pour servir
-  g.stepGame({ ...N0, ax: 0.4, ay: -0.2 }, N0);
+  // X en l'air ne sert toujours pas — il faut Y
+  g.stepGame(idle, N0);
   g.blobL.y = g.consts.GROUND_Y - 70; g.blobL.onGround = false;
   g.blobL.lastActiveHitTick = -999;
   g.ball.y = g.blobL.y - 50; g.ball.vy = 2; g.ball.serveAimLock = true;
-  g.stepGame(pad, N0);
-  assert.strictEqual(g.ball.serveAimLock, false, "vrai 2ᵉ appui en l'air sert");
+  g.stepGame(padX, N0);
+  assert.strictEqual(g.ball.serveAimLock, true, "X en l'air ≠ frappe");
+  g.blobL.lastActiveHitTick = -999;
+  g.ball.y = g.blobL.y - 50; g.ball.serveAimLock = true;
+  g.stepGame({
+    ...N0, smash: true, smashX: false, smashY: true, padFace: true, ax: 0.4, ay: -0.2
+  }, N0);
+  assert.strictEqual(g.ball.serveAimLock, false, "Y en l'air sert");
 });
 
 test("V2 : service — X tenu pendant le décompte ne lance pas au GO", () => {
@@ -1500,7 +1551,7 @@ test("V2 : après lancer, smash/X = cloche", () => {
   g.setState("play"); g.setServeCountdown(0);
   g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y; g.blobL.onGround = true;
   g.blobL.lastActiveHitTick = -999;
-  g.ball.x = 250; g.ball.y = g.blobL.y - 70; g.ball.vx = 0; g.ball.vy = 3;
+  g.ball.x = 250; g.ball.y = g.blobL.y - 46; g.ball.vx = 0; g.ball.vy = 3;
   g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
   g.ball.serveAimLock = false;
   g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
@@ -1520,7 +1571,7 @@ test("V2 : cloche suit l'angle du stick", () => {
   const setup = () => {
     g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y; g.blobL.onGround = true;
     g.blobL.lastActiveHitTick = -999;
-    g.ball.x = 250; g.ball.y = g.blobL.y - 70; g.ball.vx = 0; g.ball.vy = 1;
+    g.ball.x = 250; g.ball.y = g.blobL.y - 46; g.ball.vx = 0; g.ball.vy = 1;
     g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
     g.ball.serveAimLock = false;
     g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
@@ -1547,7 +1598,7 @@ test("V2 : clavier — réception légèrement vers l'avant (setup smash)", () =
   const setup = (ballOffX) => {
     g.blobL.x = 250; g.blobL.y = g.consts.GROUND_Y; g.blobL.onGround = true;
     g.blobL.lastActiveHitTick = -999;
-    g.ball.x = 250 + ballOffX; g.ball.y = g.blobL.y - 70; g.ball.vx = 0; g.ball.vy = 1;
+    g.ball.x = 250 + ballOffX; g.ball.y = g.blobL.y - 46; g.ball.vx = 0; g.ball.vy = 1;
     g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
     g.ball.serveAimLock = false;
     g.ball.lastTouchSide = -1; g.ball.lastTouchTick = -999;
@@ -1640,7 +1691,7 @@ test("V2 : cloche depuis le fond = passe haute légèrement avant (clavier)", ()
   g.newGame(53);
   g.setState("play"); g.setServeCountdown(0);
   g.blobL.x = 120; g.blobL.y = g.consts.GROUND_Y; g.blobL.onGround = true;
-  g.ball.x = 120; g.ball.y = g.blobL.y - 70; g.ball.vx = 0; g.ball.vy = 2;
+  g.ball.x = 120; g.ball.y = g.blobL.y - 46; g.ball.vx = 0; g.ball.vy = 2;
   g.ball.frozen = false; g.ball.inHands = false; g.ball.tossGrace = 0;
   g.ball.serveAimLock = false;
   g.stepGame({ ...N0, smash:true }, N0);
@@ -1984,6 +2035,35 @@ test("Super Smash : relâche trop tôt = smash normal, jauge gardée", () => {
   assert.ok(!g.getPowerWindup(), "sortie du dosage");
   assert.strictEqual(g.getPowerGauge()[0], g.POWER_GAUGE_MAX, "jauge non consommée");
   assert.ok(!(g.ball.slowMo > 0), "pas de Super Smash");
+});
+
+test("Super Smash : relâche à mi-charge = Super Smash, jauge consommée", () => {
+  const g = freshRally(25);
+  const N = { left:false, right:false, jump:false, smash:false, super:false, ax:0, ay:0 };
+  g.setMapEventsQuiet(true);
+  g.setPowerGauge(g.POWER_GAUGE_MAX, 0);
+  const { NET_X, GROUND_Y } = g.consts;
+  g.blobL.x = NET_X - 80;
+  g.blobL.y = GROUND_Y - 90;
+  g.blobL.onGround = false;
+  g.blobL.vy = -2;
+  g.ball.x = g.blobL.x + 8;
+  g.ball.y = g.blobL.y - 50;
+  g.ball.vx = 1; g.ball.vy = 0;
+  g.ball.frozen = false; g.ball.inHands = false; g.ball.heldBy = -1;
+  g.ball.serveAimLock = false; g.ball.serveFlight = false;
+  g.stepGame({ ...N, smash:true, ax:0.8, ay:0.2 }, N);
+  assert.ok(g.getPowerWindup(), "entre en dosage");
+  // ~mi-parcours du dosage (charge ~0.5), au-delà de minT
+  const half = Math.max((g.POWER_WINDUP_MIN | 0) + 2, Math.floor((g.POWER_WINDUP_MAX | 0) * 0.45));
+  for (let i = 0; i < half; i++) g.stepGame({ ...N, smash:true, ax:0.8, ay:0.3 }, N);
+  const ch = g.getPowerWindup() && g.getPowerWindup().charge;
+  assert.ok(ch >= 0.4 && ch <= 0.75, "mi-charge (ch=" + ch + ")");
+  g.stepGame({ ...N, smash:false, ax:0.8, ay:0.3 }, N);
+  assert.ok(!g.getPowerWindup(), "relâche → tir");
+  assert.strictEqual(g.getPowerGauge()[0], 0, "jauge consommée à mi-puissance");
+  assert.ok(g.ball.smash > 0, "Super Smash (pas smash normal)");
+  assert.ok(g.ball.slowMo > 0, "ralenti Super Smash");
 });
 
 test("SUPER Cygne : durée 300 + anti-smash retour", () => {
@@ -2738,6 +2818,19 @@ test("menus : démo 1v1 IA vs IA en fond", () => {
   assert.ok(!g.getMenuDemo().live, "newGame coupe la démo");
 });
 
+test("menus : démo ne coupe pas online (sélection perso en ligne)", () => {
+  const g = loadGame();
+  g.goMenu();
+  assert.ok(g.getMenuDemo().live, "démo démarrée hors-ligne");
+  // Simule une session WebRTC active pendant la sélection de perso
+  g.setOnline(true);
+  g.setState("selectCharacter");
+  assert.ok(!g.menuDemoWanted(), "pas de démo tant que online");
+  g.startMenuDemoMatch(true);
+  assert.ok(g.getOnline(), "startMenuDemoMatch ne coupe pas online");
+  g.setOnline(false);
+});
+
 test("tutoriel : chaque étape reste au moins 5 s", () => {
   const g = loadGame();
   g.startTutorial();
@@ -2765,8 +2858,11 @@ test("tutoriel : feeds Réception/Smash + pas de point en pratique", () => {
   assert.strictEqual(g.getState(), "play");
   assert.ok(!g.ball.inHands && !g.ball.frozen, "feed réception en jeu");
   assert.ok(g.ball.y < g.consts.GROUND_Y - 40, "balle en l'air");
-  // Feed réception : assez bas pour diguer (tête)
-  assert.ok(g.ball.y > g.consts.GROUND_Y - 140, "balle proche pour réception");
+  // Feed réception : vient du serveur adverse (camp droit)
+  assert.ok(g.ball.x > g.consts.NET_X, "balle part du camp adverse");
+  assert.ok(g.ball.vx < 0, "balle vient vers le joueur");
+  assert.ok(g.ball.y < g.consts.GROUND_Y - 180, "lob assez haut");
+  assert.strictEqual(g.getServingSide(), 1, "serveur = adversaire");
   const s0 = g.scores[0], s1 = g.scores[1];
   g.ball.y = g.consts.GROUND_Y;
   g.ball.vy = 4;
@@ -2776,13 +2872,232 @@ test("tutoriel : feeds Réception/Smash + pas de point en pratique", () => {
   assert.ok(!g.ball.frozen && g.ball.y < g.consts.GROUND_Y - 40, "feed relancé");
 });
 
+test("tutoriel : réception ne valide pas sans dig explicite", () => {
+  const g = loadGame();
+  g.startTutorial();
+  const recv = g.TUTORIAL_STEPS.findIndex(s => s.kind === "receive");
+  g.setTutorialStep(recv);
+  g.tutorialApplyScenario(recv);
+  g.setTutorialStepArmed(true);
+  g.blobL.poseAnim = "receive";
+  g.blobL.vx = 2.5;
+  assert.ok(!g.tutorialStepConditionMet(g.blobL), "bouger seul ≠ succès");
+  g.blobL._smashEdge = true;
+  g.tutorialNoteStepIntent(g.blobL);
+  assert.ok(!g.tutorialStepConditionMet(g.blobL), "dig sans payoff (balle) ≠ succès");
+  // Balle tombée de l'autre côté → on a vu le résultat
+  g.ball.x = g.consts.NET_X + 50;
+  g.ball.y = g.consts.GROUND_Y;
+  g.tutorialNoteStepIntent(g.blobL);
+  assert.ok(g.tutorialStepConditionMet(g.blobL), "dig + balle partie = succès");
+});
+
+test("tutoriel : pose smash résiduelle ne valide pas l'étape Smash", () => {
+  const g = loadGame();
+  g.startTutorial();
+  const smash = g.TUTORIAL_STEPS.findIndex(s => s.kind === "smash");
+  g.setTutorialStep(smash);
+  g.tutorialApplyScenario(smash);
+  // Encore la pose du service précédent : pas armé → pas de succès
+  g.blobL.poseAnim = "smash";
+  g.setTutorialStepArmed(false);
+  g.tutorialNoteStepIntent(g.blobL);
+  assert.ok(!g.tutorialStepConditionMet(g.blobL), "sans armement ≠ succès");
+  // Après armement : il faut une NOUVELLE pose smash + payoff
+  g.blobL.poseAnim = "";
+  g.setTutorialStepArmed(true);
+  g.tutorialNoteStepIntent(g.blobL);
+  assert.ok(!g.tutorialStepConditionMet(g.blobL), "armé sans smash ≠ succès");
+  g.blobL.poseAnim = "smash";
+  g.tutorialNoteStepIntent(g.blobL);
+  assert.ok(!g.tutorialStepConditionMet(g.blobL), "smash sans payoff ≠ succès");
+  g.ball.x = g.consts.NET_X + 50;
+  g.ball.y = g.consts.GROUND_Y;
+  g.tutorialNoteStepIntent(g.blobL);
+  assert.ok(g.tutorialStepConditionMet(g.blobL), "smash + balle partie = succès");
+});
+
+test("tutoriel : hold payoff tant que la frappe est en vol", () => {
+  const g = loadGame();
+  g.startTutorial();
+  const smash = g.TUTORIAL_STEPS.findIndex(s => s.kind === "smash");
+  g.setTutorialStep(smash);
+  g.tutorialApplyScenario(smash);
+  g.setTutorialStepArmed(true);
+  g.blobL.poseAnim = "smash";
+  g.tutorialNoteStepIntent(g.blobL);
+  g.ball.x = g.consts.NET_X + 40;
+  g.ball.y = 100;
+  assert.ok(g.tutorialHoldPayoff(), "frappe en vol = hold (pas de reclaim)");
+  assert.ok(!g.tutorialStepConditionMet(g.blobL), "pas encore au sol");
+  g.ball.y = g.consts.GROUND_Y;
+  g.tutorialNoteStepIntent(g.blobL);
+  assert.ok(!g.tutorialHoldPayoff(), "au sol = fin hold");
+  assert.ok(g.tutorialStepConditionMet(g.blobL), "payoff vu = succès");
+});
+
+test("tutoriel : Smash = lob du serveur en face", () => {
+  const g = loadGame();
+  g.startTutorial();
+  const smash = g.TUTORIAL_STEPS.findIndex(s => s.kind === "smash");
+  assert.ok(smash >= 0, "étape Smash");
+  g.setTutorialStep(smash);
+  g.tutorialApplyScenario(smash);
+  assert.strictEqual(g.getState(), "play");
+  assert.ok(!g.ball.inHands && !g.ball.frozen, "balle en jeu");
+  assert.ok(g.ball.x > g.consts.NET_X, "part du camp adverse");
+  assert.ok(g.ball.vx < 0, "vient vers le joueur");
+  assert.ok(g.ball.vy < 0, "lob montant");
+  assert.ok(g.ball.y < g.consts.GROUND_Y - 200, "assez haut pour smash");
+});
+
+test("tutoriel : feeds adverses passent le filet (pas de rebond filet)", () => {
+  const g = loadGame();
+  g.startTutorial();
+  const NET = g.consts.NET_X;
+  for (const kind of ["receive", "smash", "hud", "super", "power"]) {
+    const idx = g.TUTORIAL_STEPS.findIndex(s => s.kind === kind);
+    assert.ok(idx >= 0, "étape " + kind);
+    g.setTutorialStep(idx);
+    g.tutorialApplyScenario(idx);
+    let minX = g.ball.x;
+    for (let t = 0; t < 200; t++) {
+      g.updateBall();
+      minX = Math.min(minX, g.ball.x);
+      // Atterrissage / refeed éventuel : dès qu'on a profondément croisé, OK
+      if (minX < NET - 40) break;
+    }
+    assert.ok(minX < NET - 40,
+      kind + " : doit passer le filet et entrer en camp joueur (minX=" + minX.toFixed(1) + ")");
+  }
+});
+
+test("tutoriel : Smash Battle scripté — marteler le saut pour gagner", () => {
+  const g = loadGame();
+  g.startTutorial();
+  const battle = g.TUTORIAL_STEPS.findIndex(s => s.kind === "battle");
+  assert.ok(battle >= 0, "étape Smash Battle");
+  assert.strictEqual(g.TUTORIAL_STEPS.length, 10, "10 étapes (battle ajoutée)");
+  g.setTutorialStep(battle);
+  g.tutorialApplyScenario(battle);
+  assert.ok(g.battle.active, "duel démarré");
+  assert.ok(!g.blobL.onGround && !g.blobR.onGround, "les deux en l'air");
+  assert.ok(Math.abs(g.ball.x - g.consts.NET_X) < 20, "balle au filet");
+
+  const N = { left: false, right: false, jump: false, smash: false, super: false, ax: 0, ay: 0 };
+  // Joueur martele, adversaire (AI soft) ne suit pas dans stepBattle direct
+  g.battle.t = 1;
+  g.battle.count = [0, 0];
+  g.battle.prevJump = [false, false];
+  g.stepBattle({ ...N, jump: true }, N);
+  assert.ok(!g.battle.active, "duel résolu");
+  assert.ok(g.getTutorialBattleOk(), "victoire joueur enregistrée");
+  assert.ok(g.ball.vx > 0, "smash vers le camp adverse");
+});
+
+test("tutoriel : SUPER / HUD = balle du serveur en face", () => {
+  const g = loadGame();
+  g.startTutorial();
+  for (const kind of ["hud", "super", "power"]) {
+    const idx = g.TUTORIAL_STEPS.findIndex(s => s.kind === kind);
+    assert.ok(idx >= 0, "étape " + kind);
+    g.setTutorialStep(idx);
+    g.tutorialApplyScenario(idx);
+    assert.ok(g.ball.x > g.consts.NET_X, kind + " : camp adverse");
+    assert.ok(g.ball.vx < 0, kind + " : vers le joueur");
+    assert.strictEqual(g.getServingSide(), 1, kind + " : serveur adverse");
+  }
+});
+
 test("tutoriel : textes distincts clavier vs manette (réception)", () => {
   const g = loadGame();
   g.startTutorial(); // clavier (pas de pad en headless)
   assert.ok(!g.tutorialUsesPad(), "tuto clavier par défaut");
   const kb = g.TUTORIAL_STEPS.find(s => s.kind === "receive");
-  assert.ok(kb.body.indexOf("cloche auto") >= 0, "clavier = cloche auto");
+  assert.ok(/digue|frappe/i.test(kb.body), "clavier = dig explicite");
   assert.ok(kb.body.indexOf("[[X:") < 0, "pas de pictos manette en clavier");
+  g.setTutorialPadLocked(true);
+  const pad = g.TUTORIAL_STEPS.find(s => s.kind === "receive");
+  assert.ok(/HAUT|haut/i.test(pad.body), "manette : stick vers le haut");
+  assert.ok(pad.body.indexOf("[[X:LS]]") >= 0, "picto stick dans le texte");
+});
+
+test("tutoriel clavier : service = F lance puis saute (pas F pour frapper)", () => {
+  const g = loadGame();
+  g.startTutorial();
+  assert.ok(!g.tutorialUsesPad(), "tuto clavier");
+  const serve = g.TUTORIAL_STEPS.find(s => s.kind === "serve");
+  assert.ok(serve, "étape Service");
+  assert.ok(/lance/i.test(serve.body), "mentionne le lancer");
+  assert.ok(/saute/i.test(serve.body), "mentionne le saut");
+  assert.ok(/smash auto/i.test(serve.body), "frappe = smash auto");
+  // Un seul picto F (le lancer) — pas « F … F frappe »
+  const fMarks = serve.body.match(/\[\[K:[^\]]+\]\]/g) || [];
+  assert.strictEqual(fMarks.length, 1, "un seul picto touche (lance), pas F×2");
+  assert.ok(!/frappe/i.test(serve.body), "pas de « frappe » manuelle F");
+});
+
+test("tutoriel manette : service ne valide pas au seul lancer X", () => {
+  const g = loadGame();
+  g.startTutorial();
+  g.setTutorialPadLocked(true);
+  const serveIdx = g.TUTORIAL_STEPS.findIndex(s => s.kind === "serve");
+  assert.ok(serveIdx >= 0, "étape service");
+  g.setTutorialStep(serveIdx);
+  g.setServingSide(0);
+  // Après lancer seulement (tossGrace) → pas validé
+  g.ball.inHands = false;
+  g.ball.frozen = false;
+  g.ball.tossGrace = 8;
+  g.ball.serveAimLock = true;
+  g.ball.lastTouchSide = -1;
+  assert.ok(!g.tutorialStepConditionMet(g.blobL), "lancer X seul ≠ succès");
+  // Frappe Y en vol → pas encore (il faut l'atterrissage adverse)
+  g.ball.tossGrace = 0;
+  g.ball.serveAimLock = false;
+  g.ball.lastTouchSide = 0;
+  g.ball.vx = 5;
+  g.ball.x = g.consts.NET_X - 80;
+  g.ball.y = g.consts.GROUND_Y - 120;
+  g.blobL.poseAnim = "smash";
+  assert.ok(!g.tutorialStepConditionMet(g.blobL), "en vol ≠ succès");
+  // Atterrissage camp adverse → validé
+  g.ball.x = g.consts.NET_X + 60;
+  g.ball.y = g.consts.GROUND_Y;
+  g.ball.vx = 0;
+  assert.ok(g.tutorialStepConditionMet(g.blobL), "tombée de l'autre côté = succès");
+});
+
+test("tutoriel : service attend l'atterrissage adverse (clavier)", () => {
+  const g = loadGame();
+  g.startTutorial();
+  const serveIdx = g.TUTORIAL_STEPS.findIndex(s => s.kind === "serve");
+  g.setTutorialStep(serveIdx);
+  g.setServingSide(0);
+  g.ball.inHands = false;
+  g.ball.frozen = false;
+  g.ball.serveAimLock = false;
+  g.ball.lastTouchSide = 0;
+  g.ball.x = g.consts.NET_X - 40;
+  g.ball.y = 80;
+  assert.ok(!g.tutorialStepConditionMet(g.blobL), "frappe en vol ≠ succès");
+  // Mur du fond en l'air ≠ atterrissage (ancien bug : balle « flottante »)
+  g.ball.x = g.consts.W - 10;
+  g.ball.y = g.consts.GROUND_Y - 120;
+  g.ball.vx = 3; g.ball.vy = 2;
+  assert.ok(!g.tutorialStepConditionMet(g.blobL), "mur en l'air ≠ succès");
+  g.ball.x = g.consts.NET_X + 40;
+  g.ball.y = g.consts.GROUND_Y;
+  g.ball.vx = 0; g.ball.vy = 0;
+  assert.ok(g.tutorialStepConditionMet(g.blobL), "atterrissage adverse = succès");
+});
+
+test("tutoriel : adversaire AFK ne touche pas la balle en pratique", () => {
+  const g = loadGame();
+  g.startTutorial();
+  assert.ok(g.tutorialPracticeActive(), "pratique");
+  assert.ok(g.tutorialSkipBlobBall(g.blobR), "skip camp droit");
+  assert.ok(!g.tutorialSkipBlobBall(g.blobL), "joueur peut toucher");
 });
 
 test("tutoriel : étape Score & barres explique les 3 éléments HUD", () => {
@@ -2793,6 +3108,10 @@ test("tutoriel : étape Score & barres explique les 3 éléments HUD", () => {
   assert.ok(/touches/i.test(hud.body), "explique les touches");
   assert.ok(/orange/i.test(hud.body), "explique Super Smash orange");
   assert.ok(/or|SUPER/i.test(hud.body), "explique SUPER or");
+  assert.ok(!/\[\[X:SELECT\]\]|\[\[K:Entrée\]\]/.test(hud.body), "pas de SELECT dupliqué dans le body");
+  const hudIdx = g.TUTORIAL_STEPS.findIndex(s => s.kind === "hud");
+  g.setTutorialStep(hudIdx);
+  assert.ok(!g.tutorialStepConditionMet(g.blobL), "HUD ne s'auto-valide pas");
   const sup = g.TUTORIAL_STEPS.find(s => s.kind === "super");
   const pow = g.TUTORIAL_STEPS.find(s => s.kind === "power");
   assert.ok(/or/i.test(sup.title), "titre SUPER = barre or");

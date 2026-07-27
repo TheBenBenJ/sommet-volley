@@ -215,8 +215,18 @@ function charOf(b) { return CHARACTERS[b.charId]; }
 // Charge les manifests sprites (char-sprites.js) une fois le roster connu
 if (typeof initCharSprites === "function") initCharSprites();
 
+/** Roster jouable dans les menus de sélection — temporaire (Dorf + Cygne). */
+const MENU_CHARACTER_KEYS = ["dorf", "cygne"];
 function characterIndices() {
   return CHARACTERS.map((_, i) => i);
+}
+/** Indices affichés / choisissables dans les menus (sélection, démo fond). */
+function menuCharacterIndices() {
+  const idx = [];
+  for (let i = 0; i < CHARACTERS.length; i++) {
+    if (MENU_CHARACTER_KEYS.indexOf(CHARACTERS[i].key) >= 0) idx.push(i);
+  }
+  return idx.length ? idx : characterIndices();
 }
 function terrainIndices() {
   return TERRAINS.map((_, i) => i);
@@ -333,11 +343,11 @@ const AI_LEVELS = [
   // attack : décalage derrière la balle pour viser franchement le camp adverse
   // react : anticipation (0=lent, 1=parfait) · dbl : utilise le double saut
   // aim : 1 = place ses frappes LOIN de l'adversaire (drive profond / amorti court)
-  // Encore −2 crans : Difficile ≈ ancien Facile ; Impitoyable ≈ entre Facile et Normale d’avant.
-  { name: "Facile",      err: 155, rush: 0.00, attack: 0,  react: 0.02, dbl: false, aim: 0 },
-  { name: "Normale",     err: 130, rush: 0.005, attack: 0, react: 0.04, dbl: false, aim: 0 },
-  { name: "Difficile",   err: 105, rush: 0.01, attack: 1,  react: 0.08, dbl: false, aim: 0 },
-  { name: "Impitoyable", err: 72,  rush: 0.03, attack: 2,  react: 0.20, dbl: false, aim: 0 }
+  // Remontée franche : proche de l’ancienne grille « molle » (pas le mur d’origine).
+  { name: "Facile",      err: 120, rush: 0.01, attack: 1, react: 0.08, dbl: false, aim: 0 },
+  { name: "Normale",     err: 90,  rush: 0.02, attack: 2, react: 0.16, dbl: false, aim: 0 },
+  { name: "Difficile",   err: 60,  rush: 0.05, attack: 3, react: 0.28, dbl: false, aim: 0 },
+  { name: "Impitoyable", err: 36,  rush: 0.12, attack: 6, react: 0.48, dbl: true,  aim: 0 }
 ];
 let aiLevel = 1;
 // (erreur/rush IA : état PAR BLOB — _aiErr1/_aiRush/_aiErrT, voir ai.js)
@@ -365,8 +375,8 @@ const battle = {
 //   Volkoï → Hiver Général · Dorf → Le Mur · Cygne → Passage en Force · Bébé → Batterie AA
 //   Timonier → Le Rempart · Sultan → Séisme · Gourou → Méditation · Capitaine → Déforestation
 const SUPER_NEED = 3;
-const SUPER_FLASH_T = 100;       // ~1,7 s — tag court, pas un pavé
-const SUPER_READY_FLASH_T = 90;  // ~1,5 s quand la jauge est prête
+const SUPER_FLASH_T = 240;       // ~4 s — laisser lire nom + détail du SUPER
+const SUPER_READY_FLASH_T = 120; // ~2 s quand la jauge est prête
 const streak = [0, 0];        // points d'affilée par camp
 const superCharge = [0, 0];   // 0 = vide, 1 = super prête
 // Super Smash (tous persos) : jauge 0..POWER_GAUGE_MAX, indépendante du SUPER perso
@@ -426,6 +436,10 @@ class Blob {
     this.superSmash = false;
     this.prevSuper = false;
     this.prevSmashBtn = false;
+    this.prevSmashX = false;
+    this.prevSmashY = false;
+    this._smashXEdge = false;
+    this._smashYEdge = false;
     this._jumpEdge = false;
     this._serveAwaitRelease = false;
     this.lastActiveHitTick = -999;
@@ -441,8 +455,10 @@ class Blob {
     this.charredT = 0;       // ticks restants noirci (explosion mode Bombe)
   }
   // deux cercles de collision : corps + tête (alignés sur le dessin)
+  // receiveCircle = dig torse / avant-bras (sous la tête y-64, pas trop bas)
   get bodyCircle() { return { x: this.x, y: this.y - 30, r: 28 }; }
   get headCircle() { return { x: this.x, y: this.y - 64, r: 22 }; }
+  get receiveCircle() { return { x: this.x, y: this.y - 46, r: 26 }; }
 
   update(input) {
     const a = charOf(this);
@@ -455,10 +471,16 @@ class Blob {
     // Stun post-duel : pas de contrôle, juste l'inertie du knockback
     if (this.battleStunT > 0) {
       this.battleStunT--;
-      input = { left: false, right: false, jump: false, smash: false, super: false, ax: 0, ay: 0 };
+      input = {
+        left: false, right: false, jump: false, smash: false,
+        smashX: false, smashY: false, padFace: false,
+        super: false, ax: 0, ay: 0
+      };
       this._input = input;
       this._smashEdge = false;
       this.prevSmashBtn = false;
+      this._smashXEdge = false; this.prevSmashX = false;
+      this._smashYEdge = false; this.prevSmashY = false;
       this._jumpEdge = false;
       this.prevJump = false;
       this.vx *= 0.88;
@@ -483,10 +505,17 @@ class Blob {
     }
     this._input = input || null;
     const smashDown = !!(input && input.smash);
+    const smashXDown = !!(input && (input.smashX || (!input.padFace && smashDown)));
+    const smashYDown = !!(input && (input.smashY || (!input.padFace && smashDown)));
     this._smashEdge = smashDown && !this.prevSmashBtn;
     this.prevSmashBtn = smashDown;
-    // Service : dès que X/F est relâché après le lancer, on peut frapper
-    if (this._serveAwaitRelease && !smashDown) this._serveAwaitRelease = false;
+    this._smashXEdge = smashXDown && !this.prevSmashX;
+    this.prevSmashX = smashXDown;
+    this._smashYEdge = smashYDown && !this.prevSmashY;
+    this.prevSmashY = smashYDown;
+    // Service : relâcher le bouton de lancer (X manette / F clavier) avant de frapper
+    const tossHeld = input && input.padFace ? smashXDown : smashDown;
+    if (this._serveAwaitRelease && !tossHeld) this._serveAwaitRelease = false;
 
     const grip = groundGrip(this); // 1 sec, <1 pluie / Hiver Général
 
@@ -518,10 +547,14 @@ class Blob {
     if (wantWalk) {
       const scrambling = a.slip;
       this.scramble = scrambling ? 1 : 0;
-      // Cycle 4 frames (appui → passage → appui → passage) : 1 frame / 6 ticks
-      // (plus lisible que /8, surtout sur packs à 4 frames)
+      // Cycle PNG : avance selon la distance parcourue (rythme ∝ vitesse)
+      const stride = scrambling ? 9 : 14;
+      this._walkAcc = (this._walkAcc || 0) + Math.abs(moveVx);
+      while (this._walkAcc >= stride) {
+        this._walkAcc -= stride;
+        this.walkPhase = (this.walkPhase | 0) + 1;
+      }
       this._walkTick = (this._walkTick || 0) + 1;
-      if (this._walkTick % 6 === 0) this.walkPhase += 1;
       // Poussière de course : purement visuel, cadence déterministe (pas de
       // Math.random dans la boucle de simulation — convention core.js).
       if (this._walkTick % (scrambling ? 3 : 10) === 0) {
@@ -530,6 +563,7 @@ class Blob {
     } else {
       this.scramble = 0;
       this._walkTick = 0;
+      this._walkAcc = 0;
     }
     // Service : pas de saut avec la balle en mains, ni pendant la grâce post-lancer
     // (anti X/F + saut la même frame). Ensuite saut normal — y compris en montée

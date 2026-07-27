@@ -12,6 +12,18 @@
     "victory": 2,
     "defeat": 2
   },
+  "videos": {
+    "idle": "idle.webm",
+    "walk": "walk.webm",
+    "jump": "jump.webm",
+    "receive": "receive.webm",
+    "aim": "aim.webm",
+    "super": "super.webm",
+    "panic": "panic.webm",
+    "victory": "victory.webm",
+    "defeat": "defeat.webm"
+  },
+  "walkIntroSec": 2,
   "baseH": 110,
   "footPad": 2,
   "lockAspect": 0.49,

@@ -102,7 +102,7 @@ function handleMenuKeys(code, key) {
     // Accueil : Solo / Multijoueur, puis sous-menus dédiés.
     if (code === "Digit1") { state = "soloMenu"; navIdx = 0; }
     if (code === "Digit2") { state = "multiMenu"; navIdx = 0; }
-    if (code === "KeyR") state = "rules";
+    if (code === "KeyR") { rulesScroll = 0; state = "rules"; }
     if (code === "KeyT") startTutorial();
     if (code === "KeyH") { tutorialReset(); state = "tutorialHelp"; navIdx = 0; }
     if (code === "KeyC") state = "credits";
@@ -341,6 +341,16 @@ function handleMenuKeys(code, key) {
     }
 
   } else if (state === "rules") {
+    if (code === "ArrowDown" || code === "KeyS" || code === "PageDown") {
+      rulesScrollBy(code === "PageDown" ? 90 : 36);
+      return;
+    }
+    if (code === "ArrowUp" || code === "KeyW" || code === "PageUp") {
+      rulesScrollBy(code === "PageUp" ? -90 : -36);
+      return;
+    }
+    if (code === "Home") { rulesScroll = 0; return; }
+    if (code === "End") { rulesScroll = rulesScrollMax; return; }
     if (code === "Escape" || code === "Enter" || code === "Space" || code === "KeyR") goMenu();
 
   } else if (state === "onlineMenu") {
@@ -392,7 +402,7 @@ function handleMenuKeys(code, key) {
     // à Digit9, les suivants restent atteignables au clic ou aux flèches+Entrée).
     const _dmC = /^Digit(\d+)$/.exec(code);
     const slot = _dmC ? (parseInt(_dmC[1], 10) - 1) : undefined;
-    const vis = characterIndices();
+    const vis = menuCharacterIndices();
     const n = slot !== undefined && slot < vis.length ? vis[slot] : undefined;
     if (n !== undefined && !takenCharacterSet().has(n)) {
       (selPlayer === 0 ? blobL : blobR).charId = n;
@@ -413,7 +423,13 @@ function handleMenuKeys(code, key) {
         selPlayer = 1; // au joueur vert de choisir
         navIdx = 0;
       } else {
-        if (pendingMode.vsAI) blobR.charId = randomCharacterIdx([blobL.charId]);
+        // Adversaire IA : aussi tiré dans le roster menu (Dorf/Cygne)
+        if (pendingMode.vsAI) {
+          const pool = menuCharacterIndices().filter(i => i !== blobL.charId);
+          blobR.charId = pool.length
+            ? pool[Math.floor(Math.random() * pool.length)]
+            : randomCharacterIdx([blobL.charId]);
+        }
         navIdx = 0;
         state = "selectTerrain";
       }
@@ -674,6 +690,13 @@ const UI = {
 };
 function uiAccent() { return UI.accent; }
 
+/** Scroll du manuel (règles) — molette / ↑↓ / stick. */
+let rulesScroll = 0;
+let rulesScrollMax = 0;
+function rulesScrollBy(dy) {
+  rulesScroll = Math.max(0, Math.min(rulesScrollMax, (rulesScroll | 0) + (dy | 0)));
+}
+
 // Décor de menu : vraie démo 1v1 IA vs IA (balle + échanges), sinon marche.
 const menuBg = {
   init: false, terrain: 0, t0: 0, charL: 0, charR: 1,
@@ -681,15 +704,19 @@ const menuBg = {
 };
 let menuActors = { L: null, R: null };
 const menuDemo = { live: false, matchState: "serve" };
-/** Menus où tourne la démo IA (pas la sélection perso/terrain — elle écrit charId). */
+/** Menus où tourne la démo IA (y compris sélection : charId sauvegardé autour du tick). */
 const MENU_DEMO_STATES = {
   menu: 1, soloMenu: 1, multiMenu: 1,
   options: 1, optionsBinds: 1, optionsComfort: 1,
   aiDifficulty: 1, gameModeSelect: 1,
   teamFormat: 1, bombFormat: 1, flameFormat: 1, bombDuration: 1,
-  rules: 1, tutorialHelp: 1, credits: 1, onlineMenu: 1
+  rules: 1, tutorialHelp: 1, credits: 1, onlineMenu: 1,
+  selectCharacter: 1, selectTerrain: 1
 };
 function menuDemoWanted() {
+  // Jamais pendant une session en ligne : startMenuDemoMatch posait online=false
+  // sans le restaurer → netUpdate arrêté, hello/matchmaking morts.
+  if (typeof online !== "undefined" && online) return false;
   return !!(MENU_DEMO_STATES[state]);
 }
 
@@ -714,6 +741,7 @@ function startTutorial() {
   tutorialStep = 0;
   tutorialAdvanceLock = 0;
   tutorialStepArmed = true;
+  tutorialResetStepIntent();
   // Figé au lancement : tuto clavier OU manette (listes d'étapes distinctes)
   tutorialPadLocked = typeof padConnected !== "undefined" && !!padConnected;
   TUTORIAL_STEPS = buildTutorialSteps();
@@ -740,6 +768,12 @@ function startTutorial() {
 /** true = étapes guidées (0..avant-dernier) : pas de score ni d'IA. */
 function tutorialPracticeActive() {
   return !!tutorialMode && tutorialStep < TUTORIAL_STEPS.length - 1;
+}
+
+/** Adversaire ne touche pas la balle en pratique (sinon dig AFK → balle qui « flotte »). */
+function tutorialSkipBlobBall(blob) {
+  if (!tutorialPracticeActive()) return false;
+  return !!(blob && blob.side !== 0);
 }
 
 /** Remet les joueurs en place neutre (camp gauche / droite). */
@@ -800,23 +834,37 @@ function tutorialGivePlayerServe() {
 }
 
 /**
- * Feed scripté pour Réception / Smash / SUPER / Super Smash.
- * kind: "receive" | "smash" | "super" | "power"
+ * Feed scripté : balle qui arrive du SERVEUR EN FACE (camp droit).
+ * kind: "receive" | "smash" | "super" | "power" | "hud"
  */
 function tutorialFeedBall(kind) {
   if (!tutorialMode) return;
   state = "play";
   serveCountdown = 0;
-  servingSide = 0;
+  // L'adversaire « sert » — la balle vient du camp d'en face
+  servingSide = 1;
   if (typeof powerWindup !== "undefined") powerWindup = null;
   if (typeof clearBallHold === "function") clearBallHold();
-  // Garde le joueur dans son camp, sous la trajectoire
-  const px = Math.min(Math.max(blobL.x || W * 0.28, 110), NET_X - 90);
+
+  // Joueur prêt dans son camp
+  const px = Math.min(Math.max(blobL.x || W * 0.28, 130), NET_X - 100);
   blobL.x = px;
   blobL.y = GROUND_Y;
   blobL.vx = 0; blobL.vy = 0;
   blobL.onGround = true;
   blobL.jumpsUsed = 0;
+  blobL.poseAnim = "";
+  blobL.poseT = 0;
+  blobL.poseDur = 0;
+
+  // Serveur adverse planté en face (ne touche pas la balle — tutorialSkipBlobBall)
+  if (blobR) {
+    blobR.x = W * 0.78;
+    blobR.y = GROUND_Y;
+    blobR.vx = 0; blobR.vy = 0;
+    blobR.onGround = true;
+  }
+
   ball.frozen = false;
   ball.inHands = false;
   ball.tossGrace = 0;
@@ -826,43 +874,109 @@ function tutorialFeedBall(kind) {
   ball.smash = 0;
   ball.spin = 0;
   ball.touches = [0, 0];
-  ball.lastTouchSide = -1;
+  ball.lastTouchSide = 1;
+  ball.touches[1] = 1;
   ball.lastTouchTick = -999;
   ball.lastHitTick = -999;
   if (typeof clearNextTouchers === "function") clearNextTouchers();
-  if (kind === "receive" || kind === "super") {
-    // Réception : balle qui tombe pile sur la tête (zone auto-cloche / dig X)
-    ball.x = px;
-    ball.y = GROUND_Y - 88;
-    ball.vx = 0;
-    ball.vy = 3.2;
+
+  // Départ camp droit — lob qui PASSE le filet (vx trop faible → tombe dans le
+  // filet, rebondit, et n'arrive jamais en camp joueur).
+  // Contrainte : à l'arrivée au filet, y <= NET_TOP - BALL_R (~222).
+  ball.x = W * 0.72;
+  if (kind === "smash" || kind === "power") {
+    // Haut + assez de vitesse horizontale → fenêtre pour sauter / smasher
+    ball.y = Math.max(20, GROUND_Y - 310);
+    ball.vx = -6.0;
+    ball.vy = -6.4;
+    blobL.x = Math.min(Math.max(px, 160), NET_X - 120);
   } else {
-    // Smash / Super Smash : balle un peu plus haute pour sauter dedans
-    ball.x = px + 6;
-    ball.y = GROUND_Y - 155;
-    ball.vx = 0.3;
-    ball.vy = 1.2;
+    // Réception / SUPER / HUD : lob jouable au sol, arc qui clear le filet
+    ball.y = Math.max(24, GROUND_Y - 290);
+    ball.vx = -6.4;
+    ball.vy = -5.8;
   }
+}
+
+/**
+ * Smash Battle scripté : les deux au filet en l'air, balle au milieu, duel
+ * de martelage (touche saut). L'IA est volontairement molle (voir ai.js).
+ */
+function tutorialStartBattle() {
+  if (!tutorialMode) return;
+  state = "play";
+  serveCountdown = 0;
+  servingSide = 0;
+  if (typeof powerWindup !== "undefined") powerWindup = null;
+  if (typeof clearBallHold === "function") clearBallHold();
+  battle.cooldown = 0;
+  battle.active = false;
+
+  const half = 40;
+  blobL.x = NET_X - half;
+  blobL.y = GROUND_Y - 90;
+  blobL.vx = 0; blobL.vy = -1;
+  blobL.onGround = false;
+  blobL.jumpsUsed = 1;
+  blobL.battleStunT = 0;
+  blobL.poseAnim = "";
+  blobL.poseT = 0;
+
+  if (blobR) {
+    blobR.x = NET_X + half;
+    blobR.y = GROUND_Y - 90;
+    blobR.vx = 0; blobR.vy = -1;
+    blobR.onGround = false;
+    blobR.jumpsUsed = 1;
+    blobR.battleStunT = 0;
+  }
+
+  ball.frozen = false;
+  ball.inHands = false;
+  ball.tossGrace = 0;
+  ball.serveAimLock = false;
+  ball.serveFlight = false;
+  ball.popped = false;
+  ball.heldBy = -1;
+  ball.smash = 0;
+  ball.spin = 0;
+  ball.x = NET_X;
+  ball.y = NET_TOP;
+  ball.vx = 0;
+  ball.vy = 0;
+  ball.touches = [0, 0];
+  ball.lastTouchSide = -1;
+  if (typeof clearNextTouchers === "function") clearNextTouchers();
+
+  const N = { left: false, right: false, jump: false, smash: false, super: false };
+  if (typeof startBattle === "function") startBattle(N, N);
 }
 
 /** Applique le scénario en dur de l'étape coach (entrée d'étape). */
 function tutorialApplyScenario(step) {
   if (!tutorialMode) return;
   const kind = tutorialStepKind(step);
+  tutorialClearPlayerActionState();
   if (kind === "move") {
     tutorialResetBlobs();
     tutorialParkBall();
-  } else if (kind === "jump" || kind === "hud") {
-    // Saut / explication HUD — terrain libre, pas de service
+  } else if (kind === "jump") {
     tutorialParkBall();
+  } else if (kind === "hud") {
+    // Score & barres : balle qui arrive du serveur en face (ambiance + HUD vivant)
+    tutorialFeedBall("hud");
   } else if (kind === "serve") {
     tutorialGivePlayerServe();
   } else if (kind === "receive") {
     tutorialFeedBall("receive");
   } else if (kind === "smash") {
     tutorialFeedBall("smash");
+  } else if (kind === "battle") {
+    tutorialStartBattle();
   } else if (kind === "super") {
     if (typeof superCharge !== "undefined") superCharge[0] = 1;
+    // Couper un SUPER encore actif pour forcer un nouvel appui B
+    if (blobL) blobL.superT = 0;
     tutorialFeedBall("super");
   } else if (kind === "power") {
     if (typeof powerGauge !== "undefined" && typeof POWER_GAUGE_MAX === "number") {
@@ -880,25 +994,74 @@ function tickTutorialScenario() {
   if (!tutorialMode) return;
   if (state !== "serve" && state !== "play") return;
   const kind = tutorialStepKind(tutorialStep);
-  if (kind === "move" || kind === "jump" || kind === "hud") {
+  if (kind === "move" || kind === "jump") {
     const parked = ball.frozen && !ball.inHands && state === "play";
     if (!parked) tutorialParkBall();
     return;
   }
+  if (kind === "hud") {
+    // Relancer le service adverse si la balle est morte (pas d'action exigée)
+    const br = typeof BALL_R === "number" ? BALL_R : 14;
+    const onGround = !!ball.popped || ball.y + br >= GROUND_Y - 1;
+    const lost = ball.popped || ball.inHands || ball.frozen || onGround ||
+      ball.x < 20 || ball.x > W - 20 || ball.y < -80;
+    if (lost) tutorialFeedBall("hud");
+    return;
+  }
   if (kind === "serve") {
-    const playerHolding = servingSide === 0 && ball.inHands && ball.frozen;
-    const playerTossing = servingSide === 0 && (
-      (ball.tossGrace | 0) > 0 || (ball.serveAimLock && !ball.inHands)
+    // Ne reclaim PAS juste après une vraie frappe (sinon on annule le Y).
+    // Après une bonne frappe : laisser la balle VOLER sous gravité jusqu'au SOL.
+    // Important : le mur (x > W-20) n'est PAS un atterrissage — sinon on
+    // annulait vy chaque frame → balle qui « flotte » seule en camp adverse.
+    const holding = servingSide === 0 && ball.inHands && ball.frozen;
+    const tossing = servingSide === 0 && !ball.inHands && (
+      (ball.tossGrace | 0) > 0 || !!ball.serveAimLock
     );
-    if (!playerHolding && !playerTossing) tutorialGivePlayerServe();
+    const servedOk = !ball.inHands && !ball.serveAimLock && ball.lastTouchSide === 0;
+    const br = typeof BALL_R === "number" ? BALL_R : 14;
+    const onGround = !!ball.popped || ball.y + br >= GROUND_Y - 1;
+    if (servedOk) {
+      tutorialServeHit = true;
+      if (onGround && ball.x > NET_X + 8) {
+        tutorialServeLanded = true;
+        ball.y = GROUND_Y - br;
+        ball.vx = 0; ball.vy = 0;
+      } else if (onGround) {
+        // Faute (propre camp) → nouveau service
+        tutorialServeHit = false;
+        tutorialServeLanded = false;
+        tutorialGivePlayerServe();
+      }
+      return;
+    }
+    if (!holding && !tossing && onGround) tutorialGivePlayerServe();
     return;
   }
   if (kind === "receive" || kind === "smash" || kind === "super" || kind === "power") {
+    // Frappe réussie : ne jamais reclaim — laisser la balle / technique se jouer.
+    if (tutorialHoldPayoff()) {
+      tutorialPayoffComplete(blobL);
+      return;
+    }
     const onGround = ball.y + (typeof BALL_R === "number" ? BALL_R : 14) >= GROUND_Y - 1;
     const lost = ball.popped || ball.inHands || ball.frozen || onGround ||
       ball.x < 20 || ball.x > W - 20 || ball.y < -80;
     if (lost) tutorialApplyScenario(tutorialStep);
+    return;
   }
+  if (kind === "battle") {
+    if (tutorialHoldPayoff()) {
+      tutorialPayoffComplete(blobL);
+      return;
+    }
+    // Duel perdu / fini sans succès → relancer le Smash Battle
+    if (!battle.active && !tutorialBattleOk) tutorialStartBattle();
+  }
+}
+
+/** true si on peut re-feeder un set (pas en plein succès smash du joueur). */
+function meSmashPoseClear() {
+  return !(blobL && blobL.poseAnim === "smash");
 }
 
 /** Manette branchée au lancement du tuto (figé pour toute la session). */
@@ -916,9 +1079,8 @@ function buildTutorialSteps() {
   const L = bindLabel("left"), R = bindLabel("right"), J = bindLabel("jump");
   const F = bindLabel("smash"), S = bindLabel("super");
   const win = "Marque " + TUTORIAL_WIN_SCORE + " points  ·  filet à deux en l'air = Smash Battle";
-  // HUD : 3 pastilles = touches (pas une jauge) · orange = Super Smash · or = SUPER
-  const hud = "Regarde à gauche : ●●● = touches (max " + MAX_TOUCHES +
-    ")  ·  barre orange = Super Smash  ·  barre or = SUPER";
+  // HUD : texte court (sans picto SELECT — déjà sur la ligne Continuer)
+  const hud = "●●● = touches (max " + MAX_TOUCHES + ")  ·  orange = Super Smash  ·  or = SUPER";
   if (tutorialUsesPad()) {
     return [
       { kind: "move", title: "Déplacement",
@@ -926,16 +1088,18 @@ function buildTutorialSteps() {
       { kind: "jump", title: "Saut",
         body: "Saute [[X:A]]  ·  en l'air = double saut" },
       { kind: "serve", title: "Service",
-        body: "[[X:X]] lance  →  [[X:A]] saute  →  [[X:Y]] frappe  ·  pas au sol" },
+        body: "[[X:X]] lance → relâche → [[X:A]] saute → [[X:Y]] frappe" },
       { kind: "receive", title: "Réception",
-        body: "Au sol, sous la balle → [[X:X]] (ou [[X:Y]]) pour diguer" },
+        body: "Au sol · [[X:LS]] vers le HAUT (ou [[X:X]]/[[X:Y]]) sous la balle" },
       { kind: "smash", title: "Smash",
-        body: "Saute [[X:A]] puis [[X:Y]] près de la balle" },
+        body: "Serveur adverse : [[X:A]] saute puis [[X:Y]] en l'air" },
+      { kind: "battle", title: "Smash Battle",
+        body: "Au filet en l'air : martele [[X:A]] plus vite que l'adversaire" },
       { kind: "hud", title: "Score & barres", body: hud },
       { kind: "super", title: "SUPER (barre or)",
-        body: "3 points d'affilée remplissent l'or → [[X:B]] = technique du perso" },
+        body: "3 pts d'affilée → or pleine → [[X:B]]" },
       { kind: "power", title: "Super Smash (orange)",
-        body: "L'orange se remplit en échange → maintiens [[X:Y]] en l'air, dose, relâche" },
+        body: "Orange pleine → maintiens [[X:Y]] en l'air, relâche" },
       { kind: "goal", title: "Objectif", body: win }
     ];
   }
@@ -945,11 +1109,13 @@ function buildTutorialSteps() {
     { kind: "jump", title: "Saut",
       body: "Saute [[K:" + J + "]] / [[K:Espace]] / [[K:↑]]  ·  double saut en l'air" },
     { kind: "serve", title: "Service",
-      body: "[[K:" + F + "]] lance  →  saute  →  [[K:" + F + "]] frappe en l'air  ·  pas au sol" },
+      body: "[[K:" + F + "]] lance  →  saute dans la balle  ·  smash auto  ·  pas au sol" },
     { kind: "receive", title: "Réception",
-      body: "Au sol, place-toi sous la balle [[K:" + L + "]] [[K:" + R + "]]  ·  cloche auto" },
+      body: "Place-toi sous la balle [[K:" + L + "]] [[K:" + R + "]]  ·  digue [[K:" + F + "]]" },
     { kind: "smash", title: "Smash",
-      body: "Saute [[K:" + J + "]] / [[K:Espace]] vers la balle  ·  smash auto au contact" },
+      body: "Balle du serveur adverse : saute [[K:" + J + "]] / [[K:Espace]]  ·  smash auto" },
+    { kind: "battle", title: "Smash Battle",
+      body: "Au filet en l'air : martele [[K:" + J + "]] / [[K:Espace]] plus vite que lui" },
     { kind: "hud", title: "Score & barres", body: hud },
     { kind: "super", title: "SUPER (barre or)",
       body: "3 points d'affilée remplissent l'or → [[K:" + S + "]] = technique du perso" },
@@ -990,29 +1156,202 @@ function tutorialCoachComplete() {
 
 let tutorialAdvanceLock = 0; // tick jusqu'auquel on bloque l'auto-avance (anti-cascade)
 let tutorialStepArmed = true; // false = attendre que la condition soit fausse (action anticipée)
+/** Succès sticky — posés SEULEMENT après armement, sinon cascade d'étapes. */
+let tutorialStepHadMove = false;
+let tutorialReceiveIntent = false;
+let tutorialServeHit = false;
+let tutorialServeLanded = false;
+let tutorialSmashOk = false;
+let tutorialBattleOk = false;
+let tutorialSuperOk = false;
+let tutorialPowerOk = false;
+let tutorialJumpOk = false;
+let tutorialMoveOk = false;
+/** Action réussie, en attente que la balle / l'effet se joue (payoff visible). */
+let tutorialPayoffPending = false;
+let tutorialPayoffSeen = false;
+
+function tutorialResetStepIntent() {
+  tutorialStepHadMove = false;
+  tutorialReceiveIntent = false;
+  tutorialServeHit = false;
+  tutorialServeLanded = false;
+  tutorialSmashOk = false;
+  tutorialBattleOk = false;
+  tutorialSuperOk = false;
+  tutorialPowerOk = false;
+  tutorialJumpOk = false;
+  tutorialMoveOk = false;
+  tutorialPayoffPending = false;
+  tutorialPayoffSeen = false;
+}
+
+/** Étapes où on laisse la frappe partir avant d'avancer. */
+function tutorialNeedsPayoff() {
+  const k = tutorialStepKind(tutorialStep);
+  return k === "serve" || k === "receive" || k === "smash" ||
+    k === "battle" || k === "super" || k === "power";
+}
+
+/** true = ne pas reclaim / re-feed (la frappe doit se jouer). */
+function tutorialHoldPayoff() {
+  return tutorialNeedsPayoff() && tutorialPayoffPending && !tutorialPayoffSeen;
+}
+
+function tutorialMarkPayoffSeen() {
+  tutorialPayoffSeen = true;
+  const br = typeof BALL_R === "number" ? BALL_R : 14;
+  if (ball.x > NET_X) {
+    ball.y = Math.min(ball.y, GROUND_Y - br);
+    ball.vx = 0; ball.vy = 0;
+  }
+}
+
+/** Sol adverse (ou sortie) après une frappe réussie. */
+function tutorialBallPayoffLanded() {
+  const br = typeof BALL_R === "number" ? BALL_R : 14;
+  const onGround = !!ball.popped || ball.y + br >= GROUND_Y - 1;
+  if (!onGround) return false;
+  return ball.x > NET_X + 8 || ball.x > W - 24;
+}
+
+/** Payoff visible terminé (balle au sol adverse, ou technique SUPER finie). */
+function tutorialPayoffComplete(me) {
+  if (tutorialPayoffSeen || tutorialServeLanded) return true;
+  if (!tutorialPayoffPending) return false;
+  const kind = tutorialStepKind(tutorialStep);
+  // SUPER : laisser jouer toute la technique du perso
+  if (kind === "super" && tutorialSuperOk && me && (me.superT | 0) === 0) {
+    tutorialPayoffSeen = true;
+    return true;
+  }
+  // Power : pendant le dosage la balle est figée — attendre le relâchement + sol
+  if (kind === "power" && powerWindup && powerWindup.side === 0) return false;
+  if (tutorialBallPayoffLanded()) {
+    tutorialMarkPayoffSeen();
+    if (kind === "serve") tutorialServeLanded = true;
+    return true;
+  }
+  return false;
+}
+
+/** Manette : stick HAUT = dig (pas le latéral = déplacement, sinon auto-succès). */
+function tutorialPadReceiveStick(me) {
+  const input = me && me._input;
+  if (!input) return false;
+  const ay = Number(input.ay) || 0;
+  return ay < -0.5;
+}
+
+/** Nettoie poses / windup pour ne pas valider l'étape suivante par inertie. */
+function tutorialClearPlayerActionState() {
+  if (blobL) {
+    blobL.poseAnim = "";
+    blobL.poseT = 0;
+    blobL.poseDur = 0;
+  }
+  if (typeof powerWindup !== "undefined") powerWindup = null;
+}
+
+/**
+ * Enregistre une action FRAÎCHE pour l'étape courante (après armement).
+ * Les états résiduels (pose smash, SUPER encore actif, bouton tenu) sont ignorés.
+ */
+function tutorialNoteStepIntent(me) {
+  if (!me || !tutorialStepArmed) return;
+  const kind = tutorialStepKind(tutorialStep);
+  if (kind === "move" && Math.abs(me.vx) > 1.2) tutorialMoveOk = true;
+  if (kind === "jump" && !me.onGround) tutorialJumpOk = true;
+  if (kind === "receive") {
+    if (me._smashEdge || me._smashXEdge || me._smashYEdge) tutorialReceiveIntent = true;
+    else if (tutorialUsesPad() && tutorialPadReceiveStick(me)) tutorialReceiveIntent = true;
+    // Dig réussi (pose) → on attend que la balle parte / tombe
+    if (tutorialReceiveIntent && me.poseAnim === "receive") {
+      tutorialPayoffPending = true;
+    }
+  }
+  if (kind === "smash" && me.poseAnim === "smash") {
+    tutorialSmashOk = true;
+    tutorialPayoffPending = true;
+  }
+  if (kind === "battle" && tutorialBattleOk) {
+    tutorialPayoffPending = true;
+  }
+  if (kind === "super" && (me.superT | 0) > 0) {
+    tutorialSuperOk = true;
+    tutorialPayoffPending = true;
+  }
+  if (kind === "power") {
+    // Windup en cours ou frappe lourde relâchée
+    if (powerWindup && powerWindup.side === 0) {
+      tutorialPowerOk = true;
+      tutorialPayoffPending = true;
+    } else if (tutorialPowerOk && ball.lastTouchSide === 0 && !ball.inHands) {
+      tutorialPayoffPending = true;
+    }
+  }
+  if (kind === "serve") {
+    if (servingSide !== 0 || ball.inHands) return;
+    if (!ball.serveAimLock && ball.lastTouchSide === 0) {
+      if (tutorialUsesPad()) {
+        if (me.poseAnim === "smash" || ball.vx > 2.5 || ball.x > NET_X || tutorialServeHit)
+          tutorialServeHit = true;
+      } else {
+        tutorialServeHit = true;
+      }
+    }
+    if (tutorialServeHit) tutorialPayoffPending = true;
+  }
+  // Payoff : balle au sol / technique finie
+  tutorialPayoffComplete(me);
+}
+
+/** Étape Réception : pas de cloche passive (sinon l'étape passe toute seule). */
+function tutorialReceiveNeedsExplicitDig() {
+  return !!tutorialMode && tutorialStepKind(tutorialStep) === "receive";
+}
 
 function tutorialStepConditionMet(me) {
   const kind = tutorialStepKind(tutorialStep);
-  if (kind === "move") return Math.abs(me.vx) > 1.2;
-  if (kind === "jump") return !me.onGround;
-  if (kind === "serve") {
-    // Clavier : lancer suffit (frappe auto en sautant). Manette : lancer puis Y.
-    if (servingSide !== 0) return false;
-    if ((ball.tossGrace | 0) > 0) return true;
-    if (tutorialUsesPad() && !ball.inHands && ball.lastTouchSide === 0 &&
-        me.poseAnim === "smash") return true;
-    return false;
+  if (kind === "move") return tutorialMoveOk || Math.abs(me.vx) > 1.2;
+  if (kind === "jump") return tutorialJumpOk || !me.onGround;
+  // Frappe : action + payoff visible (balle / technique)
+  if (kind === "serve" || kind === "receive" || kind === "smash" ||
+      kind === "battle" || kind === "super" || kind === "power") {
+    if (tutorialPayoffComplete(me)) return true;
+    if (!tutorialStepArmed && kind !== "battle") return false;
+    if (kind === "serve") {
+      if (servingSide !== 0 || ball.inHands) return false;
+      if (!ball.serveAimLock && ball.lastTouchSide === 0) {
+        if (tutorialUsesPad()) {
+          if (me.poseAnim === "smash" || ball.vx > 2.5 || ball.x > NET_X || tutorialServeHit)
+            tutorialServeHit = true;
+        } else {
+          tutorialServeHit = true;
+        }
+      }
+      if (tutorialServeHit) tutorialPayoffPending = true;
+    } else if (kind === "receive") {
+      if (!(tutorialReceiveIntent && (me.poseAnim === "receive" || tutorialPayoffPending)))
+        return false;
+      tutorialPayoffPending = true;
+    } else if (kind === "smash") {
+      if (!tutorialSmashOk) return false;
+      tutorialPayoffPending = true;
+    } else if (kind === "battle") {
+      if (!tutorialBattleOk) return false;
+      tutorialPayoffPending = true;
+    } else if (kind === "super") {
+      if (!tutorialSuperOk) return false;
+      tutorialPayoffPending = true;
+    } else if (kind === "power") {
+      if (!tutorialPowerOk) return false;
+      tutorialPayoffPending = true;
+    }
+    return tutorialPayoffComplete(me);
   }
-  if (kind === "receive") return me.poseAnim === "receive";
-  if (kind === "smash") return me.poseAnim === "smash";
-  // Étape info : pas d'action — auto-avance après le délai mini (voir tickTutorialCoach)
+  // Info : pas d'auto — Entrée / Select pour continuer
   if (kind === "hud") return false;
-  if (kind === "super") return me.superT > 0;
-  if (kind === "power") {
-    if (powerWindup && powerWindup.side === 0) return true;
-    if (ball.smash > 40 && ball.lastTouchSide === 0) return true;
-    return false;
-  }
   return false;
 }
 
@@ -1024,10 +1363,13 @@ function advanceTutorialStep() {
     tutorialStep++;
     const now = typeof tick === "number" ? tick : 0;
     tutorialStepShownAt = now;
-    tutorialAdvanceLock = now + 40;
+    // Lock = délai mini : empêche toute cascade même si la condition est déjà vraie
+    tutorialAdvanceLock = now + TUTORIAL_STEP_MIN_T;
     // Tant que la condition est déjà vraie (ex. encore en l'air après un saut
     // anticipé), on n'arme pas : il faudra la relâcher puis la refaire.
     tutorialStepArmed = false;
+    tutorialResetStepIntent();
+    tutorialClearPlayerActionState();
     tutorialApplyScenario(tutorialStep);
     beep(520, 0.04, "square", 0.06);
     // Si le score est déjà bon et qu'on arrive à l'objectif → terminer
@@ -1039,21 +1381,47 @@ function advanceTutorialStep() {
 function tickTutorialCoach() {
   if (!tutorialMode) return;
   if (state !== "serve" && state !== "play") return;
-  if (typeof tickTutorialScenario === "function") tickTutorialScenario();
-  if (typeof tick === "number" && tick < tutorialAdvanceLock) return;
-  if (!tutorialStepMinElapsed()) return; // 5 s mini avant auto-avance / skip
-  // Étape « Score & barres » : pure info → avance seule après le délai
-  if (tutorialStepKind(tutorialStep) === "hud") {
-    advanceTutorialStep();
-    return;
-  }
   const me = blobL;
-  const met = tutorialStepConditionMet(me);
-  if (!tutorialStepArmed) {
-    if (!met) tutorialStepArmed = true; // condition retombée → prêt pour une vraie action
-    return;
+  // 1) Désarmer tant que l'ancienne action est encore « vraie »
+  const liveBusy = tutorialStepLiveBusy(me);
+  if (!tutorialStepArmed && !liveBusy) tutorialStepArmed = true;
+  // 2) Puis seulement, enregistrer une nouvelle action
+  tutorialNoteStepIntent(me);
+  const metNow = tutorialStepConditionMet(me);
+
+  let advanced = false;
+  if (!(typeof tick === "number" && tick < tutorialAdvanceLock) && tutorialStepMinElapsed()) {
+    // HUD : pas d'auto — uniquement Passer (Entrée / Select)
+    if (tutorialStepArmed && metNow) {
+      advanceTutorialStep();
+      advanced = true;
+    }
   }
-  if (met) advanceTutorialStep();
+  if (!advanced && typeof tickTutorialScenario === "function") tickTutorialScenario();
+}
+
+/**
+ * État résiduel qui empêche d'armer (il faut relâcher / attendre).
+ * Ne doit PAS inclure les succès sticky de l'étape courante.
+ */
+function tutorialStepLiveBusy(me) {
+  if (!me) return false;
+  const kind = tutorialStepKind(tutorialStep);
+  if (kind === "move") return Math.abs(me.vx) > 1.2;
+  if (kind === "jump") return !me.onGround;
+  // Frappe : l'armement ne dépend pas du payoff (sinon on re-dig en boucle)
+  if (kind === "serve" || kind === "receive" || kind === "smash" ||
+      kind === "battle" || kind === "super" || kind === "power") {
+    if (tutorialPayoffPending || tutorialPayoffSeen) return false;
+    if (kind === "battle") return !!(battle && battle.active);
+    if (kind === "receive") return me.poseAnim === "receive";
+    if (kind === "smash") return me.poseAnim === "smash";
+    if (kind === "super") return (me.superT | 0) > 0;
+    if (kind === "power") return !!(powerWindup && powerWindup.side === 0);
+    return false;
+  }
+  if (kind === "hud") return false;
+  return false;
 }
 
 /** Fin de match tutoriel seulement après le coach + score joueur. */
@@ -1074,18 +1442,31 @@ function maybeFinishTutorialMatch() {
   if (typeof sfxMatchWin === "function") sfxMatchWin();
 }
 
+function menuDemoPickChars() {
+  const pool = (typeof menuCharacterIndices === "function")
+    ? menuCharacterIndices().slice()
+    : ((typeof characterIndices === "function")
+      ? characterIndices().slice()
+      : CHARACTERS.map((_, i) => i));
+  if (!pool.length) return { a: 0, b: 0 };
+  const a = pool[Math.floor(Math.random() * pool.length)];
+  let b = a;
+  if (pool.length > 1) {
+    while (b === a) b = pool[Math.floor(Math.random() * pool.length)];
+  }
+  return { a, b };
+}
+
 function shuffleMenuBackdrop() {
-  const nA = CHARACTERS.length, nT = TERRAINS.length;
+  const nT = TERRAINS.length;
   menuBg.terrain = Math.floor(Math.random() * nT);
-  const a = Math.floor(Math.random() * nA);
-  let b = Math.floor(Math.random() * nA);
-  if (nA > 1) while (b === a) b = Math.floor(Math.random() * nA);
-  menuBg.charL = a;
-  menuBg.charR = b;
-  menuActors.L = makeMenuActor(0, a);
-  menuActors.R = makeMenuActor(1, b);
+  const pick = menuDemoPickChars();
+  menuBg.charL = pick.a;
+  menuBg.charR = pick.b;
+  menuActors.L = makeMenuActor(0, pick.a);
+  menuActors.R = makeMenuActor(1, pick.b);
   menuBg.ballX = W * 0.42 + Math.random() * W * 0.16;
-  menuBg.ballY = 90 + Math.random() * 40;
+  menuBg.ballY = GROUND_Y - 220 - Math.random() * 80;
   menuBg.ballVy = -2.2;
   menuBg.init = true;
   menuBg.t0 = performance.now();
@@ -1097,8 +1478,8 @@ function makeMenuActor(side, charIdx) {
   const a = CHARACTERS[charIdx];
   const minX = side === 0 ? 70 : NET_X + 55;
   const maxX = side === 0 ? NET_X - 55 : W - 70;
-  // Vitesse en px/frame rendu — assez pour que la foulée soit visible
-  const spd = 1.4;
+  // Vitesse proche du jeu (dispVx ≈ px/frame à 60 Hz)
+  const spd = 2.6;
   return {
     x: side === 0 ? W * 0.22 : W * 0.78,
     y: GROUND_Y, side, charId: charIdx,
@@ -1110,28 +1491,59 @@ function makeMenuActor(side, charIdx) {
     _menuActor: true, // décor menu : marche ou saut, jamais patinage / slip
     _walking: true, _faceRight: side === 0, _faceLock: 0,
     _walkAcc: 0,
-    minX, maxX, hopT: 90 + Math.floor(Math.random() * 160)
+    minX, maxX, hopT: 140 + Math.floor(Math.random() * 220)
   };
+}
+
+function menuApplyDemoChar(blob, idx, resetAi) {
+  const ch = CHARACTERS[idx];
+  blob.charId = idx;
+  if (ch) { blob.color = ch.color; blob.darkColor = ch.darkColor; }
+  blob.speedMul = 1;
+  blob.kitSpeed = undefined;
+  blob.kitPower = undefined;
+  // Ne reset l'IA qu'au démarrage du match démo — sinon _aiErrT/_aiLandN
+  // sont re-tirés chaque tick → cible qui saute → zig-zag gauche/droite.
+  if (resetAi) {
+    blob._aiErr1 = 0;
+    blob._aiRush = false;
+    blob._aiErrT = 0;
+    blob._aiLandN = 0;
+    blob._aiSteer = 0;
+    blob._aiChaseReady = false;
+    blob._aiReactUntil = null;
+    blob._aiTossTick = null;
+  }
 }
 
 /** Lance / relance le match fantôme IA vs IA derrière les menus. */
 function startMenuDemoMatch(reshuffleChars) {
+  if (typeof online !== "undefined" && online) return;
+  // Sélection perso/terrain : ne pas écraser le choix joueur sur blobL/R.
+  const preservePick = state === "selectCharacter" || state === "selectTerrain";
+  const savedPick = preservePick ? {
+    lId: blobL.charId, rId: blobR.charId,
+    lCol: blobL.color, lDark: blobL.darkColor,
+    rCol: blobR.color, rDark: blobR.darkColor
+  } : null;
+
   if (reshuffleChars !== false) {
-    const nA = CHARACTERS.length, nT = TERRAINS.length;
+    const nT = TERRAINS.length;
     menuBg.terrain = Math.floor(Math.random() * nT);
-    const a = Math.floor(Math.random() * nA);
-    let b = Math.floor(Math.random() * nA);
-    if (nA > 1) while (b === a) b = Math.floor(Math.random() * nA);
-    menuBg.charL = a;
-    menuBg.charR = b;
-    menuActors.L = makeMenuActor(0, a);
-    menuActors.R = makeMenuActor(1, b);
+    const pick = menuDemoPickChars();
+    menuBg.charL = pick.a;
+    menuBg.charR = pick.b;
+    menuActors.L = makeMenuActor(0, pick.a);
+    menuActors.R = makeMenuActor(1, pick.b);
   }
   menuBg.init = true;
   menuBg.t0 = performance.now();
 
   const uiState = state;
-  const savedNoFx = noFx;
+  const saved = {
+    noFx, online, vsAI, tutorialMode, bombMode, flameMode,
+    mapEventsQuiet, paused, mode
+  };
   if (typeof setMode === "function") setMode("1v1");
   else { mode = "1v1"; activeBlobs = [blobL, blobR]; }
   vsAI = true;
@@ -1143,17 +1555,8 @@ function startMenuDemoMatch(reshuffleChars) {
   paused = false;
   if (typeof setSeed === "function") setSeed((Math.random() * 2 ** 31) | 0);
 
-  const applyChar = (blob, idx) => {
-    const ch = CHARACTERS[idx];
-    blob.charId = idx;
-    if (ch) { blob.color = ch.color; blob.darkColor = ch.darkColor; }
-    blob.speedMul = 1;
-    blob.kitSpeed = undefined;
-    blob.kitPower = undefined;
-    blob._aiErr1 = 0; blob._aiRush = false; blob._aiErrT = 0;
-  };
-  applyChar(blobL, menuBg.charL);
-  applyChar(blobR, menuBg.charR);
+  menuApplyDemoChar(blobL, menuBg.charL, true);
+  menuApplyDemoChar(blobR, menuBg.charR, true);
   scores[0] = 0; scores[1] = 0;
   streak[0] = 0; streak[1] = 0;
   superCharge[0] = 0; superCharge[1] = 0;
@@ -1171,7 +1574,20 @@ function startMenuDemoMatch(reshuffleChars) {
   menuDemo.matchState = state; // "serve" après startRally
   menuDemo.live = true;
   state = uiState;
-  noFx = savedNoFx;
+  noFx = saved.noFx;
+  online = saved.online;
+  vsAI = saved.vsAI;
+  tutorialMode = saved.tutorialMode;
+  bombMode = saved.bombMode;
+  flameMode = saved.flameMode;
+  mapEventsQuiet = saved.mapEventsQuiet;
+  paused = saved.paused;
+  if (saved.mode && typeof setMode === "function") setMode(saved.mode);
+  else mode = saved.mode;
+  if (savedPick) {
+    blobL.charId = savedPick.lId; blobL.color = savedPick.lCol; blobL.darkColor = savedPick.lDark;
+    blobR.charId = savedPick.rId; blobR.color = savedPick.rCol; blobR.darkColor = savedPick.rDark;
+  }
 }
 
 function ensureMenuBackdrop() {
@@ -1198,10 +1614,18 @@ function tickMenuDemo() {
     menuDemo.live = false;
     return;
   }
+  // Ceinture + bretelles : ne jamais toucher la simu pendant une session net
+  if (typeof online !== "undefined" && online) return;
   ensureMenuBackdrop();
   if (!menuDemo.live) return;
 
   const uiState = state;
+  const preservePick = uiState === "selectCharacter" || uiState === "selectTerrain";
+  const savedPick = preservePick ? {
+    lId: blobL.charId, rId: blobR.charId,
+    lCol: blobL.color, lDark: blobL.darkColor,
+    rCol: blobR.color, rDark: blobR.darkColor
+  } : null;
   const saved = {
     noFx, mapEventsQuiet, bombMode, flameMode, vsAI, mode, online,
     tutorialMode, paused, aiLevel, terrain, weather, shake
@@ -1220,6 +1644,9 @@ function tickMenuDemo() {
   terrain = menuBg.terrain;
   weather = "clear";
   state = menuDemo.matchState;
+  // Simu avec les persos de la démo (pas le choix joueur en sélection)
+  menuApplyDemoChar(blobL, menuBg.charL);
+  menuApplyDemoChar(blobR, menuBg.charR);
 
   if (state === "point") {
     if (typeof settleAirborneBlobs === "function") settleAirborneBlobs();
@@ -1269,30 +1696,40 @@ function tickMenuDemo() {
   shake = typeof saved.shake === "number" ? saved.shake : 0;
   if (saved.mode && typeof setMode === "function") setMode(saved.mode);
   else mode = saved.mode;
+  if (savedPick) {
+    blobL.charId = savedPick.lId; blobL.color = savedPick.lCol; blobL.darkColor = savedPick.lDark;
+    blobR.charId = savedPick.rId; blobR.color = savedPick.rCol; blobR.darkColor = savedPick.rDark;
+  }
 }
 
 function tickMenuActors() {
-  // ~16 px par frame rendu → foulée lisible (fallback hors démo IA)
+  // Fallback hors démo IA — même gravité / sol que le jeu
+  const gravBlob = (typeof GRAV_BLOB === "number") ? GRAV_BLOB : 0.65;
+  const jumpV = (typeof BLOB_JUMP === "number") ? BLOB_JUMP * 0.55 : -9;
+  const gravBall = (typeof GRAV_BALL === "number") ? GRAV_BALL : 0.25;
+  const ballFloor = GROUND_Y - ((typeof BALL_R === "number") ? BALL_R : 12);
   const STRIDE = 16;
   for (const b of [menuActors.L, menuActors.R]) {
     if (!b) continue;
     b._menuActor = true;
     b.scramble = 0;
-    const spd = Math.max(1.2, Math.abs(b.dispVx) || 1.4);
+    const spd = Math.max(2.2, Math.abs(b.dispVx) || 2.6);
     let dir = b.dispVx >= 0 ? 1 : -1;
     b.hopT--;
     if (b.hopT <= 0 && b.onGround) {
-      b.vy = -3.4; b.onGround = false; b.hopT = 200 + Math.floor(Math.random() * 220);
+      b.vy = jumpV; b.onGround = false; b.hopT = 200 + Math.floor(Math.random() * 220);
     }
     if (!b.onGround) {
       b.x += dir * spd;
       if (b.x <= b.minX) { b.x = b.minX; dir = 1; }
       if (b.x >= b.maxX) { b.x = b.maxX; dir = -1; }
-      b.vy += 0.28; b.y += b.vy;
+      b.vy += gravBlob; b.y += b.vy;
       if (b.y >= GROUND_Y) { b.y = GROUND_Y; b.vy = 0; b.onGround = true; b.squash = 4; }
       b._walking = false;
       b._walkAcc = 0;
     } else {
+      b.y = GROUND_Y;
+      b.vy = 0;
       b.x += dir * spd;
       if (b.x <= b.minX) { b.x = b.minX; dir = 1; }
       if (b.x >= b.maxX) { b.x = b.maxX; dir = -1; }
@@ -1309,13 +1746,16 @@ function tickMenuActors() {
     b._faceRight = dir > 0;
     b._faceLock = 0;
   }
-  menuBg.ballVy += 0.06;
+  menuBg.ballVy += gravBall;
   menuBg.ballY += menuBg.ballVy;
-  if (menuBg.ballY > GROUND_Y - 160) {
-    menuBg.ballY = GROUND_Y - 160;
-    menuBg.ballVy = -2.2 - Math.random() * 0.7;
+  if (menuBg.ballY > ballFloor) {
+    menuBg.ballY = ballFloor;
+    menuBg.ballVy = -6.5 - Math.random() * 2.5;
   }
   menuBg.ballX += Math.sin(performance.now() / 1400) * 0.18;
+  const minBx = 80, maxBx = W - 80;
+  if (menuBg.ballX < minBx) menuBg.ballX = minBx;
+  if (menuBg.ballX > maxBx) menuBg.ballX = maxBx;
 }
 
 function drawMenuWorld() {
@@ -1327,11 +1767,21 @@ function drawMenuWorld() {
   weather = "clear";
   drawBackground();
   drawNet();
+  // Comme en match (render.js) : joueurs d'abord, balle au premier plan
   if (useDemo) {
-    if (typeof drawBall === "function") drawBall();
+    // Affiche les persos de la démo (pas le choix joueur en sélection)
+    const sL = { id: blobL.charId, c: blobL.color, d: blobL.darkColor };
+    const sR = { id: blobR.charId, c: blobR.color, d: blobR.darkColor };
+    menuApplyDemoChar(blobL, menuBg.charL);
+    menuApplyDemoChar(blobR, menuBg.charR);
     drawCharacter(blobL);
     drawCharacter(blobR);
+    if (typeof drawBall === "function") drawBall();
+    blobL.charId = sL.id; blobL.color = sL.c; blobL.darkColor = sL.d;
+    blobR.charId = sR.id; blobR.color = sR.c; blobR.darkColor = sR.d;
   } else {
+    if (menuActors.L) drawCharacter(menuActors.L);
+    if (menuActors.R) drawCharacter(menuActors.R);
     const bx = menuBg.ballX, by = menuBg.ballY;
     const shScale = Math.max(0.35, 1 - (GROUND_Y - by) / 400);
     ctx.fillStyle = "rgba(0,0,0," + (0.22 * shScale) + ")";
@@ -1353,8 +1803,6 @@ function drawMenuWorld() {
       ctx.beginPath(); ctx.arc(0, 0, BALL_R, 0, Math.PI * 2); ctx.fill();
     }
     ctx.restore();
-    if (menuActors.L) drawCharacter(menuActors.L);
-    if (menuActors.R) drawCharacter(menuActors.R);
   }
   terrain = savedT;
   weather = savedW;
@@ -1519,7 +1967,8 @@ function drawXboxPicto(x, y, btn, size) {
     return w;
   }
   const r = s * 0.55;
-  const cx = x + r, cy = y - r * 0.15;
+  // Même ancrage vertical que drawKeyPicto (baseline y) — F et Y sur une ligne
+  const cx = x + r, cy = y - (s + 4) / 2 + 3;
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.fillStyle = col;
@@ -1834,7 +2283,7 @@ function drawVolumeControl(x, y) {
 }
 
 function drawMenu() {
-  const nP = characterIndices().length, nT = terrainIndices().length;
+  const nP = menuCharacterIndices().length, nT = terrainIndices().length;
   menuScreenBase({
     title: "SOMMET VOLLEY",
     kicker: "Volley satirique · " + nP + " persos · " + nT + " terrains",
@@ -2327,9 +2776,9 @@ function drawTutorialControls(dev, x, y, maxW) {
   const rows = {
     keyboard: [
       ["Bouger / sauter", "[[K:" + kL + "]] [[K:" + kR + "]] bouger  ·  [[K:" + kJ + "]] / [[K:Espace]] sauter"],
-      ["Réception (au sol)", "Place-toi sous la balle — cloche auto"],
+      ["Réception (au sol)", "Place-toi sous la balle → touche frappe"],
       ["Smash (en l'air)", "Saute au contact : smash auto"],
-      ["Service", "[[K:" + kF + "]] lancer, puis saute et [[K:" + kF + "]] frappe"],
+      ["Service", "[[K:" + kF + "]] lancer, puis saute dans la balle (smash auto)"],
       ["SUPER (jauge or)", "3 points d'affilée → [[K:" + kS + "]]"],
       ["Super Smash", "Jauge orange → maintiens [[K:" + kF + "]] en l'air, relâche"],
       ["Pause", "[[K:P]] ou [[K:Échap]]"]
@@ -2338,7 +2787,7 @@ function drawTutorialControls(dev, x, y, maxW) {
       ["Déplacement", "[[X:LS]] stick gauche  ou  [[X:DPAD]] croix"],
       ["Saut", "[[X:A]]  (double saut en l'air)"],
       ["Service", "[[X:X]] lance  →  [[X:A]] saute  →  [[X:Y]] frappe"],
-      ["Réception", "Au sol, sous la balle → [[X:X]] (ou [[X:Y]])"],
+      ["Réception", "Au sol : [[X:LS]] vers le HAUT (ou [[X:X]] / [[X:Y]])"],
       ["Smash", "En l'air → [[X:Y]] près de la balle"],
       ["SUPER (jauge or)", "[[X:B]]  (ou [[X:RB]]) — technique du perso"],
       ["Super Smash", "Jauge orange → maintiens [[X:Y]] en l'air, relâche"],
@@ -2615,13 +3064,28 @@ function drawTutorialCoach() {
   const pad = typeof padConnected !== "undefined" && padConnected;
   const body = tutorialStepBody(tip);
   const canSkip = tutorialStepCanSkip();
+  const isHud = tip.kind === "hud";
 
   // Géométrie alignée sur drawHUD : pastilles à W*0.22 / W*0.78, pw=132, py=GROUND_Y+14
   const pillR = W * 0.22 + 66;   // bord droit pastille gauche
   const pillL = W * 0.78 - 66;   // bord gauche pastille droite
   const gap = pillL - pillR;
-  const pw = Math.min(340, Math.max(200, gap - 16));
-  const ph = 62;                 // même hauteur que les pastilles score
+  const pw = Math.min(360, Math.max(220, gap - 12));
+  const textW = pw - 24;
+  const bodySize = 11;
+  // Hauteur dynamique : si le markup déborde, 2 lignes + skip
+  let bodyH = bodySize + 4;
+  if (typeof measureControlMarkup === "function" && body.indexOf("[[") >= 0) {
+    const est = measureControlMarkup(body, bodySize);
+    if (est > textW) bodyH = (bodySize + 4) * 2 + 2;
+  } else if (typeof ctx !== "undefined") {
+    ctx.save();
+    ctx.font = "700 " + bodySize + "px " + UI.sans;
+    if (ctx.measureText(body).width > textW) bodyH = (bodySize + 3) * 2;
+    ctx.restore();
+  }
+  const skipH = canSkip ? 16 : 0;
+  const ph = Math.min(92, 18 + bodyH + skipH + 8);
   const px = (W - pw) / 2;
   const py = GROUND_Y + 14;
   // Ne pas dépasser le bas du canvas (SCORE_BAND)
@@ -2636,35 +3100,53 @@ function drawTutorialCoach() {
 
   ctx.textAlign = "center";
   ctx.fillStyle = UI.gold;
-  ctx.font = "800 12px " + UI.sans;
+  ctx.font = "800 11px " + UI.sans;
   ctx.fillText(
     "Tutoriel · " + (tutorialStep + 1) + "/" + TUTORIAL_STEPS.length + "  —  " + tip.title,
-    W / 2, py + 14
+    W / 2, py + 13
   );
 
-  const textW = pw - 20;
-  // Avec « Passer », laisser de l'air vertical entre body et pictos skip
-  const bodyY = canSkip ? py + 32 : py + 36;
+  // Zone body clipée au-dessus de la ligne skip (évite suite/Passer superposés)
+  const skipY = py + ph - 8;
+  const bodyY = py + 28;
+  const bodyBottom = canSkip ? skipY - 10 : py + ph - 6;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(px + 6, py + 16, pw - 12, Math.max(8, bodyBottom - (py + 16)));
+  ctx.clip();
   if (typeof drawControlMarkup === "function" && body.indexOf("[[") >= 0) {
     const est = typeof measureControlMarkup === "function"
-      ? Math.min(textW, measureControlMarkup(body, 12))
+      ? Math.min(textW, measureControlMarkup(body, bodySize))
       : Math.min(textW, 200);
-    drawControlMarkup(px + (pw - est) / 2, bodyY, body, textW, 12);
+    drawControlMarkup(px + (pw - est) / 2, bodyY, body, textW, bodySize);
   } else {
     ctx.fillStyle = "rgba(255,246,232,0.95)";
-    ctx.font = "700 12px " + UI.sans;
-    ctx.fillText(body, W / 2, bodyY);
+    ctx.font = "700 " + bodySize + "px " + UI.sans;
+    ctx.textAlign = "center";
+    // Wrap simple si trop long
+    if (ctx.measureText(body).width > textW && typeof uiWrapLines === "function") {
+      const lines = uiWrapLines(body, textW).slice(0, 2);
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], W / 2, bodyY + i * (bodySize + 3));
+      }
+    } else {
+      ctx.fillText(body, W / 2, bodyY);
+    }
   }
+  ctx.restore();
 
   if (canSkip) {
-    // Manette : Select/View — jamais A (saut) ni B (SUPER)
-    const skip = pad ? "Passer [[X:SELECT]]" : "Passer [[K:Entrée]]";
+    // HUD = Continuer (obligatoire) ; autres = Passer. Un seul SELECT, jamais dans le body.
+    const skip = pad
+      ? ((isHud ? "Continuer" : "Passer") + " [[X:SELECT]]")
+      : ((isHud ? "Continuer" : "Passer") + " [[K:Entrée]]");
     if (typeof drawControlMarkup === "function") {
-      ctx.globalAlpha = 0.85;
+      ctx.globalAlpha = 0.9;
       const est = typeof measureControlMarkup === "function"
         ? Math.min(textW, measureControlMarkup(skip, 10))
         : Math.min(textW, 120);
-      drawControlMarkup(px + (pw - est) / 2, py + ph - 9, skip, textW, 10);
+      drawControlMarkup(px + (pw - est) / 2, skipY, skip, textW, 10);
     }
   }
   ctx.restore();
@@ -2693,16 +3175,20 @@ function drawRules() {
   const rx = mid + 10;
   const rightW = W - UI.mx - rx;
   const hCol = "#7ed957";
-  const footY = H - 28;
+  const bodyTop = 88;
+  const bodyBot = H - 36;
+  const viewH = bodyBot - bodyTop;
 
-  // --- Colonne gauche (clip) : règles condensées ---
+  // Zone scrollable (titre fixe au-dessus)
   ctx.save();
   ctx.beginPath();
-  ctx.rect(lx - 4, 88, leftW + 8, footY - 92);
+  ctx.rect(UI.mx - 12, bodyTop, W - UI.mx * 2 + 24, viewH);
   ctx.clip();
+  ctx.translate(0, -rulesScroll);
 
+  // --- Colonne gauche : règles ---
   ctx.textAlign = "left";
-  let y = 100;
+  let y = bodyTop + 12;
   const h = (txt, c) => {
     ctx.fillStyle = c || hCol;
     ctx.font = "700 13px " + UI.sans;
@@ -2725,7 +3211,7 @@ function drawRules() {
 
   h("But");
   p("Fais tomber la balle dans le camp adverse. Premier à " + WIN_SCORE + " avec 2 d'écart. Max " + MAX_TOUCHES + " touches par camp.");
-  y += 4;
+  y += 16;
   h("Commandes");
   y = drawControlMarkup(lx, y,
     "Clavier [[K:" + bindLabel("left") + "]][[K:" + bindLabel("right") + "]] " +
@@ -2736,63 +3222,74 @@ function drawRules() {
     leftW, 12);
   p("Clavier : sol = cloche · air = smash. Droite local : flèches + Shift dr. SUPER.");
   y = drawControlMarkup(lx, y, "Pause [[K:P]] / [[K:Échap]] · son [[K:M]] · musique [[K:N]]", leftW, 12);
-  y += 4;
+  y += 16;
   h("Gameplay");
   p("Au sol, balle sur toi = cloche auto. En l'air = smash auto au contact.");
   y = drawControlMarkup(lx, y,
-    "Service : [[K:" + bindLabel("smash") + "]] / [[X:X]] lancer, puis saute et [[X:Y]] frappe (pas au sol).",
+    "Service : [[K:" + bindLabel("smash") + "]] / [[X:X]] lancer → saute (clavier) / [[X:Y]] (manette).",
     leftW, 12);
-  y += 4;
+  y += 16;
   h("HUD — 2 jauges + touches");
   p("Sous le score : ●●● = touches du camp (max " + MAX_TOUCHES + ", ce n'est PAS une jauge). Barre orange = Super Smash (échange). Barre or = SUPER du perso (points d'affilée).");
-  y += 4;
+  y += 16;
   h("★ SUPER", "#ffd93d");
   y = drawControlMarkup(lx, y,
     "3 points d'affilée → [[K:" + bindLabel("super") + "]] ou [[X:B]] (technique du perso).",
     leftW, 12);
-  y += 4;
+  y += 16;
   h("⚡ SUPER SMASH", "#ff6a2a");
   y = drawControlMarkup(lx, y,
     "Jauge orange pleine → maintiens [[K:" + bindLabel("smash") + "]] / [[X:Y]] en l'air, relâche.",
     leftW, 12);
-  y += 4;
+  y += 16;
   h("Smash Battle", "#ff8a65");
   p("Les deux joueurs en l'air près du filet + balle proche = duel de sauts. Le gagnant smash mortel, le perdant est stun.");
-  y += 4;
+  y += 16;
   h("Météo & événements", "#4db3ff");
   p("Météo sur toutes les maps : pluie/orage, neige/blizzard (Place Écarlate), tempête de sable (Country Club). Sol glissant, balle plus lourde.");
   p("Chaque terrain a un événement (canon, voiturette, cortège, radar, lanternes, tapis, vache, aras, faucon, paon…).");
-  ctx.restore();
+  const leftBottom = y + 12;
 
-  // --- Colonne droite (clip) : persos en liste ---
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(rx - 4, 88, rightW + 8, footY - 92);
-  ctx.clip();
-
+  // --- Colonne droite : persos du roster menu ---
+  let ry = bodyTop + 12;
   ctx.textAlign = "left";
   ctx.fillStyle = hCol;
   ctx.font = "800 14px " + UI.display;
-  ctx.fillText("Personnages", rx, 108);
+  ctx.fillText("Personnages", rx, ry);
+  ry += 16;
   ctx.fillStyle = "rgba(255,255,255,0.45)";
   ctx.font = "600 11px " + UI.sans;
-  ctx.fillText("V vitesse · D détente · P puissance · C contrôle", rx, 124);
+  ctx.fillText("V vitesse · D détente · P puissance · C contrôle", rx, ry);
+  ry += 14;
 
-  const visR = characterIndices();
-  const rowH = Math.min(112, Math.floor((footY - 132) / Math.max(1, visR.length)));
+  const visR = menuCharacterIndices();
+  const rowH = 148;
   for (let slot = 0; slot < visR.length; slot++) {
     const i = visR[slot];
     const a = CHARACTERS[i];
-    const ay = 132 + slot * rowH;
-    const previewX = rx + 26;
-    const previewY = ay + 52;
+    const ay = ry + slot * rowH;
+    const cardH = rowH - 10;
+
+    ctx.fillStyle = "rgba(255,255,255,0.06)";
+    ctx.strokeStyle = "rgba(255,255,255,0.12)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(rx, ay, rightW - 4, cardH, 10);
+    else ctx.rect(rx, ay, rightW - 4, cardH);
+    ctx.fill();
+    ctx.stroke();
 
     ctx.save();
     ctx.beginPath();
-    ctx.rect(rx, ay - 2, 56, rowH - 6);
+    if (ctx.roundRect) ctx.roundRect(rx, ay, rightW - 4, cardH, 10);
+    else ctx.rect(rx, ay, rightW - 4, cardH);
     ctx.clip();
+
+    const previewX = rx + 36;
+    const previewY = ay + Math.min(cardH - 8, 96);
+    ctx.save();
     ctx.translate(previewX, previewY);
-    ctx.scale(0.52, 0.52);
+    ctx.scale(0.58, 0.58);
     drawCharacter({
       x: 0, y: 0, groundY: 0, side: 0,
       color: a.color, darkColor: a.darkColor,
@@ -2800,38 +3297,74 @@ function drawRules() {
     });
     ctx.restore();
 
-    const tx = rx + 58;
+    const tx = rx + 72;
+    const tw = rightW - 84;
     ctx.textAlign = "left";
     ctx.fillStyle = "#fff";
-    ctx.font = "700 13px " + UI.sans;
-    ctx.fillText(a.name, tx, ay + 14);
+    ctx.font = "800 15px " + UI.display;
+    ctx.fillText(a.name, tx, ay + 22);
+    ctx.fillStyle = "rgba(255,246,232,0.55)";
+    ctx.font = "600 11px " + UI.sans;
+    ctx.fillText(a.nation || "", tx, ay + 38);
 
     const st = a.stats;
     const pairs = [["V", st.vitesse], ["D", st.detente], ["P", st.puissance], ["C", st.controle]];
-    ctx.font = "10px " + UI.sans;
     let bx = tx;
+    const gy = ay + 50;
     for (let k = 0; k < pairs.length; k++) {
       const pr = pairs[k];
       ctx.fillStyle = "rgba(255,255,255,0.55)";
-      ctx.fillText(pr[0], bx, ay + 30);
+      ctx.font = "700 10px " + UI.sans;
+      ctx.fillText(pr[0], bx, gy + 8);
       for (let s = 0; s < 5; s++) {
         ctx.fillStyle = s < pr[1] ? "#ffcc00" : "rgba(255,255,255,0.15)";
-        ctx.fillRect(bx + 10 + s * 8, ay + 22, 6, 6);
+        ctx.fillRect(bx + 11 + s * 7, gy, 5, 5);
       }
-      bx += 58;
+      bx += 52;
     }
 
     ctx.fillStyle = UI.gold;
-    ctx.font = "600 11px " + UI.sans;
-    ctx.fillText(a.superName, tx, ay + 46);
-    ctx.fillStyle = "rgba(255,255,255,0.7)";
-    ctx.font = "11px " + UI.sans;
-    wrapText2(a.trait, tx, ay + 60, rightW - 62, 13);
+    ctx.font = "700 12px " + UI.sans;
+    ctx.fillText("★ " + a.superName, tx, ay + 78);
+    ctx.fillStyle = "rgba(255,255,255,0.78)";
+    ctx.font = "12px " + UI.sans;
+    wrapText2(a.trait, tx, ay + 96, tw, 14);
+    if (a.superDesc) {
+      ctx.fillStyle = "rgba(255,246,232,0.55)";
+      ctx.font = "11px " + UI.sans;
+      wrapText2(a.superDesc, tx, ay + 128, tw, 13);
+    }
+    ctx.restore();
   }
+  const rightBottom = ry + visR.length * rowH + 8;
+  const contentBottom = Math.max(leftBottom, rightBottom);
   ctx.restore();
 
+  rulesScrollMax = Math.max(0, Math.ceil(contentBottom - bodyTop - viewH + 8));
+  if (rulesScroll > rulesScrollMax) rulesScroll = rulesScrollMax;
+
+  // Ascenseur + hint de scroll
+  if (rulesScrollMax > 0) {
+    const trackX = W - UI.mx + 2;
+    const trackY = bodyTop + 4;
+    const trackH = viewH - 8;
+    const thumbH = Math.max(28, trackH * (viewH / (viewH + rulesScrollMax)));
+    const thumbY = trackY + (trackH - thumbH) * (rulesScroll / rulesScrollMax);
+    ctx.fillStyle = "rgba(255,255,255,0.12)";
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(trackX, trackY, 5, trackH, 3);
+    else ctx.rect(trackX, trackY, 5, trackH);
+    ctx.fill();
+    ctx.fillStyle = UI.gold;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(trackX, thumbY, 5, thumbH, 3);
+    else ctx.rect(trackX, thumbY, 5, thumbH);
+    ctx.fill();
+  }
+
   hit(UI.mx + 80, H - 20, 200, 24, "Escape");
-  uiLabel("Échap ← Retour au menu", UI.mx, H - 14, 10, UI.muted, 1.5);
+  const scrollHint = rulesScrollMax > 0 ? "Molette · ↑↓  ·  " : "";
+  uiLabel(scrollHint + "Échap ← Retour au menu", UI.mx, H - 14, 10, UI.muted, 1.5);
 }
 
 function drawCredits() {
@@ -2900,7 +3433,7 @@ function drawSelectCharacter() {
   const pick = "Choisis ton personnage";
   uiTitle(twoLocalHumans ? "Joueur " + sideName(selPlayer) + " — " + pick : pick, UI.mx, 62, 24);
 
-  const vis = characterIndices();
+  const vis = menuCharacterIndices();
   const taken = takenCharacterSet();
   const n = vis.length;
   const grid = (typeof menuNavGrid === "function" ? menuNavGrid(n) : null) || { cols: n, rows: 1 };

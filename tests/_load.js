@@ -87,6 +87,7 @@ const EPILOGUE = `
   getState: () => state, setState: v => { state = v; },
   getMode: () => mode, getTick: () => tick,
   setVsAI: v => { vsAI = v; }, setAiLevel: v => { aiLevel = v; },
+  AI_LEVELS: typeof AI_LEVELS !== "undefined" ? AI_LEVELS : null,
   setServeCountdown: v => { serveCountdown = v; },
   setServingSide: v => { servingSide = v; },
   setBombMode: v => { bombMode = v; }, getBombMode: () => bombMode,
@@ -258,9 +259,26 @@ const EPILOGUE = `
   },
   tutorialStepCanSkip: typeof tutorialStepCanSkip === "function" ? tutorialStepCanSkip : null,
   tutorialPracticeActive: typeof tutorialPracticeActive === "function" ? tutorialPracticeActive : null,
+  tutorialSkipBlobBall: typeof tutorialSkipBlobBall === "function" ? tutorialSkipBlobBall : null,
   tutorialApplyScenario: typeof tutorialApplyScenario === "function" ? tutorialApplyScenario : null,
   tutorialUsesPad: typeof tutorialUsesPad === "function" ? tutorialUsesPad : null,
   tutorialStepKind: typeof tutorialStepKind === "function" ? tutorialStepKind : null,
+  tutorialStepConditionMet: typeof tutorialStepConditionMet === "function"
+    ? tutorialStepConditionMet : null,
+  tutorialNoteStepIntent: typeof tutorialNoteStepIntent === "function"
+    ? tutorialNoteStepIntent : null,
+  tutorialHoldPayoff: typeof tutorialHoldPayoff === "function" ? tutorialHoldPayoff : null,
+  tutorialStartBattle: typeof tutorialStartBattle === "function" ? tutorialStartBattle : null,
+  getTutorialBattleOk: () => (typeof tutorialBattleOk !== "undefined" ? !!tutorialBattleOk : false),
+  setTutorialStepArmed: v => {
+    if (typeof tutorialStepArmed !== "undefined") tutorialStepArmed = !!v;
+  },
+  setTutorialPadLocked: v => {
+    if (typeof tutorialPadLocked !== "undefined") tutorialPadLocked = !!v;
+    if (typeof TUTORIAL_STEPS !== "undefined" && typeof buildTutorialSteps === "function") {
+      TUTORIAL_STEPS = buildTutorialSteps();
+    }
+  },
   TUTORIAL_STEP_MIN_T: typeof TUTORIAL_STEP_MIN_T !== "undefined" ? TUTORIAL_STEP_MIN_T : 300,
   get TUTORIAL_STEPS() { return typeof TUTORIAL_STEPS !== "undefined" ? TUTORIAL_STEPS : null; },
   advanceTutorialStep: typeof advanceTutorialStep === "function" ? advanceTutorialStep : null,
@@ -270,6 +288,7 @@ const EPILOGUE = `
   cancelQuickplay: typeof cancelQuickplay === "function" ? cancelQuickplay : null,
   getMmQuickplay: () => (typeof mmQuickplay !== "undefined" ? !!mmQuickplay : false),
   getOnline: () => !!online,
+  setOnline: v => { online = !!v; },
   getVsAI: () => !!vsAI,
   SPRITES: typeof SPRITES !== "undefined" ? SPRITES : null,
   spriteReady: typeof spriteReady === "function" ? spriteReady : () => false,

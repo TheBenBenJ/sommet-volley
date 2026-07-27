@@ -19,7 +19,8 @@ const SPRITES = {
   mapStadeAshram: null,       // Stade Ashram (Gourou)
   mapGrandeForet: null,       // Grande Forêt (Capitaine)
   mapCitadelleDuLevant: null,      // Citadelle du Levant (Faucon)
-  mapJardinDesRoses: null      // Jardin des Roses (Safran)
+  mapJardinDesRoses: null,     // Jardin des Roses (Safran)
+  superFx: null                // FX SUPER de zone (mur, forêt, glace…)
 };
 
 function loadSprite(path) {
@@ -71,6 +72,18 @@ function initSprites() {
   initMapGrandeForet();
   initMapCitadelleDuLevant();
   initMapJardinDesRoses();
+  initSuperFx();
+}
+
+/** Props visuels des SUPER de zone (Grok → cutout magenta). */
+function initSuperFx() {
+  SPRITES.superFx = {
+    wall: loadSprite("assets/super/wall.png"),
+    forest: loadSprite("assets/super/forest.png"),
+    ice: loadSprite("assets/super/ice.png"),
+    slow: loadSprite("assets/super/slow.png"),
+    noground: loadSprite("assets/super/noground.png")
+  };
 }
 
 /** Pack fond / props Citadelle du Levant (terrain Le Faucon). */

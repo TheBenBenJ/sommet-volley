@@ -34,6 +34,15 @@ function aiV2TouchRole(side) {
   return ball.touches[side] | 0;
 }
 
+/** Bruit de visée (rng seedé) — plus fort si react bas / err haut. */
+function aiAimWobble(lvl, input) {
+  const react = lvl.react != null ? lvl.react : 0.5;
+  const wobble = (1 - react) * (0.12 + (lvl.err || 0) / 700);
+  if (wobble < 0.02) return;
+  input.ax = Math.max(-1, Math.min(1, (input.ax || 0) + (rng() - 0.5) * 2 * wobble));
+  input.ay = Math.max(-1, Math.min(1, (input.ay || 0) + (rng() - 0.5) * 2 * wobble * 0.75));
+}
+
 /** Vise selon le rôle (réception ≠ tir). */
 function aiV2FillAim(side, lvl, me, opp, input, role) {
   const fwd = side === 0 ? 1 : -1;
@@ -41,30 +50,35 @@ function aiV2FillAim(side, lvl, me, opp, input, role) {
   if (ball.serveAimLock && side === servingSide) {
     input.ax = fwd * 0.65;
     input.ay = -0.88;
+    aiAimWobble(lvl, input);
     return;
   }
   if (role === 0) {
     // Réception : passe haute quasi verticale (laisse le temps de set / smash)
     input.ax = fwd * 0.12;
     input.ay = -0.96;
+    aiAimWobble(lvl, input);
     return;
   }
   if (role === 1 && !lvl.aim) {
     // 2ᵉ touche facile : encore une passe / renvoi doux
     input.ax = fwd * 0.5;
     input.ay = -0.75;
+    aiAimWobble(lvl, input);
     return;
   }
   if (role < 2 && lvl.aim) {
     // Set vers l'avant (prépare un smash)
     input.ax = fwd * 0.32;
     input.ay = -0.92;
+    aiAimWobble(lvl, input);
     return;
   }
   // Attaque / 3ᵉ touche : vers l'adversaire
   if (!lvl.aim) {
     input.ax = fwd * (0.82 + lvl.react * 0.12);
     input.ay = -0.28;
+    aiAimWobble(lvl, input);
     return;
   }
   const oppNearNet = side === 0 ? opp.x < NET_X + 150 : opp.x > NET_X - 150;
@@ -84,6 +98,7 @@ function aiV2FillAim(side, lvl, me, opp, input, role) {
     if (side === 0) input.ax = opp.x > oppCourtMid ? 0.5 : 0.98;
     else input.ax = opp.x < oppCourtMid ? -0.5 : -0.98;
   }
+  aiAimWobble(lvl, input);
 }
 
 /**
@@ -97,7 +112,10 @@ function aiGameplayV2(side, lvl, me, opp, input) {
   if (ball.frozen && ball.inHands && servingSide === side && serveCountdown <= 0 &&
       (state === "serve" || state === "play")) {
     if (me._aiTossTick == null) {
-      me._aiTossTick = tick + 8 + Math.floor((1.05 - lvl.react) * 28) + (lvl.err > 18 ? 12 : 0);
+      // Délai variable, plafonné (~1 s) pour que le service parte (2v2 / tests)
+      const delay = 8 + Math.floor((1.05 - lvl.react) * 28) +
+        Math.floor(rng() * (5 + (1 - lvl.react) * 10)) + (lvl.err > 120 ? 8 : 0);
+      me._aiTossTick = tick + Math.min(55, delay);
     }
     if (tick >= me._aiTossTick) input.smash = true;
     input.jump = false;
@@ -111,10 +129,12 @@ function aiGameplayV2(side, lvl, me, opp, input) {
   if (!overMySide) return false;
 
   const headY = me.y - 64;
-  const dist = Math.hypot(ball.x - me.x, ball.y - headY);
+  const digY = me.y - 46; // hauteur dig (torse), pas le crâne
   const role = aiV2TouchRole(side);
   const servingHit = !!(ball.serveAimLock && side === servingSide);
   const receiving = role === 0;
+  const aimY = receiving || me.onGround ? digY : headY;
+  const dist = Math.hypot(ball.x - me.x, ball.y - aimY);
   const mustClear = role >= 2 && !servingHit;
   const descending = ball.vy > -1.2;
 
@@ -126,7 +146,7 @@ function aiGameplayV2(side, lvl, me, opp, input) {
 
   aiV2FillAim(side, lvl, me, opp, input, role);
 
-  const alignSlop = 50 + (1 - (lvl.react || 0.8)) * 8;
+  const alignSlop = 42 + (1 - (lvl.react || 0.8)) * 18;
   const aligned = Math.abs(ball.x - me.x) < alignSlop;
   const tooHighToStand = ball.y < me.y - 138;
   const goodSmashH = ball.y < me.y - 48 && ball.y > me.y - 175;
@@ -134,7 +154,7 @@ function aiGameplayV2(side, lvl, me, opp, input) {
   const fwd = side === 0 ? 1 : -1;
 
   // Fenêtre de frappe : plus serrée aux niveaux faibles (même hitbox perso).
-  const hitSlack = 1 + (lvl.react || 0.8) * 5;
+  const hitSlack = 0.4 + (lvl.react || 0.8) * 3.2;
   const inHitWindow = dist <= RECEIVE_R + hitSlack && descending && aligned &&
     (ball.y < me.y - 24) && (ball.y > me.y - 205);
   const canReachHit = inHitWindow ||
@@ -142,19 +162,21 @@ function aiGameplayV2(side, lvl, me, opp, input) {
      Math.abs(ball.x - me.x) < alignSlop + 6 &&
      ball.y < me.y - 20 && ball.y > me.y - 210);
 
-  // Hésitation : err élevé → rate surtout les smashs / 3ᵉ touches (pas les digs)
+  // Hésitation : err élevé → rate digs ET smashs ; react haut atténue
   function aiCommitHit(forRole) {
-    let miss = Math.min(0.42, (lvl.err || 0) / 260);
-    if (forRole === 0) miss *= 0.28;      // réception : quasi fiable
-    else if (forRole === 1) miss *= 0.55; // set : un peu d'hésitation
+    let miss = Math.min(0.68, (lvl.err || 0) / 190);
+    miss *= (1.08 - (lvl.react || 0) * 0.9);
+    if (forRole === 0) miss *= 0.58;      // réception : rate aussi
+    else if (forRole === 1) miss *= 0.8;  // set
     return rng() >= miss;
   }
 
   function tryJumpForBall() {
     if (!me.onGround || !tooHighToStand || !descending || !aligned) return;
     if (ball.vy < 0.4) return;
-    // Facile/Normale : parfois trop tard pour sauter
-    if ((lvl.react || 0) < 0.2 && rng() < 0.22) return;
+    // Souvent trop tôt / trop tard — surtout niveaux faibles
+    const flub = 0.14 + (1 - (lvl.react || 0)) * 0.38;
+    if (rng() < flub) return;
     input.jump = true;
   }
 
@@ -179,13 +201,17 @@ function aiGameplayV2(side, lvl, me, opp, input) {
     return false;
   }
 
-  // Réception : rester au sol ; passe haute
+  // Réception : rester au sol et diguer au milieu du corps (pas sauter à la tête)
   if (receiving) {
-    tryJumpForBall();
-    if ((canReachHit || (!me.onGround && dist <= RECEIVE_R + 4 && descending && aligned)) &&
-        aiCommitHit(0)) {
-      input.smash = true;
+    const digReady = me.onGround
+      ? (descending && aligned && ball.y >= digY - 28 && ball.y <= me.y - 16 &&
+         dist <= RECEIVE_R + hitSlack)
+      : (canReachHit || (dist <= RECEIVE_R + 4 && descending && aligned));
+    // Saut seulement si la balle ne redescend pas vers la zone dig
+    if (me.onGround && tooHighToStand && !(ball.vy > 0.35 && ball.y < digY + 40)) {
+      tryJumpForBall();
     }
+    if (digReady && aiCommitHit(0)) input.smash = true;
     return false;
   }
 
@@ -244,9 +270,21 @@ function predictLandingX() {
   return x;
 }
 
+/** Retombée « perçue » par l'IA : prédiction + bruit sticky (moins robotique). */
+function aiPredictLandingX(me, lvl) {
+  let x = predictLandingX();
+  const react = lvl && lvl.react != null ? lvl.react : 0.5;
+  const err = (lvl && lvl.err) || 0;
+  if (react < 0.95 && err > 0) {
+    if (me._aiLandN == null) me._aiLandN = 0;
+    x += me._aiLandN;
+  }
+  return x;
+}
+
 /** La balle (re)tombera-t-elle dans mon camp ? */
-function aiBallLandsMySide(side) {
-  const land = predictLandingX();
+function aiBallLandsMySide(side, me, lvl) {
+  const land = (me && lvl) ? aiPredictLandingX(me, lvl) : predictLandingX();
   return side === 0 ? land < NET_X - 8 : land > NET_X + 8;
 }
 
@@ -259,6 +297,13 @@ function aiInput(side, lvlOverride, god) {
   const lvl = lvlOverride || AI_LEVELS[aiLevel];
   const input = { left: false, right: false, jump: false, smash: false, super: false };
   if (battle.active) {
+    // Tutoriel Smash Battle : adversaire mou pour laisser le joueur gagner
+    if (typeof tutorialMode !== "undefined" && tutorialMode &&
+        typeof tutorialStepKind === "function" &&
+        tutorialStepKind(typeof tutorialStep !== "undefined" ? tutorialStep : -1) === "battle") {
+      input.jump = (tick % 14) === 0;
+      return input;
+    }
     const period = [8, 5, 3, 2][aiLevel];
     input.jump = Math.floor(tick / period) % 2 === 0;
     return input;
@@ -283,19 +328,23 @@ function aiInput(side, lvlOverride, god) {
   if (--me._aiErrT <= 0) {
     me._aiErr1 = (rng() - 0.5) * 2 * lvl.err;
     me._aiRush = rng() < lvl.rush;
-    me._aiErrT = 48 + Math.floor((1 - lvl.react) * 20);
+    // Bruit de retombée perçu (recalculé souvent = moins déterministe)
+    me._aiLandN = (rng() - 0.5) * 2 * (6 + (1 - lvl.react) * (lvl.err || 80) * 0.12);
+    me._aiErrT = 26 + Math.floor((1 - lvl.react) * 30) + Math.floor(rng() * 10);
   }
   const aiErr = me._aiErr1, aiRush = me._aiRush;
 
   if (!(typeof tutorialMode !== "undefined" && tutorialMode) &&
       superCharge[side] === 1 && me.superT <= 0 && !ball.frozen && state === "play" &&
-      (lvl.react || 0) >= 0.2) { // Facile : n'utilise presque pas le SUPER
+      (lvl.react || 0) >= 0.08) {
     const key = charOf(me).key;
     const onMySide = side === 0 ? ball.x < NET_X : ball.x > NET_X;
     const hitReach = god ? 100 : 72;
     const nearHit = Math.abs(ball.x - me.x) < hitReach && ball.y > me.y - 210 && ball.vy > -1;
-    // Normale : SUPER seulement ~40 % du temps quand l'occasion se présente
-    const commitSuper = (lvl.react || 0) >= 0.4 || rng() < 0.4;
+    // Peu de SUPER aux niveaux faibles
+    const commitSuper = (lvl.react || 0) >= 0.35
+      ? rng() < 0.55
+      : rng() < 0.18 + (lvl.react || 0) * 0.5;
     if (commitSuper) {
       if (key === "volkoi" || key === "dorf" || key === "cygne") {
         if (onMySide && nearHit) input.super = true;
@@ -309,7 +358,8 @@ function aiInput(side, lvlOverride, god) {
         Math.abs(ball.x - NET_X) < BATTLE_BALL_DIST + 40 &&
         ball.y > -40 && ball.y < NET_TOP + 70;
   const oppTowardNet = Math.abs(opp.x - NET_X) < BATTLE_NET_DIST + 60;
-  const landsNearNet = !god || !ballHighNearNet || Math.abs(predictLandingX() - NET_X) < BATTLE_BALL_DIST + 80;
+  const landsNearNet = !god || !ballHighNearNet ||
+    Math.abs(aiPredictLandingX(me, lvl) - NET_X) < BATTLE_BALL_DIST + 80;
   // V2 : ne pas abandonner la défense pour un rush filet si la balle arrive chez soi
   const defending = GAMEPLAY_V2 && (side === 0 ? ball.x < NET_X + 80 : ball.x > NET_X - 80);
   if (!defending && aiRush && battle.cooldown === 0 && ballHighNearNet && oppTowardNet && landsNearNet) {
@@ -323,38 +373,56 @@ function aiInput(side, lvlOverride, god) {
     return input;
   }
 
-  // Anticipation : lookahead selon react (niveaux forts partent plus tôt)
-  const look = GAMEPLAY_V2 ? (90 + lvl.react * 100) : 100;
+  // Anticipation : lookahead court aux niveaux faibles
+  const look = GAMEPLAY_V2 ? (36 + lvl.react * 70) : 70;
   const ballComing = side === 0
     ? (ball.x < NET_X + look || (ball.vx < -0.2 && !ball.frozen && ball.x < NET_X + 280) ||
-       (!ball.frozen && aiBallLandsMySide(0)))
+       (!ball.frozen && aiBallLandsMySide(0, me, lvl)))
     : (ball.x > NET_X - look || (ball.vx > 0.2 && !ball.frozen && ball.x > NET_X - 280) ||
-       (!ball.frozen && aiBallLandsMySide(1)));
+       (!ball.frozen && aiBallLandsMySide(1, me, lvl)));
+
+  // Délai de réaction (surtout Facile/Normale) — Impitoyable chasse vite
+  let hesitating = false;
+  if (!ballComing || ball.frozen) {
+    me._aiChaseReady = false;
+    me._aiReactUntil = null;
+  } else if (!god && (lvl.react || 0) < 0.2 && !me._aiChaseReady) {
+    if (me._aiReactUntil == null) {
+      me._aiReactUntil = tick + 4 + Math.floor((1.02 - lvl.react) * (14 + rng() * 28));
+    }
+    if (tick < me._aiReactUntil) hesitating = true;
+    else me._aiChaseReady = true;
+  } else {
+    me._aiChaseReady = true;
+  }
+
   let targetX;
 
-  if (ball.frozen && servingSide === side) {
+  if (hesitating) {
+    targetX = me.homeX;
+  } else if (ball.frozen && servingSide === side) {
     targetX = ball.inHands ? me.x : ball.x + (side === 0 ? -8 : 8);
   } else if (GAMEPLAY_V2 && servingSide === side && ball.serveAimLock && !ball.inHands) {
     // Après lancer : se placer sous la retombée pour la 1ʳᵉ frappe
-    targetX = predictLandingX() + (side === 0 ? -4 : 4);
+    targetX = aiPredictLandingX(me, lvl) + (side === 0 ? -4 : 4);
   } else if (ballComing) {
-    const land = predictLandingX();
+    const land = aiPredictLandingX(me, lvl);
     const notReachingMe = side === 0 ? land >= NET_X : land <= NET_X;
     const shortNearNet = side === 0 ? land > NET_X - 90 : land < NET_X + 90;
-    // Réaction tardive (sauf Impitoyable haut) si balle encore haute / montante
-    const lateReact = lvl.react < 0.5 && ball.vy < -1.5 && ball.y < GROUND_Y - 180 &&
-      (side === 0 ? ball.x > NET_X - 55 : ball.x < NET_X + 55);
+    // Réaction tardive : niveaux faibles restent plantés si balle encore haute
+    const lateReact = !god && lvl.react < 0.15 && ball.vy < -1.2 && ball.y < GROUND_Y - 160 &&
+      (side === 0 ? ball.x > NET_X - 70 : ball.x < NET_X + 70);
     if (notReachingMe || lateReact) {
       targetX = me.homeX;
     } else if (GAMEPLAY_V2) {
       const under = side === 0 ? -2 : 2;
-      // Erreurs de placement bien visibles (surtout Facile / Normale)
-      const errScale = 0.28 + (1 - lvl.react) * 0.5;
+      // Erreurs de placement bien visibles
+      const errScale = 0.5 + (1 - lvl.react) * 0.7;
       targetX = land + under + aiErr * errScale;
       const onSide = side === 0 ? ball.x < NET_X : ball.x > NET_X;
       if (onSide && ball.vy > 0.8 && ball.y > GROUND_Y - 200) {
-        const blend = 0.22 + lvl.react * 0.28; // plus fort → suit plus la X live en fin
-        targetX = land * (1 - blend) + ball.x * blend + under + aiErr * errScale * 0.55;
+        const blend = 0.12 + lvl.react * 0.22;
+        targetX = land * (1 - blend) + ball.x * blend + under + aiErr * errScale * 0.7;
       }
     } else if (shortNearNet) {
       targetX = land + (side === 0 ? -8 : 8);
@@ -416,13 +484,14 @@ function aiInput2v2(me, lvlOverride) {
   if (me._aiT === undefined) { me._aiT = 0; me._aiErr = 0; }
   if (--me._aiT <= 0) {
     me._aiErr = (rng() - 0.5) * 2 * lvl.err;
-    me._aiT = 45 + Math.floor((1 - lvl.react) * 15);
+    me._aiLandN = (rng() - 0.5) * 2 * (10 + (1 - lvl.react) * (lvl.err || 80) * 0.14);
+    me._aiT = 22 + Math.floor((1 - lvl.react) * 30) + Math.floor(rng() * 10);
   }
 
-  const land = predictLandingX();
+  const land = aiPredictLandingX(me, lvl);
   const ghost = typeof isBallGhostBlob === "function" && isBallGhostBlob(me);
   let chaser = me;
-  if (!ghost && mate && (onMySide || ball.frozen || aiBallLandsMySide(side))) {
+  if (!ghost && mate && (onMySide || ball.frozen || aiBallLandsMySide(side, me, lvl))) {
     const dMe = Math.abs(land - me.x), dMate = Math.abs(land - mate.x);
     if (dMate < dMe - 4) chaser = mate;
     else if (Math.abs(dMate - dMe) <= 4) {
@@ -439,13 +508,13 @@ function aiInput2v2(me, lvlOverride) {
     targetX = iChase ? (ball.inHands ? me.x : ball.x + back * 6) : me.homeX;
   } else if (GAMEPLAY_V2 && iChase && servingSide === side && ball.serveAimLock && !ball.inHands) {
     targetX = land + back * 4;
-  } else if ((onMySide || aiBallLandsMySide(side)) && iChase) {
+  } else if ((onMySide || aiBallLandsMySide(side, me, lvl)) && iChase) {
     if (GAMEPLAY_V2) {
-      const errScale = 0.28 + (1 - lvl.react) * 0.5;
+      const errScale = 0.5 + (1 - lvl.react) * 0.7;
       targetX = land + back * 3 + me._aiErr * errScale;
       if (ball.vy > 0.8 && ball.y > GROUND_Y - 200) {
-        const blend = 0.22 + lvl.react * 0.28;
-        targetX = land * (1 - blend) + ball.x * blend + back * 3 + me._aiErr * errScale * 0.55;
+        const blend = 0.12 + lvl.react * 0.22;
+        targetX = land * (1 - blend) + ball.x * blend + back * 3 + me._aiErr * errScale * 0.7;
       }
     } else {
       targetX = land + back * lvl.attack + me._aiErr;
@@ -505,7 +574,19 @@ function aiInput2v2(me, lvlOverride) {
 }
 
 function xAI(blob) {
-  if (battle.active) return { left: false, right: false, jump: tick % 2 === 0, smash: false, super: false };
+  if (battle.active) {
+    // Tutoriel Smash Battle : adversaire mou (1 front / ~14 ticks) pour laisser
+    // le joueur gagner en martelant le saut.
+    if (typeof tutorialMode !== "undefined" && tutorialMode &&
+        typeof tutorialStepKind === "function" &&
+        tutorialStepKind(typeof tutorialStep !== "undefined" ? tutorialStep : -1) === "battle") {
+      return {
+        left: false, right: false, jump: (tick % 14) === 0,
+        smash: false, super: false, ax: 0, ay: 0
+      };
+    }
+    return { left: false, right: false, jump: tick % 2 === 0, smash: false, super: false };
+  }
   if (mode === "2v2") return aiInput2v2(blob, X_LEVEL);
   return aiInput(blob.side, X_LEVEL, true);
 }

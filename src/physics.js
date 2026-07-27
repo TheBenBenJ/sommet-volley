@@ -565,9 +565,16 @@ function applyDirectedHit(blob, ang, speed, smashTicks) {
   ball.smash = smashTicks || 0;
   ball.lastHitTick = tick; // 1 frappe / tick (évite téléport coéquipier 2v2)
   clearBallHold();
-  // Garde le point de contact (pas de téléport « collé aux mains ») :
-  // on ne sépare que si la balle chevauche encore la hitbox.
-  const h = blob.headCircle;
+  // Dig au sol : ancrer le contact au milieu du corps (sinon la balle reste sur le crâne)
+  const isDig = blob.onGround && !(smashTicks > 0);
+  const h = isDig && blob.receiveCircle ? blob.receiveCircle : blobHitCircle(blob);
+  if (isDig) {
+    const face = (typeof charFaceRight === "function" && charFaceRight(blob))
+      ? 1 : (blob.side === 0 ? 1 : -1);
+    ball.x = h.x + face * 8;
+    ball.y = h.y;
+  }
+  // Sépare si encore en chevauchement
   const dx = ball.x - h.x, dy = ball.y - h.y;
   const dist = Math.hypot(dx, dy);
   const minSep = BALL_R + h.r + 1;
@@ -614,7 +621,7 @@ function simulateArc(x0, y0, vx0, vy0, maxSteps) {
 }
 
 function ballDistToBlob(blob) {
-  const h = blob.headCircle;
+  const h = blobHitCircle(blob);
   return Math.hypot(ball.x - h.x, ball.y - h.y);
 }
 
@@ -631,9 +638,23 @@ function canHitBallThroughNet(blob) {
   return (ball.y + BALL_R) <= NET_TOP;
 }
 
-/** Distance mini balle↔tête sur le segment du tick (anti-tunneling). */
+/** Cercle de contact : dig au sol = milieu du corps ; smash en l'air = tête. */
+function blobHitCircle(blob) {
+  if (blob && blob.onGround && blob.receiveCircle) return blob.receiveCircle;
+  return blob.headCircle;
+}
+
+/** La balle est à hauteur de dig (milieu), pas seulement « près en X » au-dessus de la tête. */
+function ballAtReceiveHeight(blob) {
+  if (!blob) return false;
+  const h = blob.receiveCircle || blobHitCircle(blob);
+  // Fenêtre torse / avant-bras (sous le crâne y-64)
+  return ball.y >= h.y - 28 && ball.y <= blob.y - 16;
+}
+
+/** Distance mini balle↔hitbox sur le segment du tick (anti-tunneling). */
 function ballPathDistToBlob(blob) {
-  const h = blob.headCircle;
+  const h = blobHitCircle(blob);
   const x0 = ball.x - ball.vx, y0 = ball.y - ball.vy;
   const x1 = ball.x, y1 = ball.y;
   const d0 = Math.hypot(x0 - h.x, y0 - h.y);
@@ -651,9 +672,7 @@ function ballLandsOnPlayer(blob) {
   if (!blob.onGround) return false; // en saut : pas d'auto, il faut X
   if (ball.vy < 0.6) return false; // doit descendre
   if (Math.abs(ball.x - blob.x) > AUTO_LOB_DX) return false;
-  const headY = blob.y - 64;
-  // Sur la tête / épaules — pas loin au-dessus ni sous le ventre
-  if (ball.y < headY - 28 || ball.y > blob.y - 26) return false;
+  if (!ballAtReceiveHeight(blob)) return false;
   return ballPathDistToBlob(blob) <= AUTO_LOB_R;
 }
 
@@ -677,7 +696,7 @@ function padStickDigIntent(blob) {
   const ay = Number(input.ay) || 0;
   const mag = Math.hypot(ax, ay);
   if (mag < 0.32) return false;
-  const h = blob.headCircle;
+  const h = blobHitCircle(blob);
   const dx = ball.x - h.x, dy = ball.y - h.y;
   const dist = Math.hypot(dx, dy);
   const digUp = ay < -0.4;
@@ -747,10 +766,16 @@ function tossServeBall(blob) {
 }
 
 function tryTossServe(blob) {
-  // Lancer au service : uniquement smash (X) — le saut ne doit pas envoyer la balle
+  // Lancer au service : manette = X seul ; clavier/IA = F/smash.
+  // Le saut ne doit pas envoyer la balle.
   if (!GAMEPLAY_V2 || !ball.inHands || !ball.frozen || ball.popped) return false;
   if (blob.side !== servingSide) return false;
-  if (!blob._smashEdge) return false;
+  const input = blob._input;
+  if (input && input.padFace) {
+    if (!blob._smashXEdge) return false; // Y ne lance pas
+  } else if (!blob._smashEdge) {
+    return false;
+  }
   return tossServeBall(blob);
 }
 
@@ -774,6 +799,8 @@ function tryLobBall(blob) {
   if (ball.tossGrace > 0 && blob.side === servingSide) return false;
   // Service : pas de frappe au sol — il faut sauter dans la balle.
   if (isServeHit(blob) && blob.onGround) return false;
+  // Dig au sol : attendre la hauteur milieu (pas cloche sur le crâne)
+  if (blob.onGround && !ballAtReceiveHeight(blob)) return false;
   if (ballPathDistToBlob(blob) > receiveHitRadius()) return false;
   if (!canActiveHit(blob)) return false;
   const a = charOf(blob);
@@ -812,9 +839,12 @@ function trySmashBall(blob) {
   }
   if (!canNormalHit2v2(blob)) return false;
   const serving = isServeHit(blob);
-  // Service aérien « smash » seulement si la balle est assez haute ;
-  // un petit hop au sol garde la cloche sûre (évite filet).
-  const aerialServe = serving && !blob.onGround && ball.y <= NET_TOP + 40;
+  // Service en l'air :
+  // - manette (Y) : toujours smash (sinon Y « lobbé » dès que la balle descend)
+  // - clavier : smash si balle assez haute, sinon cloche sûre (petit hop)
+  const padFace = !!(blob._input && blob._input.padFace);
+  const aerialServe = serving && !blob.onGround &&
+    (padFace || ball.y <= NET_TOP + 40);
   const ang = aerialServe
     ? aimAngleFromInput(blob, blob._input)
     : serving
@@ -1000,6 +1030,9 @@ function applyHitExtras(blob, a) {
 function ballBlobCollision(blob) {
   if (ball.heldBy >= 0) return; // balle contrôlée : pas de collision passive
   if (blob.battleStunT > 0) return; // perdant du Smash Battle : ne digue pas
+  // Tutoriel pratique : l'adversaire AFK ne renvoie pas la balle (sinon elle
+  // « flotte » en échange et l'étape Service n'atteint jamais le sol).
+  if (typeof tutorialSkipBlobBall === "function" && tutorialSkipBlobBall(blob)) return;
   // Pas de dig / smash à travers le filet (service au filet, bras qui passent…)
   if (!canHitBallThroughNet(blob)) return;
   // 2v2 : coéquipiers se traversent → sans ça, 2 frappes le même tick
@@ -1037,14 +1070,19 @@ function ballBlobCollision(blob) {
     const padHuman = !aiBlob && !kbHuman;
     const servingNow = isServeHit(blob);
 
-    // Service : après le lancer (F/X), frappe UNIQUEMENT en l'air.
+    // Service : après le lancer, frappe UNIQUEMENT en l'air.
+    // Manette : X = lancer seulement, Y = frappe (pas l'inverse).
     if (servingNow) {
+      const padFace = !!(blob._input && blob._input.padFace);
       if (blob._serveAwaitRelease) {
-        if (!(blob._input && blob._input.smash)) blob._serveAwaitRelease = false;
-        else return; // encore le maintien du lancer
+        const tossHeld = padFace
+          ? !!(blob._input && blob._input.smashX)
+          : !!(blob._input && blob._input.smash);
+        if (!tossHeld) blob._serveAwaitRelease = false;
+        else return; // encore le maintien du lancer (X / F)
       }
-      // CLAVIER : sauter DANS la balle → smash/cloche AUTO au contact en l'air.
-      if (kbHuman && !blob.onGround) {
+      // CLAVIER : sauter DANS la balle → smash AUTO au contact en l'air.
+      if (kbHuman && !padFace && !blob.onGround) {
         const d = ballPathDistToBlob(blob);
         const aligned = Math.abs(ball.x - blob.x) < 44;
         if (d <= 40 && aligned) {
@@ -1052,20 +1090,32 @@ function ballBlobCollision(blob) {
             if (!powerWindup) applyHitExtras(blob, a);
             return;
           }
-          if (tryLobBall(blob)) { applyHitExtras(blob, a); return; }
         }
       }
       // Frappe explicite : FRONT montant seulement (pas le maintien).
-      // Sinon un double-tap X pendant la grâce post-lancer « mange » le 2ᵉ
-      // front, puis le maintien sert tout seul dès que tossGrace tombe à 0.
-      if (blob._smashEdge) {
+      // Manette : Y uniquement. Clavier/IA : smash (F).
+      const hitEdge = padFace ? blob._smashYEdge : blob._smashEdge;
+      if (hitEdge) {
         const near = ballPathDistToBlob(blob) <= RECEIVE_R;
         if (near && trySmashBall(blob)) {
           if (!powerWindup) applyHitExtras(blob, a);
           return;
         }
-        if (near && tryLobBall(blob)) applyHitExtras(blob, a);
+        // Clavier seulement : cloche de secours en l'air si smash raté
+        if (!padFace && near && tryLobBall(blob)) applyHitExtras(blob, a);
       }
+      return;
+    }
+
+    // Tutoriel Réception : dig EXPLICITE seulement (sinon l'étape s'auto-valide).
+    const tutRecv = typeof tutorialReceiveNeedsExplicitDig === "function" &&
+      tutorialReceiveNeedsExplicitDig();
+    if (tutRecv) {
+      const near = ballPathDistToBlob(blob) <= receiveHitRadius();
+      if (!near || !blob.onGround) return;
+      // Bouton dig, ou stick haut (manette)
+      const stickUp = padHuman && blob._input && (Number(blob._input.ay) || 0) < -0.5;
+      if ((wantSmash(blob) || stickUp) && tryLobBall(blob)) applyHitExtras(blob, a);
       return;
     }
 
