@@ -215,8 +215,8 @@ function charOf(b) { return CHARACTERS[b.charId]; }
 // Charge les manifests sprites (char-sprites.js) une fois le roster connu
 if (typeof initCharSprites === "function") initCharSprites();
 
-/** Roster jouable dans les menus de sélection — temporaire (Dorf + Cygne). */
-const MENU_CHARACTER_KEYS = ["dorf", "cygne"];
+/** Roster menus : vide = tous les CHARACTERS (PNG fallback si pas de WebM). */
+const MENU_CHARACTER_KEYS = [];
 function characterIndices() {
   return CHARACTERS.map((_, i) => i);
 }
