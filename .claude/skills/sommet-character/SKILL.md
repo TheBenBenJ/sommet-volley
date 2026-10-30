@@ -1,126 +1,112 @@
 ---
 name: sommet-character
 description: >
-  Intègre un nouveau personnage (dirigeant caricaturé) dans le jeu Sommet Volley.
-  Pipeline pixels : Grok crée l'ANCRE d'identité (idle_0 / idle_1 / idle_face_0),
-  puis Codex CLI dérive les 26 autres poses par LOTS de 3–4 (référence image +
-  LOCK identité), fond MAGENTA chroma-key — une session Codex à la fois. Ensuite
-  INTÉGRATION : détourage, manifest (idle:2 walk:4), roster CHARACTERS, vérif.
-  Utiliser dès qu'on veut ajouter, remplacer, ou regénérer un perso.
+  Intègre un nouveau personnage (dirigeant caricaturé) dans Sommet Volley.
+  Pipeline en DEUX étapes : (1) Grok = identité + quelques PNG d'ancrage
+  (idle_1, idle_face, idle, poses de référence) ; (2) Gemini/Sora = 10 clips
+  vidéo → WebM VP9+alpha (prompts préparés par l'agent, conversion
+  tools/mp4_to_char_webm.py). Puis INTÉGRATION manifest/roster. Utiliser dès
+  qu'on veut ajouter, remplacer, ou regénérer un perso (surtout ses anims vidéo).
 ---
 
 # sommet-character — ajouter/intégrer un personnage
 
-Découpage pixels : **Grok = identité (1 ancre)** → **Codex = poses dérivées
-(lots de 3–4)** → **ce skill = intégration fiable**. Ne plus faire générer les
-27 frames une par une par Grok (identité dérive) ; ne plus lancer Codex sur les
-26 d’un coup sans lots (trop lent / risque de dérive).
+Pipeline canon **2026** :
 
-## Ce qu'attend le moteur (ne pas deviner — c'est vérifié)
+1. **Grok** → identité + **quelques** images PNG (ancre + menus + refs pose)
+2. **Gemini** (ou Sora) → **10 vidéos** gameplay → conversion **WebM alpha**
+3. **Intégration** code / manifest / roster
 
-Un perso = **un jeu de poses complet, IDENTIQUE pour tous** (`src/char-sprites.js`
-lit ces anims, `charPickAnim` choisit selon l'état). Fichiers
-`assets/<key>/<anim>_<n>.png` (n commence à 0). Structure canonique (celle de
-TOUS les persos, ex. `assets/cygne/`) :
+Ne plus générer les 27 PNG une par une via Grok, ni dériver tout le set via
+Codex par défaut. Les PNG restent un **filet** (menus + fallback si WebM KO) ;
+le gameplay lit d'abord les WebM (`src/char-sprites.js`).
 
-| anim | frames | fichiers | action (vue de CÔTÉ, face à droite) |
-|------|:--:|---|---|
-| `idle_face` | 1 | `idle_face_0` | portrait de FACE, buste, grosse tête (menus/dialogues) |
-| `idle` | 2 | `idle_0..1` | debout au repos, léger balancement |
-| `walk` | 4 | `walk_0..3` | cycle de marche 4 poses distinctes (appui/passage/appui opposé/passage) — voir ci-dessous |
-| `jump` | 3 | `jump_0..2` | 0 = flexion/décollage, 1 = montée, 2 = sommet/descente |
-| `receive` | 2 | `receive_0..1` | réception : bras joints bas devant (manchette), **mains VIDES** |
-| `aim` | 2 | `aim_0..1` | mains levées ouvertes au-dessus de la tête, regard vers le haut (comme pour recevoir/passer), **SANS balle** |
-| `smash` | 3 | `smash_0..2` | attaque sautée : armé bras haut / frappe / accompagnement (en l'air), **main ouverte, AUCUNE balle** |
-| `super` | 4 | `super_0..3` | pose spéciale dramatique (le `superName` du perso) |
-| `panic` | 2 | `panic_0..1` | surpris, bras en l'air, penché en arrière |
-| `victory` | 2 | `victory_0..1` | célébration, bras levés |
-| `defeat` | 2 | `defeat_0..1` | abattu, épaules basses |
+---
 
-= **27 frames** (walk = 4). ⚠️ **Tout ou rien** : un set PARTIEL (ex. juste `idle_face`)
-FIGE le perso sur cette image en jeu — pire que rien (sans sprites, le moteur
-tombe sur le blob canvas animé). Générer les 27, ou aucun.
+## Ce qu'attend le moteur
 
-### Cycle `walk` — 4 frames DISTINCTES (LE point qui rate le plus souvent)
+### Vidéos (priorité rendu)
 
-Le moteur charge `walk_0..3` (`manifest.anims.walk: 4`, défaut code aussi **4**)
-et avance `walkPhase` d'1 toutes les 6 ticks → les 4 images sont jouées en boucle.
-Si les 4 se ressemblent → marche « gelée » / tremblote : **rejeter**.
+`assets/<key>/manifest.json` → bloc `"videos"` :
 
-**Générer le lot `walk` ensemble** (4 frames). Chaque frame a sa propre
-description de jambes — **ne JAMAIS** écrire « walking pose » / « mid-stride »
-identique 4 fois. Exagérer le cartoon (jambes bien écartées vs collées).
+| clé anim | fichier typique |
+|----------|-----------------|
+| `idle` `walk` `jump` `receive` `aim` `smash` `super` `panic` `victory` `defeat` | `<anim>.webm` |
 
-| frame | rôle | `<POSE JAMBES>` (vue de côté, face à DROITE) — obligatoire VERBATIM |
-|-------|------|---------------------------------------------------------------------|
-| `walk_0` | **APPUI A** | `WIDE stride: LEFT foot planted FLAT far FORWARD, RIGHT leg stretched far BACK (toe down), clear gap between feet, RIGHT arm swung FORWARD, left arm back` |
-| `walk_1` | **PASSAGE** | `PASSING pose ONLY: BOTH legs CLOSE together under the body, feet nearly SIDE-BY-SIDE / overlapping silhouette, knees soft, NOT a wide stride, arms near torso (neutral)` |
-| `walk_2` | **APPUI B** | `WIDE stride MIRROR of walk_0: RIGHT foot planted FLAT far FORWARD, LEFT leg stretched far BACK, clear gap between feet, LEFT arm swung FORWARD, right arm back` |
-| `walk_3` | **PASSAGE** | `PASSING pose again: legs CLOSE together under body (like walk_1), but arms OPPOSITE to walk_1; still NOT a wide stride` |
+- WebM **VP9 + alpha** (ou MP4 fond magenta → `tools/mp4_to_char_webm.py`)
+- `idle_face` = **PNG seulement** (menus / dialogues) — pas de vidéo
+- Optionnel : `"walkIntroSec": N` si le walk.webm commence par une intro idle
 
-🚫 **INTERDIT** :
-- 4× le même demi-pas (le défaut n°1) — si `walk_0`≈`walk_1`≈`walk_2`≈`walk_3` → **rejeter le lot**
-- `walk_1` / `walk_3` en stride large (pieds écartés) — ce n'est PAS un passage
-- `walk_0` et `walk_2` avec le **même** pied devant
-- pose idle / debout / geste signature / saut
+### PNG (toujours requis pour le pick d'anim)
 
-✅ **QA walk OBLIGATOIRE** (ouvrir les 4 PNG côte à côte, ou `_contact.png`) :
-1. Silhouette `walk_0` ≠ `walk_2` : pied **gauche** devant vs pied **droit** devant (miroir).
-2. Silhouette `walk_1` et `walk_3` : jambes **collées** (écart pieds << stride) — si on voit un grand écart = échec.
-3. En lecture rapide 0→1→2→3→0 : on doit lire clairement **appui → passage → appui opposé → passage**.
-4. **Heuristique post-cutout** : largeur canvas `walk_1`/`walk_3` ≪ `walk_0`/`walk_2`
-   (ex. ~200 px vs ~380–400 px). Si les 4 largeurs sont proches → lot trop homogène, **rejeter**.
-→ Échec → **regénérer le lot walk** (ou frames fautives) via Codex, même `-i` ancre
-(`idle_1` de préférence). Prompt type : `raw/cygne/_regen_walk_fix.md` /
-`raw/<key>/_regen_walk_only.md` — forcer les mots `WIDE stride` / `PASSING` /
-`feet nearly SIDE-BY-SIDE` / `MIRROR`.
+`charPickAnim` ne choisit une anim que si les PNG de cette anim sont chargés
+(`charAnimReady`). Ensuite `drawSpriteChar` préfère la **vidéo** si prête.
 
-Contraintes communes à TOUTES les frames : même personnage (même visage, coupe,
-**tenue exacte du casting / de l’ancre**), couleurs ; **vue de côté face à DROITE**
-(sauf `idle_face` de face) ; corps ENTIER tête→pieds, pieds visibles, échelle et
-cadrage constants ; contours noirs épais, cel shading ; **fond MAGENTA uni
-#FF00FF** (chroma key, JAMAIS blanc), aucune ombre portée, aucun texte. Style =
-`docs/STYLE-REFERENCE.md` (grosse tête ~1/3, corps trapu chibi).
+Donc après les WebM : soit un pack PNG complet, soit des **stills extraites**
+des WebM pour remplir `anim_0..n-1` (voir étape 2C). Minimum absolu menus :
+`idle_face_0` + `idle_0` + `idle_1`.
 
-🚫 **Le perso est SEUL — aucun objet, aucune balle.** Même pour
-`receive`/`aim`/`smash` : **mains vides**. Pas d’accessoire tenu, sol, filet.
+Structure PNG de référence (`CHAR_ANIM_DEFAULTS`) :
+
+| anim | frames | notes |
+|------|:--:|---|
+| `idle_face` | 1 | FACE, buste (menus) |
+| `idle` | 2 | côté, face DROITE |
+| `walk` | 4 | appui / passage / appui / passage |
+| `jump` | 3 | |
+| `receive` `aim` | 2 | mains VIDES |
+| `smash` | 3 | main ouverte, pas de balle |
+| `super` | 4 | signature (`superName`) |
+| `panic` `victory` `defeat` | 2 | |
+
+Contraintes visuelles communes : fond **MAGENTA #FF00FF**, perso **SEUL**,
+mains **VIDES**, côté face **DROITE** (sauf `idle_face`), grosse tête ~1/3,
+tenue = casting. Style : `docs/STYLE-REFERENCE.md`. Fiction : `docs/FICTIONNALISATION.md`.
 
 ---
 
 ## Étape 0 — RÉSOUDRE le perso (casting = source de vérité)
 
-Invoqué avec un nom (`/sommet-character volkoi`, `safran`, …), l'agent :
+Invoqué avec un nom (`/sommet-character timonier`, `volkoi`, …) :
 
-1. **Résout la clé** : cherche dans `tools/genassets/casting.py` → `CHARACTERS`
-   par `key`, `name` (insensible à la casse / accents) ou alias évident.
-   La **clé technique** = dossier `raw/<key>/` + `assets/<key>/`.
-2. **Lit le `look` VERBATIM** + `name` / `nation`. Ce texte EST `<ARCHÉTYPE>`.
-3. **Ne réécrit PAS la tenue.** Si c'est dans le `look`, c'est **voulu**.
-4. Si le `look` est absent ou trop vague → **compléter `casting.py` d'abord**,
-   puis seulement générer.
-5. Fiche miroir : aligner `docs/chars/<key>.yaml` sur le même look / nom.
-
-> **Fictionnalisation ≠ libre-échange à la génération.** Casser les marqueurs
-> d'un vrai dirigeant se fait **dans le casting**. Ensuite le skill **obéit**.
+1. Résoudre la **clé** dans `tools/genassets/casting.py` → `CHARACTERS`
+   (`key` / `name` / alias).
+2. Lire le `look` **VERBATIM** (+ `name` / `nation`) → c'est `<ARCHÉTYPE>`.
+3. **Ne pas réécrire la tenue.** Compléter `casting.py` d'abord si le look
+   est vague.
+4. Aligner `docs/chars/<key>.yaml` sur le même look / nom.
 
 ---
 
-## Étape 1 — GÉNÉRATION pixels (Grok → Codex)
+## Étape 1 — GROK : identité + quelques images
 
-### 1A — Grok : ancre d’identité = `idle_1`
+**But** : verrouiller le perso une fois pour toutes, pas produire les 27 frames.
 
-**Grok génère UNE image** (idéalement `idle_1` : debout repos, côté face à droite,
-corps entier, fond MAGENTA #FF00FF) et l’enregistre dans
-`raw/<key>/idle_1.png` (puis cutout partiel ou copie vers `assets/<key>/idle_1.png`
-après QA visuelle).
+### Set minimal (obligatoire)
 
-Cette image est la **vérité d’identité** (visage, cheveux, tenue, proportions,
-échelle, trait). Tout le reste en découle.
+| fichier | rôle |
+|---------|------|
+| `idle_1.png` | **LOCK identité** (côté droite, corps entier, magenta) |
+| `idle_face_0.png` | portrait FACE menus / Histoire |
+| `idle_0.png` | 2ᵉ frame idle (variation légère) |
 
-Optionnel : Grok peut aussi poser `idle_face_0` (portrait face) si on veut valider
-le look menu avant les lots Codex — sinon Codex le dérive du lot 1.
+### Set utile (recommandé — refs pour Gemini)
 
-Prompt Grok (ancre) = bloc FIXE + `<ARCHÉTYPE>` (= `look` verbatim) + pose idle :
+Une image par geste, côté droite, magenta — sert de « ton de pose » joint au
+prompt vidéo (pas besoin d'un cycle walk 4 frames ici) :
+
+`walk_0`, `jump_0`, `receive_0`, `aim_0`, `smash_0`, `super_0`,
+`panic_0`, `victory_0`, `defeat_0` (au choix, 3–6 refs suffisent).
+
+Enregistrer dans `raw/<key>/`, puis :
+
+```bash
+python3 tools/cutout.py raw/<key> assets/<key>
+```
+
+Ne **jamais écraser** une bonne `idle_1` déjà validée.
+
+### Prompt Grok (ancre `idle_1`)
 
 ```
 ONE single HUMAN cartoon MAN, chibi political caricature, VERY big head and
@@ -133,128 +119,206 @@ MAGENTA #FF00FF chroma-key background (uniform magenta, fills the whole frame),
 no ground shadow, no text.
 ```
 
-Suffixe Steam en fin de `<ARCHÉTYPE>` :
-`(composite mascot archetype — must NOT resemble any real politician)`.
+Suffixe Steam : `(composite mascot archetype — must NOT resemble any real politician)`.
 
-Négatif : `ball, volleyball, sports ball, any ball, held object, prop, equipment,
-furniture, net, ground, floor, photorealism, 3d render, sketch, painterly, soft
-shading, animal, cat, furry, anthropomorphic, mascot costume, gradient background,
-textured background, scenery background, white background, cropped limbs, text,
-watermark, recognizable real politician, real person likeness, real national flag,
-national emblem, brand logo, religious symbol, wrong outfit, formal business suit
-(unless look says suit)`.
+Négatif type : ball, props, photorealism, 3D, white/gradient background, real
+politician likeness, real flags, wrong outfit, cropped limbs, text, watermark.
 
-⚠️ Fictionnalisation / Steam : détail dans `docs/FICTIONNALISATION.md`. Si le
-rendu est immédiatement identifiable → regénérer l’ancre (exagérer chibi),
-**sans changer la tenue du casting**.
+✅ **QA ancre** avant toute vidéo : tenue = casting, magenta, pieds visibles,
+échelle OK, Steam OK. Sinon refaire Grok.
 
-✅ **QA ancre** avant Codex : tenue = casting, fond magenta, pieds visibles,
-échelle OK, Steam OK. Sinon refaire Grok — ne pas empiler 26 poses sur une
-mauvaise ancre.
-
-### 1B — Codex CLI : dériver les autres poses par lots de 3–4
-
-**Ancre LOCK** (choisie par l’utilisateur / l’agent) = **une** de :
-`idle_0` | `idle_1` | `idle_face_0`. Joindre **cette** image (`-i`).
-**Ne jamais écraser l’ancre** (ni raw ni assets).
-
-| Ancre | Frames à générer (26) | Lot 1 adapté |
-|-------|------------------------|--------------|
-| `idle_1` | tout sauf `idle_1` | `idle_face_0`, `idle_0` |
-| `idle_0` | tout sauf `idle_0` | `idle_face_0`, `idle_1` |
-| `idle_face_0` | tout sauf `idle_face_0` | `idle_0`, `idle_1` (corps entier dérivés du visage + tenue visible / casting) |
-
-Si l’ancre est `idle_face_0` (buste face) : les poses corps = **même visage /
-cheveux / tenue**, vue côté face à droite, proportions chibi cohérentes — ne
-pas inventer une autre tête.
-
-Écrire `raw/<key>/_regen_codex_prompt.md` (ex. `raw/dorf/`, `raw/faucon/`),
-puis **une session Codex par perso** (ne pas paralléliser 2+ gens image — rate
-limit / WS drop). Lots **séquentiels** dans la session :
-
-```bash
-codex exec \
-  --dangerously-bypass-approvals-and-sandbox \
-  --skip-git-repo-check \
-  -C "$(pwd)" \
-  -i "assets/<key>/<ANCRE>.png" \
-  - \
-  < "raw/<key>/_regen_codex_prompt.md"
-```
-
-**Resume** (si coupure mid-flight) — **pas de `-C`** sur `resume` :
-
-```bash
-codex exec resume <session_id> \
-  --dangerously-bypass-approvals-and-sandbox \
-  --skip-git-repo-check \
-  -i "assets/<key>/<ANCRE>.png" \
-  - <<'EOF'
-…lots restants + rappel LOCK…
-EOF
-```
-
-Récupérer `session id:` dans le log. Relancer seulement les lots manquants ;
-copier d’abord les PNG déjà générés dans `~/.codex/generated_images/<session>/`.
-
-#### Lots canoniques (3–4 frames) — ordre fixe
-
-| lot | fichiers | notes |
-|-----|----------|--------|
-| 1 | selon ancre (table ci-dessus) | Manifest final `idle: 2` |
-| 2 | `walk_0`..`walk_3` | **critique** — QA walk avant de continuer |
-| 3 | `jump_0`..`jump_2` | |
-| 4 | `receive_0`, `receive_1`, `aim_0`, `aim_1` | mains vides |
-| 5 | `smash_0`..`smash_2` | main ouverte, pas de balle |
-| 6 | `super_0`..`super_3` | |
-| 7 | `panic_0`, `panic_1`, `victory_0`, `victory_1` | |
-| 8 | `defeat_0`, `defeat_1` | puis cutout global |
-
-Après **chaque lot** : `cp` → `raw/<key>/`, contact sheet, QA. Frame
-fautive → **regénérer le lot** (même `-i` ancre), pas tout le set.
-
-#### LOCK identité (à coller dans chaque prompt Codex)
-
-- Même perso que la référence jointe : visage, cheveux, **tenue EXACTE**
-  (celle de l’ancre, pas une « amélioration » casting), proportions, trait.
-- Fond MAGENTA #FF00FF, perso SEUL, mains VIDES, face à DROITE (sauf
-  `idle_face` = FACE), corps entier tête→pieds (sauf portrait).
-- Une image = une pose = `raw/<key>/<anim>_<n>.png`.
-
-Quand les 26 + ancre sont là → cutout (étape 2). Forcer `idle: 2`, `walk: 4`
-dans le manifest (Codex laisse parfois `idle: 1`).
-
-### Regen d’un perso existant (cohérence)
-
-Sans Grok si l’ancre est bonne : `-i` sur l’ancre choisie, lots 1→8, cutout.
-Ex. Dorf (`idle_1`), Faucon (`idle_0`). File d’attente multi-persos =
-**séquentielle** (un `codex exec` à la fois).
+Pour `idle_face` : même identité, **buste de FACE**, grosse tête, magenta.
+Pour les refs pose : même LOCK, une pose = une image (descriptions dans l'étape 2).
 
 ---
 
-## Étape 2 — INTÉGRATION (sur les 27 PNG rendus)
+## Étape 2 — GEMINI : vidéos WebM (cœur gameplay)
 
-1. **Vérifier** que `raw/<key>/` contient les 27 frames (noms exacts). Manquantes
-   → regénérer le lot concerné AVANT d'intégrer.
-2. **Détourer** : `python3 tools/cutout.py raw/<key> assets/<key>` → alpha,
-   ancrage pieds, planche `_contact.png` (halo, pieds, **tenue stable**,
-   identité). **Ne pas écraser `idle_1`** si le raw idle_1 est l’ancienne ancre
-   volontairement figée — sinon re-cutouter aussi idle_1 depuis raw.
-3. **manifest** `assets/<key>/manifest.json` : bloc `anims` canonique
-   (`idle_face` 1, **`idle` 2**, **`walk` 4**, jump 3, receive 2, aim 2,
-   smash 3, super 4, panic 2, victory 2, defeat 2) + `baseH: 110`, `footPad: 2`,
-   `lockAspect`, `serveHands` (calquer `assets/cygne/manifest.json`).
-   ⚠️ Codex peut laisser `idle: 1` — **corriger à 2** si `idle_0` + `idle_1`
-   existent.
-4. **Roster** : entrée dans `CHARACTERS` (`src/state.js`) — `key`, `name`,
-   `color`/`darkColor`, `stats`, multiplicateurs, `trait`, `superName`,
-   `superDesc`.
-5. **Story/sélection** : `idle_face` → portrait Histoire + sélection.
-6. **Vérifier** : `npm test` + préviz marche/saut/smash/super, pieds au sol,
-   pas de halo, **même tenue** partout.
+L'agent **prépare les 10 prompts remplis** (look casting + règles communes) et
+les donne à l'utilisateur. L'utilisateur génère dans Gemini (ou Sora) → MP4.
+L'agent convertit / câble.
+
+### 2A — Images à joindre (chaque génération)
+
+1. `assets/<key>/idle_1.png` — **LOCK identité** (obligatoire)
+2. (optionnel) `assets/<key>/<anim>_0.png` — ton du geste seulement
+3. (optionnel) `idle_face_0.png` si le modèle dérive trop
+
+### 2B — Kit de prompts (l'agent sort le kit COMPLET, déjà rempli)
+
+Coller en tête de **chaque** prompt le bloc commun, avec `<LOOK>` = `look`
+casting verbatim :
+
+```
+Using the attached image(s) as absolute IDENTITY LOCK (image 1 = character truth),
+generate ONE short looping character animation video for a 2D cartoon volleyball game.
+
+Character lock — match image 1 EXACTLY:
+<LOOK>
+(composite mascot archetype — must NOT resemble any real politician)
+
+Style / framing (mandatory):
+- Thick black ink outlines, flat cel shading, chibi oversized head ~1/3 height
+- Side view facing RIGHT, FULL BODY head→shoes, feet visible
+- EMPTY HANDS — NO ball, NO props, character ALONE
+- Solid flat PURE MAGENTA #FF00FF chroma-key background (uniform, whole frame)
+- No ground, no shadow, no text, no watermark
+- Locked camera: NO zoom, NO pan, constant scale/framing
+- Seamless loop: last frame ≈ first frame, NO hard cut, NO fade to black
+- Duration: 1.2–2.0 seconds, ~24fps
+- Prefer WebM VP9+alpha; if unavailable export MP4 with perfect flat #FF00FF magenta
+
+Negative: real politician likeness, real flags, photorealism, 3D render, white
+background, ground plane, camera move, volleyball, audience, captions, wrong outfit.
+```
+
+Puis **un prompt = une anim** (ordre recommandé) :
+
+| # | slot moteur | Animation: … (corps du prompt) |
+|---|-------------|--------------------------------|
+| 1 | `idle` | IDLE — standing at rest facing right, tiny breathing / weight shift, gentle arm settle. Hands empty. No walking. Loop. |
+| 2 | `walk` ← **RUN** | **RUN (recommandé)** — voir prompt dédié ci-dessous. Le moteur n’a qu’une clé `walk` ; `playbackRate` ralentit/accélère la vidéo (marche ↔ sprint). Brancher le MP4 sur `walk.webm`. |
+| 3 | `jump` | JUMP — crouch → launch → apex → start of fall → loop to crouch. Full body in frame. |
+| 4 | `receive` | RECEIVE / dig — arms joined low (forearm platform), knees soft, tiny ready bounce. EMPTY hands, NO ball. |
+| 5 | `aim` | AIM / set — both open hands raised above head, looking up, small ready pulse. EMPTY hands, NO ball. |
+| 6 | `smash` | SMASH (air attack) — arm cocked high → strike swing → follow-through, body in air, open empty hand, NO ball. Loop to cocked. |
+| 7 | `super` | SUPER — dramatic signature for this character's `superName` (outfit LOCK), readable silhouette, short flourish, loop. EMPTY hands. Adapter le geste au super (ex. Rempart, Hiver…). |
+| 8 | `panic` | PANIC — lean back, both arms up, startled bounce, loop. |
+| 9 | `victory` | VICTORY — arms raise celebration, small bounce, loop. |
+| 10 | `defeat` | DEFEAT — shoulders drop, head hangs, slight sway, loop. |
+
+#### Prompt RUN (slot `walk` — à privilégier)
+
+```
+…[bloc commun]…
+Animation: RUN cycle facing right — energetic cartoon sprint loop.
+Clear LEFT-foot-forward stride → passing (legs close) → RIGHT-foot-forward
+→ passing again. Big arm pump opposite to legs, forward lean, feet leave
+ground briefly each step. Continuous seamless loop (NO idle intro, NO walk-to-run
+transition, NO stop). EMPTY hands, NO ball.
+Filename intent: run.mp4  (will be converted to walk.webm)
+```
+
+Fallback seulement si RUN trop extrême pour le perso :
+
+```
+…[bloc commun]…
+Animation: WALK cycle facing right — LEFT-foot-forward → passing → RIGHT-foot-forward
+→ passing. Exaggerated cartoon steps, arms opposite legs. Continuous loop
+(no idle intro). Filename intent: walk.mp4
+```
+
+> Dorf : parfois `walk` = intro idle 0–2 s + course → alors
+> `"walkIntroSec": 2` dans le manifest. **Nouveau perso : préférer RUN pur
+> sans intro** (plus simple, boucle propre).
+
+`Filename intent: <anim>.mp4` / `run.mp4` (ou préfixe Gemini `Animation_RUN_…` /
+`Animation_<ANIM>_…`).
+
+Documenter le mapping dans `raw/<key>/_video_map.md` (ex. `raw/volkoi/_video_map.md`).
+
+### 2C — Conversion MP4 → WebM (+ PNG fallback)
+
+Quand les fichiers sont dans `~/Downloads` :
+
+> Préférer renommer en `<key>_<anim>.mp4` (ex. `timonier_run.mp4`) si
+> plusieurs persos coexistent dans Downloads — les noms Gemini
+> `Animation_RUN_…` / `Animation_WALK_…` sont ambigus (premier match gagne).
+>
+> Pour le slot **walk**, le batch accepte aussi `<key>_run.mp4` /
+> `Animation_RUN_*.mp4` → écrit `walk.webm` (priorité RUN > WALK).
+
+```bash
+# Batch générique (<key>_<anim|run>.mp4 ou Animation_<ANIM|RUN>_*.mp4)
+python3 tools/mp4_to_char_webm.py --batch <key>
+
+# Ou unitaire (RUN → walk.webm)
+python3 tools/mp4_to_char_webm.py ~/Downloads/<key>_run.mp4 assets/<key>/walk.webm
+```
+
+Le batch copie aussi vers `raw/<key>/<key>_<anim>.mp4` (gitignoré ; run →
+`raw/<key>/<key>_run.mp4` + `walk.webm`).
+
+**PNG fallback** (si pack PNG incomplet) : extraire N stills espacées de chaque
+WebM vers `assets/<key>/<anim>_0.png` … pour satisfaire `charAnimReady`, **sans
+écraser** `idle_1` / `idle_face_0` déjà validés par Grok. Ex. :
+
+```bash
+# N = compteur manifest (walk→4, jump→3, …)
+ffmpeg -y -i assets/<key>/walk.webm -vf "fps=4" /tmp/w_%02d.png
+# puis copier / renommer les N meilleures en walk_0..n-1 (cutout si besoin)
+```
+
+Ou régénérer les stills manquants via Grok (refs), pas via Codex par défaut.
+
+### 2D — Manifest vidéos
+
+Dans `assets/<key>/manifest.json` :
+
+```json
+"videos": {
+  "idle": "idle.webm",
+  "walk": "walk.webm",
+  "jump": "jump.webm",
+  "receive": "receive.webm",
+  "aim": "aim.webm",
+  "smash": "smash.webm",
+  "super": "super.webm",
+  "panic": "panic.webm",
+  "victory": "victory.webm",
+  "defeat": "defeat.webm"
+}
+```
+
+Ajuster `lockAspect` à la largeur moyenne des WebM (évite le « pulse »).
+Si le walk a une intro idle : `"walkIntroSec": 2` (comme Dorf).
+
+---
+
+## Étape 3 — INTÉGRATION roster
+
+1. PNG menus + stills / pack fallback OK ; 10 WebM présents.
+2. `manifest.json` : `anims` canoniques + `videos` + `baseH` / `footPad` /
+   `lockAspect` / `serveHands` (calquer `assets/cygne/manifest.json`).
+3. Roster `CHARACTERS` dans `src/state.js` : `key`, `name`, couleurs, stats,
+   `trait`, `superName`, `superDesc`.
+4. Story / sélection : `idle_face` pour portraits.
+5. Vérif : hard refresh navigateur Chromium (WebM VP9+alpha), marche / saut /
+   smash / super, pieds au sol, pas de halo magenta, **même tenue**.
+6. `npm test`.
+
+---
+
+## Regen / cas particuliers
+
+| Besoin | Action |
+|--------|--------|
+| Nouveau perso | Étapes 0 → 1 → 2 → 3 |
+| Remplacer les anims (ex. Volkoï, Timonier) | Étape 2 seulement (LOCK = `idle_1` existante) |
+| Corriger une seule anim | 1 prompt Gemini + convert unitaire |
+| Fallback PNG sans vidéo (Safari / debug) | Pack PNG ; Codex lots **optionnel** (legacy, voir ci-dessous) |
+
+### Legacy optionnel — Codex 27 PNG
+
+Uniquement si on veut un pack PNG complet sans vidéos, ou regen walk 4 frames
+pixel-perfect. Voir anciens prompts `raw/<key>/_regen_codex_prompt.md` /
+`raw/dorf/_regen_codex_prompt.md`. **Une** session Codex à la fois, lots 3–4,
+ancre `-i assets/<key>/idle_1.png`. Ce n'est **plus** le chemin par défaut.
+
+---
+
+## Checklist agent (quand l'utilisateur demande un perso)
+
+- [ ] Casting résolu, look verbatim
+- [ ] Kit prompts Gemini **rempli** (10 blocs) remis à l'utilisateur + images à joindre
+- [ ] Après MP4 : `--batch <key>`, `_video_map.md`, bloc `videos` + `lockAspect`
+- [ ] PNG menus + fallback stills si besoin
+- [ ] Roster / tests si perso nouveau
 
 ## Références
 
-`docs/PIPELINE-PERSONNAGE.md` · `docs/PIPELINE-ASSETS.md` · `docs/STYLE-REFERENCE.md`
-· `docs/FICTIONNALISATION.md` · casting : `tools/genassets/casting.py`
-· exemple prompt Codex : `raw/dorf/_regen_codex_prompt.md`.
+- Conversion : `tools/mp4_to_char_webm.py`
+- Exemples mapping : `raw/volkoi/_video_map.md`, `raw/dorf/_video_map.md`
+- Casting : `tools/genassets/casting.py`
+- Style / fiction : `docs/STYLE-REFERENCE.md`, `docs/FICTIONNALISATION.md`
+- Runtime : `src/char-sprites.js` (`loadCharVideos`, `drawSpriteChar`)

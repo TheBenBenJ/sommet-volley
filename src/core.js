@@ -56,9 +56,9 @@ let GAMEPLAY_V2 = true;
 // Entrées de debug (toggle V1/V2 sur `, cheat « rler ») : jamais en prod —
 // un seul appui désynchronise une partie en ligne.
 const DEV_CHEATS = false;
-const RECEIVE_R = 56;          // smash/X + cloche : assez large, sans « aimant » trop fort
-const AUTO_LOB_DX = 28;        // auto-cloche : balle quasi au-dessus du joueur
-const AUTO_LOB_R = 42;         // auto-cloche : rayon path tête (balle qui tombe dessus)
+const RECEIVE_R = 38;          // dig/smash contact — serré (évite aimant / téléport lointain)
+const AUTO_LOB_DX = 22;        // auto-cloche : balle quasi au-dessus du joueur
+const AUTO_LOB_R = 32;         // auto-cloche : rayon path (balle qui tombe dessus)
 const HOLD_MAX = 45;           // ~0,75 s de contrôle
 const HOLD_SPEED_MUL = 0.6;    // vitesse du porteur pendant le contrôle
 const AIM_CONE = (150 * Math.PI) / 180;

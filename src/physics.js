@@ -565,14 +565,17 @@ function applyDirectedHit(blob, ang, speed, smashTicks) {
   ball.smash = smashTicks || 0;
   ball.lastHitTick = tick; // 1 frappe / tick (évite téléport coéquipier 2v2)
   clearBallHold();
-  // Dig au sol : ancrer le contact au milieu du corps (sinon la balle reste sur le crâne)
+  // Dig au sol : ancrer au torse seulement si déjà proche (sinon snap = téléport)
   const isDig = blob.onGround && !(smashTicks > 0);
   const h = isDig && blob.receiveCircle ? blob.receiveCircle : blobHitCircle(blob);
   if (isDig) {
-    const face = (typeof charFaceRight === "function" && charFaceRight(blob))
-      ? 1 : (blob.side === 0 ? 1 : -1);
-    ball.x = h.x + face * 8;
-    ball.y = h.y;
+    const dist0 = Math.hypot(ball.x - h.x, ball.y - h.y);
+    if (dist0 < RECEIVE_R * 0.55) {
+      const face = (typeof charFaceRight === "function" && charFaceRight(blob))
+        ? 1 : (blob.side === 0 ? 1 : -1);
+      ball.x = h.x + face * 8;
+      ball.y = h.y;
+    }
   }
   // Sépare si encore en chevauchement
   const dx = ball.x - h.x, dy = ball.y - h.y;
@@ -676,11 +679,11 @@ function ballLandsOnPlayer(blob) {
   return ballPathDistToBlob(blob) <= AUTO_LOB_R;
 }
 
-/** Rayon de dig : un peu plus large contre smash / balle très rapide. */
+/** Rayon de dig : léger bonus contre smash / balle très rapide (sans aimant). */
 function receiveHitRadius() {
   const spd = Math.hypot(ball.vx, ball.vy);
-  if (ball.smash > 0 || spd > 11.2) return RECEIVE_R + 18;
-  if (spd > 9.2) return RECEIVE_R + 8;
+  if (ball.smash > 0 || spd > 11.2) return RECEIVE_R + 10;
+  if (spd > 9.2) return RECEIVE_R + 4;
   return RECEIVE_R;
 }
 
