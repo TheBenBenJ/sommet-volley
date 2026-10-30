@@ -65,6 +65,11 @@ def convert_mp4(src: Path, out: Path, fps: int = 24, height: int = 536) -> None:
             r, g, b = rgb[:, :, 0], rgb[:, :, 1], rgb[:, :, 2]
             pinkish = (r > 120) & (b > 80) & (g < 120) & (r > g + 40) & (b > g + 20)
             alpha = np.where(pinkish & (dist < 90), 0, alpha)
+            # Filigrane Gemini : étoile fixe en bas à droite (mêmes proportions sur
+            # chaque clip) ; seul le rose part, une chaussure dessous reste entière.
+            star = np.zeros(alpha.shape, dtype=bool)
+            star[int(h * 0.885):int(h * 0.927), int(w * 0.797):int(w * 0.87)] = True
+            alpha = np.where(star & (r > 120) & (b > 120) & (r > g + 20), 0, alpha)
             a8 = (alpha * 255).astype(np.uint8)
             return np.dstack([rgb.astype(np.uint8), a8])
 
