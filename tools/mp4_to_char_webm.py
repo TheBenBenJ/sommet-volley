@@ -3,7 +3,8 @@
 
 Usage:
   python3 tools/mp4_to_char_webm.py ~/Downloads/cygne_idle.mp4 assets/cygne/idle.webm
-  python3 tools/mp4_to_char_webm.py --batch cygne
+  python3 tools/mp4_to_char_webm.py --batch volkoi
+  python3 tools/mp4_to_char_webm.py --batch timonier
 """
 from __future__ import annotations
 
@@ -22,6 +23,20 @@ DEFAULT_ANIMS = [
     "idle", "walk", "jump", "receive", "aim", "smash",
     "super", "panic", "victory", "defeat",
 ]
+
+# Noms Gemini tronqués → anim (préfixe Animation_<MOT>_)
+ANIM_PREFIX = {
+    "idle": "Animation_IDLE_",
+    "walk": "Animation_WALK_",
+    "jump": "Animation_JUMP_",
+    "receive": "Animation_RECEIVE_",
+    "aim": "Animation_AIM_",
+    "smash": "Animation_SMASH_",
+    "super": "Animation_SUPER_",
+    "panic": "Animation_PANIC_",
+    "victory": "Animation_VICTORY_",
+    "defeat": "Animation_DEFEAT_",
+}
 
 
 def convert_mp4(src: Path, out: Path, fps: int = 24, height: int = 536) -> None:
@@ -104,16 +119,61 @@ def convert_mp4(src: Path, out: Path, fps: int = 24, height: int = 536) -> None:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
-def batch_cygne(dl: Path) -> None:
-    raw = ROOT / "raw" / "cygne"
-    out_dir = ROOT / "assets" / "cygne"
+def _glob_one(dl: Path, pattern: str) -> Path | None:
+    matches = sorted(dl.glob(pattern))
+    if not matches:
+        return None
+    if len(matches) > 1:
+        print(f"WARN several {pattern}, using {matches[0].name}")
+    return matches[0]
+
+
+def find_anim_mp4(dl: Path, key: str, anim: str) -> Path | None:
+    """Résout un MP4 Downloads.
+
+    Ordre : <key>_<anim>.mp4 → Animation_<ANIM>_*.mp4.
+    Pour walk : RUN d'abord (<key>_run.mp4 / Animation_RUN_*), puis WALK.
+    """
+    if anim == "walk":
+        for candidate in (
+            dl / f"{key}_run.mp4",
+            _glob_one(dl, "Animation_RUN_*.mp4"),
+            dl / f"{key}_walk.mp4",
+            _glob_one(dl, "Animation_WALK_*.mp4"),
+        ):
+            if candidate and Path(candidate).exists():
+                return Path(candidate)
+        return None
+
+    short = dl / f"{key}_{anim}.mp4"
+    if short.exists():
+        return short
+    prefix = ANIM_PREFIX.get(anim)
+    if prefix:
+        return _glob_one(dl, f"{prefix}*.mp4")
+    return None
+
+
+def batch_key(key: str, dl: Path) -> None:
+    """Convertit les 10 anims pour un perso (cygne, volkoi, timonier, …)."""
+    raw = ROOT / "raw" / key
+    out_dir = ROOT / "assets" / key
     raw.mkdir(parents=True, exist_ok=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
     for anim in DEFAULT_ANIMS:
-        src = dl / f"cygne_{anim}.mp4"
-        if not src.exists():
-            print(f"SKIP missing {src.name}")
+        src = find_anim_mp4(dl, key, anim)
+        if src is None:
+            if anim == "walk":
+                print(f"SKIP missing {key}_run.mp4 / Animation_RUN_* / walk")
+            else:
+                prefix = ANIM_PREFIX.get(anim, f"Animation_{anim.upper()}_")
+                print(f"SKIP missing {prefix}*.mp4 / {key}_{anim}.mp4")
             continue
-        shutil.copy2(src, raw / f"cygne_{anim}.mp4")
+        # Conserver le nom source (run vs walk) dans raw/
+        raw_name = src.name if src.name.startswith(f"{key}_") else f"{key}_{anim}.mp4"
+        if anim == "walk" and "run" in src.name.lower():
+            raw_name = f"{key}_run.mp4"
+        shutil.copy2(src, raw / raw_name)
         convert_mp4(src, out_dir / f"{anim}.webm")
 
 
@@ -121,14 +181,18 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("src", nargs="?", type=Path)
     ap.add_argument("out", nargs="?", type=Path)
-    ap.add_argument("--batch", choices=["cygne"])
+    ap.add_argument(
+        "--batch",
+        metavar="KEY",
+        help="Perso (ex. cygne, volkoi, timonier) — lit ~/Downloads",
+    )
     ap.add_argument("--downloads", type=Path, default=Path.home() / "Downloads")
     args = ap.parse_args()
-    if args.batch == "cygne":
-        batch_cygne(args.downloads)
+    if args.batch:
+        batch_key(args.batch.strip().lower(), args.downloads)
         return
     if not args.src or not args.out:
-        ap.error("src out required, or --batch cygne")
+        ap.error("src out required, or --batch <key>")
     convert_mp4(args.src.expanduser(), args.out)
 
 

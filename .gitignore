@@ -27,6 +27,7 @@ raw/**/_bak*/
 raw/**/_extra_old/
 raw/**/_pre_*_bak/
 raw/**/_merged_from_*/
+docs/**/_regen*.txt
 # Sources WIP audio/ball/fx (restent locales)
 raw/ball/
 raw/fx/
